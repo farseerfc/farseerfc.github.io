@@ -23,7 +23,7 @@ http://www.tipue.com/search
                'mode'                   : 'static',
                'liveDescription'        : '*',
                'liveContent'            : '*',
-               'contentLocation'        : 'tipuesearch/tipuesearch_content.json'
+               'contentLocation'        : 'tipuesearch_content.json'
 
           }, options);
 
