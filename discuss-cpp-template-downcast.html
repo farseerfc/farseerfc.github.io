@@ -27,6 +27,10 @@
             <meta property="article:tag" content="template" />
             <meta property="article:author" content="farseerfc" />
 
+    <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@farseerfc">
+        <meta name="twitter:creator" content="@farseerfc">
+    <meta name="twitter:domain" content="//farseerfc.github.io">
 
     <!-- Bootstrap -->
         <link rel="stylesheet" href="//farseerfc.github.io/theme/css/bootstrap.min.css" type="text/css"/>
@@ -35,6 +39,7 @@
     <link href="//farseerfc.github.io/theme/css/pygments/monokai.css" rel="stylesheet">
     <link href="//farseerfc.github.io/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
         <link href="//farseerfc.github.io/theme/css/html4css1.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/theme/css/typogrify.css" rel="stylesheet">
     <link rel="stylesheet" href="//farseerfc.github.io/theme/css/style.css" type="text/css"/>
 
         <link href="//farseerfc.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
@@ -190,8 +195,8 @@ Farseerfc's Blog            </a>
 <span class="p">}</span>
 </pre></div>
 <p>奇怪的是重載決議的時候， <tt class="docutils literal">f</tt> 的情況下它就不讓我特化的 <tt class="docutils literal">f&lt;A&gt;</tt> 進來。</p>
-<p>但是在 <tt class="docutils literal">ff</tt> 的情況下， <tt class="docutils literal">ff&lt;BB&lt;long&gt;&gt;</tt> 卻進來了。</p>
-<p>在VC10和GCC3.4下測試</p>
+<p>但是在 <tt class="docutils literal">ff</tt> 的情況下， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt> 卻進來了。</p>
+<p>在<span class="caps">VC10</span>和<span class="caps">GCC3</span>.4下測試</p>
 </div>
 <div class="section" id="id3">
 <h2>我的解答</h2>
@@ -201,23 +206,23 @@ Farseerfc's Blog            </a>
 <h3>首先看ff的情況。</h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p>處理到這句的時候，編譯器看到了 <tt class="docutils literal">DD&lt;long&gt;</tt> 的實例化，於是去實例化 <tt class="docutils literal">DD#long</tt> ，繼而實例
-化了 <tt class="docutils literal">BB#long</tt> 。</p>
+<p>處理到這句的時候，編譯器看到了 <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt> 的實例化，於是去實例化 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ，繼而實例
+化了 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
 <p>這句，首先計算重載函數集合。</p>
-<p>第一步，需要從參數 <tt class="docutils literal">DD#long <span class="pre">-&gt;</span> BB&lt;T&gt;</tt> 推斷 <tt class="docutils literal">ff&lt;T&gt;</tt> 的 <tt class="docutils literal">T</tt> 。根據函數模板參數推斷規則：</p>
+<p>第一步，需要從參數 <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt> 推斷 <tt class="docutils literal">ff&lt;T&gt;</tt> 的 <tt class="docutils literal">T</tt> 。根據函數模板參數推斷規則：</p>
 <pre class="literal-block">
 ``class_template_name&lt;T&gt;`` 類型的參數，可以用於推斷 ``T`` 。
 </pre>
-<p>於是編譯器推斷 <tt class="docutils literal">T</tt> 爲 <tt class="docutils literal">long</tt> 。這裏就算不是 <tt class="docutils literal">BB</tt> 而是完全無關的 <tt class="docutils literal">CC</tt> 都可以推斷成功，只要 <tt class="docutils literal">CC</tt> 也
-是一個 <tt class="docutils literal">CC&lt;T&gt;</tt> 形式的模板。</p>
+<p>於是編譯器推斷 <tt class="docutils literal">T</tt> 爲 <tt class="docutils literal">long</tt> 。這裏就算不是 <tt class="docutils literal"><span class="caps">BB</span></tt> 而是完全無關的 <tt class="docutils literal"><span class="caps">CC</span></tt> 都可以推斷成功，只要 <tt class="docutils literal"><span class="caps">CC</span></tt> 也
+是一個 <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt> 形式的模板。</p>
 <p>第二步，模板特化匹配。因爲只有一個模板，所以匹配了最泛化的 <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
 <p>第三步，模板實例化。</p>
 <p>推斷了 <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt> 之後，編譯器實例化 <tt class="docutils literal">ff#long</tt> 。</p>
 <p>重載函數集合： <tt class="docutils literal">{ff#long}</tt></p>
-<p>然後重載抉擇找到唯一的可匹配的實例 <tt class="docutils literal">ff#long</tt> ，檢查實際參數 <tt class="docutils literal">DD#long</tt> 可以隱式轉換到
-形式參數 <tt class="docutils literal">BB#long</tt> ，從而生成了這次函數調用。</p>
+<p>然後重載抉擇找到唯一的可匹配的實例 <tt class="docutils literal">ff#long</tt> ，檢查實際參數 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> 可以隱式轉換到
+形式參數 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ，從而生成了這次函數調用。</p>
 </div>
 <div class="section" id="f">
 <h3>再來看f的情況。</h3>
@@ -234,7 +239,7 @@ Farseerfc's Blog            </a>
 <p>第三步，模板實例化。</p>
 <p><tt class="docutils literal">B</tt> 帶入 <tt class="docutils literal">f&lt;T&gt;</tt> 實例化成 <tt class="docutils literal">f#B</tt> 的過程中，實例化 <tt class="docutils literal">traits#B</tt> 。</p>
 <p>由於沒有針對 <tt class="docutils literal">B</tt> 的特化，所以用 <tt class="docutils literal">traits&lt;T&gt;</tt> 模板， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ，進而 <tt class="docutils literal">enable_if#false</tt> 沒有 <tt class="docutils literal">type</tt> ，出錯。</p>
-<p>唯一的模板匹配出錯，重載函數集合爲空，SFINAE原則不能找到合適的匹配，於是報錯。</p>
+<p>唯一的模板匹配出錯，重載函數集合爲空，<span class="caps">SFINAE</span>原則不能找到合適的匹配，於是報錯。</p>
 </div>
 </div>
 
@@ -430,6 +435,22 @@ Farseerfc's Blog            </a>
             <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
     </div>
 </div>
+    <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@farseerfc">
+        <meta name="twitter:creator" content="@farseerfc">
+    <meta name="twitter:domain" content="//farseerfc.github.io">
+<div class="panel panel-default">
+    <div class="panel-heading">
+    	<h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+    </div>
+    <div class="panel-body" id="twitter_timeline">
+        <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+    </div>
+</div>
+
+<script>
+$(function(){!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");});</script>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
