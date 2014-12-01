@@ -9,7 +9,11 @@ var github = (function(){
     for(i = 0; i < repos.length; i++) {
       fragment += '<div class="list-group-item">'
       fragment += ' <div class="row-action-primary">'
-      fragment += '   <i class="fa fa-code-fork"></i>'
+      if(repos[i].fork){
+        fragment += '   <i class="fa fa-code-fork"></i>'
+      }else{
+        fragment += '   <i class="fa fa-code"></i>'
+      }
       fragment += ' </div>'
       fragment += ' <div class="row-content">'
       fragment += '   <h6 class="list-group-item-heading">'
