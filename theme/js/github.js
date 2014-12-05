@@ -17,7 +17,7 @@ var github = (function(){
       fragment += ' </div>'
       fragment += ' <div class="row-content">'
       fragment += '   <h6 class="list-group-item-heading">'
-      fragment += '     <a href="'+repos[i].html_url+'">'+repos[i].name+'</a>'
+      fragment += '     <a href="'+repos[i].html_url+'" target="_blank">'+repos[i].name+'</a>'
       fragment += '   </h6>'
       fragment += '   <div class="list-group-item-text"><small>'
       fragment += repos[i].description
