@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++,template,C" />
-        <meta name="description" content="这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..." />
+        <meta name="description" content="这两天在饮水思源的 C 板 ， 关于 C++ 模板的类型转换的一个讨论 ， 后面是我的解答 。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许 cast-down， 于是我写了个东西 ： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..." />
 
         <meta property="og:site_name" content="Farseerfc's Blog" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="关于C++模板的类型转换的讨论"/>
         <meta property="og:url" content="//farseerfc.github.io/discuss-cpp-template-downcast-zhs.html"/>
-        <meta property="og:description" content="这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..."/>
+        <meta property="og:description" content="这两天在饮水思源的 C 板 ， 关于 C++ 模板的类型转换的一个讨论 ， 后面是我的解答 。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许 cast-down， 于是我写了个东西 ： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..."/>
         <meta property="article:published_time" content="2012-02-26" />
             <meta property="article:section" content="programming" />
             <meta property="article:tag" content="C++" />
@@ -155,14 +155,14 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <p>这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。</p>
+                <p> 这两天在饮水思源的 C 板 ， 关于 C++ 模板的类型转换的一个讨论 ， 后面是我的解答 。</p>
 <div class="section" id="id1">
-<h2>讨论地址</h2>
+<h2> 讨论地址 </h2>
 <p><a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html">http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html</a></p>
 </div>
 <div class="section" id="id2">
-<h2>原问题</h2>
-<p>今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：</p>
+<h2> 原问题 </h2>
+<p> 今天在书上看到模板演绎的时候可以允许 cast-down， 于是我写了个东西 ：</p>
 <div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
 
@@ -204,55 +204,72 @@ Farseerfc's Blog            </a>
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p>奇怪的是重载决议的时候， <tt class="docutils literal">f</tt> 的情况下它就不让我特化的 <tt class="docutils literal">f&lt;A&gt;</tt> 进来。</p>
-<p>但是在 <tt class="docutils literal">ff</tt> 的情况下， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt> 却进来了。</p>
-<p>在<span class="caps">VC10</span>和<span class="caps">GCC3</span>.4下测试</p>
+<p> 奇怪的是重载决议的时候 ， <tt class="docutils literal">f</tt>  的情况下它就不让我特化的  <tt class="docutils literal">f&lt;A&gt;</tt>  进来 。</p>
+<p> 但是在  <tt class="docutils literal">ff</tt>  的情况下 ， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt>  却进来了 。</p>
+<p> 在 <span class="caps">VC10</span> 和 <span class="caps">GCC3</span>.4 下测试 </p>
 </div>
 <div class="section" id="id3">
-<h2>我的解答</h2>
-<p>我们来设身处地地作为编译器，看一遍到底发生了什么。</p>
-<p>约定符号 <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt> 是把 <tt class="docutils literal">B</tt> 带入 <tt class="docutils literal">A&lt;T&gt;</tt> 的参数 <tt class="docutils literal">T</tt> 之后实例化得到的结果。</p>
+<h2> 我的解答 </h2>
+<p> 我们来设身处地地作为编译器 ， 看一遍到底发生了什么 。</p>
+<p> 约定符号  <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt>  是把  <tt class="docutils literal">B</tt>  带入  <tt class="docutils literal">A&lt;T&gt;</tt>  的参数  <tt class="docutils literal">T</tt>  之后实例化得到的结果 。</p>
 <div class="section" id="ff">
-<h3>首先看ff的情况。</h3>
+<h3> 首先看 ff 的情况 。</h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p>处理到这句的时候，编译器看到了 <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt> 的实例化，于是去实例化 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ，继而实例
-化了 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
+<p> 处理到这句的时候 ， 编译器看到了  <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt>  的实例化 ， 于是去实例化  <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ， 继而实例 
+ 化了  <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
-<p>这句，首先计算重载函数集合。</p>
-<p>第一步，需要从参数 <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt> 推断 <tt class="docutils literal">ff&lt;T&gt;</tt> 的 <tt class="docutils literal">T</tt> 。根据函数模板参数推断规则：</p>
+<p> 这句 ， 首先计算重载函数集合 。</p>
+<p> 第一步 ， 需要从参数  <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt>  推断  <tt class="docutils literal">ff&lt;T&gt;</tt>  的  <tt class="docutils literal">T</tt> 。 根据函数模板参数推断规则 ：</p>
 <pre class="literal-block">
-``class_template_name&lt;T&gt;`` 类型的参数，可以用于推断 ``T`` 。
+``class_template_name&lt;T&gt;``  类型的参数 ， 可以用于推断  ``T`` 。
 </pre>
-<p>于是编译器推断 <tt class="docutils literal">T</tt> 为 <tt class="docutils literal">long</tt> 。这里就算不是 <tt class="docutils literal"><span class="caps">BB</span></tt> 而是完全无关的 <tt class="docutils literal"><span class="caps">CC</span></tt> 都可以推断成功，只要 <tt class="docutils literal"><span class="caps">CC</span></tt> 也
-是一个 <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt> 形式的模板。</p>
-<p>第二步，模板特化匹配。因为只有一个模板，所以匹配了最泛化的 <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
-<p>第三步，模板实例化。</p>
-<p>推断了 <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt> 之后，编译器实例化 <tt class="docutils literal">ff#long</tt> 。</p>
-<p>重载函数集合： <tt class="docutils literal">{ff#long}</tt></p>
-<p>然后重载抉择找到唯一的可匹配的实例 <tt class="docutils literal">ff#long</tt> ，检查实际参数 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> 可以隐式转换到
-形式参数 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ，从而生成了这次函数调用。</p>
+<p> 于是编译器推断  <tt class="docutils literal">T</tt>  为  <tt class="docutils literal">long</tt> 。 这里就算不是  <tt class="docutils literal"><span class="caps">BB</span></tt>  而是完全无关的  <tt class="docutils literal"><span class="caps">CC</span></tt>  都可以推断成功 ， 只要  <tt class="docutils literal"><span class="caps">CC</span></tt>  也 
+ 是一个  <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt>  形式的模板 。</p>
+<p> 第二步 ， 模板特化匹配 。 因为只有一个模板 ， 所以匹配了最泛化的  <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
+<p> 第三步 ， 模板实例化 。</p>
+<p> 推断了  <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt>  之后 ， 编译器实例化  <tt class="docutils literal">ff#long</tt> 。</p>
+<p> 重载函数集合 ： <tt class="docutils literal">{ff#long}</tt></p>
+<p> 然后重载抉择找到唯一的可匹配的实例  <tt class="docutils literal">ff#long</tt> ， 检查实际参数  <tt class="docutils literal"><span class="caps">DD</span>#long</tt>  可以隐式转换到 
+ 形式参数  <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ， 从而生成了这次函数调用 。</p>
 </div>
 <div class="section" id="f">
-<h3>再来看f的情况。</h3>
+<h3> 再来看 f 的情况 。</h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
-<p>计算候选重载函数集合。</p>
-<p>第一步，对所有 <tt class="docutils literal">f</tt> 模板推断实参。根据函数模板参数推断规则：</p>
+<p> 计算候选重载函数集合 。</p>
+<p> 第一步 ， 对所有  <tt class="docutils literal">f</tt>  模板推断实参 。 根据函数模板参数推断规则 ：</p>
 <pre class="literal-block">
-带有 ``T`` 类型的参数，可以用于推断 ``T`` 。
+ 带有  ``T``  类型的参数 ， 可以用于推断  ``T`` 。
 </pre>
-<p>于是 <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt> 被推断出来了。</p>
-<p>第二步，模板特化匹配。</p>
-<p>这里 <tt class="docutils literal">B</tt> 不是 <tt class="docutils literal">A</tt> ，所以不能用 <tt class="docutils literal">f&lt;A&gt;</tt> 特化，只能用 <tt class="docutils literal">f&lt;T&gt;</tt> 模板。</p>
-<p>第三步，模板实例化。</p>
-<p><tt class="docutils literal">B</tt> 带入 <tt class="docutils literal">f&lt;T&gt;</tt> 实例化成 <tt class="docutils literal">f#B</tt> 的过程中，实例化 <tt class="docutils literal">traits#B</tt> 。</p>
-<p>由于没有针对 <tt class="docutils literal">B</tt> 的特化，所以用 <tt class="docutils literal">traits&lt;T&gt;</tt> 模板， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ，进而 <tt class="docutils literal">enable_if#false</tt> 没有 <tt class="docutils literal">type</tt> ，出错。</p>
-<p>唯一的模板匹配出错，重载函数集合为空，<span class="caps">SFINAE</span>原则不能找到合适的匹配，于是报错。</p>
+<p> 于是  <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt>  被推断出来了 。</p>
+<p> 第二步 ， 模板特化匹配 。</p>
+<p> 这里  <tt class="docutils literal">B</tt>  不是  <tt class="docutils literal">A</tt> ， 所以不能用  <tt class="docutils literal">f&lt;A&gt;</tt>  特化 ， 只能用  <tt class="docutils literal">f&lt;T&gt;</tt>  模板 。</p>
+<p> 第三步 ， 模板实例化 。</p>
+<p><tt class="docutils literal">B</tt>  带入  <tt class="docutils literal">f&lt;T&gt;</tt>  实例化成  <tt class="docutils literal">f#B</tt>  的过程中 ， 实例化  <tt class="docutils literal">traits#B</tt> 。</p>
+<p> 由于没有针对  <tt class="docutils literal">B</tt>  的特化 ， 所以用  <tt class="docutils literal">traits&lt;T&gt;</tt>  模板 ， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ， 进而  <tt class="docutils literal">enable_if#false</tt>  没有  <tt class="docutils literal">type</tt> ， 出错 。</p>
+<p> 唯一的模板匹配出错 ， 重载函数集合为空 ，<span class="caps">SFINAE</span> 原则不能找到合适的匹配 ， 于是报错 。</p>
 </div>
 </div>
 
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="//farseerfc.github.io/try-pelican-zhs.html" class="btn btn-default btn-lg" ><h4 style="float:right;clear:both">
+                        <i class="fa fa-arrow-left"></i>
+                        尝试一下&nbsp;Pelican
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="//farseerfc.github.io/mix-ruby-zhs.html" class="btn btn-default btn-lg" ><h4 style="float:left;clear:both">
+                        PyRuby
+                        <i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
             </div>
             <!-- /.entry-content -->
     <hr/>

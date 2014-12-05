@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++Tricks" />
-        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.4 I386平臺C函數調用邊界的棧分配 當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。 函數的返回值不同於函數參數，通過寄存器傳遞。如果返回值類型可以放入32位變量，比如int、short、char、指針等類型，通過eax寄存器傳遞。如果返回值類型是64位變量，如_int64，同過edx+eax傳遞，edx存儲高32位，eax存儲低32位。如果返回值是浮點類型，如float和double，通過專用的浮點數寄存器棧的棧頂返回。如果返回值類型是用戶自定義結構，或C++類類型，通過修改函數簽名，以引用型參數的形式傳回。 同樣以最簡單的函數爲例： void f(){ int i ..." />
+        <meta name="description" content="從 farseerfc.wordpress.com  導入 2.4 I386 平臺 C 函數調用邊界的棧分配 當調用一個函數時 ， 主調函數將參數以聲明中相反的順序壓棧 ， 然後將當前的代碼執行指針 (eip) 壓棧 ， 然後跳轉到被調函數的入口點 。 在被調函數中 ， 通過將 ebp 加上一個偏移量來訪問函數參數 ， 以聲明中的順序 ( 即壓棧的相反順序 ) 來確定參數偏移量 。 被調函數返回時 ， 彈出主調函數壓在棧中的代碼執行指針 ， 跳回主調函數 。 再由主調函數恢復到調用前的棧 。 函數的返回值不同於函數參數 ， 通過寄存器傳遞 。 如果返回值類型可以放入 32 位變量 ， 比如 int、short、char、 指針等類型 ， 通過 eax 寄存器傳遞 。 如果返回值類型是 64 位變量 ， 如 _int64， 同過 edx+eax 傳遞 ..." />
 
         <meta property="og:site_name" content="Farseerfc's Blog" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"/>
-        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.4 I386平臺C函數調用邊界的棧分配 當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。 函數的返回值不同於函數參數，通過寄存器傳遞。如果返回值類型可以放入32位變量，比如int、short、char、指針等類型，通過eax寄存器傳遞。如果返回值類型是64位變量，如_int64，同過edx+eax傳遞，edx存儲高32位，eax存儲低32位。如果返回值是浮點類型，如float和double，通過專用的浮點數寄存器棧的棧頂返回。如果返回值類型是用戶自定義結構，或C++類類型，通過修改函數簽名，以引用型參數的形式傳回。 同樣以最簡單的函數爲例： void f(){ int i ..."/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com  導入 2.4 I386 平臺 C 函數調用邊界的棧分配 當調用一個函數時 ， 主調函數將參數以聲明中相反的順序壓棧 ， 然後將當前的代碼執行指針 (eip) 壓棧 ， 然後跳轉到被調函數的入口點 。 在被調函數中 ， 通過將 ebp 加上一個偏移量來訪問函數參數 ， 以聲明中的順序 ( 即壓棧的相反順序 ) 來確定參數偏移量 。 被調函數返回時 ， 彈出主調函數壓在棧中的代碼執行指針 ， 跳回主調函數 。 再由主調函數恢復到調用前的棧 。 函數的返回值不同於函數參數 ， 通過寄存器傳遞 。 如果返回值類型可以放入 32 位變量 ， 比如 int、short、char、 指針等類型 ， 通過 eax 寄存器傳遞 。 如果返回值類型是 64 位變量 ， 如 _int64， 同過 edx+eax 傳遞 ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++Tricks" />
@@ -150,12 +150,12 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>&nbsp;導入</p>
+                <p> 從  <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>&nbsp; 導入 </p>
 <div class="section" id="i386c">
-<h2>2.4&nbsp;I386平臺C函數調用邊界的棧分配</h2>
-<p>當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。</p>
-<p>函數的返回值不同於函數參數，通過寄存器傳遞。如果返回值類型可以放入32位變量，比如int、short、char、指針等類型，通過eax寄存器傳遞。如果返回值類型是64位變量，如_int64，同過edx+eax傳遞，edx存儲高32位，eax存儲低32位。如果返回值是浮點類型，如float和double，通過專用的浮點數寄存器棧的棧頂返回。如果返回值類型是用戶自定義結構，或C++類類型，通過修改函數簽名，以引用型參數的形式傳回。</p>
-<p>同樣以最簡單的函數爲例：</p>
+<h2>2.4&nbsp;I386 平臺 C 函數調用邊界的棧分配 </h2>
+<p> 當調用一個函數時 ， 主調函數將參數以聲明中相反的順序壓棧 ， 然後將當前的代碼執行指針 (eip) 壓棧 ， 然後跳轉到被調函數的入口點 。 在被調函數中 ， 通過將 ebp 加上一個偏移量來訪問函數參數 ， 以聲明中的順序 ( 即壓棧的相反順序 ) 來確定參數偏移量 。 被調函數返回時 ， 彈出主調函數壓在棧中的代碼執行指針 ， 跳回主調函數 。 再由主調函數恢復到調用前的棧 。</p>
+<p> 函數的返回值不同於函數參數 ， 通過寄存器傳遞 。 如果返回值類型可以放入 32 位變量 ， 比如 int、short、char、 指針等類型 ， 通過 eax 寄存器傳遞 。 如果返回值類型是 64 位變量 ， 如 _int64， 同過 edx+eax 傳遞 ，edx 存儲高 32 位 ，eax 存儲低 32 位 。 如果返回值是浮點類型 ， 如 float 和 double， 通過專用的浮點數寄存器棧的棧頂返回 。 如果返回值類型是用戶自定義結構 ， 或 C++ 類類型 ， 通過修改函數簽名 ， 以引用型參數的形式傳回 。</p>
+<p> 同樣以最簡單的函數爲例 ：</p>
 <p>void&nbsp;f(){</p>
 <p>int&nbsp;i=g(1,2);</p>
 <p>}</p>
@@ -163,46 +163,63 @@ Farseerfc's Blog            </a>
 <p>int&nbsp;c=a+b；</p>
 <p>return&nbsp;c;</p>
 <p>}</p>
-<p>產生的彙編代碼如下：</p>
+<p> 產生的彙編代碼如下 ：</p>
 <p>f:</p>
-<p>push ebp&nbsp;;備份ebp</p>
-<p>mov ebp,esp&nbsp;;建立棧底</p>
-<p>sub esp,4&nbsp;;爲i分配空間</p>
-<p>mov eax,2&nbsp;;準備參數b的值2</p>
-<p>push eax&nbsp;;將b壓棧</p>
-<p>mov eax,1&nbsp;;準備參數a的值1</p>
-<p>push eax&nbsp;;將a壓棧</p>
-<p>call g&nbsp;;調用g</p>
-<p>add esp,8&nbsp;;將a和b一起彈出，恢復調用前的棧</p>
-<p>mov dword ptr[ebp-4],eax&nbsp;;將返回值保存進變量i</p>
-<p>mov esp,ebp&nbsp;;恢復棧頂</p>
-<p>pop ebp&nbsp;;恢復棧底</p>
+<p>push ebp&nbsp;; 備份 ebp</p>
+<p>mov ebp,esp&nbsp;; 建立棧底 </p>
+<p>sub esp,4&nbsp;; 爲 i 分配空間 </p>
+<p>mov eax,2&nbsp;; 準備參數 b 的值 2</p>
+<p>push eax&nbsp;; 將 b 壓棧 </p>
+<p>mov eax,1&nbsp;; 準備參數 a 的值 1</p>
+<p>push eax&nbsp;; 將 a 壓棧 </p>
+<p>call g&nbsp;; 調用 g</p>
+<p>add esp,8&nbsp;; 將 a 和 b 一起彈出 ， 恢復調用前的棧 </p>
+<p>mov dword ptr[ebp-4],eax&nbsp;; 將返回值保存進變量 i</p>
+<p>mov esp,ebp&nbsp;; 恢復棧頂 </p>
+<p>pop ebp&nbsp;; 恢復棧底 </p>
 <p>g:</p>
-<p>push ebp&nbsp;;備份ebp</p>
-<p>mov ebp,esp&nbsp;;建立棧底</p>
-<p>sub esp,4&nbsp;;爲局部變量c在棧中分配內存</p>
-<p>mov eax,dword ptr[ebp+8]&nbsp;;通過ebp間接讀取參數a的值</p>
-<p>mov ebx,dword ptr[ebp+12]&nbsp;;通過ebp間接讀取參數b的值</p>
-<p>add eax,ebx&nbsp;;將a和b的值相加，之和存在eax中</p>
-<p>mov dword ptr[ebp-4],eax&nbsp;;將和存入變量c</p>
-<p>mov eax,dword ptr[ebp-4]&nbsp;;將c作爲返回值，代碼優化後會刪除此句</p>
-<p>add esp,4&nbsp;;銷燬c的內存</p>
-<p>mov esp,ebp&nbsp;;恢復棧頂</p>
-<p>pop ebp&nbsp;;恢復棧底</p>
-<p>ret&nbsp;;返回函數f</p>
-<p>棧的內存佈局如下：</p>
-<p>100076:c &lt;-&nbsp;g的esp</p>
-<p>100080:f的ebp=100100 &lt;-&nbsp;g的ebp</p>
-<p>100084:f的eip</p>
+<p>push ebp&nbsp;; 備份 ebp</p>
+<p>mov ebp,esp&nbsp;; 建立棧底 </p>
+<p>sub esp,4&nbsp;; 爲局部變量 c 在棧中分配內存 </p>
+<p>mov eax,dword ptr[ebp+8]&nbsp;; 通過 ebp 間接讀取參數 a 的值 </p>
+<p>mov ebx,dword ptr[ebp+12]&nbsp;; 通過 ebp 間接讀取參數 b 的值 </p>
+<p>add eax,ebx&nbsp;; 將 a 和 b 的值相加 ， 之和存在 eax 中 </p>
+<p>mov dword ptr[ebp-4],eax&nbsp;; 將和存入變量 c</p>
+<p>mov eax,dword ptr[ebp-4]&nbsp;; 將 c 作爲返回值 ， 代碼優化後會刪除此句 </p>
+<p>add esp,4&nbsp;; 銷燬 c 的內存 </p>
+<p>mov esp,ebp&nbsp;; 恢復棧頂 </p>
+<p>pop ebp&nbsp;; 恢復棧底 </p>
+<p>ret&nbsp;; 返回函數 f</p>
+<p> 棧的內存佈局如下 ：</p>
+<p>100076:c &lt;-&nbsp;g 的 esp</p>
+<p>100080:f 的 ebp=100100 &lt;-&nbsp;g 的 ebp</p>
+<p>100084:f 的 eip</p>
 <p>100088:a=1</p>
 <p>100092:b=2</p>
 <p>100096:i</p>
-<p>100100:舊ebp&nbsp;&lt;-f的ebp</p>
+<p>100100: 舊 ebp&nbsp;&lt;-f 的 ebp</p>
 <p>100104:……</p>
-<p>注意在函數g的彙編代碼中，訪問函數的局部變量和訪問函數參數的區別。局部變量總是通過將ebp減去偏移量來訪問，函數參數總是通過將ebp加上偏移量來訪問。對於32位變量而言，第一個局部變量位於ebp-4，第二個位於ebp-8，以此類推，32位局部變量在棧中形成一個逆序數組；第一個函數參數位於ebp+8，第二個位於ebp+12，以此類推，32位函數參數在棧中形成一個正序數組。</p>
-<p>由於函數返回值通過寄存器返回，不需要空間分配等操作，所以返回值的代價很低。基於這個原因，舊的C語法約定，不寫明返回值類型的函數，返回值類型爲int。這一規則與現行的C++語法相違背，因爲C++中，不寫明返回值類型的函數返回值類型爲void，表示不返回值。這種語法不兼容性是爲了加強C++的類型安全，但同時也帶來了一些問題。</p>
+<p> 注意在函數 g 的彙編代碼中 ， 訪問函數的局部變量和訪問函數參數的區別 。 局部變量總是通過將 ebp 減去偏移量來訪問 ， 函數參數總是通過將 ebp 加上偏移量來訪問 。 對於 32 位變量而言 ， 第一個局部變量位於 ebp-4， 第二個位於 ebp-8， 以此類推 ，32 位局部變量在棧中形成一個逆序數組 ； 第一個函數參數位於 ebp+8， 第二個位於 ebp+12， 以此類推 ，32 位函數參數在棧中形成一個正序數組 。</p>
+<p> 由於函數返回值通過寄存器返回 ， 不需要空間分配等操作 ， 所以返回值的代價很低 。 基於這個原因 ， 舊的 C 語法約定 ， 不寫明返回值類型的函數 ， 返回值類型爲 int。 這一規則與現行的 C++ 語法相違背 ， 因爲 C++ 中 ， 不寫明返回值類型的函數返回值類型爲 void， 表示不返回值 。 這種語法不兼容性是爲了加強 C++ 的類型安全 ， 但同時也帶來了一些問題 。</p>
 </div>
 
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="//farseerfc.github.io/c-tricks-2-5-address-alignment.html" class="btn btn-default btn-lg" ><h4 style="float:right;clear:both">
+                        <i class="fa fa-arrow-left"></i>
+                        C++ Tricks 2.5&nbsp;I386平臺的邊界對齊(Align)
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="btn btn-default btn-lg" ><h4 style="float:left;clear:both">
+                        C++ Tricks 2.3&nbsp;I386平臺C函數內部的棧分配
+                        <i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
             </div>
             <!-- /.entry-content -->
     <hr/>
