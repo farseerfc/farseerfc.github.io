@@ -39,6 +39,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
+<div style="display:none" id="title">Articles by farseerfc - Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -109,9 +110,9 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/if-we-do-this-work-en.html">English</a></li>
-	<li><a href="//farseerfc.github.io/if-we-do-this-work-jp.html">日本語</a></li>
-	<li><a href="//farseerfc.github.io/if-we-do-this-work-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/if-we-do-this-work-en.html" class="translate">English</a></li>
+	<li><a href="//farseerfc.github.io/if-we-do-this-work-jp.html" class="translate">日本語</a></li>
+	<li><a href="//farseerfc.github.io/if-we-do-this-work-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -151,7 +152,7 @@ make the &quot;<span class="caps">ACPI</span>&quot; extensions somehow Windows&n
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/zz-introducing-scholarzhang-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/zz-introducing-scholarzhang-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -189,8 +190,8 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/sine-cpu-en.html">English</a></li>
-	<li><a href="//farseerfc.github.io/sine-cpu-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/sine-cpu-en.html" class="translate">English</a></li>
+	<li><a href="//farseerfc.github.io/sine-cpu-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -237,7 +238,7 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/some-thought-on-creationism-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/some-thought-on-creationism-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -302,7 +303,7 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/9-thoughts-about-oop-from-wrongly-insert-memory-stick-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/9-thoughts-about-oop-from-wrongly-insert-memory-stick-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -344,7 +345,7 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/program-development-in-java-preface-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/program-development-in-java-preface-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -396,7 +397,7 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -839,8 +840,65 @@ oldOnload();
 <script>
     $(document).ready(function() {
         $.material.init();
-    });
 
+        function applyTranslateAnime(){
+            $(".article-content .translate").each(function(idx, obj){
+                $(obj).attr("data-href", $(obj).attr("href"));
+                $(obj).attr("href", "javascript:void(0)");
+                $(obj).click(function(){
+                    var href = $(obj).attr("data-href");
+                    $('.breadcrumb').fadeOut("slow");
+                    $('.article-content').fadeOut("slow",function(){
+                        $.get(href, function(data){
+                            var el = new DOMParser().parseFromString(data, 'text/html');
+                            var title = $("#title", el)[0].innerHTML;
+                            var content = $(".article-content", el)[0].innerHTML;
+                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+                            document.title = title;
+                            window.history.pushState({
+                                "content": content ,
+                                "title":title ,
+                                "breadcrumb":breadcrumb
+                            },"", href);
+                            $('.article-content')[0].innerHTML = content;
+                            $('.breadcrumb')[0].innerHTML = breadcrumb;
+                            $('.article-content').fadeIn('slow');
+                            $('.breadcrumb').fadeIn('slow');
+                            $("#comments script", el).each(function(idx, obj){
+                                // re-enable disqus
+                                eval(obj.innerHTML);
+                            });
+                            applyTranslateAnime();
+                        }).fail(function(){
+                            // failback to changing url
+                            window.location.href = href ;
+                        });
+                    });
+                });
+            });
+        };
+        applyTranslateAnime();
+
+        window.onpopstate = function(e){
+            if(e.state){
+                
+                document.title = e.state.title;
+                $('.breadcrumb').fadeOut("slow");
+                $('.article-content').fadeOut("slow",function(){
+                    $('.article-content')[0].innerHTML = e.state.content;
+                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+                    $('.article-content').fadeIn('slow');
+                    $('.breadcrumb').fadeIn('slow');
+                    $("#comments script").each(function(idx, obj){
+                        // re-enable disqus
+                        eval(obj.innerHTML);
+                    });
+                    applyTranslateAnime();
+                });
+            }
+        }
+    });
 </script>
 
 </body>

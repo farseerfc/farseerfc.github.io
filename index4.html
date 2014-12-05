@@ -39,6 +39,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
+<div style="display:none" id="title">Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -104,7 +105,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-1-x86-architecture-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-1-x86-architecture-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -142,7 +143,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-1-2-trap-in-comma-logical-operator-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-1-2-trap-in-comma-logical-operator-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -178,7 +179,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-1-1-conditional-operator-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-1-1-conditional-operator-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -219,7 +220,7 @@ operator)，用於在表達式中作條件判斷，通常可以替換if語句，
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/filling-believings-calling-conscience-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/filling-believings-calling-conscience-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -657,8 +658,65 @@ oldOnload();
 <script>
     $(document).ready(function() {
         $.material.init();
-    });
 
+        function applyTranslateAnime(){
+            $(".article-content .translate").each(function(idx, obj){
+                $(obj).attr("data-href", $(obj).attr("href"));
+                $(obj).attr("href", "javascript:void(0)");
+                $(obj).click(function(){
+                    var href = $(obj).attr("data-href");
+                    $('.breadcrumb').fadeOut("slow");
+                    $('.article-content').fadeOut("slow",function(){
+                        $.get(href, function(data){
+                            var el = new DOMParser().parseFromString(data, 'text/html');
+                            var title = $("#title", el)[0].innerHTML;
+                            var content = $(".article-content", el)[0].innerHTML;
+                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+                            document.title = title;
+                            window.history.pushState({
+                                "content": content ,
+                                "title":title ,
+                                "breadcrumb":breadcrumb
+                            },"", href);
+                            $('.article-content')[0].innerHTML = content;
+                            $('.breadcrumb')[0].innerHTML = breadcrumb;
+                            $('.article-content').fadeIn('slow');
+                            $('.breadcrumb').fadeIn('slow');
+                            $("#comments script", el).each(function(idx, obj){
+                                // re-enable disqus
+                                eval(obj.innerHTML);
+                            });
+                            applyTranslateAnime();
+                        }).fail(function(){
+                            // failback to changing url
+                            window.location.href = href ;
+                        });
+                    });
+                });
+            });
+        };
+        applyTranslateAnime();
+
+        window.onpopstate = function(e){
+            if(e.state){
+                
+                document.title = e.state.title;
+                $('.breadcrumb').fadeOut("slow");
+                $('.article-content').fadeOut("slow",function(){
+                    $('.article-content')[0].innerHTML = e.state.content;
+                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+                    $('.article-content').fadeIn('slow');
+                    $('.breadcrumb').fadeIn('slow');
+                    $("#comments script").each(function(idx, obj){
+                        // re-enable disqus
+                        eval(obj.innerHTML);
+                    });
+                    applyTranslateAnime();
+                });
+            }
+        }
+    });
 </script>
 
 </body>

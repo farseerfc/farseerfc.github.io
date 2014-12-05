@@ -45,6 +45,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
+<div style="display:none" id="title">C++ Tricks 2.7 I386平臺的其它函數調用模型 - Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -98,7 +99,7 @@ Farseerfc's Blog            </a>
                 <li><a href="//farseerfc.github.io/category/import.html" title="import">import</a></li>
                 <li class="active">C++ Tricks 2.7&nbsp;I386平臺的其它函數調用模型</li>
             </ol>
-    <section id="content" >
+    <section id="content" class="article-content">
         <article>
             <header class="page-header jumbotron jumbotron-primary panel-primary">
                 <div class="panel-heading">
@@ -121,7 +122,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -245,6 +246,7 @@ Farseerfc's Blog            </a>
     </section>
         </article>
     </section>
+
 
         </div>
         <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
@@ -647,8 +649,65 @@ oldOnload();
 <script>
     $(document).ready(function() {
         $.material.init();
-    });
 
+        function applyTranslateAnime(){
+            $(".article-content .translate").each(function(idx, obj){
+                $(obj).attr("data-href", $(obj).attr("href"));
+                $(obj).attr("href", "javascript:void(0)");
+                $(obj).click(function(){
+                    var href = $(obj).attr("data-href");
+                    $('.breadcrumb').fadeOut("slow");
+                    $('.article-content').fadeOut("slow",function(){
+                        $.get(href, function(data){
+                            var el = new DOMParser().parseFromString(data, 'text/html');
+                            var title = $("#title", el)[0].innerHTML;
+                            var content = $(".article-content", el)[0].innerHTML;
+                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+                            document.title = title;
+                            window.history.pushState({
+                                "content": content ,
+                                "title":title ,
+                                "breadcrumb":breadcrumb
+                            },"", href);
+                            $('.article-content')[0].innerHTML = content;
+                            $('.breadcrumb')[0].innerHTML = breadcrumb;
+                            $('.article-content').fadeIn('slow');
+                            $('.breadcrumb').fadeIn('slow');
+                            $("#comments script", el).each(function(idx, obj){
+                                // re-enable disqus
+                                eval(obj.innerHTML);
+                            });
+                            applyTranslateAnime();
+                        }).fail(function(){
+                            // failback to changing url
+                            window.location.href = href ;
+                        });
+                    });
+                });
+            });
+        };
+        applyTranslateAnime();
+
+        window.onpopstate = function(e){
+            if(e.state){
+                
+                document.title = e.state.title;
+                $('.breadcrumb').fadeOut("slow");
+                $('.article-content').fadeOut("slow",function(){
+                    $('.article-content')[0].innerHTML = e.state.content;
+                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+                    $('.article-content').fadeIn('slow');
+                    $('.breadcrumb').fadeIn('slow');
+                    $("#comments script").each(function(idx, obj){
+                        // re-enable disqus
+                        eval(obj.innerHTML);
+                    });
+                    applyTranslateAnime();
+                });
+            }
+        }
+    });
 </script>
 
 </body>

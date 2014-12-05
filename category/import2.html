@@ -40,6 +40,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
+<div style="display:none" id="title">import - Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -111,7 +112,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -153,7 +154,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -195,7 +196,7 @@ left operand must be&nbsp;l-value”，就是說’=’的左操作數必須是�
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-2-i386-memory-layout-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-2-i386-memory-layout-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -235,7 +236,7 @@ left operand must be&nbsp;l-value”，就是說’=’的左操作數必須是�
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -284,7 +285,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -328,7 +329,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -366,7 +367,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-5-address-alignment-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-5-address-alignment-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -403,7 +404,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments-zhs.html">简体</a></li>
+	<li><a href="//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -840,8 +841,65 @@ oldOnload();
 <script>
     $(document).ready(function() {
         $.material.init();
-    });
 
+        function applyTranslateAnime(){
+            $(".article-content .translate").each(function(idx, obj){
+                $(obj).attr("data-href", $(obj).attr("href"));
+                $(obj).attr("href", "javascript:void(0)");
+                $(obj).click(function(){
+                    var href = $(obj).attr("data-href");
+                    $('.breadcrumb').fadeOut("slow");
+                    $('.article-content').fadeOut("slow",function(){
+                        $.get(href, function(data){
+                            var el = new DOMParser().parseFromString(data, 'text/html');
+                            var title = $("#title", el)[0].innerHTML;
+                            var content = $(".article-content", el)[0].innerHTML;
+                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+                            document.title = title;
+                            window.history.pushState({
+                                "content": content ,
+                                "title":title ,
+                                "breadcrumb":breadcrumb
+                            },"", href);
+                            $('.article-content')[0].innerHTML = content;
+                            $('.breadcrumb')[0].innerHTML = breadcrumb;
+                            $('.article-content').fadeIn('slow');
+                            $('.breadcrumb').fadeIn('slow');
+                            $("#comments script", el).each(function(idx, obj){
+                                // re-enable disqus
+                                eval(obj.innerHTML);
+                            });
+                            applyTranslateAnime();
+                        }).fail(function(){
+                            // failback to changing url
+                            window.location.href = href ;
+                        });
+                    });
+                });
+            });
+        };
+        applyTranslateAnime();
+
+        window.onpopstate = function(e){
+            if(e.state){
+                
+                document.title = e.state.title;
+                $('.breadcrumb').fadeOut("slow");
+                $('.article-content').fadeOut("slow",function(){
+                    $('.article-content')[0].innerHTML = e.state.content;
+                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+                    $('.article-content').fadeIn('slow');
+                    $('.breadcrumb').fadeIn('slow');
+                    $("#comments script").each(function(idx, obj){
+                        // re-enable disqus
+                        eval(obj.innerHTML);
+                    });
+                    applyTranslateAnime();
+                });
+            }
+        }
+    });
 </script>
 
 </body>
