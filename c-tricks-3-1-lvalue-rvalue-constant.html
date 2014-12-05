@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh"
+>
+<head>
+    <title>C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue & constant) - Farseerfc's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++Tricks" />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 3.1 左值右值與常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義： 1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。 2、左值是可讀可寫的值，右值是隻讀的值。 3、左值有地址，右值沒有地址。 根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 這個複製操作在C++中是語法錯誤，MSVC給出的錯誤提示爲“error C2106: ‘=’ : left operand must be l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。 根據第二定義 ..." />
+
+        <meta property="og:site_name" content="Farseerfc's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)"/>
+        <meta property="og:url" content="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html"/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 3.1 左值右值與常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義： 1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。 2、左值是可讀可寫的值，右值是隻讀的值。 3、左值有地址，右值沒有地址。 根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 這個複製操作在C++中是語法錯誤，MSVC給出的錯誤提示爲“error C2106: ‘=’ : left operand must be l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。 根據第二定義 ..."/>
+        <meta property="article:published_time" content="2007-09-16" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++Tricks" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/theme/css/html4css1.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc's Blog ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/" class="navbar-brand">
+Farseerfc's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="//farseerfc.github.io/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="//farseerfc.github.io/category/import.html">Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/category/life.html">Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/category/programming.html">Programming</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.github.io/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.github.io/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io" title="Farseerfc's Blog"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue <span class="amp">&amp;</span>&nbsp;constant)</li>
+            </ol>
+    <section id="content" >
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                    <div class="row">
+                        <div class="col-lg-10 col-md-9">
+                            C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue <span class="amp">&amp;</span>&nbsp;constant)
+                            <a href="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html"
+                               rel="bookmark"
+                               class="btn btn-primary btn-lg"
+                               title="Permalink to C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue & constant)">
+                               <i class="mdi-action-launch"></i>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-3">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+<i class="mdi-action-translate"></i>
+繁體
+<span class="caret">
+</a>
+<ul class="dropdown-menu">
+	<li><a href="//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant-zhs.html">简体</a></li>
+</ul>
+</div>
+
+                        </div>
+                    </div>
+                    </h1>
+<footer class="post-info">
+    
+    
+    <span class="published">
+        <time datetime="2007-09-16T13:07:00+09:00"><i class="fa fa-calendar"></i> 2007年09月16日(週日)</time>
+    </span>
+    
+
+
+
+
+
+<span>
+	<a href="//farseerfc.github.io/tag/ctricks.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> C++Tricks</a>
+</span>
+
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>&nbsp;導入</p>
+<div class="section" id="lvalue-rvalue-constant">
+<h2>3.1 左值右值與常量性(lvalue，rvalue <span class="amp">&amp;</span>&nbsp;constant)</h2>
+<p>首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義：</p>
+<p>1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。</p>
+<p>2、左值是可讀可寫的值，右值是隻讀的值。</p>
+<p>3、左值有地址，右值沒有地址。</p>
+<p>根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：</p>
+<p>1=1;//Error</p>
+<p>這個複製操作在C++中是語法錯誤，<span class="caps">MSVC</span>給出的錯誤提示爲“error C2106: &#8216;=&#8217; :
+left operand must be&nbsp;l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。</p>
+<p>根據第二定義，一個左值也是一個右值，因爲左值也可讀，而一個右值不是一個左值，因爲右值不可寫。</p>
+<p>通常情況下，聲明的變量是一個左值，除非你指定const將它變成一個右值：</p>
+<p>int&nbsp;lv=1;</p>
+<p>const int&nbsp;rv=lv;</p>
+<p>由於右值的值在程序執行期間不能改變，所以必須用另一個右值初始化它。</p>
+<p>一個普通變量只能用右值初始化，如果你想傳遞左值，必須聲明一個引用或一個指針：</p>
+<p>int <span class="amp">&amp;</span>&nbsp;ref=lv;//用引用傳遞左值</p>
+<p>int *&nbsp;plv=&amp;lv;//傳遞指針以間接傳遞左值</p>
+<p>必須用左值初始化引用，然而，可以用右值初始化常量引用：</p>
+<p>int <span class="amp">&amp;</span> r1=1;&nbsp;//Error!</p>
+<p>const int <span class="amp">&amp;</span> r2=1; //<span class="caps">OK</span></p>
+<p>這實際上相當於：</p>
+<p>int&nbsp;_r2=1;</p>
+<p>const int <span class="amp">&amp;</span>&nbsp;r2=_r2;</p>
+<p>這樣的寫法在函數體內沒什麼作用，但是在傳遞函數參數時，它可以避免潛在的(傳遞左值時的)複製操作，同時又可以接受右值。</p>
+<p>通常情況下，函數的參數和返回值都只傳回右值，除非你明確的通過引用傳遞左值。</p>
+<p>明確了左值與右值的區別，有助於我們寫函數時確定什麼時候應該有const，什麼時候不該有。比如，我們寫了一個代表數學中複數的類Complex：</p>
+<p>class&nbsp;Complex;</p>
+<p>然後，我們寫針對Complex的運算符重載：operator+和operator=。問題在於，參數和返回值應該是什麼類型，可選類型有四種：
+Complex、const Complex、Complex&amp;、const&nbsp;Complex&amp;。</p>
+<p>對於operator+，我們不會改變參數的值，所以可以通過const
+Complex&amp;傳遞參數。至於返回值類型，由於int類型的加法返回右值，所以根據Do
+as the ints do的原則，返回值類型爲const&nbsp;Complex：</p>
+<p>const Complex operator+(const Complex&amp;,const&nbsp;Complex&amp;);</p>
+<p>對於operator=，同樣要思考這些問題。我們寫入第一個參數，所以第一個參數爲Complex&amp;，我們只讀取第二個參數，所以第二個參數爲const
+Complex&amp;。至於返回值，還是Do as the ints&nbsp;do。int的賦值返回左值，不信你可以試一試：</p>
+<p>int&nbsp;i;</p>
+<p>(i=1)=2;</p>
+<p>雖然比較傻，先將i賦爲1，再將其改爲2，但是這是被C++語法支持的做法，我們就理應遵守。所以返回第一個參數的左值：</p>
+<p>Complex&amp; operator=(Complex&amp;,const&nbsp;Complex&amp;);</p>
+<p>const是C++引入的語言特性，也被<span class="caps">ANSI</span>
+C99借鑑，在經典版本的C語言中是沒有的。關於const的歷史，有幾點值得玩味。最初Bjarne
+Stroustrup引入const時，可寫性是和可讀性分開的。那時使用關鍵字readonly和writeonly。這個特點被首先提交到C的<span class="caps">ANSI</span>標準化委員會(當時還沒有C++標準化的計劃)，但是<span class="caps">ANSI</span>&nbsp;C標準只接受了readonly的概念，並將其命名爲const。隨後，有人發現在多線程同步的環境下，有些變量的值會在編譯器的預料之外改變，爲了防止過度優化破壞這些變量，C++又引入關鍵字violate。從語義特點來看，violate是const的反義詞，因爲const表示不會變的量，而violate表示會不按照預期自行變化的量。從語法特點而言，violate與const是極爲相似的，適用於const的一切語法規則同樣適用於violate。</p>
+<p>值的常量性可以被劃分爲兩種：編譯期常量和運行期常量。C++語法並沒有嚴格區分這兩種常量，導致了少許混亂：</p>
+<p>const int i=5;const int *&nbsp;pi=&amp;i;</p>
+<p>const_cast&lt;int&amp;&gt;i=1;//對於運行期常量，在需要時可以去除它的常量性</p>
+<p>int&nbsp;a[i];//對於編譯期常量，可以用它來指定數組大小</p>
+<p>cout&lt;&lt;i&lt;&lt;sizeof(a)/sizeof(a[0])&lt;&lt;*pi;</p>
+<p>這種將編譯期與運行期常量的特性混用的方法，勢必導致語義的混亂。數組a的大小最終是5，因爲採用了i的編譯期值，而不管i在運行期是否被改變了值。最後一句代碼將（有可能）輸出551，第一個i的值作爲一種優化在編譯期綁定，第二個值標明瞭a的大小，第三個值通過指針顯示地輸出i的運行期真實值。</p>
+<p>在C++的近親C#的語法中，這兩種常量被嚴格地區分開：編譯期常量由const指定，只能是內建類型變量；運行期常量由readonly指定，可以是任何類型。永遠不會改變的常量，如圓周率pi的值，應該用const聲明；而其它有可能改變的常量，皆由readonly聲明。</p>
+<p>C++中的const的特點更傾向於C#中的readonly，雖然語法上允許使用const的編譯期常量性，但正如上文所展示的，這容易造成混亂。爲了得到C#中const的語義，在C++中，我們不必迴歸惡魔#define的懷抱，可以使用所謂“匿名enum技巧”。當匿名聲明一個enum類型時，其中的枚舉值就是一個int類型的編譯期常量，比如：</p>
+<p>enum{Size=5;};</p>
+<p>int&nbsp;a[Size];</p>
+<p>這種使用匿名enum來聲明編譯期常量的做法，被廣泛應用於<span class="caps">STL</span>、boost等模板庫的實現代碼中。</p>
+</div>
+
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'c-tricks-3-1-lvalue-rvalue-constant';
+                var disqus_url = 'http://farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-home fa-lg"></i><span class="icon-label">About farseerfc</span>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <img width="100%" src="//farseerfc.github.io/images/avatar.jpg"/>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/ctricks.html">
+                    C++Tricks <sup> 12</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-weibo fa-lg"></i><span class="icon-label">Latest Weibo</span>
+        </h4>
+    </div>
+<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+<div class="col-md-12 col-sm-12">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="http://blog.phoenixlzx.com/static/img/avatar/avatar.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2013 farseerfc
+            &middot; Powered by
+            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> and
+            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> Top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/theme/js/material.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+    });
+
+</script>
+
+</body>
+</html>
