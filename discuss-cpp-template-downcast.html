@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++,template,C" />
-        <meta name="description" content="這兩天在飲水思源的 C 板 ， 關於 C++ 模板的類型轉換的一個討論 ， 後面是我的解答 。 討論地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原問題 今天在書上看到模板演繹的時候可以允許 cast-down， 於是我寫了個東西 ： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..." />
+        <meta name="description" content="這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。 討論地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原問題 今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..." />
 
         <meta property="og:site_name" content="Farseerfc's Blog" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="關於C++模板的類型轉換的討論"/>
         <meta property="og:url" content="//farseerfc.github.io/discuss-cpp-template-downcast.html"/>
-        <meta property="og:description" content="這兩天在飲水思源的 C 板 ， 關於 C++ 模板的類型轉換的一個討論 ， 後面是我的解答 。 討論地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原問題 今天在書上看到模板演繹的時候可以允許 cast-down， 於是我寫了個東西 ： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..."/>
+        <meta property="og:description" content="這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。 討論地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原問題 今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..."/>
         <meta property="article:published_time" content="2012-02-26" />
             <meta property="article:section" content="programming" />
             <meta property="article:tag" content="C++" />
@@ -155,14 +155,14 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <html><body><p> 這兩天在飲水思源的 C 板 ， 關於 C++ 模板的類型轉換的一個討論 ， 後面是我的解答 。</p>
+                <html><body><p>這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。</p>
 <div class="section" id="id1">
-<h2> 討論地址 </h2>
+<h2>討論地址</h2>
 <p><a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html">http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html</a></p>
 </div>
 <div class="section" id="id2">
-<h2> 原問題 </h2>
-<p> 今天在書上看到模板演繹的時候可以允許 cast-down， 於是我寫了個東西 ：</p>
+<h2>原問題</h2>
+<p>今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西：</p>
 <div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
 
@@ -204,52 +204,52 @@ Farseerfc's Blog            </a>
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p> 奇怪的是重載決議的時候 ， <tt class="docutils literal">f</tt>  的情況下它就不讓我特化的  <tt class="docutils literal">f&lt;A&gt;</tt>  進來 。</p>
-<p> 但是在  <tt class="docutils literal">ff</tt>  的情況下 ， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt>  卻進來了 。</p>
-<p> 在 <span class="caps">VC10</span> 和 <span class="caps">GCC3</span>.4 下測試 </p>
+<p>奇怪的是重載決議的時候， <tt class="docutils literal">f</tt> 的情況下它就不讓我特化的 <tt class="docutils literal">f&lt;A&gt;</tt> 進來。</p>
+<p>但是在 <tt class="docutils literal">ff</tt> 的情況下， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt> 卻進來了。</p>
+<p>在<span class="caps">VC10</span>和<span class="caps">GCC3</span>.4下測試</p>
 </div>
 <div class="section" id="id3">
-<h2> 我的解答 </h2>
-<p> 我們來設身處地地作爲編譯器 ， 看一遍到底發生了什麼 。</p>
-<p> 約定符號  <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt>  是把  <tt class="docutils literal">B</tt>  帶入  <tt class="docutils literal">A&lt;T&gt;</tt>  的參數  <tt class="docutils literal">T</tt>  之後實例化得到的結果 。</p>
+<h2>我的解答</h2>
+<p>我們來設身處地地作爲編譯器，看一遍到底發生了什麼。</p>
+<p>約定符號 <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt> 是把 <tt class="docutils literal">B</tt> 帶入 <tt class="docutils literal">A&lt;T&gt;</tt> 的參數 <tt class="docutils literal">T</tt> 之後實例化得到的結果。</p>
 <div class="section" id="ff">
-<h3> 首先看 ff 的情況 。</h3>
+<h3>首先看ff的情況。</h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p> 處理到這句的時候 ， 編譯器看到了  <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt>  的實例化 ， 於是去實例化  <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ， 繼而實例 
- 化了  <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
+<p>處理到這句的時候，編譯器看到了 <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt> 的實例化，於是去實例化 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ，繼而實例
+化了 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
-<p> 這句 ， 首先計算重載函數集合 。</p>
-<p> 第一步 ， 需要從參數  <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt>  推斷  <tt class="docutils literal">ff&lt;T&gt;</tt>  的  <tt class="docutils literal">T</tt> 。 根據函數模板參數推斷規則 ：</p>
+<p>這句，首先計算重載函數集合。</p>
+<p>第一步，需要從參數 <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt> 推斷 <tt class="docutils literal">ff&lt;T&gt;</tt> 的 <tt class="docutils literal">T</tt> 。根據函數模板參數推斷規則：</p>
 <pre class="literal-block">
-``class_template_name&lt;T&gt;``  類型的參數 ， 可以用於推斷  ``T`` 。
+``class_template_name&lt;T&gt;`` 類型的參數，可以用於推斷 ``T`` 。
 </pre>
-<p> 於是編譯器推斷  <tt class="docutils literal">T</tt>  爲  <tt class="docutils literal">long</tt> 。 這裏就算不是  <tt class="docutils literal"><span class="caps">BB</span></tt>  而是完全無關的  <tt class="docutils literal"><span class="caps">CC</span></tt>  都可以推斷成功 ， 只要  <tt class="docutils literal"><span class="caps">CC</span></tt>  也 
- 是一個  <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt>  形式的模板 。</p>
-<p> 第二步 ， 模板特化匹配 。 因爲只有一個模板 ， 所以匹配了最泛化的  <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
-<p> 第三步 ， 模板實例化 。</p>
-<p> 推斷了  <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt>  之後 ， 編譯器實例化  <tt class="docutils literal">ff#long</tt> 。</p>
-<p> 重載函數集合 ： <tt class="docutils literal">{ff#long}</tt></p>
-<p> 然後重載抉擇找到唯一的可匹配的實例  <tt class="docutils literal">ff#long</tt> ， 檢查實際參數  <tt class="docutils literal"><span class="caps">DD</span>#long</tt>  可以隱式轉換到 
- 形式參數  <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ， 從而生成了這次函數調用 。</p>
+<p>於是編譯器推斷 <tt class="docutils literal">T</tt> 爲 <tt class="docutils literal">long</tt> 。這裏就算不是 <tt class="docutils literal"><span class="caps">BB</span></tt> 而是完全無關的 <tt class="docutils literal"><span class="caps">CC</span></tt> 都可以推斷成功，只要 <tt class="docutils literal"><span class="caps">CC</span></tt> 也
+是一個 <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt> 形式的模板。</p>
+<p>第二步，模板特化匹配。因爲只有一個模板，所以匹配了最泛化的 <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
+<p>第三步，模板實例化。</p>
+<p>推斷了 <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt> 之後，編譯器實例化 <tt class="docutils literal">ff#long</tt> 。</p>
+<p>重載函數集合： <tt class="docutils literal">{ff#long}</tt></p>
+<p>然後重載抉擇找到唯一的可匹配的實例 <tt class="docutils literal">ff#long</tt> ，檢查實際參數 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> 可以隱式轉換到
+形式參數 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ，從而生成了這次函數調用。</p>
 </div>
 <div class="section" id="f">
-<h3> 再來看 f 的情況 。</h3>
+<h3>再來看f的情況。</h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
-<p> 計算候選重載函數集合 。</p>
-<p> 第一步 ， 對所有  <tt class="docutils literal">f</tt>  模板推斷實參 。 根據函數模板參數推斷規則 ：</p>
+<p>計算候選重載函數集合。</p>
+<p>第一步，對所有 <tt class="docutils literal">f</tt> 模板推斷實參。根據函數模板參數推斷規則：</p>
 <pre class="literal-block">
- 帶有  ``T``  類型的參數 ， 可以用於推斷  ``T`` 。
+帶有 ``T`` 類型的參數，可以用於推斷 ``T`` 。
 </pre>
-<p> 於是  <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt>  被推斷出來了 。</p>
-<p> 第二步 ， 模板特化匹配 。</p>
-<p> 這裏  <tt class="docutils literal">B</tt>  不是  <tt class="docutils literal">A</tt> ， 所以不能用  <tt class="docutils literal">f&lt;A&gt;</tt>  特化 ， 只能用  <tt class="docutils literal">f&lt;T&gt;</tt>  模板 。</p>
-<p> 第三步 ， 模板實例化 。</p>
-<p><tt class="docutils literal">B</tt>  帶入  <tt class="docutils literal">f&lt;T&gt;</tt>  實例化成  <tt class="docutils literal">f#B</tt>  的過程中 ， 實例化  <tt class="docutils literal">traits#B</tt> 。</p>
-<p> 由於沒有針對  <tt class="docutils literal">B</tt>  的特化 ， 所以用  <tt class="docutils literal">traits&lt;T&gt;</tt>  模板 ， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ， 進而  <tt class="docutils literal">enable_if#false</tt>  沒有  <tt class="docutils literal">type</tt> ， 出錯 。</p>
-<p> 唯一的模板匹配出錯 ， 重載函數集合爲空 ，<span class="caps">SFINAE</span> 原則不能找到合適的匹配 ， 於是報錯 。</p>
+<p>於是 <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt> 被推斷出來了。</p>
+<p>第二步，模板特化匹配。</p>
+<p>這裏 <tt class="docutils literal">B</tt> 不是 <tt class="docutils literal">A</tt> ，所以不能用 <tt class="docutils literal">f&lt;A&gt;</tt> 特化，只能用 <tt class="docutils literal">f&lt;T&gt;</tt> 模板。</p>
+<p>第三步，模板實例化。</p>
+<p><tt class="docutils literal">B</tt> 帶入 <tt class="docutils literal">f&lt;T&gt;</tt> 實例化成 <tt class="docutils literal">f#B</tt> 的過程中，實例化 <tt class="docutils literal">traits#B</tt> 。</p>
+<p>由於沒有針對 <tt class="docutils literal">B</tt> 的特化，所以用 <tt class="docutils literal">traits&lt;T&gt;</tt> 模板， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ，進而 <tt class="docutils literal">enable_if#false</tt> 沒有 <tt class="docutils literal">type</tt> ，出錯。</p>
+<p>唯一的模板匹配出錯，重載函數集合爲空，<span class="caps">SFINAE</span>原則不能找到合適的匹配，於是報錯。</p>
 </div>
 </div>
 </body></html>
@@ -313,7 +313,7 @@ Farseerfc's Blog            </a>
 
 <section>
     <div class="row">
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -345,7 +345,7 @@ Farseerfc's Blog            </a>
 
             
 
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -478,7 +478,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -561,7 +561,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -576,7 +576,7 @@ Farseerfc's Blog            </a>
     </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -586,7 +586,7 @@ Farseerfc's Blog            </a>
 <div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>

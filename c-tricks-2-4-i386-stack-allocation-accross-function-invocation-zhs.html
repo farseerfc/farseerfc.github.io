@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.4 I386 平台 C 函数调用边界的栈分配 当调用一个函数时 ， 主调函数将参数以声明中相反的顺序压栈 ， 然后将当前的代码执行指针 (eip) 压栈 ， 然后跳转到被调函数的入口点 。 在被调函数中 ， 通过将 ebp 加上一个偏移量来访问函数参数 ， 以声明中的顺序 ( 即压栈的相反顺序 ) 来确定参数偏移量 。 被调函数返回时 ， 弹出主调函数压在栈中的代码执行指针 ， 跳回主调函数 。 再由主调函数恢复到调用前的栈 。 函数的返回值不同于函数参数 ， 通过寄存器传递 。 如果返回值类型可以放入 32 位变量 ， 比如 int、short、char、 指针等类型 ， 通过 eax 寄存器传递 。 如果返回值类型是 64 位变量 ， 如 _int64， 同过 edx+eax 传递 ..." />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.4 I386平台C函数调用边界的栈分配 当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。 函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。 同样以最简单的函数为例： void f(){ int i ..." />
 
         <meta property="og:site_name" content="Farseerfc's Blog" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.4 I386平台C函数调用边界的栈分配"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation-zhs.html"/>
-        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.4 I386 平台 C 函数调用边界的栈分配 当调用一个函数时 ， 主调函数将参数以声明中相反的顺序压栈 ， 然后将当前的代码执行指针 (eip) 压栈 ， 然后跳转到被调函数的入口点 。 在被调函数中 ， 通过将 ebp 加上一个偏移量来访问函数参数 ， 以声明中的顺序 ( 即压栈的相反顺序 ) 来确定参数偏移量 。 被调函数返回时 ， 弹出主调函数压在栈中的代码执行指针 ， 跳回主调函数 。 再由主调函数恢复到调用前的栈 。 函数的返回值不同于函数参数 ， 通过寄存器传递 。 如果返回值类型可以放入 32 位变量 ， 比如 int、short、char、 指针等类型 ， 通过 eax 寄存器传递 。 如果返回值类型是 64 位变量 ， 如 _int64， 同过 edx+eax 传递 ..."/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.4 I386平台C函数调用边界的栈分配 当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。 函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。 同样以最简单的函数为例： void f(){ int i ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -150,12 +150,12 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <html><body><p> 从  <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                <html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="i386c">
-<h2>2.4 I386 平台 C 函数调用边界的栈分配 </h2>
-<p> 当调用一个函数时 ， 主调函数将参数以声明中相反的顺序压栈 ， 然后将当前的代码执行指针 (eip) 压栈 ， 然后跳转到被调函数的入口点 。 在被调函数中 ， 通过将 ebp 加上一个偏移量来访问函数参数 ， 以声明中的顺序 ( 即压栈的相反顺序 ) 来确定参数偏移量 。 被调函数返回时 ， 弹出主调函数压在栈中的代码执行指针 ， 跳回主调函数 。 再由主调函数恢复到调用前的栈 。</p>
-<p> 函数的返回值不同于函数参数 ， 通过寄存器传递 。 如果返回值类型可以放入 32 位变量 ， 比如 int、short、char、 指针等类型 ， 通过 eax 寄存器传递 。 如果返回值类型是 64 位变量 ， 如 _int64， 同过 edx+eax 传递 ，edx 存储高 32 位 ，eax 存储低 32 位 。 如果返回值是浮点类型 ， 如 float 和 double， 通过专用的浮点数寄存器栈的栈顶返回 。 如果返回值类型是用户自定义结构 ， 或 C++ 类类型 ， 通过修改函数签名 ， 以引用型参数的形式传回 。</p>
-<p> 同样以最简单的函数为例 ：</p>
+<h2>2.4 I386平台C函数调用边界的栈分配</h2>
+<p>当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。</p>
+<p>函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。</p>
+<p>同样以最简单的函数为例：</p>
 <p>void f(){</p>
 <p>int i=g(1,2);</p>
 <p>}</p>
@@ -163,44 +163,44 @@ Farseerfc's Blog            </a>
 <p>int c=a+b；</p>
 <p>return c;</p>
 <p>}</p>
-<p> 产生的汇编代码如下 ：</p>
+<p>产生的汇编代码如下：</p>
 <p>f:</p>
-<p>push ebp ; 备份 ebp</p>
-<p>mov ebp,esp ; 建立栈底 </p>
-<p>sub esp,4 ; 为 i 分配空间 </p>
-<p>mov eax,2 ; 准备参数 b 的值 2</p>
-<p>push eax ; 将 b 压栈 </p>
-<p>mov eax,1 ; 准备参数 a 的值 1</p>
-<p>push eax ; 将 a 压栈 </p>
-<p>call g ; 调用 g</p>
-<p>add esp,8 ; 将 a 和 b 一起弹出 ， 恢复调用前的栈 </p>
-<p>mov dword ptr[ebp-4],eax ; 将返回值保存进变量 i</p>
-<p>mov esp,ebp ; 恢复栈顶 </p>
-<p>pop ebp ; 恢复栈底 </p>
+<p>push ebp ;备份ebp</p>
+<p>mov ebp,esp ;建立栈底</p>
+<p>sub esp,4 ;为i分配空间</p>
+<p>mov eax,2 ;准备参数b的值2</p>
+<p>push eax ;将b压栈</p>
+<p>mov eax,1 ;准备参数a的值1</p>
+<p>push eax ;将a压栈</p>
+<p>call g ;调用g</p>
+<p>add esp,8 ;将a和b一起弹出，恢复调用前的栈</p>
+<p>mov dword ptr[ebp-4],eax ;将返回值保存进变量i</p>
+<p>mov esp,ebp ;恢复栈顶</p>
+<p>pop ebp ;恢复栈底</p>
 <p>g:</p>
-<p>push ebp ; 备份 ebp</p>
-<p>mov ebp,esp ; 建立栈底 </p>
-<p>sub esp,4 ; 为局部变量 c 在栈中分配内存 </p>
-<p>mov eax,dword ptr[ebp+8] ; 通过 ebp 间接读取参数 a 的值 </p>
-<p>mov ebx,dword ptr[ebp+12] ; 通过 ebp 间接读取参数 b 的值 </p>
-<p>add eax,ebx ; 将 a 和 b 的值相加 ， 之和存在 eax 中 </p>
-<p>mov dword ptr[ebp-4],eax ; 将和存入变量 c</p>
-<p>mov eax,dword ptr[ebp-4] ; 将 c 作为返回值 ， 代码优化后会删除此句 </p>
-<p>add esp,4 ; 销毁 c 的内存 </p>
-<p>mov esp,ebp ; 恢复栈顶 </p>
-<p>pop ebp ; 恢复栈底 </p>
-<p>ret ; 返回函数 f</p>
-<p> 栈的内存布局如下 ：</p>
-<p>100076:c &lt;- g 的 esp</p>
-<p>100080:f 的 ebp=100100 &lt;- g 的 ebp</p>
-<p>100084:f 的 eip</p>
+<p>push ebp ;备份ebp</p>
+<p>mov ebp,esp ;建立栈底</p>
+<p>sub esp,4 ;为局部变量c在栈中分配内存</p>
+<p>mov eax,dword ptr[ebp+8] ;通过ebp间接读取参数a的值</p>
+<p>mov ebx,dword ptr[ebp+12] ;通过ebp间接读取参数b的值</p>
+<p>add eax,ebx ;将a和b的值相加，之和存在eax中</p>
+<p>mov dword ptr[ebp-4],eax ;将和存入变量c</p>
+<p>mov eax,dword ptr[ebp-4] ;将c作为返回值，代码优化后会删除此句</p>
+<p>add esp,4 ;销毁c的内存</p>
+<p>mov esp,ebp ;恢复栈顶</p>
+<p>pop ebp ;恢复栈底</p>
+<p>ret ;返回函数f</p>
+<p>栈的内存布局如下：</p>
+<p>100076:c &lt;- g的esp</p>
+<p>100080:f的ebp=100100 &lt;- g的ebp</p>
+<p>100084:f的eip</p>
 <p>100088:a=1</p>
 <p>100092:b=2</p>
 <p>100096:i</p>
-<p>100100: 旧 ebp &lt;-f 的 ebp</p>
+<p>100100:旧ebp &lt;-f的ebp</p>
 <p>100104:……</p>
-<p> 注意在函数 g 的汇编代码中 ， 访问函数的局部变量和访问函数参数的区别 。 局部变量总是通过将 ebp 减去偏移量来访问 ， 函数参数总是通过将 ebp 加上偏移量来访问 。 对于 32 位变量而言 ， 第一个局部变量位于 ebp-4， 第二个位于 ebp-8， 以此类推 ，32 位局部变量在栈中形成一个逆序数组 ； 第一个函数参数位于 ebp+8， 第二个位于 ebp+12， 以此类推 ，32 位函数参数在栈中形成一个正序数组 。</p>
-<p> 由于函数返回值通过寄存器返回 ， 不需要空间分配等操作 ， 所以返回值的代价很低 。 基于这个原因 ， 旧的 C 语法约定 ， 不写明返回值类型的函数 ， 返回值类型为 int。 这一规则与现行的 C++ 语法相违背 ， 因为 C++ 中 ， 不写明返回值类型的函数返回值类型为 void， 表示不返回值 。 这种语法不兼容性是为了加强 C++ 的类型安全 ， 但同时也带来了一些问题 。</p>
+<p>注意在函数g的汇编代码中，访问函数的局部变量和访问函数参数的区别。局部变量总是通过将ebp减去偏移量来访问，函数参数总是通过将ebp加上偏移量来访问。对于32位变量而言，第一个局部变量位于ebp-4，第二个位于ebp-8，以此类推，32位局部变量在栈中形成一个逆序数组；第一个函数参数位于ebp+8，第二个位于ebp+12，以此类推，32位函数参数在栈中形成一个正序数组。</p>
+<p>由于函数返回值通过寄存器返回，不需要空间分配等操作，所以返回值的代价很低。基于这个原因，旧的C语法约定，不写明返回值类型的函数，返回值类型为int。这一规则与现行的C++语法相违背，因为C++中，不写明返回值类型的函数返回值类型为void，表示不返回值。这种语法不兼容性是为了加强C++的类型安全，但同时也带来了一些问题。</p>
 </div>
 </body></html>
             </div>
@@ -208,7 +208,7 @@ Farseerfc's Blog            </a>
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <h4>
-                This is part <built-in method index of unicode object at 0x7ff6e1c13330> of the "" series:
+                This is part <built-in method index of unicode object at 0x7f877419f690> of the "" series:
                 </h4>
                 </div>
                 <div class="btn-group-vertical btn-group-flat" style="width:100%">
@@ -272,7 +272,7 @@ Farseerfc's Blog            </a>
 
 <section>
     <div class="row">
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -304,7 +304,7 @@ Farseerfc's Blog            </a>
 
             
 
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -437,7 +437,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -520,7 +520,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -535,7 +535,7 @@ Farseerfc's Blog            </a>
     </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -545,7 +545,7 @@ Farseerfc's Blog            </a>
 <div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>

@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386 平臺的其它函數調用模型 上文介紹的只是 I386 平臺上 C 函數調用的標準模型 ， 被稱作 __cdecl。 事實上 ，Microsoft Visual C++ 編譯器還支持其它一些函數調用模型 ， 所有調用模型名稱皆以雙下劃線開頭 ， 下面列出所有函數調用模型的異同 ： 1 __cdecl 參數壓棧順序 ： 逆序 ( 從右至左 ) 參數堆棧恢復者 ： 主調函數 (caller) __cdecl 明確地指出函數使用 C 函數調用模型 ， 這是默認的調用模型 。 2 __stdcall 參數壓棧順序 ： 逆序 ( 從右至左 ) 參數堆棧恢復者 ： 被調函數 (callee) __stdcall 是微軟所謂的標準調用模型 。 可惜的是它與 __cdecl 不兼容 。 幾乎所有的 ..." />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型 ..." />
 
         <meta property="og:site_name" content="Farseerfc's Blog" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.7 I386平臺的其它函數調用模型"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions.html"/>
-        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386 平臺的其它函數調用模型 上文介紹的只是 I386 平臺上 C 函數調用的標準模型 ， 被稱作 __cdecl。 事實上 ，Microsoft Visual C++ 編譯器還支持其它一些函數調用模型 ， 所有調用模型名稱皆以雙下劃線開頭 ， 下面列出所有函數調用模型的異同 ： 1 __cdecl 參數壓棧順序 ： 逆序 ( 從右至左 ) 參數堆棧恢復者 ： 主調函數 (caller) __cdecl 明確地指出函數使用 C 函數調用模型 ， 這是默認的調用模型 。 2 __stdcall 參數壓棧順序 ： 逆序 ( 從右至左 ) 參數堆棧恢復者 ： 被調函數 (callee) __stdcall 是微軟所謂的標準調用模型 。 可惜的是它與 __cdecl 不兼容 。 幾乎所有的 ..."/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型 ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -150,65 +150,65 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <html><body><p> 從  <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  導入 </p>
+                <html><body><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
 <div class="section" id="i386">
-<h2>2.7 I386 平臺的其它函數調用模型 </h2>
+<h2>2.7 I386平臺的其它函數調用模型</h2>
 <div class="line-block">
-<div class="line"> 上文介紹的只是 I386 平臺上 C 函數調用的標準模型 ， 被稱作 __cdecl。 事實上 ，Microsoft Visual C++ 編譯器還支持其它一些函數調用模型 ， 所有調用模型名稱皆以雙下劃線開頭 ， 下面列出所有函數調用模型的異同 ：</div>
+<div class="line">上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同：</div>
 </div>
 <div class="section" id="cdecl">
 <h3>1 __cdecl</h3>
-<p> 參數壓棧順序 ： 逆序 ( 從右至左 )</p>
-<p> 參數堆棧恢復者 ： 主調函數 (caller)</p>
+<p>參數壓棧順序：逆序(從右至左)</p>
+<p>參數堆棧恢復者：主調函數(caller)</p>
 <div class="line-block">
-<div class="line">__cdecl 明確地指出函數使用 C 函數調用模型 ， 這是默認的調用模型 。</div>
+<div class="line">__cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。</div>
 </div>
 </div>
 <div class="section" id="stdcall">
 <h3>2 __stdcall</h3>
-<p> 參數壓棧順序 ： 逆序 ( 從右至左 )</p>
-<p> 參數堆棧恢復者 ： 被調函數 (callee)</p>
+<p>參數壓棧順序：逆序(從右至左)</p>
+<p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line">__stdcall 是微軟所謂的標準調用模型 。 可惜的是它與 __cdecl 不兼容 。 幾乎所有的 Win32API 函數使用這種函數調用模型 ， 希望在 <span class="caps">DLL</span> 之間 ， 或者在程序和 WinNT 操作系統之間傳遞函數指針的函數也應該使用這種模型 。 與 __cdecl 模型的不同之處在於 ，__stdcall 模型下由被調函數恢復堆棧 。 主調函數在 call 語句之後 ， 不需要再加上 add 語句 。 而被調函數的 ret 語句則被添加一個參數 ， 代表函數參數堆棧的長度 。 因此 ， 被調函數需要明確的知曉函數參數的數量和類型 ， 所以在 __stdcall 模型下不支持可變參數表 ， 所有參數必須寫明 。</div>
+<div class="line">__stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在<span class="caps">DLL</span>之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明。</div>
 </div>
 </div>
 <div class="section" id="thiscall">
 <h3>3 __thiscall</h3>
-<p> 參數壓棧順序 ： 逆序 ( 從右至左 )，this 用 ecx 傳遞 。</p>
-<p> 參數堆棧恢復者 ： 被調函數 (callee)</p>
+<p>參數壓棧順序：逆序(從右至左)，this用ecx傳遞。</p>
+<p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line">__thiscall 是 <span class="caps">VC</span> 編譯器中類的非靜態成員函數 (non-static member functon) 的默認調用模型 。 但是如果此成員函數有可變參數表 ，<span class="caps">VC</span> 編譯器會使用 __cdecl。 和 __stdcall 一樣 ，__thiscall 由被調函數恢復堆棧 。 比較獨特的是 __thiscall 會通過 ecx 寄存器傳遞成員函數的 this 指針 ， 而 __cdecl 下 this 指針是通過在參數表最前面增加一個函數參數來傳遞的 。__thiscall 是 <span class="caps">VC</span> 編譯器對 this 指針的使用的一種優化 ， 大大提高了面向對象程序的效率 。 在 <span class="caps">VC2003</span> 及之前的編譯器上 __thiscall 不是一個關鍵字 ， 不能被顯式指定 。 但可以給成員函數顯式指定 __cdecl 來避免使用 __thiscall。</div>
+<div class="line">__thiscall是<span class="caps">VC</span>編譯器中類的非靜態成員函數(non-static member functon)的默認調用模型。但是如果此成員函數有可變參數表，<span class="caps">VC</span>編譯器會使用__cdecl。和__stdcall一樣，__thiscall由被調函數恢復堆棧。比較獨特的是__thiscall會通過ecx寄存器傳遞成員函數的this指針，而__cdecl下this指針是通過在參數表最前面增加一個函數參數來傳遞的。__thiscall是<span class="caps">VC</span>編譯器對this指針的使用的一種優化，大大提高了面向對象程序的效率。在<span class="caps">VC2003</span>及之前的編譯器上__thiscall不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定__cdecl來避免使用__thiscall。</div>
 </div>
 </div>
 <div class="section" id="fastcall">
 <h3>4 __fastcall</h3>
-<p> 參數壓棧順序 ： 逆序 ( 從右至左 )， 前兩個 32 位函數參數放入 ecx 和 edx 中 </p>
-<p> 參數堆棧恢復者 ： 被調函數 (callee)</p>
+<p>參數壓棧順序：逆序(從右至左)，前兩個32位函數參數放入ecx和edx中</p>
+<p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line"> 快速函數調用模型 ， 將前兩個 32 位函數參數放入 ecx 和 edx 中 ， 其餘參數再逆序壓棧 。 使用的是和 __thiscall 類似的優化技術 ， 加快函數調用 ， 適合運用在小型 inline 函數上 。 同樣使用 __stdcall 形式的被調函數恢復堆棧 ， 所以不支持可變參數表 。</div>
+<div class="line">快速函數調用模型，將前兩個32位函數參數放入ecx和edx中，其餘參數再逆序壓棧。使用的是和__thiscall類似的優化技術，加快函數調用，適合運用在小型inline函數上。同樣使用__stdcall形式的被調函數恢復堆棧，所以不支持可變參數表。</div>
 </div>
 </div>
 <div class="section" id="pascal">
 <h3>5 __pascal</h3>
-<p> 參數壓棧順序 ： 正序 ( 從左至右 )</p>
-<p> 參數堆棧恢復者 ： 被調函數 (callee)</p>
+<p>參數壓棧順序：正序(從左至右)</p>
+<p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line"> 過程式編程語言 Pascal 所使用的函數調用模型 ， 由此得名 。 也是 16 位版本的 Windows 使用的 <span class="caps">API</span> 模型 ， 過時的模型 ， 現在已經廢棄且禁止使用 。 你會看到有些書本仍會不時提到它 ， 所以需要注意 。__pascal 是正序壓棧 ， 這與大部分 I386 函數模型都不相同 。 與 __stdcall 一樣 ， 由被調者恢復堆棧 ， 不支持可變參數表 。 歷史上曾有過的別名 <span class="caps">PASCAL</span>、pascal、_pascal( 單下劃線 )， 現在都改成了 __stdcall 的別名 ， 與 __pascal( 雙下劃線 ) 不同 。</div>
+<div class="line">過程式編程語言Pascal所使用的函數調用模型，由此得名。也是16位版本的Windows使用的<span class="caps">API</span>模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。__pascal是正序壓棧，這與大部分I386函數模型都不相同。與__stdcall一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名<span class="caps">PASCAL</span>、pascal、_pascal(單下劃線)，現在都改成了__stdcall的別名，與__pascal(雙下劃線)不同。</div>
 </div>
 </div>
 <div class="section" id="id1">
-<h3>6  其它函數調用模型 ， 以及模型別名 。</h3>
-<p>__syscall： 操作系統內部使用的函數調用模型 ， 由用戶模式向核心模式跳轉時使用的模型 。 由於用戶模式和核心模式使用不同的棧 ， 所以沒辦法使用棧來傳遞參數 ， 所有參數通過寄存器傳遞 ， 這限制了參數的數量 。 用戶模式編程中不允許使用 。</p>
-<p>__fortran： 數學運算語言 fortran 使用的函數模型 ， 由此得名 。 在 C 中調用由 fortran 編譯的函數時使用 。</p>
-<p>__clrcall： 微軟 .Net 框架使用的函數模型 ， 託管 (Managed)C++ 默認使用 ， 也可以從非託管代碼調用託管函數時使用 。 參數在託管棧上正序 ( 從左至右 ) 壓棧 ， 不使用普通棧 。</p>
-<p><span class="caps">CALLBACK</span>、<span class="caps">PASCAL</span>、<span class="caps">WINAPI</span>、<span class="caps">APIENTRY</span>、<span class="caps">APIPRIVATE</span>：I386 平臺上是 __stdcall 的別名 </p>
+<h3>6 其它函數調用模型，以及模型別名。</h3>
+<p>__syscall：操作系統內部使用的函數調用模型，由用戶模式向核心模式跳轉時使用的模型。由於用戶模式和核心模式使用不同的棧，所以沒辦法使用棧來傳遞參數，所有參數通過寄存器傳遞，這限制了參數的數量。用戶模式編程中不允許使用。</p>
+<p>__fortran：數學運算語言fortran使用的函數模型，由此得名。在C中調用由fortran編譯的函數時使用。</p>
+<p>__clrcall：微軟.Net框架使用的函數模型，託管(Managed)C++默認使用，也可以從非託管代碼調用託管函數時使用。參數在託管棧上正序(從左至右)壓棧，不使用普通棧。</p>
+<p><span class="caps">CALLBACK</span>、<span class="caps">PASCAL</span>、<span class="caps">WINAPI</span>、<span class="caps">APIENTRY</span>、<span class="caps">APIPRIVATE</span>：I386平臺上是__stdcall的別名</p>
 <div class="line-block">
-<div class="line"><span class="caps">WINAPIV</span>：I386 平臺上是 __cdecl 的別名 </div>
+<div class="line"><span class="caps">WINAPIV</span>：I386平臺上是__cdecl的別名</div>
 </div>
 </div>
 <div class="section" id="id2">
-<h3>7  函數調用模型的指定 </h3>
-<p> 函數調用模型的指定方式和 inline 關鍵字的指定方式相同 ， 事實上 ，inline 可以被看作是 C++ 語言內建的一種函數調用模型 。 唯一不同的是 ， 聲明函數指針時 ， 也要指明函數調用模型 ， 而 inline 的指針是不能指明的 ， 根本不存在指向 inline 函數的指針 。 比如 ：</p>
+<h3>7 函數調用模型的指定</h3>
+<p>函數調用模型的指定方式和inline關鍵字的指定方式相同，事實上，inline可以被看作是C++語言內建的一種函數調用模型。唯一不同的是，聲明函數指針時，也要指明函數調用模型，而inline的指針是不能指明的，根本不存在指向inline函數的指針。比如：</p>
 <p>int <span class="caps">CALLBACK</span> GetVersion();</p>
 <p>int (<span class="caps">CALLBACK</span> * pf)()=GetVersion;</p>
 </div>
@@ -295,7 +295,7 @@ Farseerfc's Blog            </a>
 
 <section>
     <div class="row">
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -327,7 +327,7 @@ Farseerfc's Blog            </a>
 
             
 
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -460,7 +460,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 ">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -543,7 +543,7 @@ Farseerfc's Blog            </a>
 </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -558,7 +558,7 @@ Farseerfc's Blog            </a>
     </div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
@@ -568,7 +568,7 @@ Farseerfc's Blog            </a>
 <div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
 </div>
 </div>
-<div class="col-md-12 col-sm-12 col-xs-6">
+<div class="col-md-12 col-sm-12 hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
