@@ -72,6 +72,9 @@ Farseerfc's Blog            </a>
                         <li >
                             <a href="//farseerfc.github.io/category/life.html">Life</a>
                         </li>
+                        <li >
+                            <a href="//farseerfc.github.io/category/linux.html">Linux</a>
+                        </li>
                         <li class="active">
                             <a href="//farseerfc.github.io/category/programming.html">Programming</a>
                         </li>
@@ -204,48 +207,133 @@ English
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p>It is strange when <tt class="docutils literal">f</tt> it don’t allow my specified <tt class="docutils literal">f&lt;A&gt;</tt>.</p>
-<p>But in <tt class="docutils literal">ff</tt> it allowed <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt>.</p>
+<p>It is strange when </p><pre>
+f</pre>
+ it don’t allow my specified <pre>
+f&lt;A&gt;</pre>
+.
+<p>But in </p><pre>
+ff</pre>
+ it allowed <pre>
+ff&lt;BB&lt;long&gt;&gt;</pre>
+.
 <p>Tested under <span class="caps">VC10</span> and <span class="caps">GCC3</span>.4</p>
 </div>
 <div class="section" id="my-answer-to-the-problem">
 <h2>My answer to the problem</h2>
 <p>Let’s think ourself as compiler to see what happened there.</p>
-<p>Define mark <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt> is the instantiated result when we put <tt class="docutils literal">B</tt> into the parameter <tt class="docutils literal">T</tt> of <tt class="docutils literal">A&lt;T&gt;</tt> .</p>
+<p>Define mark </p><pre>
+#</pre>
+ : <pre>
+A#B</pre>
+ is the instantiated result when we put <pre>
+B</pre>
+ into the parameter <pre>
+T</pre>
+ of <pre>
+A&lt;T&gt;</pre>
+ .
 <div class="section" id="first-we-discuss-ff">
 <h3>First we discuss ff</h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p>After this sentense, the compiler saw the instantiation of <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt> , so it instantiate <tt class="docutils literal"><span class="caps">DD</span>#long</tt> , and also <tt class="docutils literal"><span class="caps">BB</span>#long</tt> .</p>
+<p>After this sentense, the compiler saw the instantiation of </p><pre>
+DD&lt;long&gt;</pre>
+ , so it instantiate <pre>
+DD#long</pre>
+ , and also <pre>
+BB#long</pre>
+ .
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
 <p>This sentense required the compiler to calculate set of overloading functions.</p>
-<p>Step 1 we need to infer <tt class="docutils literal">T</tt> of <tt class="docutils literal">ff&lt;T&gt;</tt> from argument <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt> . Based on the inference rule:</p>
+<p>Step 1 we need to infer </p><pre>
+T</pre>
+ of <pre>
+ff&lt;T&gt;</pre>
+ from argument <pre>
+DD#long -&gt; BB&lt;T&gt;</pre>
+ . Based on the inference rule:
 <pre class="literal-block">
 Argument with type ``class_template_name&lt;T&gt;`` can be use to infer ``T``.
 </pre>
-<p>So compiler inferred <tt class="docutils literal">T</tt> as <tt class="docutils literal">long</tt> . Here if it is not <tt class="docutils literal"><span class="caps">BB</span></tt> but <tt class="docutils literal"><span class="caps">CC</span></tt> which is complete un-related, we can also infer, as long as <tt class="docutils literal"><span class="caps">CC</span></tt> is a template like <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt> .</p>
-<p>Step 2 Template Specialization Resolution. There is only one template here so we matched <tt class="docutils literal">ff&lt;T&gt;</tt> .</p>
+<p>So compiler inferred </p><pre>
+T</pre>
+ as <pre>
+long</pre>
+ . Here if it is not <pre>
+BB</pre>
+ but <pre>
+CC</pre>
+ which is complete un-related, we can also infer, as long as <pre>
+CC</pre>
+ is a template like <pre>
+CC&lt;T&gt;</pre>
+ .
+<p>Step 2 Template Specialization Resolution. There is only one template here so we matched </p><pre>
+ff&lt;T&gt;</pre>
+ .
 <p>Step 3 Template Instantiation</p>
-<p>After inferred <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt> , compiler instantiated <tt class="docutils literal">ff#long</tt> .</p>
-<p>Set of available overloading functions : <tt class="docutils literal">{ff#long}</tt></p>
-<p>Then overloading resolution found the only match <tt class="docutils literal">ff#long</tt>, checked its real parameter <tt class="docutils literal"><span class="caps">DD</span>#long</tt> can be down-cast to formal parameter <tt class="docutils literal"><span class="caps">BB</span>#long</tt> .</p>
+<p>After inferred </p><pre>
+long -&gt; T</pre>
+ , compiler instantiated <pre>
+ff#long</pre>
+ .
+<p>Set of available overloading functions : </p><pre>
+{ff#long}</pre>
+<p>Then overloading resolution found the only match </p><pre>
+ff#long</pre>
+, checked its real parameter <pre>
+DD#long</pre>
+ can be down-cast to formal parameter <pre>
+BB#long</pre>
+ .
 </div>
 <div class="section" id="then-we-discuss-f">
 <h3>Then we discuss f</h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 <p>Calculate set of overloading functions.</p>
-<p>Step 1 infer all template parameters for template <tt class="docutils literal">f</tt> . According to inference rule:</p>
+<p>Step 1 infer all template parameters for template </p><pre>
+f</pre>
+ . According to inference rule:
 <pre class="literal-block">
 Parameter with type ``T`` can be used to infer ``T`` 。
 </pre>
-<p>So <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt> is inferred.</p>
+<p>So </p><pre>
+B -&gt; T</pre>
+ is inferred.
 <p>Step 2 Template Specialization Resolution.</p>
-<p>Here <tt class="docutils literal">B</tt> is not <tt class="docutils literal">A</tt> so we can not apply specialization of <tt class="docutils literal">f&lt;A&gt;</tt> , remaining <tt class="docutils literal">f&lt;T&gt;</tt> as the only alternative.</p>
+<p>Here </p><pre>
+B</pre>
+ is not <pre>
+A</pre>
+ so we can not apply specialization of <pre>
+f&lt;A&gt;</pre>
+ , remaining <pre>
+f&lt;T&gt;</pre>
+ as the only alternative.
 <p>Step 3 Template Instantiation.</p>
-<p>When we put <tt class="docutils literal">B</tt> into <tt class="docutils literal">f&lt;T&gt;</tt> to instantiate as <tt class="docutils literal">f#B</tt> , we need to instantiate <tt class="docutils literal">traits#B</tt>.</p>
-<p>There is no specialization for <tt class="docutils literal">B</tt> so we use template <tt class="docutils literal">traits&lt;T&gt;</tt>, <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> , so <tt class="docutils literal">enable_if#false</tt> didn’t contains a <tt class="docutils literal">type</tt> , an error occurred.</p>
+<p>When we put </p><pre>
+B</pre>
+ into <pre>
+f&lt;T&gt;</pre>
+ to instantiate as <pre>
+f#B</pre>
+ , we need to instantiate <pre>
+traits#B</pre>
+.
+<p>There is no specialization for </p><pre>
+B</pre>
+ so we use template <pre>
+traits&lt;T&gt;</pre>
+, <pre>
+traits#B::value=false</pre>
+ , so <pre>
+enable_if#false</pre>
+ didn’t contains a <pre>
+type</pre>
+ , an error occurred.
 <p>The only template is mismatch, available overloading functions is empty set. So we got an error.</p>
 </div>
 </div>
@@ -362,13 +450,18 @@ Parameter with type ``T`` can be used to infer ``T`` 。
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/zz.html">
                     zz <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
+            <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 1</sup>
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -387,6 +480,11 @@ Parameter with type ``T`` can be used to infer ``T`` 。
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/music.html">
                     music <sup> 1</sup>
                 </a>
@@ -399,6 +497,11 @@ Parameter with type ``T`` can be used to infer ``T`` 。
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/you.html">
                     you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -620,7 +723,7 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2013 farseerfc
+         <div class="col-xs-10">&copy; 2014 farseerfc
             &middot; Powered by
             <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,

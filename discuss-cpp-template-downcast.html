@@ -72,6 +72,9 @@ Farseerfc's Blog            </a>
                         <li >
                             <a href="//farseerfc.github.io/category/life.html">Life</a>
                         </li>
+                        <li >
+                            <a href="//farseerfc.github.io/category/linux.html">Linux</a>
+                        </li>
                         <li class="active">
                             <a href="//farseerfc.github.io/category/programming.html">Programming</a>
                         </li>
@@ -204,51 +207,136 @@ Farseerfc's Blog            </a>
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p>奇怪的是重載決議的時候， <tt class="docutils literal">f</tt> 的情況下它就不讓我特化的 <tt class="docutils literal">f&lt;A&gt;</tt> 進來。</p>
-<p>但是在 <tt class="docutils literal">ff</tt> 的情況下， <tt class="docutils literal">ff&lt;<span class="caps">BB</span>&lt;long&gt;&gt;</tt> 卻進來了。</p>
+<p>奇怪的是重載決議的時候， </p><pre>
+f</pre>
+ 的情況下它就不讓我特化的 <pre>
+f&lt;A&gt;</pre>
+ 進來。
+<p>但是在 </p><pre>
+ff</pre>
+ 的情況下， <pre>
+ff&lt;BB&lt;long&gt;&gt;</pre>
+ 卻進來了。
 <p>在<span class="caps">VC10</span>和<span class="caps">GCC3</span>.4下測試</p>
 </div>
 <div class="section" id="id3">
 <h2>我的解答</h2>
 <p>我們來設身處地地作爲編譯器，看一遍到底發生了什麼。</p>
-<p>約定符號 <tt class="docutils literal">#</tt> : <tt class="docutils literal">A#B</tt> 是把 <tt class="docutils literal">B</tt> 帶入 <tt class="docutils literal">A&lt;T&gt;</tt> 的參數 <tt class="docutils literal">T</tt> 之後實例化得到的結果。</p>
+<p>約定符號 </p><pre>
+#</pre>
+ : <pre>
+A#B</pre>
+ 是把 <pre>
+B</pre>
+ 帶入 <pre>
+A&lt;T&gt;</pre>
+ 的參數 <pre>
+T</pre>
+ 之後實例化得到的結果。
 <div class="section" id="ff">
 <h3>首先看ff的情況。</h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p>處理到這句的時候，編譯器看到了 <tt class="docutils literal"><span class="caps">DD</span>&lt;long&gt;</tt> 的實例化，於是去實例化 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> ，繼而實例
-化了 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> 。</p>
+<p>處理到這句的時候，編譯器看到了 </p><pre>
+DD&lt;long&gt;</pre>
+ 的實例化，於是去實例化 <pre>
+DD#long</pre>
+ ，繼而實例
+化了 <pre>
+BB#long</pre>
+ 。
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
 <p>這句，首先計算重載函數集合。</p>
-<p>第一步，需要從參數 <tt class="docutils literal"><span class="caps">DD</span>#long <span class="pre">-&gt;</span> <span class="caps">BB</span>&lt;T&gt;</tt> 推斷 <tt class="docutils literal">ff&lt;T&gt;</tt> 的 <tt class="docutils literal">T</tt> 。根據函數模板參數推斷規則：</p>
+<p>第一步，需要從參數 </p><pre>
+DD#long -&gt; BB&lt;T&gt;</pre>
+ 推斷 <pre>
+ff&lt;T&gt;</pre>
+ 的 <pre>
+T</pre>
+ 。根據函數模板參數推斷規則：
 <pre class="literal-block">
 ``class_template_name&lt;T&gt;`` 類型的參數，可以用於推斷 ``T`` 。
 </pre>
-<p>於是編譯器推斷 <tt class="docutils literal">T</tt> 爲 <tt class="docutils literal">long</tt> 。這裏就算不是 <tt class="docutils literal"><span class="caps">BB</span></tt> 而是完全無關的 <tt class="docutils literal"><span class="caps">CC</span></tt> 都可以推斷成功，只要 <tt class="docutils literal"><span class="caps">CC</span></tt> 也
-是一個 <tt class="docutils literal"><span class="caps">CC</span>&lt;T&gt;</tt> 形式的模板。</p>
-<p>第二步，模板特化匹配。因爲只有一個模板，所以匹配了最泛化的 <tt class="docutils literal">ff&lt;T&gt;</tt> 。</p>
+<p>於是編譯器推斷 </p><pre>
+T</pre>
+ 爲 <pre>
+long</pre>
+ 。這裏就算不是 <pre>
+BB</pre>
+ 而是完全無關的 <pre>
+CC</pre>
+ 都可以推斷成功，只要 <pre>
+CC</pre>
+ 也
+是一個 <pre>
+CC&lt;T&gt;</pre>
+ 形式的模板。
+<p>第二步，模板特化匹配。因爲只有一個模板，所以匹配了最泛化的 </p><pre>
+ff&lt;T&gt;</pre>
+ 。
 <p>第三步，模板實例化。</p>
-<p>推斷了 <tt class="docutils literal">long <span class="pre">-&gt;</span> T</tt> 之後，編譯器實例化 <tt class="docutils literal">ff#long</tt> 。</p>
-<p>重載函數集合： <tt class="docutils literal">{ff#long}</tt></p>
-<p>然後重載抉擇找到唯一的可匹配的實例 <tt class="docutils literal">ff#long</tt> ，檢查實際參數 <tt class="docutils literal"><span class="caps">DD</span>#long</tt> 可以隱式轉換到
-形式參數 <tt class="docutils literal"><span class="caps">BB</span>#long</tt> ，從而生成了這次函數調用。</p>
+<p>推斷了 </p><pre>
+long -&gt; T</pre>
+ 之後，編譯器實例化 <pre>
+ff#long</pre>
+ 。
+<p>重載函數集合： </p><pre>
+{ff#long}</pre>
+<p>然後重載抉擇找到唯一的可匹配的實例 </p><pre>
+ff#long</pre>
+ ，檢查實際參數 <pre>
+DD#long</pre>
+ 可以隱式轉換到
+形式參數 <pre>
+BB#long</pre>
+ ，從而生成了這次函數調用。
 </div>
 <div class="section" id="f">
 <h3>再來看f的情況。</h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 <p>計算候選重載函數集合。</p>
-<p>第一步，對所有 <tt class="docutils literal">f</tt> 模板推斷實參。根據函數模板參數推斷規則：</p>
+<p>第一步，對所有 </p><pre>
+f</pre>
+ 模板推斷實參。根據函數模板參數推斷規則：
 <pre class="literal-block">
 帶有 ``T`` 類型的參數，可以用於推斷 ``T`` 。
 </pre>
-<p>於是 <tt class="docutils literal">B <span class="pre">-&gt;</span> T</tt> 被推斷出來了。</p>
+<p>於是 </p><pre>
+B -&gt; T</pre>
+ 被推斷出來了。
 <p>第二步，模板特化匹配。</p>
-<p>這裏 <tt class="docutils literal">B</tt> 不是 <tt class="docutils literal">A</tt> ，所以不能用 <tt class="docutils literal">f&lt;A&gt;</tt> 特化，只能用 <tt class="docutils literal">f&lt;T&gt;</tt> 模板。</p>
+<p>這裏 </p><pre>
+B</pre>
+ 不是 <pre>
+A</pre>
+ ，所以不能用 <pre>
+f&lt;A&gt;</pre>
+ 特化，只能用 <pre>
+f&lt;T&gt;</pre>
+ 模板。
 <p>第三步，模板實例化。</p>
-<p><tt class="docutils literal">B</tt> 帶入 <tt class="docutils literal">f&lt;T&gt;</tt> 實例化成 <tt class="docutils literal">f#B</tt> 的過程中，實例化 <tt class="docutils literal">traits#B</tt> 。</p>
-<p>由於沒有針對 <tt class="docutils literal">B</tt> 的特化，所以用 <tt class="docutils literal">traits&lt;T&gt;</tt> 模板， <tt class="docutils literal"><span class="pre">traits#B::value=false</span></tt> ，進而 <tt class="docutils literal">enable_if#false</tt> 沒有 <tt class="docutils literal">type</tt> ，出錯。</p>
+<p></p><pre>
+B</pre>
+ 帶入 <pre>
+f&lt;T&gt;</pre>
+ 實例化成 <pre>
+f#B</pre>
+ 的過程中，實例化 <pre>
+traits#B</pre>
+ 。
+<p>由於沒有針對 </p><pre>
+B</pre>
+ 的特化，所以用 <pre>
+traits&lt;T&gt;</pre>
+ 模板， <pre>
+traits#B::value=false</pre>
+ ，進而 <pre>
+enable_if#false</pre>
+ 沒有 <pre>
+type</pre>
+ ，出錯。
 <p>唯一的模板匹配出錯，重載函數集合爲空，<span class="caps">SFINAE</span>原則不能找到合適的匹配，於是報錯。</p>
 </div>
 </div>
@@ -365,13 +453,18 @@ Farseerfc's Blog            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/zz.html">
                     zz <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
+            <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 1</sup>
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -390,6 +483,11 @@ Farseerfc's Blog            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/music.html">
                     music <sup> 1</sup>
                 </a>
@@ -402,6 +500,11 @@ Farseerfc's Blog            </a>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/you.html">
                     you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -623,7 +726,7 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2013 farseerfc
+         <div class="col-xs-10">&copy; 2014 farseerfc
             &middot; Powered by
             <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
