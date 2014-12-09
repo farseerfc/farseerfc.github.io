@@ -71,9 +71,6 @@ Farseerfc's Blog            </a>
                         <li >
                             <a href="//farseerfc.github.io/category/life.html">Life</a>
                         </li>
-                        <li >
-                            <a href="//farseerfc.github.io/category/linux.html">Linux</a>
-                        </li>
                         <li class="active">
                             <a href="//farseerfc.github.io/category/programming.html">Programming</a>
                         </li>
@@ -271,7 +268,7 @@ posts</pre>
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <h4>
-                This is part <built-in method index of unicode object at 0x7fa498b64330> of the "" series:
+                This is part <built-in method index of unicode object at 0x7f55d5163630> of the "" series:
                 </h4>
                 </div>
                 <div class="btn-group-vertical btn-group-flat" style="width:100%">
@@ -762,63 +759,63 @@ oldOnload();
         $.material.init();
         $("div.navbar").autoHidingNavbar();
 
-        function applyTranslateAnime(){
-            $(".article-content .translate").each(function(idx, obj){
-                $(obj).attr("data-href", $(obj).attr("href"));
-                $(obj).attr("href", "javascript:void(0)");
-                $(obj).click(function(){
-                    var href = $(obj).attr("data-href");
-                    $('.breadcrumb').fadeOut("slow");
-                    $('.article-content').fadeOut("slow",function(){
-                        $.get(href, function(data){
-                            var el = new DOMParser().parseFromString(data, 'text/html');
-                            var title = $("#title", el)[0].innerHTML;
-                            var content = $(".article-content", el)[0].innerHTML;
-                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+        // function applyTranslateAnime(){
+        //     $(".article-content .translate").each(function(idx, obj){
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript:void(0)");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('.breadcrumb').fadeOut("slow");
+        //             $('.article-content').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $(".article-content", el)[0].innerHTML;
+        //                     var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
 
-                            document.title = htmlDecode(title);
-                            window.history.pushState({
-                                "content": content ,
-                                "title":title ,
-                                "breadcrumb":breadcrumb
-                            },"", href);
-                            $('.article-content')[0].innerHTML = content;
-                            $('.breadcrumb')[0].innerHTML = breadcrumb;
-                            $('.article-content').fadeIn('slow');
-                            $('.breadcrumb').fadeIn('slow');
-                            $("#comments script", el).each(function(idx, obj){
-                                // re-enable disqus
-                                eval(obj.innerHTML);
-                            });
-                            applyTranslateAnime();
-                        }).fail(function(){
-                            // failback to changing url
-                            window.location.href = href ;
-                        });
-                    });
-                });
-            });
-        };
-        applyTranslateAnime();
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title ,
+        //                         "breadcrumb":breadcrumb
+        //                     },"", href);
+        //                     $('.article-content')[0].innerHTML = content;
+        //                     $('.breadcrumb')[0].innerHTML = breadcrumb;
+        //                     $('.article-content').fadeIn('slow');
+        //                     $('.breadcrumb').fadeIn('slow');
+        //                     $("#comments script", el).each(function(idx, obj){
+        //                         // re-enable disqus
+        //                         eval(obj.innerHTML);
+        //                     });
+        //                     applyTranslateAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     });
+        // };
+        // applyTranslateAnime();
 
-        window.onpopstate = function(e){
-            if(e.state){
+        // window.onpopstate = function(e){
+        //     if(e.state){
                 
-                document.title = htmlDecode(e.state.title);
-                $('.breadcrumb').fadeOut("slow");
-                $('.article-content').fadeOut("slow",function(){
-                    $('.article-content')[0].innerHTML = e.state.content;
-                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
-                    $('.article-content').fadeIn('slow');
-                    $('.breadcrumb').fadeIn('slow');
-                    $("#comments script").each(function(idx, obj){
-                        // re-enable disqus
-                        eval(obj.innerHTML);
-                    });
-                    applyTranslateAnime();
-                });
-            }
-        }
+        //         document.title = htmlDecode(e.state.title);
+        //         $('.breadcrumb').fadeOut("slow");
+        //         $('.article-content').fadeOut("slow",function(){
+        //             $('.article-content')[0].innerHTML = e.state.content;
+        //             $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+        //             $('.article-content').fadeIn('slow');
+        //             $('.breadcrumb').fadeIn('slow');
+        //             $("#comments script").each(function(idx, obj){
+        //                 // re-enable disqus
+        //                 eval(obj.innerHTML);
+        //             });
+        //             applyTranslateAnime();
+        //         });
+        //     }
+        // }
         
         
 

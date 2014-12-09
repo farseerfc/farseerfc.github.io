@@ -65,9 +65,6 @@ Farseerfc's Blog            </a>
                             <a href="//farseerfc.github.io/category/life.html">Life</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/category/linux.html">Linux</a>
-                        </li>
-                        <li >
                             <a href="//farseerfc.github.io/category/programming.html">Programming</a>
                         </li>
             </ul>
@@ -148,23 +145,12 @@ Farseerfc's Blog            </a>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-linux">linux <span class="badge pull-right">1</span></a>
-                    </h4>
-                </div>
-                <div id="collapse-linux" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <p><span class="categories-timestamp"><time datetime="2014-12-09T01:54:00+09:00">2014年12月09日(週二)</time></span> <a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button.html"><span class="caps">KDE5</span> Plasma&nbsp;之跳動賣萌的活動按鈕</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-programming">programming <span class="badge pull-right">4</span></a>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-programming">programming <span class="badge pull-right">5</span></a>
                     </h4>
                 </div>
                 <div id="collapse-programming" class="panel-collapse collapse">
                     <div class="panel-body">
+                        <p><span class="categories-timestamp"><time datetime="2014-12-09T01:54:00+09:00">2014年12月09日(週二)</time></span> <a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button.html"><span class="caps">KDE5</span> Plasma&nbsp;之跳動賣萌的活動按鈕</a></p>
                         <p><span class="categories-timestamp"><time datetime="2012-04-02T12:42:00+09:00">2012年04月02日(週一)</time></span> <a href="//farseerfc.github.io/pyssy.html">Pyssy&nbsp;項目</a></p>
                         <p><span class="categories-timestamp"><time datetime="2012-03-02T23:09:00+09:00">2012年03月02日(週五)</time></span> <a href="//farseerfc.github.io/mix-ruby.html">PyRuby</a></p>
                         <p><span class="categories-timestamp"><time datetime="2012-02-26T05:54:57+09:00">2012年02月26日(週日)</time></span> <a href="//farseerfc.github.io/discuss-cpp-template-downcast.html">關於C++模板的類型轉換的討論</a></p>
@@ -609,63 +595,63 @@ oldOnload();
         $.material.init();
         $("div.navbar").autoHidingNavbar();
 
-        function applyTranslateAnime(){
-            $(".article-content .translate").each(function(idx, obj){
-                $(obj).attr("data-href", $(obj).attr("href"));
-                $(obj).attr("href", "javascript:void(0)");
-                $(obj).click(function(){
-                    var href = $(obj).attr("data-href");
-                    $('.breadcrumb').fadeOut("slow");
-                    $('.article-content').fadeOut("slow",function(){
-                        $.get(href, function(data){
-                            var el = new DOMParser().parseFromString(data, 'text/html');
-                            var title = $("#title", el)[0].innerHTML;
-                            var content = $(".article-content", el)[0].innerHTML;
-                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+        // function applyTranslateAnime(){
+        //     $(".article-content .translate").each(function(idx, obj){
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript:void(0)");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('.breadcrumb').fadeOut("slow");
+        //             $('.article-content').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $(".article-content", el)[0].innerHTML;
+        //                     var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
 
-                            document.title = htmlDecode(title);
-                            window.history.pushState({
-                                "content": content ,
-                                "title":title ,
-                                "breadcrumb":breadcrumb
-                            },"", href);
-                            $('.article-content')[0].innerHTML = content;
-                            $('.breadcrumb')[0].innerHTML = breadcrumb;
-                            $('.article-content').fadeIn('slow');
-                            $('.breadcrumb').fadeIn('slow');
-                            $("#comments script", el).each(function(idx, obj){
-                                // re-enable disqus
-                                eval(obj.innerHTML);
-                            });
-                            applyTranslateAnime();
-                        }).fail(function(){
-                            // failback to changing url
-                            window.location.href = href ;
-                        });
-                    });
-                });
-            });
-        };
-        applyTranslateAnime();
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title ,
+        //                         "breadcrumb":breadcrumb
+        //                     },"", href);
+        //                     $('.article-content')[0].innerHTML = content;
+        //                     $('.breadcrumb')[0].innerHTML = breadcrumb;
+        //                     $('.article-content').fadeIn('slow');
+        //                     $('.breadcrumb').fadeIn('slow');
+        //                     $("#comments script", el).each(function(idx, obj){
+        //                         // re-enable disqus
+        //                         eval(obj.innerHTML);
+        //                     });
+        //                     applyTranslateAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     });
+        // };
+        // applyTranslateAnime();
 
-        window.onpopstate = function(e){
-            if(e.state){
+        // window.onpopstate = function(e){
+        //     if(e.state){
                 
-                document.title = htmlDecode(e.state.title);
-                $('.breadcrumb').fadeOut("slow");
-                $('.article-content').fadeOut("slow",function(){
-                    $('.article-content')[0].innerHTML = e.state.content;
-                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
-                    $('.article-content').fadeIn('slow');
-                    $('.breadcrumb').fadeIn('slow');
-                    $("#comments script").each(function(idx, obj){
-                        // re-enable disqus
-                        eval(obj.innerHTML);
-                    });
-                    applyTranslateAnime();
-                });
-            }
-        }
+        //         document.title = htmlDecode(e.state.title);
+        //         $('.breadcrumb').fadeOut("slow");
+        //         $('.article-content').fadeOut("slow",function(){
+        //             $('.article-content')[0].innerHTML = e.state.content;
+        //             $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+        //             $('.article-content').fadeIn('slow');
+        //             $('.breadcrumb').fadeIn('slow');
+        //             $("#comments script").each(function(idx, obj){
+        //                 // re-enable disqus
+        //                 eval(obj.innerHTML);
+        //             });
+        //             applyTranslateAnime();
+        //         });
+        //     }
+        // }
         
         
 

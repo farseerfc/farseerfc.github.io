@@ -65,9 +65,6 @@ Farseerfc's Blog            </a>
                             <a href="//farseerfc.github.io/category/life.html">Life</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/category/linux.html">Linux</a>
-                        </li>
-                        <li >
                             <a href="//farseerfc.github.io/category/programming.html">Programming</a>
                         </li>
             </ul>
@@ -115,6 +112,7 @@ Farseerfc's Blog            </a>
 </a>
 <ul class="dropdown-menu">
 	<li><a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button-en.html" class="translate">English</a></li>
+	<li><a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button-jp.html" class="translate">日本語</a></li>
 	<li><a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button-zhs.html" class="translate">简体</a></li>
 </ul>
 </div>
@@ -128,10 +126,7 @@ Farseerfc's Blog            </a>
                 <div class="panel-body">
                     <div class="summary"><html><body><p>今天嘗試 <span class="caps">KDE5</span> Plasma 的活動的時候無意間發現這個現象。
 只要把活動按鈕拖出桌面，它就會在桌面邊緣來回跳動。 視頻如下：</p>
-<div align="left" class="youtube"><iframe frameborder="0" height="315" src="https://www.youtube.com/embed/SSbf97jGSpI" width="420"></iframe></div><embed align="middle" allowfullscreen="true" allowscriptaccess="always" height="400" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash" width="480"></embed><p>當然你可以把它再拖回來，所以這個問題還無傷大雅，只是賣萌。</p>
-<p>比比之前 Gnome3 那個跳動的界面真是好太多了：</p>
-<div align="left" class="youtube"><iframe frameborder="0" height="315" src="https://www.youtube.com/embed/TRQJdRHYwrw" width="420"></iframe></div><embed align="middle" allowfullscreen="true" allowscriptaccess="always" height="400" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash" width="480"></embed><p>順便，今天還看到一個賣萌的 <span class="caps">KDE5</span> Plasma 靜音圖標的翻譯：</p>
-<blockquote class="twitter-tweet" lang="zh-tw"><p><span class="caps">KDE5</span>のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 <a href="http://t.co/ipyHjXMscR">pic.twitter.com/ipyHjXMscR</a></p>— Jiachen <span class="caps">YANG</span> (@farseerfc) <a href="https://twitter.com/farseerfc/status/541944351270518784">2014 12月 8日</a></blockquote></body></html>
+
                     </div>
                 </div>
             </article>
@@ -902,63 +897,63 @@ oldOnload();
         $.material.init();
         $("div.navbar").autoHidingNavbar();
 
-        function applyTranslateAnime(){
-            $(".article-content .translate").each(function(idx, obj){
-                $(obj).attr("data-href", $(obj).attr("href"));
-                $(obj).attr("href", "javascript:void(0)");
-                $(obj).click(function(){
-                    var href = $(obj).attr("data-href");
-                    $('.breadcrumb').fadeOut("slow");
-                    $('.article-content').fadeOut("slow",function(){
-                        $.get(href, function(data){
-                            var el = new DOMParser().parseFromString(data, 'text/html');
-                            var title = $("#title", el)[0].innerHTML;
-                            var content = $(".article-content", el)[0].innerHTML;
-                            var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+        // function applyTranslateAnime(){
+        //     $(".article-content .translate").each(function(idx, obj){
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript:void(0)");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('.breadcrumb').fadeOut("slow");
+        //             $('.article-content').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $(".article-content", el)[0].innerHTML;
+        //                     var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
 
-                            document.title = htmlDecode(title);
-                            window.history.pushState({
-                                "content": content ,
-                                "title":title ,
-                                "breadcrumb":breadcrumb
-                            },"", href);
-                            $('.article-content')[0].innerHTML = content;
-                            $('.breadcrumb')[0].innerHTML = breadcrumb;
-                            $('.article-content').fadeIn('slow');
-                            $('.breadcrumb').fadeIn('slow');
-                            $("#comments script", el).each(function(idx, obj){
-                                // re-enable disqus
-                                eval(obj.innerHTML);
-                            });
-                            applyTranslateAnime();
-                        }).fail(function(){
-                            // failback to changing url
-                            window.location.href = href ;
-                        });
-                    });
-                });
-            });
-        };
-        applyTranslateAnime();
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title ,
+        //                         "breadcrumb":breadcrumb
+        //                     },"", href);
+        //                     $('.article-content')[0].innerHTML = content;
+        //                     $('.breadcrumb')[0].innerHTML = breadcrumb;
+        //                     $('.article-content').fadeIn('slow');
+        //                     $('.breadcrumb').fadeIn('slow');
+        //                     $("#comments script", el).each(function(idx, obj){
+        //                         // re-enable disqus
+        //                         eval(obj.innerHTML);
+        //                     });
+        //                     applyTranslateAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     });
+        // };
+        // applyTranslateAnime();
 
-        window.onpopstate = function(e){
-            if(e.state){
+        // window.onpopstate = function(e){
+        //     if(e.state){
                 
-                document.title = htmlDecode(e.state.title);
-                $('.breadcrumb').fadeOut("slow");
-                $('.article-content').fadeOut("slow",function(){
-                    $('.article-content')[0].innerHTML = e.state.content;
-                    $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
-                    $('.article-content').fadeIn('slow');
-                    $('.breadcrumb').fadeIn('slow');
-                    $("#comments script").each(function(idx, obj){
-                        // re-enable disqus
-                        eval(obj.innerHTML);
-                    });
-                    applyTranslateAnime();
-                });
-            }
-        }
+        //         document.title = htmlDecode(e.state.title);
+        //         $('.breadcrumb').fadeOut("slow");
+        //         $('.article-content').fadeOut("slow",function(){
+        //             $('.article-content')[0].innerHTML = e.state.content;
+        //             $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+        //             $('.article-content').fadeIn('slow');
+        //             $('.breadcrumb').fadeIn('slow');
+        //             $("#comments script").each(function(idx, obj){
+        //                 // re-enable disqus
+        //                 eval(obj.innerHTML);
+        //             });
+        //             applyTranslateAnime();
+        //         });
+        //     }
+        // }
         
         
 
