@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="jp"
+>
+<head>
+    <title>Pelicanを試してみた - Farseerfcの居場所</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/jp/try-pelican.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="python,pelican" />
+        <meta name="description" content="一日の間に全ての ギーク たち が 自分の Githubユーザーページ と Octopress ブログを導入したような気がします。皆がブログに書いた通りに、静的ブログは確かに WordPress などの従来の動的ブログ・エンジンより便利だと思います。これらブログを見ると、私も自分の Octopress ブログを立ちましょう とずっと思っています。 ですが Octopress は私に向いてないかも 初めのところに Octopressの配置手順 に迷わされた。 RVM とはなに？ rbenv とは何のこと？見るところ Ruby コミュニティーの発展するハイペースは既に私の想像に超えましたみたい。 彼らは Ruby の各バージョン間に互換性を持つために、バージョン管理が必要らしいです。同様の互換性問題が Python コミュニティーにもある ですが [1] 、 Python は今のところこのようなバージョン管理の必要がないと思います [2] 。 実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが ..." />
+
+        <meta property="og:site_name" content="Farseerfcの居場所" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Pelicanを試してみた"/>
+        <meta property="og:url" content="//farseerfc.github.io/jp/try-pelican.html"/>
+        <meta property="og:description" content="一日の間に全ての ギーク たち が 自分の Githubユーザーページ と Octopress ブログを導入したような気がします。皆がブログに書いた通りに、静的ブログは確かに WordPress などの従来の動的ブログ・エンジンより便利だと思います。これらブログを見ると、私も自分の Octopress ブログを立ちましょう とずっと思っています。 ですが Octopress は私に向いてないかも 初めのところに Octopressの配置手順 に迷わされた。 RVM とはなに？ rbenv とは何のこと？見るところ Ruby コミュニティーの発展するハイペースは既に私の想像に超えましたみたい。 彼らは Ruby の各バージョン間に互換性を持つために、バージョン管理が必要らしいです。同様の互換性問題が Python コミュニティーにもある ですが [1] 、 Python は今のところこのようなバージョン管理の必要がないと思います [2] 。 実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが ..."/>
+        <meta property="article:published_time" content="2012-02-24" />
+            <meta property="article:section" content="programming" />
+            <meta property="article:tag" content="python" />
+            <meta property="article:tag" content="pelican" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/jp/../theme/css/html4css1.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/jp/../theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/jp/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの居場所 ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/jp/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">Pelicanを試してみた - Farseerfcの居場所</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/jp/" class="navbar-brand">
+Farseerfcの居場所            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/zc/">简体</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
+                        </ul>
+                    </li>
+                    <!-- separator -->
+                    <li>&nbsp;</li>
+
+                     <li class="hidden-sm "><a href="//farseerfc.github.io/jp/pages/about.html">
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+                        <li >
+                            <a href="//farseerfc.github.io/jp/category/import.html">Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/jp/category/life.html">Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.github.io/jp/category/programming.html">Programming</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.github.io/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.github.io/jp/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io/jp" title="Farseerfcの居場所"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/jp/category/programming.html" title="programming">programming</a></li>
+                <li class="active">Pelicanを試してみた</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        Pelicanを試してみた
+                        <a href="//farseerfc.github.io/jp/try-pelican.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to Pelicanを試してみた">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-9 col-sm-7 col-xs-6">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2012-02-24T17:33:00+09:00"><i class="fa fa-calendar"></i> 2012年02月24日(金)</time>
+    </span>
+    
+
+
+
+
+
+<span>
+	<a href="//farseerfc.github.io/jp/tag/python.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> python</a>
+	<a href="//farseerfc.github.io/jp/tag/pelican.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> pelican</a>
+</span>
+
+</footer><!-- /.post-info -->                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-5 col-xs-6">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+<i class="mdi-action-translate"></i>
+日本語
+<span class="caret">
+</a>
+<ul class="dropdown-menu">
+	<li><a href="//farseerfc.github.io/jp/../en/try-pelican.html" class="translate">English</a></li>
+	<li><a href="//farseerfc.github.io/jp/../zc/try-pelican.html" class="translate">简体</a></li>
+	<li><a href="//farseerfc.github.io/jp/../try-pelican.html" class="translate">繁體</a></li>
+</ul>
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <html><body><p>一日の間に全ての
+<a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/">ギーク</a>
+<a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/">たち</a>
+<a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/">が</a>
+<a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html">自分の</a>
+<a class="reference external" href="http://pages.github.com/#user__organization_pages">Githubユーザーページ</a>
+と <a class="reference external" href="http://octopress.org/">Octopress</a> ブログを導入したような気がします。皆がブログに書いた通りに、静的ブログは確かに WordPress
+などの従来の動的ブログ・エンジンより便利だと思います。これらブログを見ると、私も自分の <a class="reference external" href="http://octopress.org/">Octopress</a> ブログを立ちましょう とずっと思っています。</p>
+<div class="section" id="id6">
+<h2>ですが <a class="reference external" href="http://octopress.org/">Octopress</a> は私に向いてないかも</h2>
+<p>初めのところに <a class="reference external" href="http://octopress.org/docs/setup/">Octopressの配置手順</a> に迷わされた。
+<a class="reference external" href="http://beginrescueend.com/"><span class="caps">RVM</span></a> とはなに？ <a class="reference external" href="https://github.com/sstephenson/rbenv">rbenv</a> とは何のこと？見るところ Ruby コミュニティーの発展するハイペースは既に私の想像に超えましたみたい。
+彼らは Ruby の各バージョン間に互換性を持つために、バージョン管理が必要らしいです。同様の互換性問題が Python コミュニティーにもある
+ですが <a class="footnote-reference" href="#id10" id="id8">[1]</a> 、 Python は今のところこのようなバージョン管理の必要がないと思います <a class="footnote-reference" href="#id11" id="id9">[2]</a> 。</p>
+<p>実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが <a class="reference external" href="http://beginrescueend.com/"><span class="caps">RVM</span></a> それとも <a class="reference external" href="https://github.com/sstephenson/rbenv">rbenv</a> 両方も Unix/Linux/MacOSX しか実行できないらしいです。ギークとしたの皆は絶対に Windows つかっじゃいけないんですか？（本当かも……）。</p>
+<p>残りは Ruby と Python の争いです。私は <a class="reference external" href="http://daringfireball.net/projects/markdown/">Markdown</a> に詳しくない、比べると <a class="reference external" href="http://docutils.sourceforge.net/rst.html">ReST</a> のほうが私に向いています。それに、どっちでも <a class="reference external" href="http://pygments.org/">Pygments</a> を依存しシンタックス・ハイライトをしているから、 Rubyist 達も少なくとも Python を入れなきゃダメみたいです。 私の好みは一切の Ruby コンポーネントを頼らず、 C 拡張もない純粋な Python の実現がほしいです。</p>
+<p>そこから Github に Python で実現した静的ブログ・エンジンを探し始めた。 <a class="reference external" href="http://flask.pocoo.org/">Flask</a> の作者である <a class="reference external" href="https://github.com/mitsuhiko">mitsuhiko</a> 氏が書いた <a class="reference external" href="https://github.com/mitsuhiko/rstblog">rstblog</a> が素晴らしいが、あんまり他人に使われていないようです。 <a class="reference external" href="http://ringce.com/hyde">Hyde</a> は多く使われているけれと、ホームページにブログの感じがみえないです。最後に <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> を見かけました。</p>
+<table class="table docutils table-hover  table-striped footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label"></col><col></col></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[1]</a></td><td>例えば Python 2.x と 3.x の間にあまりにも巨大なる差、それと <a class="reference external" href="http://pypy.org/">PyPy</a> 、 <a class="reference external" href="http://python.org/">CPython</a> 、 <a class="reference external" href="http://www.stackless.com/">Stackless</a> 、 <a class="reference external" href="http://cython.org/">Cython</a> など各実現間に微妙な違いがあります。</td></tr>
+</tbody>
+</table>
+<table class="table docutils table-hover  table-striped footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label"></col><col></col></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[2]</a></td><td>はい、こっちに <a class="reference external" href="http://packages.python.org/distribute/easy_install.html">easy_install</a> とか <a class="reference external" href="http://www.pip-installer.org/en/latest/index.html">pip</a> があります、ですがそれらはパッケージ管理、特定なPython環境を入れた後の話です。Python自身はまだ管理する必要がないです。 Python のバージョン問題も <a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html">2to3.py</a> とか <a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8">3to2.py</a> のようなツールで変換すればいいです、違うソフトを実行するためたくさんの Python バージョンを残る必要はないです。もしバージョンの違いが気にするなら <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a> を使うのも構わないが、それも別のことです。</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id12">
+<h2>それでは <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> にしよう</h2>
+<p>私自身にとって、 <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> は <a class="reference external" href="http://octopress.org/">Octopress</a> よりいいところ：</p>
+<blockquote>
+<ol class="arabic simple">
+<li>純粋な Python で実現した。ですから <a class="reference external" href="http://python.org/">CPython</a> のほかべつの実現を使うのも心配がない。例えばわたしは <a class="reference external" href="http://pypy.org/">PyPy</a> を使ています。</li>
+<li>多言語。<a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> の原作者はフランス人らしいです。ほとんどの人はこれの必要がないと思うが……できるだけ、わたしは三つの言語で書く。</li>
+<li><a class="reference external" href="http://docutils.sourceforge.net/rst.html">ReST</a> 。それなら <a class="reference external" href="http://webpages.charter.net/edreamleo/front.html">Leo</a> の <pre>
+@auto-rst</pre>
+ を使って直接 <a class="reference external" href="http://docutils.sourceforge.net/rst.html">ReST</a> をかけます。</li>
+</ol>
+</blockquote>
+<p>でも <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> は <a class="reference external" href="http://octopress.org/">Octopress</a> のほど注目されていないから、一部問題があります。</p>
+<blockquote>
+<ol class="arabic simple">
+<li>pelican-import は WordPress から導入する時、日本語や中国語は問題となります。</li>
+<li>多言語の機能と日付、タイムゾーンなどにバグがある。  <strong>私は改善しています。</strong></li>
+<li>テンプレートは少ない。</li>
+<li>プラグインも少ない……</li>
+</ol>
+</blockquote>
+<p>こんなに優れたツールにもっと注目されてほしい。</p>
+</div>
+<div class="section" id="id13">
+<h2>配置</h2>
+<p><a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> を入れるのは簡単：</p>
+<div class="highlight"><pre><span class="gp">$</span> pip install pelican
+</pre></div>
+<p>文章を <a class="reference external" href="http://docutils.sourceforge.net/rst.html">ReST</a> で書いて、 </p><pre>
+posts</pre>
+ フォルダーに置きます。ページを生成する：
+<div class="highlight"><pre><span class="gp">$</span> pelican -s settings.py
+</pre></div>
+<p>Github に送る:</p>
+<div class="highlight"><pre><span class="gp">$</span> git commit -am <span class="s2">"Commit message"</span>
+<span class="gp">$</span> git push
+</pre></div>
+<p>私の配置ファイル：</p>
+<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="n">TIMEZONE</span> <span class="o">=</span> <span class="s">'Asia/Tokyo'</span>
+
+<span class="n">DATE_FORMATS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'en'</span><span class="p">:(</span><span class="s">'usa'</span><span class="p">,</span><span class="s">'%a, </span><span class="si">%d</span><span class="s"> %b %Y'</span><span class="p">),</span>
+    <span class="s">'zh'</span><span class="p">:(</span><span class="s">'chs'</span><span class="p">,</span><span class="s">'%Y-%m-</span><span class="si">%d</span><span class="s">, %a'</span><span class="p">),</span>
+    <span class="s">'jp'</span><span class="p">:(</span><span class="s">'jpn'</span><span class="p">,</span><span class="s">'%Y年%m月</span><span class="si">%d</span><span class="s">日(%a)'</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="c"># windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx</span>
+<span class="n">LOCALE</span> <span class="o">=</span> <span class="p">[</span><span class="s">'usa'</span><span class="p">,</span> <span class="s">'chs'</span><span class="p">,</span> <span class="s">'jpn'</span><span class="p">,</span>        <span class="c"># windows</span>
+          <span class="s">'en_US'</span><span class="p">,</span> <span class="s">'zh_CN'</span><span class="p">,</span> <span class="s">'ja_JP'</span><span class="p">]</span>  <span class="c"># Unix/Linux</span>
+<span class="n">DEFAULT_LANG</span> <span class="o">=</span> <span class="s">'zh'</span>
+
+<span class="n">SITENAME</span> <span class="o">=</span> <span class="s">'Farseerfc Blog'</span>
+<span class="n">AUTHOR</span> <span class="o">=</span> <span class="s">'Jiachen Yang'</span>
+
+<span class="n">DISQUS_SITENAME</span> <span class="o">=</span> <span class="s">'farseerfcgithub'</span>
+<span class="n">GITHUB_URL</span> <span class="o">=</span> <span class="s">'https://github.com/farseerfc'</span>
+<span class="n">SITEURL</span> <span class="o">=</span> <span class="s">'http://farseerfc.github.com'</span>
+<span class="n">TAG_FEED</span>  <span class="o">=</span> <span class="s">'feeds/</span><span class="si">%s</span><span class="s">.atom.xml'</span>
+
+<span class="n">SOCIAL</span> <span class="o">=</span> <span class="p">((</span><span class="s">'twitter'</span><span class="p">,</span> <span class="s">'http://twitter.com/farseerfc'</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">'github'</span><span class="p">,</span> <span class="s">'https://github.com/farseerfc'</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">'facebook'</span><span class="p">,</span> <span class="s">'http://www.facebook.com/farseerfc'</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">'weibo'</span><span class="p">,</span> <span class="s">'http://weibo.com/farseerfc'</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">'renren'</span><span class="p">,</span> <span class="s">'http://www.renren.com/farseer'</span><span class="p">),</span>
+          <span class="p">)</span>
+
+
+<span class="n">TWITTER_USERNAME</span> <span class="o">=</span> <span class="s">'farseerfc'</span>
+
+<span class="n">THEME</span><span class="o">=</span><span class="s">'notmyidea'</span>
+<span class="n">CSS_FILE</span> <span class="o">=</span> <span class="s">"wide.css"</span>
+
+<span class="n">DEFAULT_CATEGORY</span> <span class="o">=</span><span class="s">'Others'</span>
+<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s">'.'</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="s">'posts'</span>
+</pre></div>
+</div>
+</body></html>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+                This is part 1 of the "pelican" series:
+                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                        <a class="btn btn-primary" href='//farseerfc.github.io/jp/try-pelican.html' style="text-align:left">Pelicanを試してみた</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <a href="//farseerfc.github.io/jp/if-we-do-this-work.html" class="btn btn-default btn-lg" style="float:right;clear:both">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        “…if we do this work … ” &#8212;Bill&nbsp;Gates
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-6">
+                    <a href="//farseerfc.github.io/jp/mix-ruby.html" class="btn btn-default btn-lg" style="float:left;clear:both">
+                        <h4>
+                        PyRuby<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'try-pelican';
+                var disqus_url = 'http://farseerfc.github.io/jp/try-pelican.html';
+
+            var disqus_config = function () {
+
+                this.language = "ja";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-home fa-lg"></i>
+<a href="//farseerfc.github.io/jp/pages/about.html">
+About farseerfc
+</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.github.io/jp/pages/about.html"><img width="100%" src="//farseerfc.github.io/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="http://blog.phoenixlzx.com/static/img/avatar/avatar.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-weibo fa-lg"></i><span class="icon-label">Latest Weibo</span>
+        </h4>
+    </div>
+<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2014 farseerfc
+            &middot; Powered by
+            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> and
+            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> Top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.github.io/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    function linkto(){
+
+    }
+
+    function htmlDecode(value){
+      return $('<div/>').html(value).text();
+    }
+
+    function evalScript(data, context){
+        var re = /<script\b[^>]*>([\s\S]*?)<\/script>/gm;
+        var match;
+        while (match = re.exec(data)) {
+          // full match is in match[0], whereas captured groups are in ...[1], ...[2], etc.
+          context.append(match[0]);
+        }
+    }
+
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // function applyTranslateAnime(){
+        //     $(".article-content .translate").each(function(idx, obj){
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript:void(0)");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('.breadcrumb').fadeOut("slow");
+        //             $('.article-content').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $(".article-content", el)[0].innerHTML;
+        //                     var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title ,
+        //                         "breadcrumb":breadcrumb
+        //                     },"", href);
+        //                     $('.article-content')[0].innerHTML = content;
+        //                     $('.breadcrumb')[0].innerHTML = breadcrumb;
+        //                     $('.article-content').fadeIn('slow');
+        //                     $('.breadcrumb').fadeIn('slow');
+        //                     $("#comments script", el).each(function(idx, obj){
+        //                         // re-enable disqus
+        //                         eval(obj.innerHTML);
+        //                     });
+        //                     applyTranslateAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     });
+        // };
+        // applyTranslateAnime();
+
+        // window.onpopstate = function(e){
+        //     if(e.state){
+                
+        //         document.title = htmlDecode(e.state.title);
+        //         $('.breadcrumb').fadeOut("slow");
+        //         $('.article-content').fadeOut("slow",function(){
+        //             $('.article-content')[0].innerHTML = e.state.content;
+        //             $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+        //             $('.article-content').fadeIn('slow');
+        //             $('.breadcrumb').fadeIn('slow');
+        //             $("#comments script").each(function(idx, obj){
+        //                 // re-enable disqus
+        //                 eval(obj.innerHTML);
+        //             });
+        //             applyTranslateAnime();
+        //         });
+        //     }
+        // }
+        
+        
+
+        // if (typeof String.prototype.startsWith != 'function') {
+        //   // see below for better implementation!
+        //   String.prototype.startsWith = function (str){
+        //     return this.indexOf(str) == 0;
+        //   };
+        // }
+        // if (typeof String.prototype.endsWith != 'function') {
+        //     String.prototype.endsWith = function(suffix) {
+        //         return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        //     };
+        // }
+        // function applyAjaxAnime(){
+            
+        //     function applyAjaxAnimeOn(idx, obj){
+        //         var href = $(obj).attr("href");
+        //         if(href.startsWith("java") || 
+        //             href.startsWith("http")||
+        //             ! href.endsWith(".html")){
+        //             return;
+        //         }
+
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript: linkto('" + href+"')");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('#loading-block').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $("#loading-block", el)[0].innerHTML;
+                            
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title,
+        //                         "data":data
+        //                     },"", href);
+        //                     $('#loading-block')[0].innerHTML = content;
+        //                     $('#loading-block').fadeIn('slow');
+
+        //                     evalScript(data, $('#loading-block'));
+        //                     applyAjaxAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     }
+
+        //     $("a").each(applyAjaxAnimeOn);
+        // };
+        // applyAjaxAnime();
+
+        // window.onpopstate = function(e){
+        //     if(e.state){
+                
+        //         document.title = htmlDecode(title);
+        //         $('#loading-block').fadeOut("slow",function(){
+        //             $('#loading-block')[0].innerHTML = e.state.content;
+        //             $('#loading-block').fadeIn('slow');
+        //             evalScript(e.state.data, $('#loading-block'));
+        //             applyAjaxAnime();
+        //         });
+        //     }
+        // }
+        
+    });
+</script>
+
+</body>
+</html>

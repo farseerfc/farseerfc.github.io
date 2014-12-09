@@ -2,7 +2,7 @@
 <html lang="zh"
 >
 <head>
-    <title>[zz]“西廂計劃”原理小解 - Farseerfc's Blog</title>
+    <title>[zz]“西廂計劃”原理小解 - Farseerfc的小窩</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -16,7 +16,7 @@
         <meta name="keywords" content="zz" />
         <meta name="description" content="從 farseerfc.wordpress.com 導入 好神奇的想法，先存着，以後慢慢研究 原文： http://blog.youxu.info/2010/03/14/west- chamber/ 待月西廂下，迎風戶半開。隔牆花影動，疑是玉人來。 最近推上最流行的一個關鍵詞是”西廂計劃”, 這個計劃名字取得很浪漫，客戶端叫做張生，對，就是西廂記裏面那個翻牆去見崔鶯鶯小姐的張生；顯然，服務器端必然叫做崔鶯鶯。客戶端的張生是最重要的部件，可以不依賴於服務端工作。因爲西廂計劃的作者只是簡要的介紹了一下原理，其他報道又語焉不詳，我當時就覺得很好奇，花了昨天一個晚上詳細讀了一下源代碼，終於知道怎麼回事了，覺得原理非常漂亮，所以寫篇文章介紹總結一下。 先說大方向。大家都知道，連接被重置的本質，是因爲收到了破壞連接的一個 TCP Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 Reset, 則通信可以不受影響 ..." />
 
-        <meta property="og:site_name" content="Farseerfc's Blog" />
+        <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="[zz]“西廂計劃”原理小解"/>
         <meta property="og:url" content="//farseerfc.github.io/zz-introducing-scholarzhang.html"/>
@@ -39,13 +39,13 @@
     <link rel="stylesheet" href="//farseerfc.github.io/theme/css/style.css" type="text/css"/>
 
         <link href="//farseerfc.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
-              title="Farseerfc's Blog ATOM Feed"/>
+              title="Farseerfc的小窩 ATOM Feed"/>
 
         <link href="//farseerfc.github.io/theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">[zz]“西廂計劃”原理小解 - Farseerfc's Blog</div>
+<div style="display:none" id="title">[zz]“西廂計劃”原理小解 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -57,13 +57,28 @@
                 <span class="icon-bar"></span>
             </button>
             <a href="//farseerfc.github.io/" class="navbar-brand">
-Farseerfc's Blog            </a>
+Farseerfc的小窩            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                         <li><a href="//farseerfc.github.io/pages/about.html">
-                             About
-                          </a></li>
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/zc/">简体</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
+                        </ul>
+                    </li>
+                    <!-- separator -->
+                    <li>&nbsp;</li>
+
+                     <li class="hidden-sm "><a href="//farseerfc.github.io/pages/about.html">
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
                         <li class="active">
                             <a href="//farseerfc.github.io/category/import.html">Import</a>
                         </li>
@@ -96,7 +111,7 @@ Farseerfc's Blog            </a>
         <div class="col-lg-10 col-md-9 col-sm-8">
             <div id="loading-block">
             <ol class="breadcrumb">
-                <li><a href="//farseerfc.github.io" title="Farseerfc's Blog"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
                 <li><a href="//farseerfc.github.io/category/import.html" title="import">import</a></li>
                 <li class="active">[zz]“西廂計劃”原理小解</li>
             </ol>
@@ -140,7 +155,7 @@ Farseerfc's Blog            </a>
 <span class="caret">
 </a>
 <ul class="dropdown-menu">
-	<li><a href="//farseerfc.github.io/zz-introducing-scholarzhang-zhs.html" class="translate">简体</a></li>
+	<li><a href="//farseerfc.github.io/zc/zz-introducing-scholarzhang.html" class="translate">简体</a></li>
 </ul>
 </div>
 
@@ -184,7 +199,7 @@ Reset 給忽略了)。只要服務器不忽略 Reset,
 <p>事實上，牆是雙向檢測的（或者說對每個包都檢測的），因此，對服務器和客戶端實現相同的對待方法，所以，牆不管客戶端還不行，假如服務端有關鍵詞傳給客戶端，牆還是有可能要發飆的（這裏說有可能，因爲我也不知道）。所以，最好的辦法就是，讓服務端也給牆一個終止連接的標誌就好了。可是這個說起來簡單，做起來難，怎麼能讓不受自己控制的服務器發一個自己想要的包呢？
 西廂計劃的那幫黑客，再次去讀幾百頁的 <span class="caps">RFC</span>, 令人驚訝的發現，他們居然在 <span class="caps">RFC</span>
 上發現了一個可以用的特性。我們上面說了，三次握手的時候，在收到 <span class="caps">SYN</span>/<span class="caps">ACK</span>
-後，客戶端要給服務器發送一個序列號+1 的<span class="caps">ACK</span>，可是，假如我不+1呢，直接發
+後，客戶端要給服務器發送一個序列號+1 的ACK，可是，假如我不+1呢，直接發
 <span class="caps">ACK</span> 包給服務器。
 牆已經認爲你客戶端是死老虎了，不理你了，不知道你搞什麼飛機，讓這個 <span class="caps">ACK</span>
 過了。可是服務器一看，不對啊，你給我的不是我期待的那個序列號， <span class="caps">RFC</span>
@@ -193,7 +208,7 @@ Reset 給忽略了)。只要服務器不忽略 Reset,
 過牆的時候，牆一看樂了，服務器也終止連接了，好吧，兩邊都是死老虎了，我就不監聽這條連接了。而至於客戶端，這個服務器過來的
 Reset 非常好識別，忽略就是。隨後，客戶端開始正確的發送 <span class="caps">ACK</span>,
 至此，三次握手成功，真正的好戲開始，而牆則認爲客戶端和服務器都是死老虎，直接放過。所以，張生就這樣透明的過了牆。 至於過牆以後所有的事情，《西廂記》裏面都有記載，各位讀者自行買書學習。</p>
-<p>現在的西廂計劃客戶端，即“張生”模塊的防連接重置的原理就是這樣，服務器端，即鶯鶯模塊的實現也是類似的。防<span class="caps">DNS</span>那個，不懂
+<p>現在的西廂計劃客戶端，即“張生”模塊的防連接重置的原理就是這樣，服務器端，即鶯鶯模塊的實現也是類似的。防DNS那個，不懂
 <span class="caps">DNS</span>
 協議，所以看不懂。我猜想，因爲開發人員都是黑客，所以自然喜歡用最經得起折騰和高度定製的
 Linux 開發。 現在看西廂計劃的實現，因爲依賴於 Linux 內核模塊 netfilter,
@@ -217,7 +232,7 @@ Linux 最好 :)</p>
                 <div class="col-xs-6">
                     <a href="//farseerfc.github.io/sine-cpu.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
-                        寫程序讓<span class="caps">CPU</span>佔用率保持正弦函數
+                        寫程序讓CPU佔用率保持正弦函數
                         </h4>
                     </a>
                 </div>
@@ -274,11 +289,14 @@ Linux 最好 :)</p>
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
-<i class="fa fa-home fa-lg"></i><span class="icon-label">About farseerfc</span>
+<i class="fa fa-home fa-lg"></i>
+<a href="//farseerfc.github.io/pages/about.html">
+About farseerfc
+</a>
         </h4>
     </div>
 <div class="panel-body" id="aboutme">
-        <img width="100%" src="//farseerfc.github.io/images/avatar.jpg"/>
+        <a href="//farseerfc.github.io/pages/about.html"><img width="100%" src="//farseerfc.github.io/../images/avatar.jpg"/></a>
     <h3 style="text-align:center">
 <a href="https://twitter.com/farseerfc"                  target="_blank">
 <i class="fa fa-twitter" style="text-align:center"></i></a>
@@ -312,43 +330,13 @@ Linux 最好 :)</p>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/pelican.html">
                     pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -357,63 +345,23 @@ Linux 最好 :)</p>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/music.html">
-                    music <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.github.io/tag/python.html">
                     python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -422,8 +370,53 @@ Linux 最好 :)</p>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -436,14 +429,34 @@ Linux 最好 :)</p>
                     sjtu <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
                 </a>
             </li>
     </ul>
