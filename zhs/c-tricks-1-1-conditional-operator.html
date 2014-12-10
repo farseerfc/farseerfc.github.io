@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zhs"
+>
+<head>
+    <title>C++ Tricks 1.1 条件运算符(?:) - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++" />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 1.1 条件运算符(?:) 条件运算符(?:)是C++中唯一的三目运算符(trinary operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下： condition ? true_value : false_value 其中condition *条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*、int、指针。与if和while的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。 另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如： int *pi=getInt(); int i=pi ..." />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 1.1 条件运算符(?:)"/>
+        <meta property="og:url" content="//farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html"/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 1.1 条件运算符(?:) 条件运算符(?:)是C++中唯一的三目运算符(trinary operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下： condition ? true_value : false_value 其中condition *条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*、int、指针。与if和while的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。 另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如： int *pi=getInt(); int i=pi ..."/>
+        <meta property="article:published_time" content="2007-08-22" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/zhs/../theme/css/html4css1.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/zhs/../theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/zhs/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/zhs/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">C++ Tricks 1.1 条件运算符(?:) - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                     <li class="hidden-sm "><a href="//farseerfc.github.io/zhs/pages/about.html">
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+                        <li class="active">
+                            <a href="//farseerfc.github.io/zhs/category/import.html">Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/life.html">Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/programming.html">Programming</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right hidden-sm">
+              <li><a href="//farseerfc.github.io/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.github.io/zhs/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io/zhs" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/zhs/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 1.1&nbsp;条件运算符(?:)</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        C++ Tricks 1.1&nbsp;条件运算符(?:)
+                        <a href="//farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to C++ Tricks 1.1 条件运算符(?:)">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-9 col-sm-7 col-xs-6">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2007-08-22T18:05:00+09:00"><i class="fa fa-calendar"></i> 三 22 八月 2007</time>
+    </span>
+    
+
+
+
+
+
+<span>
+	<a href="//farseerfc.github.io/zhs/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> C++</a>
+</span>
+
+</footer><!-- /.post-info -->                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-5 col-xs-6">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+<i class="mdi-action-translate"></i>
+简体
+<span class="caret">
+</a>
+<ul class="dropdown-menu">
+	<li><a href="//farseerfc.github.io/zhs/../c-tricks-1-1-conditional-operator.html" class="translate">繁體</a></li>
+</ul>
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="id1">
+<h2>1.1   条件运算符(?:)</h2>
+<p>条件运算符(?:)是C++中唯一的三目运算符(trinary
+operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下：</p>
+<p><em>condition</em> ? <em>true_value</em> : <em>false_value</em></p>
+<p>其中<em>condition
+*条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*</em>、<strong>int</strong>、指针。与<strong>if</strong>和<strong>while</strong>的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。</p>
+<p>另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如：</p>
+<p><strong>int</strong> *pi=getInt();</p>
+<p><strong>int</strong> i=pi<strong>?</strong>*pi<strong>:</strong>0;</p>
+<p>这里，只有当pi的值不为0时，它才会被提领(dereference)。这种语义保证了程序的正确性，因为提领一个空指针将导致致命的运行期错误(通常是非法操作的警告)。同时，正因为条件运算符控制运算流程的特点，使得它不能用类似iif的普通函数来模拟：</p>
+<p><strong>int</strong> iif(<strong>int</strong> con,<strong>int</strong> t,<strong>int</strong>f){<strong>if</strong>(c)<strong>return</strong> t;<strong>return</strong> f;}//试图模拟?:</p>
+<p>…//in some function</p>
+<p><strong>int</strong> *pi=getInt();</p>
+<p><strong>int</strong> i=iif(pi,*pi,0);//Error!</p>
+<p>这段代码会导致上文提到的致命运行期错误。C/C++标准规定，参数在被传递给函数之前求值，因此无论pi为何值，都会被提领。又因为函数传回一个空指针的情况比较少见，所以这样的错误在调试时很难被发现，一旦发生又势必造成重大灾难。这样的代码在实践中应尽量避免。</p>
+<p>有时，条件运算符控制流程的特点会不知不觉影响我们的代码。在C时代，最大值<span class="caps">MAX</span>通常用宏实现：</p>
+<p><strong>#define</strong><span class="caps">MAX</span>(a,b) ((a)&gt;(b)<strong>?</strong>(a)<strong>:</strong>(b))</p>
+<p>需要用额外的括号将宏参数和宏本体保护起来，以免运算符优先级扰乱逻辑，这是宏丑陋的特点之一，这里暂且不提。矛盾在于，用具有副作用的表达式调用宏时，会出现问题：</p>
+<p><strong>int</strong> i=5,j=6;//…</p>
+<p><strong>int</strong> a=<span class="caps">MAX</span>(++i,++j);</p>
+<p>代码的作者原意显然是想先将i,j分别递增，再将其中较大的一个赋给a。执行这段代码，当i=5,j=6时，a=8，知道为什么吗？通过宏展开，赋值语句成这样：</p>
+<p><strong>int</strong> a=(++i)&gt;(++j)<strong>?</strong>(++i)<strong>:</strong>(++j);//删除了多余括号</p>
+<p>在判断之前，i、j被分别自增一次，然后舍弃:之前的部分，j又被自增一次。执行之后，i=6,j=8。</p>
+<p><span class="caps">MAX</span>的更正确更安全的实现，是利用模板将类型参数化。<span class="caps">STL</span>标准算法中就有一个这样的工具级模版函数std::max。</p>
+<p>条件运算符是表达式而不是语句，这使得它可以出现在任何需要表达式的地方，这扩大了它的适用范围。在那些语法上只能出现表达式而不能出现语句的地方（比如变量初始化），条件运算符有着不可替代的作用。</p>
+<p>条件运算符优于<strong>if</strong>语句的另一个场合是“模板元编程”(<span class="caps">TMP</span>, Template
+MetaProgramming)。在<span class="caps">TMP</span>这个古怪奇异的编译期运算编程技术中，一切旧有的技术和法则被全线击破，我们所能仰仗的工具，只有模板特化(Specialization)、<strong>typedef</strong>s、函数声明(无法调用它们)、以及编译期常量运算。已经有人很深入地论证过，仅有以上这些，就已经形成了一个“图灵完善”的计算机语言。我们可以用模板特化技术，来模拟条件分支，循环迭代等一系列复杂的语言结构。由于可以参与编译期常量运算，条件运算符在<span class="caps">TMP</span>世界中很自然地扮演起重要角色。</p>
+<p>比如，给与类型T的一个变量t，我们想声明一个缓冲区存放t和一个int，缓冲区的大小不小于sizeof(T)也不小于sizeif(int)，我们可以这样写：</p>
+<p>char buffer[sizeof(T)&gt;sizeof(int)? sizeof(T): sizeof(int)];</p>
+<p>我们不能用一个if语句替换这个运算：</p>
+<p>int i;</p>
+<p>if(sizeof(T)&gt;sizeof(int))i=sizeof(T);</p>
+<p>else i=sizeof(int);</p>
+<p>char buffer[i];//语法错误!</p>
+<p>原因在于数组声明中的下标必须是一个编译期常量，而不是一个运行期的值，条件表达式的运算可以在编译期进行，if语句就只能在执行期执行。</p>
+</div>
+</body></html>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+                This is part 2 of the "CPP_Tricks" series:
+                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks.html' style="text-align:left">C++&nbsp;Tricks</a>
+                        <a class="btn btn-primary" href='//farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html' style="text-align:left">C++ Tricks 1.1&nbsp;条件运算符(?:)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html' style="text-align:left">C++ Tricks 1.2&nbsp;逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-1-x86-architecture.html' style="text-align:left">C++ Tricks 2.1&nbsp;X86概述</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-2-i386-memory-layout.html' style="text-align:left">C++ Tricks 2.2&nbsp;I386平台的内存布局</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html' style="text-align:left">C++ Tricks 2.3&nbsp;I386平台C函数内部的栈分配</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html' style="text-align:left">C++ Tricks 2.4&nbsp;I386平台C函数调用边界的栈分配</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-5-address-alignment.html' style="text-align:left">C++ Tricks 2.5&nbsp;I386平台的边界对齐(Align)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-6-i386-variable-arguments.html' style="text-align:left">C++ Tricks 2.6 I386平台C函数的可变参数表(Variable&nbsp;Arguments)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-2-7-i386-calling-conventions.html' style="text-align:left">C++ Tricks 2.7&nbsp;I386平台的其它函数调用模型</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-3-1-lvalue-rvalue-constant.html' style="text-align:left">C++ Tricks 3.1 左值右值与常量性(lvalue，rvalue <span class="amp">&amp;</span>&nbsp;constant)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html' style="text-align:left">C++ Tricks 3.2&nbsp;标号、goto，以及switch的实现</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <a href="//farseerfc.github.io/zhs/filling-believings-calling-conscience.html" class="btn btn-default btn-lg" style="float:right;clear:both">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        填补信仰、唤醒良知
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-6">
+                    <a href="//farseerfc.github.io/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html" class="btn btn-default btn-lg" style="float:left;clear:both">
+                        <h4>
+                        C++ Tricks 1.2&nbsp;逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'c-tricks-1-1-conditional-operator';
+                var disqus_url = 'http://farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-home fa-lg"></i>
+<a href="//farseerfc.github.io/zhs/pages/about.html">
+About farseerfc
+</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.github.io/zhs/pages/about.html"><img width="100%" src="//farseerfc.github.io/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="http://blog.phoenixlzx.com/static/img/avatar/avatar.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-weibo fa-lg"></i><span class="icon-label">Latest Weibo</span>
+        </h4>
+    </div>
+<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2014 farseerfc
+            &middot; Powered by
+            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> and
+            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> Top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.github.io/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    function linkto(){
+
+    }
+
+    function htmlDecode(value){
+      return $('<div/>').html(value).text();
+    }
+
+    function evalScript(data, context){
+        var re = /<script\b[^>]*>([\s\S]*?)<\/script>/gm;
+        var match;
+        while (match = re.exec(data)) {
+          // full match is in match[0], whereas captured groups are in ...[1], ...[2], etc.
+          context.append(match[0]);
+        }
+    }
+
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // function applyTranslateAnime(){
+        //     $(".article-content .translate").each(function(idx, obj){
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript:void(0)");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('.breadcrumb').fadeOut("slow");
+        //             $('.article-content').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $(".article-content", el)[0].innerHTML;
+        //                     var breadcrumb = $(".breadcrumb", el)[0].innerHTML;
+
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title ,
+        //                         "breadcrumb":breadcrumb
+        //                     },"", href);
+        //                     $('.article-content')[0].innerHTML = content;
+        //                     $('.breadcrumb')[0].innerHTML = breadcrumb;
+        //                     $('.article-content').fadeIn('slow');
+        //                     $('.breadcrumb').fadeIn('slow');
+        //                     $("#comments script", el).each(function(idx, obj){
+        //                         // re-enable disqus
+        //                         eval(obj.innerHTML);
+        //                     });
+        //                     applyTranslateAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     });
+        // };
+        // applyTranslateAnime();
+
+        // window.onpopstate = function(e){
+        //     if(e.state){
+                
+        //         document.title = htmlDecode(e.state.title);
+        //         $('.breadcrumb').fadeOut("slow");
+        //         $('.article-content').fadeOut("slow",function(){
+        //             $('.article-content')[0].innerHTML = e.state.content;
+        //             $('.breadcrumb')[0].innerHTML = e.state.breadcrumb;
+        //             $('.article-content').fadeIn('slow');
+        //             $('.breadcrumb').fadeIn('slow');
+        //             $("#comments script").each(function(idx, obj){
+        //                 // re-enable disqus
+        //                 eval(obj.innerHTML);
+        //             });
+        //             applyTranslateAnime();
+        //         });
+        //     }
+        // }
+        
+        
+
+        // if (typeof String.prototype.startsWith != 'function') {
+        //   // see below for better implementation!
+        //   String.prototype.startsWith = function (str){
+        //     return this.indexOf(str) == 0;
+        //   };
+        // }
+        // if (typeof String.prototype.endsWith != 'function') {
+        //     String.prototype.endsWith = function(suffix) {
+        //         return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        //     };
+        // }
+        // function applyAjaxAnime(){
+            
+        //     function applyAjaxAnimeOn(idx, obj){
+        //         var href = $(obj).attr("href");
+        //         if(href.startsWith("java") || 
+        //             href.startsWith("http")||
+        //             ! href.endsWith(".html")){
+        //             return;
+        //         }
+
+        //         $(obj).attr("data-href", $(obj).attr("href"));
+        //         $(obj).attr("href", "javascript: linkto('" + href+"')");
+        //         $(obj).click(function(){
+        //             var href = $(obj).attr("data-href");
+        //             $('#loading-block').fadeOut("slow",function(){
+        //                 $.get(href, function(data){
+        //                     var el = new DOMParser().parseFromString(data, 'text/html');
+
+        //                     var title = $("#title", el)[0].innerHTML;
+        //                     var content = $("#loading-block", el)[0].innerHTML;
+                            
+        //                     document.title = htmlDecode(title);
+        //                     window.history.pushState({
+        //                         "content": content ,
+        //                         "title":title,
+        //                         "data":data
+        //                     },"", href);
+        //                     $('#loading-block')[0].innerHTML = content;
+        //                     $('#loading-block').fadeIn('slow');
+
+        //                     evalScript(data, $('#loading-block'));
+        //                     applyAjaxAnime();
+        //                 }).fail(function(){
+        //                     // failback to changing url
+        //                     window.location.href = href ;
+        //                 });
+        //             });
+        //         });
+        //     }
+
+        //     $("a").each(applyAjaxAnimeOn);
+        // };
+        // applyAjaxAnime();
+
+        // window.onpopstate = function(e){
+        //     if(e.state){
+                
+        //         document.title = htmlDecode(title);
+        //         $('#loading-block').fadeOut("slow",function(){
+        //             $('#loading-block')[0].innerHTML = e.state.content;
+        //             $('#loading-block').fadeIn('slow');
+        //             evalScript(e.state.data, $('#loading-block'));
+        //             applyAjaxAnime();
+        //         });
+        //     }
+        // }
+        
+    });
+</script>
+
+</body>
+</html>
