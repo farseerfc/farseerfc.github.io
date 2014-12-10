@@ -62,8 +62,8 @@ Farseerfc的小窝            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/">繁體</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                         </ul>
                     </li>
 
@@ -144,9 +144,9 @@ Farseerfc的小窝            </a>
 <p>3、左值有地址，右值没有地址。</p>
 <p>根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：</p>
 <p>1=1;//Error</p>
-<p>这个复制操作在C++中是语法错误，<span class="caps">MSVC</span>给出的错误提示为“error C2106: ‘=’ :
+<p>这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ :
 left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。</p>
-<p>根据第二定义 ...</p></div></body></html>
+<p>根据第二定义，一个左值也是一个右值 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -183,11 +183,13 @@ left operand must be l-value”，就是说’=’的左操作数必须是一�
 <h2>2.2 I386平台的内存布局</h2>
 <p>众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。</p>
 <div class="line-block">
-<div class="line">32位指针的可寻址空间为<span class="caps">4GB</span>。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部<span class="caps">4GB</span>的内存空间。<span class="caps">4GB</span>的地址被一分为二，前<span class="caps">2GB</span>供应用程序自己使用，后<span class="caps">2GB</span>由系统内核分配和管理。这<span class="caps">2GB</span>的内存地址，通常被划分成3种内存区使用：</div>
+<div class="line">32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用：</div>
 </div>
 <div class="section" id="id1">
 <h3>1 代码及静态数据区</h3>
-<p>由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址 ...</p></div></div></body></html>
+<p>由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。</p>
+<div class="line-block">
+<div class="line">在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 ...</div></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -226,7 +228,7 @@ left operand must be l-value”，就是说’=’的左操作数必须是一�
 Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">QQZone</a>同时发表一系列文章，暂定名为“C++Tricks”。</p>
 <p>本文旨在记录和阐述一些本人学习C++时所得的心得、技巧。总体来看，本文涉及的内容是每一个C++程序员都应该知道的，但是很少见诸C++教材。希望对各位同仁学习C++有所帮助。</p>
 <div class="line-block">
-<div class="line">也可以通过<span class="caps">QQ</span>或<span class="caps">MSN</span>向我索要此文的<span class="caps">DOC</span>版或<span class="caps">PDF</span>版，会比网页上的更新的快一点。</div>
+<div class="line">也可以通过QQ或MSN向我索要此文的DOC版或PDF版，会比网页上的更新的快一点。</div>
 </div>
 <div class="section" id="lexical-problems">
 <h2>1      词法问题(Lexical Problems)</h2>
@@ -237,7 +239,15 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!139.entry">1.1 条件运算符(?:)</a></h3>
 </div>
 <div class="section" id="id2">
-<h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!140.entry">1.2 逗号运算符(,)、逻辑运算符 ...</a></h3></div></div></body></html>
+<h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!140.entry">1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</a></h3>
+</div>
+<div class="section" id="x86">
+<h3>2      X86体系结构</h3>
+<div class="section" id="id3">
+<h4>     <a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!146.entry">2.1 X86概述</a></h4>
+</div>
+<div class="section" id="i386">
+<h4>     <a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!147.entry">2.2 ...</a></h4></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -359,7 +369,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <p>首先提问，既然I386上sizeof(int)==4、sizeof(char)==1，那么如下结构(struct)A的sizeof是多少？</p>
 <p>struct A{int i;char c;};</p>
 <p>答案是sizeof(A)==8……1+5=8？</p>
-<p>呵呵，这就是I386上的边界对齐问题。我们知道，I386上有整整<span class="caps">4GB</span>的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于I386平台而言，类型为T的变量必须放置在sizeof(T)的整数倍的地址上，char可以随便放置，short必须放在2的整数倍的地址上，int必须放在4的整数倍的地址上 ...</p></div></body></html>
+<p>呵呵，这就是I386上的边界对齐问题。我们知道，I386上有整整4GB的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于I386平台而言，类型为T的变量必须放置在sizeof(T)的整数倍的地址上，char可以随便放置，short必须放在2的整数倍的地址上，int必须放在4的整数倍的地址上，double必须放在8的整数倍的地址上。如果违反边界对齐要求 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -449,7 +459,7 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
 <p>参数压栈顺序：逆序(从右至左)</p>
 <p>参数堆栈恢复者：被调函数(callee)</p>
 <div class="line-block">
-<div class="line">__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在<span class="caps">DLL</span>之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型 ...</div></div></div></div></body></html>
+<div class="line">__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明 ...</div></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -525,74 +535,14 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -601,8 +551,73 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/yssy.html">
                     yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -610,9 +625,9 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                     oop <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -626,28 +641,23 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/will.html">
                     will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -790,16 +800,18 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2014 farseerfc
+         <div class="col-md-10 col-sm-9 col-xs-7">&copy; 2014 farseerfc
             &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.
+         </div>
+         <div class="col-md-2 col-sm-3 col-xs-5"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>         <div class="col-xs-12">
+              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     Content
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> 回页首</a></p></div>
       </div>
    </div>
 </footer>

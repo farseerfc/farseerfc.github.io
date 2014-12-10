@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="从 farseerfc.wordpress.com 导入 3.1 左值右值与常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义： 1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。 2、左值是可读可写的值，右值是只读的值。 3、左值有地址，右值没有地址。 根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ : left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 根据第二定义 ..." />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 3.1 左值右值与常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义： 1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。 2、左值是可读可写的值，右值是只读的值。 3、左值有地址，右值没有地址。 根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ : left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 根据第二定义，一个左值也是一个右值 ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 3.1 左值右值与常量性(lvalue，rvalue &amp; constant)"/>
         <meta property="og:url" content="//farseerfc.github.io/zhs/c-tricks-3-1-lvalue-rvalue-constant.html"/>
-        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 3.1 左值右值与常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义： 1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。 2、左值是可读可写的值，右值是只读的值。 3、左值有地址，右值没有地址。 根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ : left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 根据第二定义 ..."/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 3.1 左值右值与常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义： 1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。 2、左值是可读可写的值，右值是只读的值。 3、左值有地址，右值没有地址。 根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ : left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 根据第二定义，一个左值也是一个右值 ..."/>
         <meta property="article:published_time" content="2007-09-16" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -68,8 +68,8 @@ Farseerfc的小窝            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/">繁體</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                         </ul>
                     </li>
 
@@ -132,7 +132,7 @@ Farseerfc的小窝            </a>
                         <div class="col-lg-10 col-md-9 col-sm-7 col-xs-6">
 <footer class="post-info">
     <span class="published">
-        <time datetime="2007-09-16T13:07:00+09:00"><i class="fa fa-calendar"></i> 日 16 九月 2007</time>
+        <time datetime="2007-09-16T13:07:00+09:00"><i class="fa fa-calendar"></i> 2007年09月16日(周日)</time>
     </span>
     
 
@@ -172,7 +172,7 @@ Farseerfc的小窝            </a>
 <p>3、左值有地址，右值没有地址。</p>
 <p>根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：</p>
 <p>1=1;//Error</p>
-<p>这个复制操作在C++中是语法错误，<span class="caps">MSVC</span>给出的错误提示为“error C2106: ‘=’ :
+<p>这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: ‘=’ :
 left operand must be l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。</p>
 <p>根据第二定义，一个左值也是一个右值，因为左值也可读，而一个右值不是一个左值，因为右值不可写。</p>
 <p>通常情况下，声明的变量是一个左值，除非你指定const将它变成一个右值：</p>
@@ -204,9 +204,9 @@ Complex&amp;。至于返回值，还是Do as the ints do。int的赋值返回�
 <p>(i=1)=2;</p>
 <p>虽然比较傻，先将i赋为1，再将其改为2，但是这是被C++语法支持的做法，我们就理应遵守。所以返回第一个参数的左值：</p>
 <p>Complex&amp; operator=(Complex&amp;,const Complex&amp;);</p>
-<p>const是C++引入的语言特性，也被<span class="caps">ANSI</span>
+<p>const是C++引入的语言特性，也被ANSI
 C99借鉴，在经典版本的C语言中是没有的。关于const的历史，有几点值得玩味。最初Bjarne
-Stroustrup引入const时，可写性是和可读性分开的。那时使用关键字readonly和writeonly。这个特点被首先提交到C的<span class="caps">ANSI</span>标准化委员会(当时还没有C++标准化的计划)，但是<span class="caps">ANSI</span> C标准只接受了readonly的概念，并将其命名为const。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量，C++又引入关键字violate。从语义特点来看，violate是const的反义词，因为const表示不会变的量，而violate表示会不按照预期自行变化的量。从语法特点而言，violate与const是极为相似的，适用于const的一切语法规则同样适用于violate。</p>
+Stroustrup引入const时，可写性是和可读性分开的。那时使用关键字readonly和writeonly。这个特点被首先提交到C的ANSI标准化委员会(当时还没有C++标准化的计划)，但是ANSI C标准只接受了readonly的概念，并将其命名为const。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量，C++又引入关键字violate。从语义特点来看，violate是const的反义词，因为const表示不会变的量，而violate表示会不按照预期自行变化的量。从语法特点而言，violate与const是极为相似的，适用于const的一切语法规则同样适用于violate。</p>
 <p>值的常量性可以被划分为两种：编译期常量和运行期常量。C++语法并没有严格区分这两种常量，导致了少许混乱：</p>
 <p>const int i=5;const int * pi=&amp;i;</p>
 <p>const_cast&lt;int&amp;&gt;i=1;//对于运行期常量，在需要时可以去除它的常量性</p>
@@ -217,7 +217,7 @@ Stroustrup引入const时，可写性是和可读性分开的。那时使用关�
 <p>C++中的const的特点更倾向于C#中的readonly，虽然语法上允许使用const的编译期常量性，但正如上文所展示的，这容易造成混乱。为了得到C#中const的语义，在C++中，我们不必回归恶魔#define的怀抱，可以使用所谓“匿名enum技巧”。当匿名声明一个enum类型时，其中的枚举值就是一个int类型的编译期常量，比如：</p>
 <p>enum{Size=5;};</p>
 <p>int a[Size];</p>
-<p>这种使用匿名enum来声明编译期常量的做法，被广泛应用于<span class="caps">STL</span>、boost等模板库的实现代码中。</p>
+<p>这种使用匿名enum来声明编译期常量的做法，被广泛应用于STL、boost等模板库的实现代码中。</p>
 </div>
 </body></html>
             </div>
@@ -348,74 +348,14 @@ Stroustrup引入const时，可写性是和可读性分开的。那时使用关�
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -424,8 +364,73 @@ Stroustrup引入const时，可写性是和可读性分开的。那时使用关�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/yssy.html">
                     yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -433,9 +438,9 @@ Stroustrup引入const时，可写性是和可读性分开的。那时使用关�
                     oop <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -449,28 +454,23 @@ Stroustrup引入const时，可写性是和可读性分开的。那时使用关�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/will.html">
                     will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -613,16 +613,18 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2014 farseerfc
+         <div class="col-md-10 col-sm-9 col-xs-7">&copy; 2014 farseerfc
             &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.
+         </div>
+         <div class="col-md-2 col-sm-3 col-xs-5"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>         <div class="col-xs-12">
+              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     Content
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> 回页首</a></p></div>
       </div>
    </div>
 </footer>

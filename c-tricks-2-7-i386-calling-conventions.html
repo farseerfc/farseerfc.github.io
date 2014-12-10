@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型 ..." />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.7 I386平臺的其它函數調用模型"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions.html"/>
-        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型 ..."/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -68,8 +68,8 @@ Farseerfc的小窩            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                         </ul>
                     </li>
 
@@ -182,7 +182,7 @@ Farseerfc的小窩            </a>
 <p>參數壓棧順序：逆序(從右至左)</p>
 <p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line">__stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在<span class="caps">DLL</span>之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明。</div>
+<div class="line">__stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明。</div>
 </div>
 </div>
 <div class="section" id="thiscall">
@@ -190,7 +190,7 @@ Farseerfc的小窩            </a>
 <p>參數壓棧順序：逆序(從右至左)，this用ecx傳遞。</p>
 <p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line">__thiscall是<span class="caps">VC</span>編譯器中類的非靜態成員函數(non-static member functon)的默認調用模型。但是如果此成員函數有可變參數表，<span class="caps">VC</span>編譯器會使用__cdecl。和__stdcall一樣，__thiscall由被調函數恢復堆棧。比較獨特的是__thiscall會通過ecx寄存器傳遞成員函數的this指針，而__cdecl下this指針是通過在參數表最前面增加一個函數參數來傳遞的。__thiscall是<span class="caps">VC</span>編譯器對this指針的使用的一種優化，大大提高了面向對象程序的效率。在<span class="caps">VC2003</span>及之前的編譯器上__thiscall不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定__cdecl來避免使用__thiscall。</div>
+<div class="line">__thiscall是VC編譯器中類的非靜態成員函數(non-static member functon)的默認調用模型。但是如果此成員函數有可變參數表，VC編譯器會使用__cdecl。和__stdcall一樣，__thiscall由被調函數恢復堆棧。比較獨特的是__thiscall會通過ecx寄存器傳遞成員函數的this指針，而__cdecl下this指針是通過在參數表最前面增加一個函數參數來傳遞的。__thiscall是VC編譯器對this指針的使用的一種優化，大大提高了面向對象程序的效率。在VC2003及之前的編譯器上__thiscall不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定__cdecl來避免使用__thiscall。</div>
 </div>
 </div>
 <div class="section" id="fastcall">
@@ -206,7 +206,7 @@ Farseerfc的小窩            </a>
 <p>參數壓棧順序：正序(從左至右)</p>
 <p>參數堆棧恢復者：被調函數(callee)</p>
 <div class="line-block">
-<div class="line">過程式編程語言Pascal所使用的函數調用模型，由此得名。也是16位版本的Windows使用的<span class="caps">API</span>模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。__pascal是正序壓棧，這與大部分I386函數模型都不相同。與__stdcall一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名<span class="caps">PASCAL</span>、pascal、_pascal(單下劃線)，現在都改成了__stdcall的別名，與__pascal(雙下劃線)不同。</div>
+<div class="line">過程式編程語言Pascal所使用的函數調用模型，由此得名。也是16位版本的Windows使用的API模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。__pascal是正序壓棧，這與大部分I386函數模型都不相同。與__stdcall一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名PASCAL、pascal、_pascal(單下劃線)，現在都改成了__stdcall的別名，與__pascal(雙下劃線)不同。</div>
 </div>
 </div>
 <div class="section" id="id1">
@@ -355,74 +355,14 @@ Farseerfc的小窩            </a>
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -431,8 +371,73 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/yssy.html">
                     yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -440,9 +445,9 @@ Farseerfc的小窩            </a>
                     oop <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -456,28 +461,23 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/will.html">
                     will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -620,16 +620,18 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2014 farseerfc
+         <div class="col-md-10 col-sm-9 col-xs-7">&copy; 2014 farseerfc
             &middot; 這些開源技術驅動：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.
+         </div>
+         <div class="col-md-2 col-sm-3 col-xs-5"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回頁首</a></p></div>         <div class="col-xs-12">
+              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     Content
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> 回頁首</a></p></div>
       </div>
    </div>
 </footer>

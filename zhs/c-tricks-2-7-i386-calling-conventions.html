@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.7 I386平台的其它函数调用模型 上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同： 1 __cdecl 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：主调函数(caller) __cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。 2 __stdcall 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：被调函数(callee) __stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型 ..." />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.7 I386平台的其它函数调用模型 上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同： 1 __cdecl 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：主调函数(caller) __cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。 2 __stdcall 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：被调函数(callee) __stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明 ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.7 I386平台的其它函数调用模型"/>
         <meta property="og:url" content="//farseerfc.github.io/zhs/c-tricks-2-7-i386-calling-conventions.html"/>
-        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.7 I386平台的其它函数调用模型 上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同： 1 __cdecl 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：主调函数(caller) __cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。 2 __stdcall 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：被调函数(callee) __stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型 ..."/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.7 I386平台的其它函数调用模型 上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同： 1 __cdecl 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：主调函数(caller) __cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。 2 __stdcall 参数压栈顺序：逆序(从右至左) 参数堆栈恢复者：被调函数(callee) __stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明 ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -68,8 +68,8 @@ Farseerfc的小窝            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/">繁體</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                         </ul>
                     </li>
 
@@ -132,7 +132,7 @@ Farseerfc的小窝            </a>
                         <div class="col-lg-10 col-md-9 col-sm-7 col-xs-6">
 <footer class="post-info">
     <span class="published">
-        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 二 28 八月 2007</time>
+        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 2007年08月28日(周二)</time>
     </span>
     
 
@@ -182,7 +182,7 @@ Farseerfc的小窝            </a>
 <p>参数压栈顺序：逆序(从右至左)</p>
 <p>参数堆栈恢复者：被调函数(callee)</p>
 <div class="line-block">
-<div class="line">__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在<span class="caps">DLL</span>之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明。</div>
+<div class="line">__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明。</div>
 </div>
 </div>
 <div class="section" id="thiscall">
@@ -190,7 +190,7 @@ Farseerfc的小窝            </a>
 <p>参数压栈顺序：逆序(从右至左)，this用ecx传递。</p>
 <p>参数堆栈恢复者：被调函数(callee)</p>
 <div class="line-block">
-<div class="line">__thiscall是<span class="caps">VC</span>编译器中类的非静态成员函数(non-static member functon)的默认调用模型。但是如果此成员函数有可变参数表，<span class="caps">VC</span>编译器会使用__cdecl。和__stdcall一样，__thiscall由被调函数恢复堆栈。比较独特的是__thiscall会通过ecx寄存器传递成员函数的this指针，而__cdecl下this指针是通过在参数表最前面增加一个函数参数来传递的。__thiscall是<span class="caps">VC</span>编译器对this指针的使用的一种优化，大大提高了面向对象程序的效率。在<span class="caps">VC2003</span>及之前的编译器上__thiscall不是一个关键字，不能被显式指定。但可以给成员函数显式指定__cdecl来避免使用__thiscall。</div>
+<div class="line">__thiscall是VC编译器中类的非静态成员函数(non-static member functon)的默认调用模型。但是如果此成员函数有可变参数表，VC编译器会使用__cdecl。和__stdcall一样，__thiscall由被调函数恢复堆栈。比较独特的是__thiscall会通过ecx寄存器传递成员函数的this指针，而__cdecl下this指针是通过在参数表最前面增加一个函数参数来传递的。__thiscall是VC编译器对this指针的使用的一种优化，大大提高了面向对象程序的效率。在VC2003及之前的编译器上__thiscall不是一个关键字，不能被显式指定。但可以给成员函数显式指定__cdecl来避免使用__thiscall。</div>
 </div>
 </div>
 <div class="section" id="fastcall">
@@ -206,7 +206,7 @@ Farseerfc的小窝            </a>
 <p>参数压栈顺序：正序(从左至右)</p>
 <p>参数堆栈恢复者：被调函数(callee)</p>
 <div class="line-block">
-<div class="line">过程式编程语言Pascal所使用的函数调用模型，由此得名。也是16位版本的Windows使用的<span class="caps">API</span>模型，过时的模型，现在已经废弃且禁止使用。你会看到有些书本仍会不时提到它，所以需要注意。__pascal是正序压栈，这与大部分I386函数模型都不相同。与__stdcall一样，由被调者恢复堆栈，不支持可变参数表。历史上曾有过的别名<span class="caps">PASCAL</span>、pascal、_pascal(单下划线)，现在都改成了__stdcall的别名，与__pascal(双下划线)不同。</div>
+<div class="line">过程式编程语言Pascal所使用的函数调用模型，由此得名。也是16位版本的Windows使用的API模型，过时的模型，现在已经废弃且禁止使用。你会看到有些书本仍会不时提到它，所以需要注意。__pascal是正序压栈，这与大部分I386函数模型都不相同。与__stdcall一样，由被调者恢复堆栈，不支持可变参数表。历史上曾有过的别名PASCAL、pascal、_pascal(单下划线)，现在都改成了__stdcall的别名，与__pascal(双下划线)不同。</div>
 </div>
 </div>
 <div class="section" id="id1">
@@ -355,74 +355,14 @@ Farseerfc的小窝            </a>
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -431,8 +371,73 @@ Farseerfc的小窝            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/yssy.html">
                     yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -440,9 +445,9 @@ Farseerfc的小窝            </a>
                     oop <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -456,28 +461,23 @@ Farseerfc的小窝            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/will.html">
                     will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -620,16 +620,18 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2014 farseerfc
+         <div class="col-md-10 col-sm-9 col-xs-7">&copy; 2014 farseerfc
             &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.
+         </div>
+         <div class="col-md-2 col-sm-3 col-xs-5"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>         <div class="col-xs-12">
+              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     Content
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> 回页首</a></p></div>
       </div>
    </div>
 </footer>

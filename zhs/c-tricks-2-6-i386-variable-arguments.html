@@ -68,8 +68,8 @@ Farseerfc的小窝            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/">繁體</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                         </ul>
                     </li>
 
@@ -132,7 +132,7 @@ Farseerfc的小窝            </a>
                         <div class="col-lg-10 col-md-9 col-sm-7 col-xs-6">
 <footer class="post-info">
     <span class="published">
-        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 二 28 八月 2007</time>
+        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 2007年08月28日(周二)</time>
     </span>
     
 
@@ -213,7 +213,7 @@ Farseerfc的小窝            </a>
 <p>}</p>
 <p>可以看出，如果参数类型一致，使用标准库要多些几行代码。不过如果参数类型不一致或者未知(printf的情况)，使用标准库就要方便很多，因为我们很难猜出编译器处置边界对齐(align)等汇编代码的细节。使用标准库的代码是可以移植的，而使用上文所述的其它方法操纵可变参数表都是不可移植的，仅限于在I386平台上使用。</p>
 <p>纵使可变参数表有使用上的便利性，它的缺陷也有很多，不可移植性和平台依赖性只是其一，最大的问题在于它的类型不安全性。使用可变参数表就意味着编译器不对参数作任何类型检查，这在C中算是一言难尽的历史遗留问题，在C++中就意味着恶魔reinterpret_cast被你唤醒。C的可变参数表是C++代码错误频发的根源之一，以至于C++标准将可变参数表列为即将被废除的C语言遗留特性。C++语法中的许多新特性，比如重载函数、默认参数值、模板，都可以一定程度上替代可变参数表，并且比可变参数表更加安全。</p>
-<p>可变参数表在C++中惟一值得嘉奖的贡献，是在模板元编程(<span class="caps">TMP</span>)的<span class="caps">SFINAE</span>技术中利用可变参数表制作最差匹配重载。根据C++标准中有关函数重载决议的规则，具有可变参数表的函数总是最差匹配，编译器在被逼无奈走头无路时才会选择可变参数表。利用这一点，我们可以精心制作重载函数来提取类型信息。比如，要判断一个通过模板传递来的类型是不是int：</p>
+<p>可变参数表在C++中惟一值得嘉奖的贡献，是在模板元编程(<span class="caps">TMP</span>)的SFINAE技术中利用可变参数表制作最差匹配重载。根据C++标准中有关函数重载决议的规则，具有可变参数表的函数总是最差匹配，编译器在被逼无奈走头无路时才会选择可变参数表。利用这一点，我们可以精心制作重载函数来提取类型信息。比如，要判断一个通过模板传递来的类型是不是int：</p>
 <p>long isIntImp(int);</p>
 <p>char isIntImp(…);</p>
 <p>template&lt;typename T&gt;</p>
@@ -223,8 +223,8 @@ Farseerfc的小窝            </a>
 <p>}</p>
 <p>然后，在一个具有模板参数T的函数中，我们就可以写</p>
 <p>if(isInt&lt;T&gt;::value)//…</p>
-<p>在这个(不怎么精致的)例子中，如果T是int，那么isIntImp的第一个重载版本就会被选中，返回值类型就是long，这样value就为1。否则，编译器只能选中第二个具有可变参数表的重载版本，返回值类型成为char，这样value就为0。把它说得再明白一些，上文的代码所表达的意思是：如果类型T是int，那它就是int，否则它就不是int，呵呵简单吧。这种通过重载决议规则来提取类型信息的技术，在模板元编程中被称作<span class="caps">SFINAE</span>，它和其它模板元编程技术被广泛运用于<span class="caps">STL</span>、Boost等模板库的开发实现之中。</p>
-<p>值得注意的是，在上文<span class="caps">SFINAE</span>的运用中，isIntImp并没有出现定义而只提供了声明，因为我们并没有实际调用isIntImp函数，而只是让它参与重载决议并用sizeof判断其返回值类型。这是C++的一个设计准则的完美体现：不需要的东西可以不出现。由于这一准则，我们避免了在C++中调用具有可变参数表的函数这一危险举动，而仅仅利用了可变参数表在语法分析过程中的特殊地位，这种对于危险语言特性的巧妙利用是善意而无害的。</p>
+<p>在这个(不怎么精致的)例子中，如果T是int，那么isIntImp的第一个重载版本就会被选中，返回值类型就是long，这样value就为1。否则，编译器只能选中第二个具有可变参数表的重载版本，返回值类型成为char，这样value就为0。把它说得再明白一些，上文的代码所表达的意思是：如果类型T是int，那它就是int，否则它就不是int，呵呵简单吧。这种通过重载决议规则来提取类型信息的技术，在模板元编程中被称作SFINAE，它和其它模板元编程技术被广泛运用于STL、Boost等模板库的开发实现之中。</p>
+<p>值得注意的是，在上文SFINAE的运用中，isIntImp并没有出现定义而只提供了声明，因为我们并没有实际调用isIntImp函数，而只是让它参与重载决议并用sizeof判断其返回值类型。这是C++的一个设计准则的完美体现：不需要的东西可以不出现。由于这一准则，我们避免了在C++中调用具有可变参数表的函数这一危险举动，而仅仅利用了可变参数表在语法分析过程中的特殊地位，这种对于危险语言特性的巧妙利用是善意而无害的。</p>
 </div>
 </body></html>
             </div>
@@ -355,74 +355,14 @@ Farseerfc的小窝            </a>
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -431,8 +371,73 @@ Farseerfc的小窝            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/yssy.html">
                     yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -440,9 +445,9 @@ Farseerfc的小窝            </a>
                     oop <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -456,28 +461,23 @@ Farseerfc的小窝            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/will.html">
                     will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -620,16 +620,18 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2014 farseerfc
+         <div class="col-md-10 col-sm-9 col-xs-7">&copy; 2014 farseerfc
             &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.
+         </div>
+         <div class="col-md-2 col-sm-3 col-xs-5"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>         <div class="col-xs-12">
+              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     Content
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-xs-2"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i> 回页首</a></p></div>
       </div>
    </div>
 </footer>
