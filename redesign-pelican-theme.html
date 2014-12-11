@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh"
+>
+<head>
+    <title>重新設計了Pelican的主題與插件 - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//localhost:8000/redesign-pelican-theme.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="python,pelican" />
+        <meta name="description" content="前言 不知不覺間放任這邊長草很久了，從上次 折騰主題 到現在都快三年了，而從上次 寫了篇告白信 到現在也有快兩年了。這期間曾經把主題配色從 Bootstrap 2 默認的白底黑字改成了黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。 而洞中一日世上千載，兩年裏 Bootstrap 已經升上 v3.3 , 而 Pelican 則已經升到 3.5 了。早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。 Bootstrap 3 的新設計 全新的 mobile-first responsive 設計。 原本 Bootstrap 2 雖然有 responsive design 的設計，不過諸多細節不能符合我的需求，最終還是得手工 ..." />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="重新設計了Pelican的主題與插件"/>
+        <meta property="og:url" content="//localhost:8000/redesign-pelican-theme.html"/>
+        <meta property="og:description" content="前言 不知不覺間放任這邊長草很久了，從上次 折騰主題 到現在都快三年了，而從上次 寫了篇告白信 到現在也有快兩年了。這期間曾經把主題配色從 Bootstrap 2 默認的白底黑字改成了黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。 而洞中一日世上千載，兩年裏 Bootstrap 已經升上 v3.3 , 而 Pelican 則已經升到 3.5 了。早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。 Bootstrap 3 的新設計 全新的 mobile-first responsive 設計。 原本 Bootstrap 2 雖然有 responsive design 的設計，不過諸多細節不能符合我的需求，最終還是得手工 ..."/>
+        <meta property="article:published_time" content="2014-12-11" />
+            <meta property="article:section" content="drafts" />
+            <meta property="article:tag" content="python" />
+            <meta property="article:tag" content="pelican" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//localhost:8000/theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//localhost:8000/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//localhost:8000/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//localhost:8000/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//localhost:8000/theme/css/html4css1.css" rel="stylesheet">
+        <link href="//localhost:8000/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="//localhost:8000/theme/css/style.css" type="text/css"/>
+
+
+        <link href="//localhost:8000/theme/css/material.min.css" rel="stylesheet">
+        <link href="//localhost:8000/theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">重新設計了Pelican的主題與插件 - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切換導航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//localhost:8000/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//localhost:8000/jp/">日本語</a></li>
+                            <li><a href="//localhost:8000/zhs/">简体</a></li>
+                            <li><a href="//localhost:8000/en/">English</a></li>
+                        </ul>
+                    </li>
+
+                     <li class="hidden-sm "><a href="//localhost:8000/pages/about.html">
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+                        <li class="active">
+                            <a href="//localhost:8000/category/drafts.html">Drafts</a>
+                        </li>
+                        <li >
+                            <a href="//localhost:8000/category/import.html">Import</a>
+                        </li>
+                        <li >
+                            <a href="//localhost:8000/category/life.html">Life</a>
+                        </li>
+                        <li >
+                            <a href="//localhost:8000/category/programming.html">Programming</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right hidden-sm">
+              <li><a href="//localhost:8000/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">歸檔</span></a></li>
+              <li><a href="//localhost:8000/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//localhost:8000" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//localhost:8000/category/drafts.html" title="drafts">drafts</a></li>
+                <li class="active">重新設計了Pelican的主題與插件</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        重新設計了Pelican的主題與插件
+                        <a href="//localhost:8000/redesign-pelican-theme.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 重新設計了Pelican的主題與插件 的永久鏈接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2014-12-11T23:45:00+09:00"><i class="fa fa-calendar"></i> 2014年12月11日(週四)</time>
+    </span>
+    
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>繁體<span class="caret"></a>
+<ul class="dropdown-menu"><li><a href="//localhost:8000/zhs/redesign-pelican-theme.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//localhost:8000/redesign-pelican-theme.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+<span><small><a href="//localhost:8000/redesign-pelican-theme.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="redesign-pelican-theme" data-disqus-url="http://localhost:8000/redesign-pelican-theme.html"><i class="fa fa-cogs"></i></a></small></span><span class="btn-group">
+	<a href="//localhost:8000/tag/python.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> python</a>
+	<a href="//localhost:8000/tag/pelican.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> pelican</a>
+</span>
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            
+            <div class="entry-content jumbotron" id="article-content">
+                <html><body><div class="section" id="id1">
+<h2> 前言 </h2>
+<p> 不知不覺間放任這邊長草很久了，從上次 <a class="reference external" href="//localhost:8000/try-pelican.html"> 折騰主題 </a>  到現在都快三年了，而從上次 <a class="reference external" href="//localhost:8000/marry-me.html"> 寫了篇告白信 </a>  到現在也有快兩年了。這期間曾經把主題配色從 <a class="reference external" href="http://getbootstrap.com/2.3.2/">Bootstrap 2</a>  默認的白底黑字改成了黑底白字，也不過是用 drop-in  的配色方案而已，沒有本質上的改進。 </p>
+<p> 而洞中一日世上千載，兩年裏 Bootstrap  已經升上 <a class="reference external" href="http://getbootstrap.com/">v3.3</a> ,
+ 而 Pelican  則已經升到 <a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0">3.5</a>  了。早就眼饞 Bootstrap  和 Pelican  中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。 </p>
+<div class="panel panel-default">
+<div class="panel-heading">
+Bootstrap 3  的新設計 </div>
+<div class="panel-body">
+<ul>
+<li><p class="first"> 全新的 mobile-first responsive 設計。 </p>
+<p> 原本 Bootstrap 2 雖然有 responsive design 的設計，不過諸多細節不能符合我的需求，最終還是得手工 hack <code class="code">
+@media screen</code>
+  查詢去微調。現在的 mobile-first responsive grid system  則相對顯得科學很多了，也終於在手持設備上看起來能舒服很多。諸位可以嘗試改變窗口寬度，或者在不同的手持設備上打開這個 blog  ，體驗一下這個頁面在不同顯示器大小中的效果。如果仍有問題歡迎 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/issues"> 發 Issue  給我 </a>  呀。 </p>
+</li>
+<li><p class="first"> 科學的 Navbar  。 </p>
+<p> 比 Bootstrap 2  那個科學很多了。無論是 sticky  在上端還是跟着浮動，或者像這邊這樣 <a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"> 自動隱藏 </a>  都很簡單。 </p>
+</li>
+</ul>
+<p> 更多細節參考 <a class="reference external" href="http://getbootstrap.com/">Bootstrap 3  主頁 </a>  。 </p>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+Pelican 3.5  的新功能 </div>
+<div class="panel-body">
+<ul>
+<li><p class="first">Python 2  和 Python 3  統一代碼 </p>
+<p> 再沒有惱人的 unicode  相關的問題了。這對 blog  系統來說相當重要啊。而且還能方便切換 pypy  等不同的解釋器。 </p>
+</li>
+<li><p class="first"> 全新的插件系統：非常多好用的 <a class="reference external" href="https://github.com/getpelican/pelican-plugins"> 插件 </a>  等着你。 </p>
+</li>
+<li><p class="first"> 增強了導入系統：嗯總算可以導入我的中文的 wordpress  博客了。（雖然那邊長草更久了 …… ） </p>
+</li>
+<li><p class="first"> 頁面內鏈接：不用硬編碼手寫鏈接了，方便各種 plugin  和 theme  的實現。 </p>
+</li>
+</ul>
+<p> 更多細節參考 <a class="reference external" href="http://pelican.readthedocs.org/en/latest/">Pelican  文檔 </a>  。 </p>
+</div>
+</div>
+<p> 近日想寫的東西越積越多，終於下定決心重新設計了一遍 Pelican  的主題，加之一些精選的插件。於是本博客就變成你們現在看到的樣子了。   接下來從主題和插件，也即外用與內體兩方面介紹一下這次改版的細節。 </p>
+</div>
+<div class="section" id="id8">
+<h2> 外用：基於材料設計的主題 </h2>
+<p> 這個界面風格要從 Google  在 <a class="reference external" href="https://www.google.com/events/io">I/O 2014  大會 </a>
+ 上公佈 Android L  也即後來的 Lollipop  說起。他們在談論界面設計的時候公佈了他們的設計準則： <a class="reference external" href="http://www.google.com/design/"> 材料設計 (Material Design)</a>  。當然這只是一些準則，總結並描述了之前在 Web  設計和移動端 App  界面設計方面的一些規範，   並且用材料的類比來形象化的比喻這個準則。 </p>
+</div>
+</body></html>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <pre><code id="source-code">
+                </code></pre>
+            </div>
+ 
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+這篇文章是 "pelican" 系列文章的第 2 篇：                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                        <a class="btn btn-default" href='//localhost:8000/try-pelican.html' style="text-align:left">嘗試一下&nbsp;Pelican</a>
+                        <a class="btn btn-primary" href='//localhost:8000/redesign-pelican-theme.html' style="text-align:left">重新設計了Pelican的主題與插件</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <a href="//localhost:8000/jumping-kde5-plasma-activities-button.html" class="btn btn-default btn-lg" style="float:right;clear:both">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        <span class="caps">KDE5</span> Plasma&nbsp;之跳動賣萌的活動按鈕
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'redesign-pelican-theme';
+                var disqus_url = 'http://localhost:8000/redesign-pelican-theme.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-home fa-lg"></i>
+<a href="//localhost:8000/pages/about.html">
+關於 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//localhost:8000/pages/about.html"><img width="100%" src="//localhost:8000/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//localhost:8000/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">標籤雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//localhost:8000/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//localhost:8000/tag/python.html">
+                    python <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//localhost:8000/tag/pelican.html">
+                    pelican <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//localhost:8000/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">友情鏈接</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/4a0750751cf52f6dc1cf5629de3a20d0"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub倉庫</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">最新推文</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-md-10 col-sm-9">&copy; 2014 farseerfc
+            &middot; 這些開源技術驅動：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回頁首</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//localhost:8000/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//localhost:8000/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//localhost:8000/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//localhost:8000/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//localhost:8000/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//localhost:8000/theme/js/ripples.min.js"></script>
+<script src="//localhost:8000/theme/js/material.min.js"></script>
+<script src="//localhost:8000/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+    });
+</script>
+
+</body>
+</html>

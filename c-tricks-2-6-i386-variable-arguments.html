@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.6 I386 平臺 C 函數的可變參數表 (Variable Arguments) 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式，C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…”： void g(int a,char* c,…); 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞 ..." />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.6 I386 平臺 C 函數的可變參數表 (Variable Arguments) 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式， C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…” ： void g(int a,char* c,…); 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞 ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable Arguments)"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.html"/>
-        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.6 I386 平臺 C 函數的可變參數表 (Variable Arguments) 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式，C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…”： void g(int a,char* c,…); 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞 ..."/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.6 I386 平臺 C 函數的可變參數表 (Variable Arguments) 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式， C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…” ： void g(int a,char* c,…); 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞 ..."/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -51,7 +51,7 @@
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                <span class="sr-only">開闔導航</span>
+                <span class="sr-only">切換導航</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -128,8 +128,6 @@ Farseerfc的小窩            </a>
                     </h1>
                 </div>
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-9 col-md-8 col-sm-12">
 <footer class="post-info">
     <span class="published">
         <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 2007年08月28日(週二)</time>
@@ -137,84 +135,71 @@ Farseerfc的小窩            </a>
     
 
 
-
-
-
-<span>
-	<a href="//farseerfc.github.io/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> C++</a>
-</span>
-
-</footer><!-- /.post-info -->                        </div>
-                        <div class="col-lg-3 col-md-4 col-sm-12">
-                            <div class="btn-group translations">
+<div class="btn-group translations">
 <a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>繁體<span class="caret"></a>
-<ul class="dropdown-menu">
-<li><a href="//farseerfc.github.io/zhs/c-tricks-2-6-i386-variable-arguments.html" class="translate">简体</a></li>
-</ul>
-<a onclick="$.get('//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page">
-<i class="fa fa-code"></i>
-</a>
+<ul class="dropdown-menu"><li><a href="//farseerfc.github.io/zhs/c-tricks-2-6-i386-variable-arguments.html" class="translate">简体</a></li></ul>
 </div>
 
-                        </div>
-                    </div>
-                </div>
+    <a onclick="$.get('//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-6-i386-variable-arguments" data-disqus-url="http://farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.html"><i class="fa fa-cogs"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.github.io/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> C++</a>
+</span>
+</footer><!-- /.post-info -->                </div>
             </header>
 
             
-
             <div class="entry-content jumbotron" id="article-content">
                 <html><body><p> 從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  導入 </p>
 <div class="section" id="i386c-variable-arguments">
 <h2>2.6 I386 平臺 C 函數的可變參數表 (Variable Arguments)</h2>
-<p> 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式，C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…”：</p>
+<p> 基於前文 (2.4 節 ) 分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式， C 語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號 “…” ： </p>
 <p>void g(int a,char* c,…);</p>
-<p> 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞：</p>
-<p>g(3,”Hello”,2,4,5);// 調用 g 並傳遞 5 個參數，其中後 3 個爲可變參數。</p>
+<p> 省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數 g 可以接受 2 個或 2 個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞： </p>
+<p>g(3,”Hello”,2,4,5);// 調用 g 並傳遞 5 個參數，其中後 3 個爲可變參數。 </p>
 <p> 在函數的實現代碼中，可以通過 2.4 節敘述的，參數在棧中的排列順序，來訪問位於可變參數表的參數。比如 :</p>
 <p>void g(int a,char* c…){</p>
 <p>void *pc=&amp;c;int* pi=static_cast&lt;int*&gt;(pc)+1;// 將 pi 指向首個可變參數 </p>
-<p>for(int i=0;i&lt;a;i++)std::cout&lt;&lt;pi[i]&lt;&lt;” ”；</p>
+<p>for(int i=0;i&lt;a;i++)std::cout&lt;&lt;pi[i]&lt;&lt;” ” ； </p>
 <p>std::cout&lt;&lt;c&lt;&lt;std::endl;</p>
 <p>}</p>
-<p> 我們甚至可以讓一個函數的所有參數都是可變參數，只要有辦法獲知參數的數量即可。比如，我們約定，在傳遞給 addAll 的參數都是 int，並且最後一個以 0 結束：</p>
+<p> 我們甚至可以讓一個函數的所有參數都是可變參數，只要有辦法獲知參數的數量即可。比如，我們約定，在傳遞給 addAll 的參數都是 int ，並且最後一個以 0 結束： </p>
 <p>int addAll(…);</p>
 <p>int a=f(1,4,2,5,7,0);</p>
-<p> 那麼 addAll 可以這樣實現：</p>
+<p> 那麼 addAll 可以這樣實現： </p>
 <p>int addAll(…){</p>
 <p>int sum=0;int *p=&amp;sum; //p 指向第一個局部變量 </p>
-<p>p+=3; // 跳過 sum，ebp，eip，現在 p 指向第一個參數 </p>
+<p>p+=3; // 跳過 sum ， ebp ， eip ，現在 p 指向第一個參數 </p>
 <p>for(;*p;++p) // 如果 p 不指向 0 就繼續循環 </p>
 <p>sum+=*p;</p>
 <p>return sum;</p>
 <p>}</p>
-<p> 可變參數表的最廣泛應用是 C 的標準庫函數中的格式化輸入輸出：printf 和 scanf。</p>
+<p> 可變參數表的最廣泛應用是 C 的標準庫函數中的格式化輸入輸出： printf 和 scanf 。 </p>
 <p>void printf(char *c,…);</p>
 <p>void scanf(char *c,…);</p>
-<p> 兩者都通過它的首個參數指出後續參數表中的參數類型和參數數量。</p>
-<p> 如果可變參數表中的參數類型不一樣，那麼操縱可變參數表就需要複雜的指針運算，並且還要時刻注意邊界對齊 (align) 問題，非常令人頭痛。好在 C 標準庫提供了用於操縱可變參數表的宏 (macro) 和結構 (struct)，他們被定義在庫文件 stdarg.h 中 :</p>
+<p> 兩者都通過它的首個參數指出後續參數表中的參數類型和參數數量。 </p>
+<p> 如果可變參數表中的參數類型不一樣，那麼操縱可變參數表就需要複雜的指針運算，並且還要時刻注意邊界對齊 (align) 問題，非常令人頭痛。好在 C 標準庫提供了用於操縱可變參數表的宏 (macro) 和結構 (struct) ，他們被定義在庫文件 stdarg.h 中 :</p>
 <p>typedef struct {char *p;int offset;} va_list;</p>
 <p>#define va_start(valist,arg)</p>
 <p>#define va_arg(valist,type)</p>
 <p>#define va_end(valist)</p>
-<p> 其中結構 va_list 用於指示參數在棧中的位置，宏 va_start 接受一個 va_list 和函數的可變參數表之前的參數，通過第一個參數初始化 va_list 中的相應數據，因此要使用 stdarg.h 中的宏，你的可變參數表的函數必須至少有一個具名參數。va_arg 返回下一個類型爲 type 的參數，va_end 結束可變參數表的使用。還是以上文的 addAll 爲例，這次寫出它的使用標準宏的版本：</p>
+<p> 其中結構 va_list 用於指示參數在棧中的位置，宏 va_start 接受一個 va_list 和函數的可變參數表之前的參數，通過第一個參數初始化 va_list 中的相應數據，因此要使用 stdarg.h 中的宏，你的可變參數表的函數必須至少有一個具名參數。 va_arg 返回下一個類型爲 type 的參數， va_end 結束可變參數表的使用。還是以上文的 addAll 爲例，這次寫出它的使用標準宏的版本： </p>
 <p>int addAll(int i,…)</p>
 <p>{</p>
 <p>va_list vl; // 定義一個 va_list 結構 </p>
 <p>va_start(vl,i); // 用省略號之前的參數初始化 vl</p>
-<p>if(i=0)return 0; // 如果第一個參數就是 0，返回 </p>
+<p>if(i=0)return 0; // 如果第一個參數就是 0 ，返回 </p>
 <p>int sum=i; // 將第一個參數加入 sum</p>
 <p>for(;;){</p>
 <p>i=va_arg(vl,int); // 取得下一個參數，類型是 sum</p>
-<p>if(i==0)break; // 如果參數是 0，跳出循環 </p>
+<p>if(i==0)break; // 如果參數是 0 ，跳出循環 </p>
 <p>sum+=i;</p>
 <p>}</p>
 <p>va_end(vl);</p>
 <p>return sum;</p>
 <p>}</p>
-<p> 可以看出，如果參數類型一致，使用標準庫要多些幾行代碼。不過如果參數類型不一致或者未知 (printf 的情況 )，使用標準庫就要方便很多，因爲我們很難猜出編譯器處置邊界對齊 (align) 等彙編代碼的細節。使用標準庫的代碼是可以移植的，而使用上文所述的其它方法操縱可變參數表都是不可移植的，僅限於在 I386 平臺上使用。</p>
-<p> 縱使可變參數表有使用上的便利性，它的缺陷也有很多，不可移植性和平臺依賴性只是其一，最大的問題在於它的類型不安全性。使用可變參數表就意味着編譯器不對參數作任何類型檢查，這在 C 中算是一言難盡的歷史遺留問題，在 C++ 中就意味着惡魔 reinterpret_cast 被你喚醒。C 的可變參數表是 C++ 代碼錯誤頻發的根源之一，以至於 C++ 標準將可變參數表列爲即將被廢除的 C 語言遺留特性。C++ 語法中的許多新特性，比如重載函數、默認參數值、模板，都可以一定程度上替代可變參數表，並且比可變參數表更加安全。</p>
-<p> 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (<span class="caps">TMP</span>) 的 SFINAE 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int：</p>
+<p> 可以看出，如果參數類型一致，使用標準庫要多些幾行代碼。不過如果參數類型不一致或者未知 (printf 的情況 ) ，使用標準庫就要方便很多，因爲我們很難猜出編譯器處置邊界對齊 (align) 等彙編代碼的細節。使用標準庫的代碼是可以移植的，而使用上文所述的其它方法操縱可變參數表都是不可移植的，僅限於在 I386 平臺上使用。 </p>
+<p> 縱使可變參數表有使用上的便利性，它的缺陷也有很多，不可移植性和平臺依賴性只是其一，最大的問題在於它的類型不安全性。使用可變參數表就意味着編譯器不對參數作任何類型檢查，這在 C 中算是一言難盡的歷史遺留問題，在 C++ 中就意味着惡魔 reinterpret_cast 被你喚醒。 C 的可變參數表是 C++ 代碼錯誤頻發的根源之一，以至於 C++ 標準將可變參數表列爲即將被廢除的 C 語言遺留特性。 C++ 語法中的許多新特性，比如重載函數、默認參數值、模板，都可以一定程度上替代可變參數表，並且比可變參數表更加安全。 </p>
+<p> 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (<span class="caps">TMP</span>) 的 SFINAE 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int ： </p>
 <p>long isIntImp(int);</p>
 <p>char isIntImp(…);</p>
 <p>template&lt;typename T&gt;</p>
@@ -224,8 +209,8 @@ Farseerfc的小窩            </a>
 <p>}</p>
 <p> 然後，在一個具有模板參數 T 的函數中，我們就可以寫 </p>
 <p>if(isInt&lt;T&gt;::value)//…</p>
-<p> 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long，這樣 value 就爲 1。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char，這樣 value 就爲 0。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int，那它就是 int，否則它就不是 int，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 SFINAE，它和其它模板元編程技術被廣泛運用於 STL、Boost 等模板庫的開發實現之中。</p>
-<p> 值得注意的是，在上文 SFINAE 的運用中，isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。</p>
+<p> 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int ，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long ，這樣 value 就爲 1 。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char ，這樣 value 就爲 0 。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int ，那它就是 int ，否則它就不是 int ，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 SFINAE ，它和其它模板元編程技術被廣泛運用於 STL 、 Boost 等模板庫的開發實現之中。 </p>
+<p> 值得注意的是，在上文 SFINAE 的運用中， isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。 </p>
 </div>
 </body></html>
             </div>
@@ -356,54 +341,14 @@ Farseerfc的小窩            </a>
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/plasma.html">
                     plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -412,23 +357,13 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -437,8 +372,43 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -446,9 +416,19 @@ Farseerfc的小窩            </a>
                     Java <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -462,28 +442,33 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/gnome3.html">
                     gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
     </ul>
