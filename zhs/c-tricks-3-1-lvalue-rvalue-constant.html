@@ -158,7 +158,7 @@ Farseerfc的小窝            </a>
 <p>3 、左值有地址，右值没有地址。 </p>
 <p> 根据左值右值的第二定义，值的左右性就是值的常量性 —— 常量是右值，非常量是左值。比如： </p>
 <p>1=1;//Error</p>
-<p> 这个复制操作在 C++ 中是语法错误， MSVC 给出的错误提示为 “error C2106: ‘=’ :
+<p> 这个复制操作在 C++ 中是语法错误， <span class="caps">MSVC</span> 给出的错误提示为 “error C2106: ‘=’ :
 left operand must be l-value” ，就是说 ’=’ 的左操作数必须是一个左值，而字面常数 1 是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 </p>
 <p> 根据第二定义，一个左值也是一个右值，因为左值也可读，而一个右值不是一个左值，因为右值不可写。 </p>
 <p> 通常情况下，声明的变量是一个左值，除非你指定 const 将它变成一个右值： </p>
@@ -189,9 +189,9 @@ Complex&amp; 。至于返回值，还是 Do as the ints do 。 int 的赋值返
 <p>(i=1)=2;</p>
 <p> 虽然比较傻，先将 i 赋为 1 ，再将其改为 2 ，但是这是被 C++ 语法支持的做法，我们就理应遵守。所以返回第一个参数的左值： </p>
 <p>Complex&amp; operator=(Complex&amp;,const Complex&amp;);</p>
-<p>const 是 C++ 引入的语言特性，也被 ANSI
+<p>const 是 C++ 引入的语言特性，也被 <span class="caps">ANSI</span>
 C99 借鉴，在经典版本的 C 语言中是没有的。关于 const 的历史，有几点值得玩味。最初 Bjarne
-Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用关键字 readonly 和 writeonly 。这个特点被首先提交到 C 的 ANSI 标准化委员会 ( 当时还没有 C++ 标准化的计划 ) ，但是 ANSI C 标准只接受了 readonly 的概念，并将其命名为 const 。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量， C++ 又引入关键字 violate 。从语义特点来看， violate 是 const 的反义词，因为 const 表示不会变的量，而 violate 表示会不按照预期自行变化的量。从语法特点而言， violate 与 const 是极为相似的，适用于 const 的一切语法规则同样适用于 violate 。 </p>
+Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用关键字 readonly 和 writeonly 。这个特点被首先提交到 C 的 <span class="caps">ANSI</span> 标准化委员会 ( 当时还没有 C++ 标准化的计划 ) ，但是 <span class="caps">ANSI</span> C 标准只接受了 readonly 的概念，并将其命名为 const 。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量， C++ 又引入关键字 violate 。从语义特点来看， violate 是 const 的反义词，因为 const 表示不会变的量，而 violate 表示会不按照预期自行变化的量。从语法特点而言， violate 与 const 是极为相似的，适用于 const 的一切语法规则同样适用于 violate 。 </p>
 <p> 值的常量性可以被划分为两种：编译期常量和运行期常量。 C++ 语法并没有严格区分这两种常量，导致了少许混乱： </p>
 <p>const int i=5;const int * pi=&amp;i;</p>
 <p>const_cast&lt;int&amp;&gt;i=1;// 对于运行期常量，在需要时可以去除它的常量性 </p>
@@ -202,7 +202,7 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
 <p>C++ 中的 const 的特点更倾向于 C# 中的 readonly ，虽然语法上允许使用 const 的编译期常量性，但正如上文所展示的，这容易造成混乱。为了得到 C# 中 const 的语义，在 C++ 中，我们不必回归恶魔 #define 的怀抱，可以使用所谓 “ 匿名 enum 技巧 ” 。当匿名声明一个 enum 类型时，其中的枚举值就是一个 int 类型的编译期常量，比如： </p>
 <p>enum{Size=5;};</p>
 <p>int a[Size];</p>
-<p> 这种使用匿名 enum 来声明编译期常量的做法，被广泛应用于 STL 、 boost 等模板库的实现代码中。 </p>
+<p> 这种使用匿名 enum 来声明编译期常量的做法，被广泛应用于 <span class="caps">STL</span> 、 boost 等模板库的实现代码中。 </p>
 </div>
 </body></html>
             </div>
@@ -335,83 +335,8 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/termcap.html">
                     termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -420,28 +345,43 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
-                    yssy <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -449,14 +389,29 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
                     Java <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -470,8 +425,58 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
-                    pelican <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -479,24 +484,19 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
                     will <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

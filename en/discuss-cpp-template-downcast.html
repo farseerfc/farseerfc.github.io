@@ -178,47 +178,49 @@ Table of Contents                    </div>
 <div class="section" id="the-problem">
 <h2><a class="toc-backref" href="#id2">The problem</a></h2>
 <p>Today I read a book about we can do cast-down in template, so I write this to test:</p>
-<div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
+<pre class="code c++ literal-block">
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-kt">bool</span> <span class="pygments-n">_Test</span><span class="pygments-p">,</span> <span class="pygments-k">class</span> <span class="pygments-nc">_Type</span> <span class="pygments-o">=</span> <span class="pygments-kt">void</span><span class="pygments-o">&gt;</span>
+<span class="pygments-k">struct</span> <span class="pygments-n">enable_if</span> <span class="pygments-p">{</span> <span class="pygments-p">};</span>
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">_Type</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="n">_Type</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="k">typedef</span> <span class="n">_Type</span> <span class="n">type</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="pygments-k">template</span><span class="pygments-o">&lt;</span><span class="pygments-k">class</span> <span class="pygments-nc">_Type</span><span class="pygments-o">&gt;</span>
+<span class="pygments-k">struct</span> <span class="pygments-n">enable_if</span><span class="pygments-o">&lt;</span><span class="pygments-nb">true</span><span class="pygments-p">,</span> <span class="pygments-n">_Type</span><span class="pygments-o">&gt;</span> <span class="pygments-p">{</span>
+    <span class="pygments-k">typedef</span> <span class="pygments-n">_Type</span> <span class="pygments-n">type</span><span class="pygments-p">;</span>
+<span class="pygments-p">};</span>
 
-<span class="k">class</span> <span class="nc">A</span> <span class="p">{</span> <span class="p">};</span>
-<span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A</span> <span class="p">{</span> <span class="p">};</span>
+<span class="pygments-k">class</span> <span class="pygments-nc">A</span> <span class="pygments-p">{</span> <span class="pygments-p">};</span>
+<span class="pygments-k">class</span> <span class="pygments-nc">B</span> <span class="pygments-o">:</span> <span class="pygments-n">A</span> <span class="pygments-p">{</span> <span class="pygments-p">};</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="n">traits</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">};</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-k">typename</span> <span class="pygments-n">T</span><span class="pygments-o">&gt;</span>
+<span class="pygments-k">struct</span> <span class="pygments-n">traits</span> <span class="pygments-p">{</span> <span class="pygments-k">static</span> <span class="pygments-kt">int</span> <span class="pygments-k">const</span> <span class="pygments-n">value</span> <span class="pygments-o">=</span> <span class="pygments-nb">false</span><span class="pygments-p">;</span> <span class="pygments-p">};</span>
 
-<span class="k">template</span> <span class="o">&lt;&gt;</span>
-<span class="k">struct</span> <span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;&gt;</span>
+<span class="pygments-k">struct</span> <span class="pygments-n">traits</span><span class="pygments-o">&lt;</span><span class="pygments-n">A</span><span class="pygments-o">&gt;</span> <span class="pygments-p">{</span> <span class="pygments-k">static</span> <span class="pygments-kt">int</span> <span class="pygments-k">const</span> <span class="pygments-n">value</span> <span class="pygments-o">=</span> <span class="pygments-nb">true</span><span class="pygments-p">;</span> <span class="pygments-p">};</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-<span class="kt">void</span> <span class="n">f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-k">typename</span> <span class="pygments-n">T</span><span class="pygments-o">&gt;</span>
+<span class="pygments-kt">void</span> <span class="pygments-n">f</span><span class="pygments-p">(</span><span class="pygments-n">T</span><span class="pygments-p">,</span> <span class="pygments-k">typename</span> <span class="pygments-n">enable_if</span><span class="pygments-o">&lt;</span><span class="pygments-n">traits</span><span class="pygments-o">&lt;</span><span class="pygments-n">T</span><span class="pygments-o">&gt;::</span><span class="pygments-n">value</span><span class="pygments-o">&gt;::</span><span class="pygments-n">type</span><span class="pygments-o">*</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">)</span> <span class="pygments-p">{</span> <span class="pygments-p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;&gt;</span>
-<span class="kt">void</span> <span class="n">f</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;&gt;</span>
+<span class="pygments-kt">void</span> <span class="pygments-n">f</span><span class="pygments-o">&lt;</span><span class="pygments-n">A</span><span class="pygments-o">&gt;</span><span class="pygments-p">(</span><span class="pygments-n">A</span><span class="pygments-p">,</span> <span class="pygments-n">enable_if</span><span class="pygments-o">&lt;</span><span class="pygments-n">traits</span><span class="pygments-o">&lt;</span><span class="pygments-n">A</span><span class="pygments-o">&gt;::</span><span class="pygments-n">value</span><span class="pygments-o">&gt;::</span><span class="pygments-n">type</span><span class="pygments-o">*</span><span class="pygments-p">)</span> <span class="pygments-p">{</span> <span class="pygments-p">}</span>
 
 
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-<span class="k">class</span> <span class="nc">BB</span> <span class="p">{};</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-k">typename</span> <span class="pygments-n">T</span><span class="pygments-o">&gt;</span>
+<span class="pygments-k">class</span> <span class="pygments-nc">BB</span> <span class="pygments-p">{};</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-<span class="k">class</span> <span class="nc">DD</span> <span class="o">:</span> <span class="k">public</span> <span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{};</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-k">typename</span> <span class="pygments-n">T</span><span class="pygments-o">&gt;</span>
+<span class="pygments-k">class</span> <span class="pygments-nc">DD</span> <span class="pygments-o">:</span> <span class="pygments-k">public</span> <span class="pygments-n">BB</span><span class="pygments-o">&lt;</span><span class="pygments-n">T</span><span class="pygments-o">&gt;</span> <span class="pygments-p">{};</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">ff</span><span class="p">(</span><span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{};</span>
+<span class="pygments-k">template</span> <span class="pygments-o">&lt;</span><span class="pygments-k">typename</span> <span class="pygments-n">T</span><span class="pygments-o">&gt;</span> <span class="pygments-kt">void</span> <span class="pygments-n">ff</span><span class="pygments-p">(</span><span class="pygments-n">BB</span><span class="pygments-o">&lt;</span><span class="pygments-n">T</span><span class="pygments-o">&gt;</span><span class="pygments-p">)</span> <span class="pygments-p">{};</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-    <span class="n">A</span> <span class="n">a</span><span class="p">;</span> <span class="n">B</span> <span class="n">b</span><span class="p">;</span>
-    <span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
-    <span class="c1">//f(b);</span>
-    <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
+<span class="pygments-kt">int</span> <span class="pygments-nf">main</span><span class="pygments-p">(</span><span class="pygments-kt">int</span> <span class="pygments-n">argc</span><span class="pygments-p">,</span> <span class="pygments-kt">char</span> <span class="pygments-o">*</span> <span class="pygments-n">argv</span><span class="pygments-p">[])</span>
+<span class="pygments-p">{</span>
+    <span class="pygments-n">A</span> <span class="pygments-n">a</span><span class="pygments-p">;</span> <span class="pygments-n">B</span> <span class="pygments-n">b</span><span class="pygments-p">;</span>
+    <span class="pygments-n">DD</span><span class="pygments-o">&lt;</span><span class="pygments-kt">long</span><span class="pygments-o">&gt;</span> <span class="pygments-n">dd</span><span class="pygments-p">;</span>
+    <span class="pygments-c1">//f(b);
+</span>    <span class="pygments-n">ff</span><span class="pygments-p">(</span><span class="pygments-n">dd</span><span class="pygments-p">);</span>
+<span class="pygments-p">}</span>
+
+</pre>
 <p>It is strange when <code class="code">
 f</code>
  it don’t allow my specified <code class="code">
@@ -247,8 +249,10 @@ A&lt;T&gt;</code>
  .</p>
 <div class="section" id="first-we-discuss-ff">
 <h3><a class="toc-backref" href="#id4">First we discuss ff</a></h3>
-<div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
-</pre></div>
+<pre class="code c++ literal-block">
+<span class="pygments-n">DD</span><span class="pygments-o">&lt;</span><span class="pygments-kt">long</span><span class="pygments-o">&gt;</span> <span class="pygments-n">dd</span><span class="pygments-p">;</span>
+
+</pre>
 <p>After this sentense, the compiler saw the instantiation of <code class="code">
 DD&lt;long&gt;</code>
  , so it instantiate <code class="code">
@@ -256,8 +260,10 @@ DD#long</code>
  , and also <code class="code">
 BB#long</code>
  .</p>
-<div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
-</pre></div>
+<pre class="code c++ literal-block">
+<span class="pygments-n">ff</span><span class="pygments-p">(</span><span class="pygments-n">dd</span><span class="pygments-p">);</span>
+
+</pre>
 <p>This sentense required the compiler to calculate set of overloading functions.</p>
 <p>Step 1 we need to infer <code class="code">
 T</code>
@@ -304,8 +310,10 @@ BB#long</code>
 </div>
 <div class="section" id="then-we-discuss-f">
 <h3><a class="toc-backref" href="#id5">Then we discuss f</a></h3>
-<div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
-</pre></div>
+<pre class="code c++ literal-block">
+<span class="pygments-n">f</span><span class="pygments-p">(</span><span class="pygments-n">b</span><span class="pygments-p">);</span>
+
+</pre>
 <p>Calculate set of overloading functions.</p>
 <p>Step 1 infer all template parameters for template <code class="code">
 f</code>
@@ -469,28 +477,18 @@ About farseerfc</a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/music.html">
-                    music <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/icse.html">
                     icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -499,8 +497,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/software.html">
-                    software <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/java.html">
+                    java <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -509,13 +507,58 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/ruby.html">
                     ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/me.html">
+                    me <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -529,18 +572,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/java.html">
-                    java <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/will.html">
+                    will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -549,33 +582,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/python.html">
-                    python <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/software.html">
+                    software <sup> 1</sup>
                 </a>
             </li>
     </ul>

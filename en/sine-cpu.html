@@ -157,37 +157,39 @@ Farseerfc's Blog            </a>
 <img alt="Sine function 1" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/>
 <img alt="Sine function 2" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/>
 <p>The program below is written in java:</p>
-<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">sincpu</span> <span class="o">{</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">cycle</span><span class="o">=</span><span class="mi">1024</span><span class="o">,</span><span class="n">tick</span> <span class="o">=</span> <span class="mi">256</span><span class="o">;</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span> <span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
-        <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;;</span><span class="n">i</span><span class="o">++){</span>
-            <span class="n">work</span><span class="o">(</span><span class="n">calcNextSleep</span><span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">cycle</span><span class="o">));</span>
-            <span class="n">sleep</span><span class="o">(</span><span class="n">tick</span> <span class="o">-</span> <span class="n">calcNextSleep</span><span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">cycle</span><span class="o">));</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
+<pre class="code java literal-block">
+<span class="pygments-kd">public</span> <span class="pygments-kd">class</span> <span class="pygments-nc">sincpu</span> <span class="pygments-o">{</span>
+    <span class="pygments-kd">private</span> <span class="pygments-kd">static</span> <span class="pygments-kd">final</span> <span class="pygments-kt">int</span> <span class="pygments-n">cycle</span><span class="pygments-o">=</span><span class="pygments-mi">1024</span><span class="pygments-o">,</span><span class="pygments-n">tick</span> <span class="pygments-o">=</span> <span class="pygments-mi">256</span><span class="pygments-o">;</span>
+    <span class="pygments-kd">public</span> <span class="pygments-kd">static</span> <span class="pygments-kt">void</span> <span class="pygments-nf">main</span> <span class="pygments-o">(</span><span class="pygments-n">String</span><span class="pygments-o">[]</span> <span class="pygments-n">args</span><span class="pygments-o">)</span> <span class="pygments-kd">throws</span> <span class="pygments-n">InterruptedException</span> <span class="pygments-o">{</span>
+        <span class="pygments-k">for</span><span class="pygments-o">(</span><span class="pygments-kt">int</span> <span class="pygments-n">i</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-o">;;</span><span class="pygments-n">i</span><span class="pygments-o">++){</span>
+            <span class="pygments-n">work</span><span class="pygments-o">(</span><span class="pygments-n">calcNextSleep</span><span class="pygments-o">(</span><span class="pygments-n">i</span> <span class="pygments-o">%</span> <span class="pygments-n">cycle</span><span class="pygments-o">));</span>
+            <span class="pygments-n">sleep</span><span class="pygments-o">(</span><span class="pygments-n">tick</span> <span class="pygments-o">-</span> <span class="pygments-n">calcNextSleep</span><span class="pygments-o">(</span><span class="pygments-n">i</span> <span class="pygments-o">%</span> <span class="pygments-n">cycle</span><span class="pygments-o">));</span>
+        <span class="pygments-o">}</span>
+    <span class="pygments-o">}</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">calcNextSleep</span><span class="o">(</span><span class="kt">long</span> <span class="n">i</span><span class="o">){</span>
-        <span class="k">return</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">((</span><span class="kt">double</span><span class="o">)</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Math</span><span class="o">.</span><span class="na">PI</span> <span class="o">/</span> <span class="n">cycle</span><span class="o">)</span> <span class="o">*</span> <span class="n">tick</span> <span class="o">+</span> <span class="n">tick</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span>
-    <span class="o">}</span>
+    <span class="pygments-kd">private</span> <span class="pygments-kd">static</span> <span class="pygments-kt">long</span> <span class="pygments-nf">calcNextSleep</span><span class="pygments-o">(</span><span class="pygments-kt">long</span> <span class="pygments-n">i</span><span class="pygments-o">){</span>
+        <span class="pygments-k">return</span> <span class="pygments-o">(</span><span class="pygments-kt">int</span><span class="pygments-o">)(</span><span class="pygments-n">Math</span><span class="pygments-o">.</span><span class="pygments-na">sin</span><span class="pygments-o">((</span><span class="pygments-kt">double</span><span class="pygments-o">)</span><span class="pygments-n">i</span> <span class="pygments-o">*</span> <span class="pygments-mi">2</span> <span class="pygments-o">*</span> <span class="pygments-n">Math</span><span class="pygments-o">.</span><span class="pygments-na">PI</span> <span class="pygments-o">/</span> <span class="pygments-n">cycle</span><span class="pygments-o">)</span> <span class="pygments-o">*</span> <span class="pygments-n">tick</span> <span class="pygments-o">+</span> <span class="pygments-n">tick</span><span class="pygments-o">)</span> <span class="pygments-o">/</span> <span class="pygments-mi">2</span><span class="pygments-o">;</span>
+    <span class="pygments-o">}</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sleep</span> <span class="o">(</span><span class="kt">long</span> <span class="n">sleepTime</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedException</span>
-    <span class="o">{</span>
-        <span class="k">if</span><span class="o">(</span><span class="n">sleepTime</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span>
-            <span class="n">Thread</span><span class="o">.</span><span class="na">yield</span><span class="o">();</span>
-        <span class="k">else</span>
-            <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">sleepTime</span><span class="o">);</span>
-    <span class="o">}</span>
+    <span class="pygments-kd">private</span> <span class="pygments-kd">static</span> <span class="pygments-kt">void</span> <span class="pygments-nf">sleep</span> <span class="pygments-o">(</span><span class="pygments-kt">long</span> <span class="pygments-n">sleepTime</span><span class="pygments-o">)</span> <span class="pygments-kd">throws</span> <span class="pygments-n">InterruptedException</span>
+    <span class="pygments-o">{</span>
+        <span class="pygments-k">if</span><span class="pygments-o">(</span><span class="pygments-n">sleepTime</span> <span class="pygments-o">&lt;</span> <span class="pygments-mi">2</span><span class="pygments-o">)</span>
+            <span class="pygments-n">Thread</span><span class="pygments-o">.</span><span class="pygments-na">yield</span><span class="pygments-o">();</span>
+        <span class="pygments-k">else</span>
+            <span class="pygments-n">Thread</span><span class="pygments-o">.</span><span class="pygments-na">sleep</span><span class="pygments-o">(</span><span class="pygments-n">sleepTime</span><span class="pygments-o">);</span>
+    <span class="pygments-o">}</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">work</span> <span class="o">(</span><span class="kt">long</span> <span class="n">period</span><span class="o">)</span> <span class="o">{</span>
-        <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
-        <span class="k">for</span><span class="o">(;;){</span>
-            <span class="n">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
-            <span class="k">if</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">period</span><span class="o">)</span>
-                <span class="k">break</span><span class="o">;</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
+    <span class="pygments-kd">private</span> <span class="pygments-kd">static</span> <span class="pygments-kt">void</span> <span class="pygments-nf">work</span> <span class="pygments-o">(</span><span class="pygments-kt">long</span> <span class="pygments-n">period</span><span class="pygments-o">)</span> <span class="pygments-o">{</span>
+        <span class="pygments-kt">long</span> <span class="pygments-n">start</span> <span class="pygments-o">=</span> <span class="pygments-n">System</span><span class="pygments-o">.</span><span class="pygments-na">currentTimeMillis</span><span class="pygments-o">();</span>
+        <span class="pygments-k">for</span><span class="pygments-o">(;;){</span>
+            <span class="pygments-n">Math</span><span class="pygments-o">.</span><span class="pygments-na">sin</span><span class="pygments-o">(</span><span class="pygments-mi">1</span><span class="pygments-o">);</span>
+            <span class="pygments-k">if</span><span class="pygments-o">(</span><span class="pygments-n">System</span><span class="pygments-o">.</span><span class="pygments-na">currentTimeMillis</span><span class="pygments-o">()</span> <span class="pygments-o">-</span> <span class="pygments-n">start</span> <span class="pygments-o">&gt;=</span> <span class="pygments-n">period</span><span class="pygments-o">)</span>
+                <span class="pygments-k">break</span><span class="pygments-o">;</span>
+        <span class="pygments-o">}</span>
+    <span class="pygments-o">}</span>
+<span class="pygments-o">}</span>
+
+</pre>
 <p>Be careful you need to turn off other cores if you have multi-core <span class="caps">CPU</span>.</p>
 <img alt="multi-core CPU" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/>
 </body></html>
@@ -301,28 +303,18 @@ About farseerfc</a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/music.html">
-                    music <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/icse.html">
                     icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -331,8 +323,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/software.html">
-                    software <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/java.html">
+                    java <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -341,13 +333,58 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/ruby.html">
                     ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/me.html">
+                    me <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -361,18 +398,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/java.html">
-                    java <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/will.html">
+                    will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -381,33 +408,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/python.html">
-                    python <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/software.html">
+                    software <sup> 1</sup>
                 </a>
             </li>
     </ul>

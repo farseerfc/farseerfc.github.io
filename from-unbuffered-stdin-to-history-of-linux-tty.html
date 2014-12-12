@@ -75,8 +75,8 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
@@ -171,14 +171,14 @@ Farseerfc的小窩            </a>
                     <html><body><div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id2" id="id7"> 可以設置不帶緩衝的標準輸入流嗎？ </a><ul>
-<li><a class="reference internal" href="#id3" id="id8"> 這和緩存無關，是控制檯的實現方式的問題。 </a></li>
-<li><a class="reference internal" href="#strace" id="id9">strace 查看了下 </a></li>
-<li><a class="reference internal" href="#raw-mode" id="id10"> 如果想感受一下 raw mode</a></li>
+<li><a class="reference internal" href="#id2" id="id7">可以設置不帶緩衝的標準輸入流嗎？</a><ul>
+<li><a class="reference internal" href="#id3" id="id8">這和緩存無關，是控制檯的實現方式的問題。</a></li>
+<li><a class="reference internal" href="#strace" id="id9">strace查看了下</a></li>
+<li><a class="reference internal" href="#raw-mode" id="id10">如果想感受一下 raw mode</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id4" id="id11"> 終端上的字符編程 </a><ul>
-<li><a class="reference internal" href="#id5" id="id12">Linux 控制檯的歷史 </a></li>
+<li><a class="reference internal" href="#id4" id="id11">終端上的字符編程</a><ul>
+<li><a class="reference internal" href="#id5" id="id12">Linux控制檯的歷史</a></li>
 </ul>
 </li>
 </ul>
@@ -193,19 +193,21 @@ Farseerfc的小窩            </a>
 <p>WaterElement(UnChanged)  於 2014 年 12 月 09 日 23:29:51  星期二   問到： </p>
 <blockquote>
 <p> 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 </p>
-<div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
-<span class="cp">#include &lt;unistd.h&gt;</span>
+<pre class="code c++ literal-block">
+<span class="pygments-cp">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+</span>
+<span class="pygments-kt">int</span> <span class="pygments-nf">main</span><span class="pygments-p">(</span><span class="pygments-kt">int</span> <span class="pygments-n">argc</span><span class="pygments-p">,</span> <span class="pygments-kt">char</span> <span class="pygments-o">*</span><span class="pygments-n">argv</span><span class="pygments-p">[])</span> <span class="pygments-p">{</span>
+    <span class="pygments-kt">FILE</span> <span class="pygments-o">*</span><span class="pygments-n">fp</span> <span class="pygments-o">=</span> <span class="pygments-n">fdopen</span><span class="pygments-p">(</span><span class="pygments-n">STDIN_FILENO</span><span class="pygments-p">,</span> <span class="pygments-s">"r"</span><span class="pygments-p">);</span>
+    <span class="pygments-n">setvbuf</span><span class="pygments-p">(</span><span class="pygments-n">fp</span><span class="pygments-p">,</span> <span class="pygments-nb">NULL</span><span class="pygments-p">,</span> <span class="pygments-n">_IONBF</span><span class="pygments-p">,</span> <span class="pygments-mi">0</span><span class="pygments-p">);</span>
+    <span class="pygments-kt">char</span> <span class="pygments-n">buffer</span><span class="pygments-p">[</span><span class="pygments-mi">20</span><span class="pygments-p">];</span>
+    <span class="pygments-n">buffer</span><span class="pygments-p">[</span><span class="pygments-mi">0</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span>
+    <span class="pygments-n">fgets</span><span class="pygments-p">(</span><span class="pygments-n">buffer</span><span class="pygments-p">,</span> <span class="pygments-mi">20</span><span class="pygments-p">,</span> <span class="pygments-n">fp</span><span class="pygments-p">);</span>
+    <span class="pygments-n">printf</span><span class="pygments-p">(</span><span class="pygments-s">"buffer is:%s"</span><span class="pygments-p">,</span> <span class="pygments-n">buffer</span><span class="pygments-p">);</span>
+    <span class="pygments-k">return</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span>
+<span class="pygments-p">}</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">,</span> <span class="s">"r"</span><span class="p">);</span>
-    <span class="n">setvbuf</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">_IONBF</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
-    <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">fgets</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">fp</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"buffer is:%s"</span><span class="p">,</span> <span class="n">buffer</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+</pre>
 <p> 似乎還是需要在命令行輸入後按回車纔會讓 <code class="code">
 fgets</code>
   返回，不帶緩衝究竟體現在哪裏？ </p>
@@ -220,7 +222,7 @@ fgets</code>
 <li> 你的程序的 c  庫從 stdin  讀入一個輸入，處理 </li>
 </ol>
 <p> 標準庫說的輸入緩存是在 4  的這一步進行的。而行輸入是在 3  的這一步被緩存起來的。 </p>
-<p> 終端 pty 有多種狀態，一般控制檯程序所在的狀態叫「回顯行緩存」狀態，這個狀態的   意思是 :</p>
+<p> 終端 pty 有多種狀態，一般控制檯程序所在的狀態叫「回顯行緩存」狀態，這個狀態的意思是 :</p>
 <ol class="arabic simple">
 <li> 所有普通字符的按鍵，會回顯到屏幕上，同時記錄在行緩存區裏。 </li>
 <li> 處理退格 ( <kbd class="kbd">
@@ -253,90 +255,96 @@ Ctrl-Shift-C</kbd>
 <h3><a class="toc-backref" href="#id9">strace 查看了下 </a></h3>
 <p>WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三   回復： </p>
 <blockquote>
-<p> 感謝 FC 的詳盡解答。 </p>
+<p> 感謝 <span class="caps">FC</span> 的詳盡解答。 </p>
 <p> 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 <code class="code">
 read</code>
   系統調用，   比如輸入 abc ： </p>
-<div class="highlight"><pre>read(0, abc
+<pre class="code strace literal-block">
+read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
-</pre></div>
+
+</pre>
 <p> 如果有緩存的話就只調用一次了 <code class="code">
 read</code>
   系統調用了： </p>
-<div class="highlight"><pre>read(0, abc
+<pre class="code strace literal-block">
+read(0, abc
 "abc\n", 1024)                  = 4
-</pre></div>
+
+</pre>
 </blockquote>
 </div>
 <div class="section" id="raw-mode">
 <h3><a class="toc-backref" href="#id10"> 如果想感受一下 raw mode</a></h3>
 <p> 沒錯，這個是你的進程內 C 庫做的緩存， tty 屬於字符設備所以是一個一個字符塞給你的   程序的。 </p>
 <p> 如果想感受一下 raw mode  可以試試下面這段程序（沒有檢測錯誤返回值） </p>
-<div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
-<span class="cp">#include &lt;unistd.h&gt;</span>
-<span class="cp">#include &lt;termios.h&gt;</span>
+<pre class="code c++ literal-block">
+<span class="pygments-cp">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;termios.h&gt;
+</span>
+<span class="pygments-k">static</span> <span class="pygments-kt">int</span> <span class="pygments-n">ttyfd</span> <span class="pygments-o">=</span> <span class="pygments-n">STDIN_FILENO</span><span class="pygments-p">;</span>
+<span class="pygments-k">static</span> <span class="pygments-k">struct</span> <span class="pygments-n">termios</span> <span class="pygments-n">orig_termios</span><span class="pygments-p">;</span>
 
-<span class="k">static</span> <span class="kt">int</span> <span class="n">ttyfd</span> <span class="o">=</span> <span class="n">STDIN_FILENO</span><span class="p">;</span>
-<span class="k">static</span> <span class="k">struct</span> <span class="n">termios</span> <span class="n">orig_termios</span><span class="p">;</span>
-
-<span class="cm">/* reset tty - useful also for restoring the terminal when this process</span>
-<span class="cm">   wishes to temporarily relinquish the tty</span>
-<span class="cm">*/</span>
-<span class="kt">int</span> <span class="nf">tty_reset</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
-    <span class="cm">/* flush and reset */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">ttyfd</span><span class="p">,</span><span class="n">TCSAFLUSH</span><span class="p">,</span><span class="o">&amp;</span><span class="n">orig_termios</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
-
-<span class="cm">/* put terminal in raw mode - see termio(7I) for modes */</span>
-<span class="kt">void</span> <span class="nf">tty_raw</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">struct</span> <span class="n">termios</span> <span class="n">raw</span><span class="p">;</span>
-
-    <span class="n">raw</span> <span class="o">=</span> <span class="n">orig_termios</span><span class="p">;</span>  <span class="cm">/* copy original and then modify below */</span>
-
-    <span class="cm">/* input modes - clear indicated ones giving: no break, no CR to NL,</span>
-<span class="cm">       no parity check, no strip char, no start/stop output (sic) control */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_iflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">BRKINT</span> <span class="o">|</span> <span class="n">ICRNL</span> <span class="o">|</span> <span class="n">INPCK</span> <span class="o">|</span> <span class="n">ISTRIP</span> <span class="o">|</span> <span class="n">IXON</span><span class="p">);</span>
-
-    <span class="cm">/* output modes - clear giving: no post processing such as NL to CR+NL */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_oflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">OPOST</span><span class="p">);</span>
-
-    <span class="cm">/* control modes - set 8 bit chars */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_cflag</span> <span class="o">|=</span> <span class="p">(</span><span class="n">CS8</span><span class="p">);</span>
-
-    <span class="cm">/* local modes - clear giving: echoing off, canonical off (no erase with</span>
-<span class="cm">       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_lflag</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">(</span><span class="n">ECHO</span> <span class="o">|</span> <span class="n">ICANON</span> <span class="o">|</span> <span class="n">IEXTEN</span> <span class="o">|</span> <span class="n">ISIG</span><span class="p">);</span>
-
-    <span class="cm">/* control chars - set return condition: min number of bytes and timer */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VMIN</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VTIME</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span> <span class="cm">/* after 5 bytes or .8 seconds</span>
-<span class="cm">                                                after first byte seen      */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VMIN</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VTIME</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="cm">/* immediate - anything       */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VMIN</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VTIME</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="cm">/* after two bytes, no timer  */</span>
-    <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VMIN</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">raw</span><span class="p">.</span><span class="n">c_cc</span><span class="p">[</span><span class="n">VTIME</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span> <span class="cm">/* after a byte or .8 seconds */</span>
-
-    <span class="cm">/* put terminal in raw mode after flushing */</span>
-    <span class="n">tcsetattr</span><span class="p">(</span><span class="n">ttyfd</span><span class="p">,</span><span class="n">TCSAFLUSH</span><span class="p">,</span><span class="o">&amp;</span><span class="n">raw</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="pygments-cm">/* reset tty - useful also for restoring the terminal when this process
+   wishes to temporarily relinquish the tty
+*/</span>
+<span class="pygments-kt">int</span> <span class="pygments-nf">tty_reset</span><span class="pygments-p">(</span><span class="pygments-kt">void</span><span class="pygments-p">){</span>
+    <span class="pygments-cm">/* flush and reset */</span>
+    <span class="pygments-k">if</span> <span class="pygments-p">(</span><span class="pygments-n">tcsetattr</span><span class="pygments-p">(</span><span class="pygments-n">ttyfd</span><span class="pygments-p">,</span><span class="pygments-n">TCSAFLUSH</span><span class="pygments-p">,</span><span class="pygments-o">&amp;</span><span class="pygments-n">orig_termios</span><span class="pygments-p">)</span> <span class="pygments-o">&lt;</span> <span class="pygments-mi">0</span><span class="pygments-p">)</span> <span class="pygments-k">return</span> <span class="pygments-o">-</span><span class="pygments-mi">1</span><span class="pygments-p">;</span>
+    <span class="pygments-k">return</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span>
+<span class="pygments-p">}</span>
 
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-    <span class="n">atexit</span><span class="p">(</span><span class="n">tty_reset</span><span class="p">);</span>
-    <span class="n">tty_raw</span><span class="p">();</span>
-    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">ttyfd</span><span class="p">,</span> <span class="s">"r"</span><span class="p">);</span>
-    <span class="n">setvbuf</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">_IONBF</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
-    <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">fgets</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">fp</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"buffer is:%s"</span><span class="p">,</span> <span class="n">buffer</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+<span class="pygments-cm">/* put terminal in raw mode - see termio(7I) for modes */</span>
+<span class="pygments-kt">void</span> <span class="pygments-nf">tty_raw</span><span class="pygments-p">(</span><span class="pygments-kt">void</span><span class="pygments-p">)</span>
+<span class="pygments-p">{</span>
+    <span class="pygments-k">struct</span> <span class="pygments-n">termios</span> <span class="pygments-n">raw</span><span class="pygments-p">;</span>
+
+    <span class="pygments-n">raw</span> <span class="pygments-o">=</span> <span class="pygments-n">orig_termios</span><span class="pygments-p">;</span>  <span class="pygments-cm">/* copy original and then modify below */</span>
+
+    <span class="pygments-cm">/* input modes - clear indicated ones giving: no break, no CR to NL,
+       no parity check, no strip char, no start/stop output (sic) control */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_iflag</span> <span class="pygments-o">&amp;=</span> <span class="pygments-o">~</span><span class="pygments-p">(</span><span class="pygments-n">BRKINT</span> <span class="pygments-o">|</span> <span class="pygments-n">ICRNL</span> <span class="pygments-o">|</span> <span class="pygments-n">INPCK</span> <span class="pygments-o">|</span> <span class="pygments-n">ISTRIP</span> <span class="pygments-o">|</span> <span class="pygments-n">IXON</span><span class="pygments-p">);</span>
+
+    <span class="pygments-cm">/* output modes - clear giving: no post processing such as NL to CR+NL */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_oflag</span> <span class="pygments-o">&amp;=</span> <span class="pygments-o">~</span><span class="pygments-p">(</span><span class="pygments-n">OPOST</span><span class="pygments-p">);</span>
+
+    <span class="pygments-cm">/* control modes - set 8 bit chars */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cflag</span> <span class="pygments-o">|=</span> <span class="pygments-p">(</span><span class="pygments-n">CS8</span><span class="pygments-p">);</span>
+
+    <span class="pygments-cm">/* local modes - clear giving: echoing off, canonical off (no erase with
+       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_lflag</span> <span class="pygments-o">&amp;=</span> <span class="pygments-o">~</span><span class="pygments-p">(</span><span class="pygments-n">ECHO</span> <span class="pygments-o">|</span> <span class="pygments-n">ICANON</span> <span class="pygments-o">|</span> <span class="pygments-n">IEXTEN</span> <span class="pygments-o">|</span> <span class="pygments-n">ISIG</span><span class="pygments-p">);</span>
+
+    <span class="pygments-cm">/* control chars - set return condition: min number of bytes and timer */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VMIN</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">5</span><span class="pygments-p">;</span> <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VTIME</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">8</span><span class="pygments-p">;</span> <span class="pygments-cm">/* after 5 bytes or .8 seconds
+                                                after first byte seen      */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VMIN</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span> <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VTIME</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span> <span class="pygments-cm">/* immediate - anything       */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VMIN</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">2</span><span class="pygments-p">;</span> <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VTIME</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span> <span class="pygments-cm">/* after two bytes, no timer  */</span>
+    <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VMIN</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span> <span class="pygments-n">raw</span><span class="pygments-p">.</span><span class="pygments-n">c_cc</span><span class="pygments-p">[</span><span class="pygments-n">VTIME</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">8</span><span class="pygments-p">;</span> <span class="pygments-cm">/* after a byte or .8 seconds */</span>
+
+    <span class="pygments-cm">/* put terminal in raw mode after flushing */</span>
+    <span class="pygments-n">tcsetattr</span><span class="pygments-p">(</span><span class="pygments-n">ttyfd</span><span class="pygments-p">,</span><span class="pygments-n">TCSAFLUSH</span><span class="pygments-p">,</span><span class="pygments-o">&amp;</span><span class="pygments-n">raw</span><span class="pygments-p">);</span>
+<span class="pygments-p">}</span>
+
+
+<span class="pygments-kt">int</span> <span class="pygments-nf">main</span><span class="pygments-p">(</span><span class="pygments-kt">int</span> <span class="pygments-n">argc</span><span class="pygments-p">,</span> <span class="pygments-kt">char</span> <span class="pygments-o">*</span><span class="pygments-n">argv</span><span class="pygments-p">[])</span> <span class="pygments-p">{</span>
+    <span class="pygments-n">atexit</span><span class="pygments-p">(</span><span class="pygments-n">tty_reset</span><span class="pygments-p">);</span>
+    <span class="pygments-n">tty_raw</span><span class="pygments-p">();</span>
+    <span class="pygments-kt">FILE</span> <span class="pygments-o">*</span><span class="pygments-n">fp</span> <span class="pygments-o">=</span> <span class="pygments-n">fdopen</span><span class="pygments-p">(</span><span class="pygments-n">ttyfd</span><span class="pygments-p">,</span> <span class="pygments-s">"r"</span><span class="pygments-p">);</span>
+    <span class="pygments-n">setvbuf</span><span class="pygments-p">(</span><span class="pygments-n">fp</span><span class="pygments-p">,</span> <span class="pygments-nb">NULL</span><span class="pygments-p">,</span> <span class="pygments-n">_IONBF</span><span class="pygments-p">,</span> <span class="pygments-mi">0</span><span class="pygments-p">);</span>
+    <span class="pygments-kt">char</span> <span class="pygments-n">buffer</span><span class="pygments-p">[</span><span class="pygments-mi">20</span><span class="pygments-p">];</span>
+    <span class="pygments-n">buffer</span><span class="pygments-p">[</span><span class="pygments-mi">0</span><span class="pygments-p">]</span> <span class="pygments-o">=</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span>
+    <span class="pygments-n">fgets</span><span class="pygments-p">(</span><span class="pygments-n">buffer</span><span class="pygments-p">,</span> <span class="pygments-mi">20</span><span class="pygments-p">,</span> <span class="pygments-n">fp</span><span class="pygments-p">);</span>
+    <span class="pygments-n">printf</span><span class="pygments-p">(</span><span class="pygments-s">"buffer is:%s"</span><span class="pygments-p">,</span> <span class="pygments-n">buffer</span><span class="pygments-p">);</span>
+    <span class="pygments-k">return</span> <span class="pygments-mi">0</span><span class="pygments-p">;</span>
+<span class="pygments-p">}</span>
+
+</pre>
 </div>
 </div>
 <div class="section" id="id4">
@@ -351,7 +359,7 @@ read</code>
 <p> 嗯理論上可以不用 ncurses  庫直接在 raw  模式操縱終端。 </p>
 <p> 這裏稍微聊一下 terminfo/termcap 的歷史，詳細的歷史和吐槽參考 <a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf">Unix hater’s Handbook</a>
  第 6 章 Terminal Insanity 。 </p>
-<p> 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 HTML 要測試各種瀏覽器兼容性一樣。   通常的做法是 </p>
+<p> 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 <span class="caps">HTML</span> 要測試各種瀏覽器兼容性一樣。   通常的做法是 </p>
 <ol class="arabic simple">
 <li> 使用最小功能子集 </li>
 <li> 假設終端是某個特殊設備，不管別的設備。 </li>
@@ -497,83 +505,8 @@ Delete</kbd>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/termcap.html">
                     termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -582,28 +515,43 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/unix.html">
+                    unix <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -611,14 +559,29 @@ Delete</kbd>
                     Java <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -632,8 +595,58 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -641,24 +654,19 @@ Delete</kbd>
                     will <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

@@ -67,8 +67,8 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
@@ -154,7 +154,7 @@ Farseerfc的小窩            </a>
 <h2>2.2 I386 平臺的內存佈局 </h2>
 <p> 衆所周知， I386 是 32 位體系結構。因此對於絕大多數 I386 平臺的 C++ 編譯器而言， sizeof(int)=sizeof(long)=sizeof(void*)=4 。當然 C++ 標準對此沒有任何保證，我們也不應該試圖編寫依賴於此的代碼。 </p>
 <div class="line-block">
-<div class="line">32 位指針的可尋址空間爲 4GB 。爲充分利用這麼大的尋址空間，也是爲了支持其它更先進的技術比如多任務技術或者動態鏈接庫技術， WinNT 使用虛擬內存技術，給與每個應用程序全部 4GB 的內存空間。 4GB 的地址被一分爲二，前 2GB 供應用程序自己使用，後 2GB 由系統內核分配和管理。這 2GB 的內存地址，通常被劃分成 3 種內存區使用： </div>
+<div class="line">32 位指針的可尋址空間爲 <span class="caps">4GB</span> 。爲充分利用這麼大的尋址空間，也是爲了支持其它更先進的技術比如多任務技術或者動態鏈接庫技術， WinNT 使用虛擬內存技術，給與每個應用程序全部 <span class="caps">4GB</span> 的內存空間。 <span class="caps">4GB</span> 的地址被一分爲二，前 <span class="caps">2GB</span> 供應用程序自己使用，後 <span class="caps">2GB</span> 由系統內核分配和管理。這 <span class="caps">2GB</span> 的內存地址，通常被劃分成 3 種內存區使用： </div>
 </div>
 <div class="section" id="id1">
 <h3>1  代碼及靜態數據區 </h3>
@@ -166,9 +166,10 @@ Farseerfc的小窩            </a>
 <div class="section" id="stack">
 <h3>2  棧 (Stack)</h3>
 <p> 棧是最常用的動態數據存儲區，所有函數的 non-static 對象和函數參數都在程序運行期在棧上分配內存。在數據結構中，術語 “ 棧 (Stack)” 意指先進後出 (<span class="caps">FILO</span> ， First
-In Last Out) ，與 “ 隊列 (Queue)” 所指的 FIFO 相對。相對於基於堆的對象分配技術，默認使用棧的對象分配有兩點優勢： </p>
-<p> 一、棧的 FILO 與人的思維方式相同 </p>
-<p> 現實生活中有許多事例都使用 FILO 的方式，比如人們必須先提起話筒再撥打號碼，而後掛斷電話之後再放下話筒。使用 FILO 的棧，可以保證事物的銷燬順序以其誕生順序相反的順序進行，不會產生在掛斷電話之前就放下話筒的尷尬。 </p>
+In Last
+Out) ，與 “ 隊列 (Queue)” 所指的 <span class="caps">FIFO</span> 相對。相對於基於堆的對象分配技術，默認使用棧的對象分配有兩點優勢： </p>
+<p> 一、棧的 <span class="caps">FILO</span> 與人的思維方式相同 </p>
+<p> 現實生活中有許多事例都使用 <span class="caps">FILO</span> 的方式，比如人們必須先提起話筒再撥打號碼，而後掛斷電話之後再放下話筒。使用 <span class="caps">FILO</span> 的棧，可以保證事物的銷燬順序以其誕生順序相反的順序進行，不會產生在掛斷電話之前就放下話筒的尷尬。 </p>
 <p> 二、棧的分配管理僅需要兩個額外指針：棧頂 (esp) 和棧底 (ebp) 指針 </p>
 <p> 從實現的技術層面而言，棧的管理比其它動態分配技術要簡單很多。 I386 平臺上的動態棧管理，僅需要棧頂和棧底兩個指針。這兩個指針的存儲顯然不能放置於棧中，置於靜態數據區又有損效率。 I386 平臺爲管理動態棧專門預留了兩個通用寄存器變量 esp 與 ebp ，分別代表棧頂 (esp,Extended
 Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 代表它們是 32 位指針，以區分 16 位的 sp 和 bp 寄存器。 </p>
@@ -180,7 +181,7 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
 <h3>3  堆 (Heap) 和自由存儲區 </h3>
 <p> 棧中的變量對於分配與釋放的順序有特定要求，這在一定程度上限制了棧的適用範圍。面向對象 (<span class="caps">OO</span> ， Object Oriented) 的程序設計思想也要求能自由地控制變量的分配與銷燬。由此，現代操作系統都提供了被稱作 “ 堆 (Heap)” 的自由存儲區，以允許由程序員控制的對象創建和銷燬過程。 C 標準庫函數 malloc 和 free 則是對操作系統提供的堆操作的封裝。 C++ 提供的自由存儲區運算符 new 和 delete 則通常是 malloc 和 free 的又一層封裝。 </p>
 <p> 操作系統經由 malloc 和 free 控制對堆的訪問。堆的存儲管理技術各不相同，簡單的使用雙鏈表管理，複雜的可以比擬一個完整的文件系統。 </p>
-<p> 由於額外的管理需求，使用系統提供的通用分配器在堆上分配和銷燬變量的代價，無論從空間角度還是效率角度而言，都比在棧上分配對象要高昂很多。對於 sizeof 上百的大型對象，這樣的高昂代價還是可以接受的，但是對於 sizeof 只有個位數的小對象，這樣的代價通常是一個數量級的差距。正因爲這個原因， STL 不使用 new 和 delete ，轉而使用分配子 (alllocor) 分配對象。 </p>
+<p> 由於額外的管理需求，使用系統提供的通用分配器在堆上分配和銷燬變量的代價，無論從空間角度還是效率角度而言，都比在棧上分配對象要高昂很多。對於 sizeof 上百的大型對象，這樣的高昂代價還是可以接受的，但是對於 sizeof 只有個位數的小對象，這樣的代價通常是一個數量級的差距。正因爲這個原因， <span class="caps">STL</span> 不使用 new 和 delete ，轉而使用分配子 (alllocor) 分配對象。 </p>
 </div>
 </div>
 </body></html>
@@ -314,83 +315,8 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/termcap.html">
                     termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -399,28 +325,43 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/unix.html">
+                    unix <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -428,14 +369,29 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
                     Java <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -449,8 +405,58 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -458,24 +464,19 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
                     will <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

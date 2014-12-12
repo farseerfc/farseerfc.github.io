@@ -67,8 +67,8 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
@@ -199,7 +199,7 @@ Farseerfc的小窩            </a>
 <p>}</p>
 <p> 可以看出，如果參數類型一致，使用標準庫要多些幾行代碼。不過如果參數類型不一致或者未知 (printf 的情況 ) ，使用標準庫就要方便很多，因爲我們很難猜出編譯器處置邊界對齊 (align) 等彙編代碼的細節。使用標準庫的代碼是可以移植的，而使用上文所述的其它方法操縱可變參數表都是不可移植的，僅限於在 I386 平臺上使用。 </p>
 <p> 縱使可變參數表有使用上的便利性，它的缺陷也有很多，不可移植性和平臺依賴性只是其一，最大的問題在於它的類型不安全性。使用可變參數表就意味着編譯器不對參數作任何類型檢查，這在 C 中算是一言難盡的歷史遺留問題，在 C++ 中就意味着惡魔 reinterpret_cast 被你喚醒。 C 的可變參數表是 C++ 代碼錯誤頻發的根源之一，以至於 C++ 標準將可變參數表列爲即將被廢除的 C 語言遺留特性。 C++ 語法中的許多新特性，比如重載函數、默認參數值、模板，都可以一定程度上替代可變參數表，並且比可變參數表更加安全。 </p>
-<p> 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (<span class="caps">TMP</span>) 的 SFINAE 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int ： </p>
+<p> 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (<span class="caps">TMP</span>) 的 <span class="caps">SFINAE</span> 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int ： </p>
 <p>long isIntImp(int);</p>
 <p>char isIntImp(…);</p>
 <p>template&lt;typename T&gt;</p>
@@ -209,8 +209,8 @@ Farseerfc的小窩            </a>
 <p>}</p>
 <p> 然後，在一個具有模板參數 T 的函數中，我們就可以寫 </p>
 <p>if(isInt&lt;T&gt;::value)//…</p>
-<p> 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int ，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long ，這樣 value 就爲 1 。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char ，這樣 value 就爲 0 。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int ，那它就是 int ，否則它就不是 int ，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 SFINAE ，它和其它模板元編程技術被廣泛運用於 STL 、 Boost 等模板庫的開發實現之中。 </p>
-<p> 值得注意的是，在上文 SFINAE 的運用中， isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。 </p>
+<p> 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int ，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long ，這樣 value 就爲 1 。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char ，這樣 value 就爲 0 。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int ，那它就是 int ，否則它就不是 int ，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 <span class="caps">SFINAE</span> ，它和其它模板元編程技術被廣泛運用於 <span class="caps">STL</span> 、 Boost 等模板庫的開發實現之中。 </p>
+<p> 值得注意的是，在上文 <span class="caps">SFINAE</span> 的運用中， isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。 </p>
 </div>
 </body></html>
             </div>
@@ -343,83 +343,8 @@ Farseerfc的小窩            </a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/termcap.html">
                     termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -428,28 +353,43 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/unix.html">
+                    unix <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -457,14 +397,29 @@ Farseerfc的小窩            </a>
                     Java <sup> 2</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -478,8 +433,58 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -487,24 +492,19 @@ Farseerfc的小窩            </a>
                     will <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

@@ -176,13 +176,13 @@ debug into it and make minor modifications.</p>
 <p>So I started searching for Static Blog Engine in Python on Github. The author of the great framework <a class="reference external" href="http://flask.pocoo.org/">Flask</a> , <a class="reference external" href="https://github.com/mitsuhiko">mitsuhiko</a> ,
 wrote a <a class="reference external" href="https://github.com/mitsuhiko/rstblog">rstblog</a> , but it’s not well developed. <a class="reference external" href="http://ringce.com/hyde">Hyde</a> seems to be complete enough, but it use <a class="reference external" href="http://daringfireball.net/projects/markdown/">MarkDown</a> as its default markup
 language, and the design of its homepage is too fashion to be used as blog. Finally I found <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> .</p>
-<table class="table-hover footnote docutils table  table-striped" frame="void" id="id3" rules="none">
+<table class="footnote docutils table-hover  table-striped table" frame="void" id="id3" rules="none">
 <colgroup><col class="label"></col><col></col></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Such as the difference between Python 2.x and 3.x , and also difference in C-<span class="caps">API</span> of implementations of <a class="reference external" href="http://pypy.org/">PyPy</a> , <a class="reference external" href="http://python.org/">CPython</a> , <a class="reference external" href="http://www.stackless.com/">Stackless</a> , <a class="reference external" href="http://cython.org/">Cython</a> .</td></tr>
 </tbody>
 </table>
-<table class="table-hover footnote docutils table  table-striped" frame="void" id="id4" rules="none">
+<table class="footnote docutils table-hover  table-striped table" frame="void" id="id4" rules="none">
 <colgroup><col class="label"></col><col></col></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Yes, we have <a class="reference external" href="http://packages.python.org/distribute/easy_install.html">easy_install</a> and <a class="reference external" href="http://www.pip-installer.org/en/latest/index.html">pip</a> , but all these are package manager, running in a perticular Python implementation. Python implementation itself don’t need a manager. Version issue of Python largely have been solved by lightweight converters such as <a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html">2to3.py</a> and <a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8">3to2.py</a> , you don’t need to store multiple implementations of Python in your disk for different packages. Yes you can use  <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a> if you need to preserve stablility but this is another story.</td></tr>
@@ -213,61 +213,69 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 <div class="section" id="my-settings">
 <h2>My settings</h2>
 <p>To install <a class="reference external" href="http://pelican.notmyidea.org/en/latest/">Pelican</a> is simple:</p>
-<div class="highlight"><pre><span class="gp">$</span> pip install pelican
-</pre></div>
+<pre class="code console literal-block">
+<span class="pygments-gp">$</span> pip install pelican
+
+</pre>
 <p>Write posts in <a class="reference external" href="http://docutils.sourceforge.net/rst.html">ReST</a> , with </p><pre>
 rst</pre>
  extensions, and put them in <pre>
 pages</pre>
  folder. (Re)Build all pages is simply:
-<div class="highlight"><pre><span class="gp">$</span> pelican -s settings.py
-</pre></div>
+<pre class="code console literal-block">
+<span class="pygments-gp">$</span> pelican -s settings.py
+
+</pre>
 <p>Push to Github:</p>
-<div class="highlight"><pre><span class="gp">$</span> git commit -am <span class="s2">"Commit message"</span>
-<span class="gp">$</span> git push
-</pre></div>
+<pre class="code console literal-block">
+<span class="pygments-gp">$</span> git commit -am <span class="pygments-s2">"Commit message"</span>
+<span class="pygments-gp">$</span> git push
+
+</pre>
 <p>And following is my </p><pre>
 settings.py</pre>
 :
-<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
+<pre class="code python literal-block">
+<span class="pygments-c"># -*- coding: utf-8 -*-</span>
 
-<span class="n">TIMEZONE</span> <span class="o">=</span> <span class="s">'Asia/Tokyo'</span>
+<span class="pygments-n">TIMEZONE</span> <span class="pygments-o">=</span> <span class="pygments-s">'Asia/Tokyo'</span>
 
-<span class="n">DATE_FORMATS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">'en'</span><span class="p">:(</span><span class="s">'usa'</span><span class="p">,</span><span class="s">'%a, </span><span class="si">%d</span><span class="s"> %b %Y'</span><span class="p">),</span>
-    <span class="s">'zh'</span><span class="p">:(</span><span class="s">'chs'</span><span class="p">,</span><span class="s">'%Y-%m-</span><span class="si">%d</span><span class="s">, %a'</span><span class="p">),</span>
-    <span class="s">'jp'</span><span class="p">:(</span><span class="s">'jpn'</span><span class="p">,</span><span class="s">'%Y/%m/</span><span class="si">%d</span><span class="s"> (%a)'</span><span class="p">),</span>
-<span class="p">}</span>
-<span class="c"># windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx</span>
-<span class="n">LOCALE</span> <span class="o">=</span> <span class="p">[</span><span class="s">'usa'</span><span class="p">,</span> <span class="s">'chs'</span><span class="p">,</span> <span class="s">'jpn'</span><span class="p">,</span>        <span class="c"># windows</span>
-          <span class="s">'en_US'</span><span class="p">,</span> <span class="s">'zh_CN'</span><span class="p">,</span> <span class="s">'ja_JP'</span><span class="p">]</span>  <span class="c"># Unix/Linux</span>
-<span class="n">DEFAULT_LANG</span> <span class="o">=</span> <span class="s">'zh'</span>
+<span class="pygments-n">DATE_FORMATS</span> <span class="pygments-o">=</span> <span class="pygments-p">{</span>
+    <span class="pygments-s">'en'</span><span class="pygments-p">:(</span><span class="pygments-s">'usa'</span><span class="pygments-p">,</span><span class="pygments-s">'%a, </span><span class="pygments-si">%d</span><span class="pygments-s"> %b %Y'</span><span class="pygments-p">),</span>
+    <span class="pygments-s">'zh'</span><span class="pygments-p">:(</span><span class="pygments-s">'chs'</span><span class="pygments-p">,</span><span class="pygments-s">'%Y-%m-</span><span class="pygments-si">%d</span><span class="pygments-s">, %a'</span><span class="pygments-p">),</span>
+    <span class="pygments-s">'jp'</span><span class="pygments-p">:(</span><span class="pygments-s">'jpn'</span><span class="pygments-p">,</span><span class="pygments-s">'%Y/%m/</span><span class="pygments-si">%d</span><span class="pygments-s"> (%a)'</span><span class="pygments-p">),</span>
+<span class="pygments-p">}</span>
+<span class="pygments-c"># windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx</span>
+<span class="pygments-n">LOCALE</span> <span class="pygments-o">=</span> <span class="pygments-p">[</span><span class="pygments-s">'usa'</span><span class="pygments-p">,</span> <span class="pygments-s">'chs'</span><span class="pygments-p">,</span> <span class="pygments-s">'jpn'</span><span class="pygments-p">,</span>        <span class="pygments-c"># windows</span>
+          <span class="pygments-s">'en_US'</span><span class="pygments-p">,</span> <span class="pygments-s">'zh_CN'</span><span class="pygments-p">,</span> <span class="pygments-s">'ja_JP'</span><span class="pygments-p">]</span>  <span class="pygments-c"># Unix/Linux</span>
+<span class="pygments-n">DEFAULT_LANG</span> <span class="pygments-o">=</span> <span class="pygments-s">'zh'</span>
 
-<span class="n">SITENAME</span> <span class="o">=</span> <span class="s">'Farseerfc Blog'</span>
-<span class="n">AUTHOR</span> <span class="o">=</span> <span class="s">'Jiachen Yang'</span>
+<span class="pygments-n">SITENAME</span> <span class="pygments-o">=</span> <span class="pygments-s">'Farseerfc Blog'</span>
+<span class="pygments-n">AUTHOR</span> <span class="pygments-o">=</span> <span class="pygments-s">'Jiachen Yang'</span>
 
-<span class="n">DISQUS_SITENAME</span> <span class="o">=</span> <span class="s">'farseerfcgithub'</span>
-<span class="n">GITHUB_URL</span> <span class="o">=</span> <span class="s">'https://github.com/farseerfc'</span>
-<span class="n">SITEURL</span> <span class="o">=</span> <span class="s">'http://farseerfc.github.com'</span>
-<span class="n">TAG_FEED</span>  <span class="o">=</span> <span class="s">'feeds/</span><span class="si">%s</span><span class="s">.atom.xml'</span>
+<span class="pygments-n">DISQUS_SITENAME</span> <span class="pygments-o">=</span> <span class="pygments-s">'farseerfcgithub'</span>
+<span class="pygments-n">GITHUB_URL</span> <span class="pygments-o">=</span> <span class="pygments-s">'https://github.com/farseerfc'</span>
+<span class="pygments-n">SITEURL</span> <span class="pygments-o">=</span> <span class="pygments-s">'http://farseerfc.github.com'</span>
+<span class="pygments-n">TAG_FEED</span>  <span class="pygments-o">=</span> <span class="pygments-s">'feeds/</span><span class="pygments-si">%s</span><span class="pygments-s">.atom.xml'</span>
 
-<span class="n">SOCIAL</span> <span class="o">=</span> <span class="p">((</span><span class="s">'twitter'</span><span class="p">,</span> <span class="s">'http://twitter.com/farseerfc'</span><span class="p">),</span>
-          <span class="p">(</span><span class="s">'github'</span><span class="p">,</span> <span class="s">'https://github.com/farseerfc'</span><span class="p">),</span>
-          <span class="p">(</span><span class="s">'facebook'</span><span class="p">,</span> <span class="s">'http://www.facebook.com/farseerfc'</span><span class="p">),</span>
-          <span class="p">(</span><span class="s">'weibo'</span><span class="p">,</span> <span class="s">'http://weibo.com/farseerfc'</span><span class="p">),</span>
-          <span class="p">(</span><span class="s">'renren'</span><span class="p">,</span> <span class="s">'http://www.renren.com/farseer'</span><span class="p">),</span>
-          <span class="p">)</span>
+<span class="pygments-n">SOCIAL</span> <span class="pygments-o">=</span> <span class="pygments-p">((</span><span class="pygments-s">'twitter'</span><span class="pygments-p">,</span> <span class="pygments-s">'http://twitter.com/farseerfc'</span><span class="pygments-p">),</span>
+          <span class="pygments-p">(</span><span class="pygments-s">'github'</span><span class="pygments-p">,</span> <span class="pygments-s">'https://github.com/farseerfc'</span><span class="pygments-p">),</span>
+          <span class="pygments-p">(</span><span class="pygments-s">'facebook'</span><span class="pygments-p">,</span> <span class="pygments-s">'http://www.facebook.com/farseerfc'</span><span class="pygments-p">),</span>
+          <span class="pygments-p">(</span><span class="pygments-s">'weibo'</span><span class="pygments-p">,</span> <span class="pygments-s">'http://weibo.com/farseerfc'</span><span class="pygments-p">),</span>
+          <span class="pygments-p">(</span><span class="pygments-s">'renren'</span><span class="pygments-p">,</span> <span class="pygments-s">'http://www.renren.com/farseer'</span><span class="pygments-p">),</span>
+          <span class="pygments-p">)</span>
 
 
-<span class="n">TWITTER_USERNAME</span> <span class="o">=</span> <span class="s">'farseerfc'</span>
+<span class="pygments-n">TWITTER_USERNAME</span> <span class="pygments-o">=</span> <span class="pygments-s">'farseerfc'</span>
 
-<span class="n">THEME</span><span class="o">=</span><span class="s">'notmyidea'</span>
-<span class="n">CSS_FILE</span> <span class="o">=</span> <span class="s">"wide.css"</span>
+<span class="pygments-n">THEME</span><span class="pygments-o">=</span><span class="pygments-s">'notmyidea'</span>
+<span class="pygments-n">CSS_FILE</span> <span class="pygments-o">=</span> <span class="pygments-s">"wide.css"</span>
 
-<span class="n">DEFAULT_CATEGORY</span> <span class="o">=</span><span class="s">'Others'</span>
-<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s">'.'</span>
-<span class="n">PATH</span> <span class="o">=</span> <span class="s">'posts'</span>
-</pre></div>
+<span class="pygments-n">DEFAULT_CATEGORY</span> <span class="pygments-o">=</span><span class="pygments-s">'Others'</span>
+<span class="pygments-n">OUTPUT_PATH</span> <span class="pygments-o">=</span> <span class="pygments-s">'.'</span>
+<span class="pygments-n">PATH</span> <span class="pygments-o">=</span> <span class="pygments-s">'posts'</span>
+
+</pre>
 </div>
 </body></html>
             </div>
@@ -389,28 +397,18 @@ About farseerfc</a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/music.html">
-                    music <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/icse.html">
                     icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -419,8 +417,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/software.html">
-                    software <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/java.html">
+                    java <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -429,13 +427,58 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/mining.html">
                     mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/ruby.html">
                     ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/me.html">
+                    me <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -449,18 +492,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/java.html">
-                    java <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/will.html">
+                    will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -469,33 +502,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/python.html">
-                    python <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/repository.html">
-                    repository <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/software.html">
+                    software <sup> 1</sup>
                 </a>
             </li>
     </ul>
