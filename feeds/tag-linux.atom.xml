@@ -6,21 +6,19 @@
 &lt;p&gt;WaterElement(UnChanged)  於 2014 年 12 月 09 日 23:29:51  星期二   問到： &lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt; 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-cp"&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;unistd.h&amp;gt;
-&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;FILE&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;fdopen&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-s"&gt;"r"&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;setvbuf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-nb"&gt;NULL&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_IONBF&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;];&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;fgets&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;printf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 
-&lt;/pre&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;setvbuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_IONBF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 似乎還是需要在命令行輸入後按回車纔會讓 &lt;code class="code"&gt;
 fgets&lt;/code&gt;
   返回，不帶緩衝究竟體現在哪裏？ &lt;/p&gt;
@@ -68,96 +66,90 @@ Ctrl-Shift-C&lt;/kbd&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;strace 查看了下 &lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三   回復： &lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 感謝 &lt;span class="caps"&gt;FC&lt;/span&gt; 的詳盡解答。 &lt;/p&gt;
+&lt;p&gt; 感謝 FC 的詳盡解答。 &lt;/p&gt;
 &lt;p&gt; 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 &lt;code class="code"&gt;
 read&lt;/code&gt;
   系統調用，   比如輸入 abc ： &lt;/p&gt;
-&lt;pre class="code strace literal-block"&gt;
-read(0, abc
+&lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
-
-&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 如果有緩存的話就只調用一次了 &lt;code class="code"&gt;
 read&lt;/code&gt;
   系統調用了： &lt;/p&gt;
-&lt;pre class="code strace literal-block"&gt;
-read(0, abc
+&lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "abc\n", 1024)                  = 4
-
-&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;/div&gt;
 &lt;div class="section" id="raw-mode"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt; 如果想感受一下 raw mode&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt; 沒錯，這個是你的進程內 C 庫做的緩存， tty 屬於字符設備所以是一個一個字符塞給你的   程序的。 &lt;/p&gt;
 &lt;p&gt; 如果想感受一下 raw mode  可以試試下面這段程序（沒有檢測錯誤返回值） &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-cp"&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;unistd.h&amp;gt;
-#include &amp;lt;termios.h&amp;gt;
-&lt;/span&gt;
-&lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;termios&lt;/span&gt; &lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;termios.h&amp;gt;&lt;/span&gt;
 
-&lt;span class="pygments-cm"&gt;/* reset tty - useful also for restoring the terminal when this process
-   wishes to temporarily relinquish the tty
-*/&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;tty_reset&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-p"&gt;){&lt;/span&gt;
-    &lt;span class="pygments-cm"&gt;/* flush and reset */&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;if&lt;/span&gt; &lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;tcsetattr&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-o"&gt;-&lt;/span&gt;&lt;span class="pygments-mi"&gt;1&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;ttyfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-
-&lt;span class="pygments-cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-nf"&gt;tty_raw&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt;
-&lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;termios&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;  &lt;span class="pygments-cm"&gt;/* copy original and then modify below */&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* input modes - clear indicated ones giving: no break, no CR to NL,
-       no parity check, no strip char, no start/stop output (sic) control */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_iflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;BRKINT&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ICRNL&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;INPCK&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ISTRIP&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;IXON&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* output modes - clear giving: no post processing such as NL to CR+NL */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_oflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;OPOST&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* control modes - set 8 bit chars */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cflag&lt;/span&gt; &lt;span class="pygments-o"&gt;|=&lt;/span&gt; &lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;CS8&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* local modes - clear giving: echoing off, canonical off (no erase with
-       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_lflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ECHO&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ICANON&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;IEXTEN&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ISIG&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* control chars - set return condition: min number of bytes and timer */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;5&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;8&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after 5 bytes or .8 seconds
-                                                after first byte seen      */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* immediate - anything       */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;2&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after two bytes, no timer  */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;8&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after a byte or .8 seconds */&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* put terminal in raw mode after flushing */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;tcsetattr&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="cm"&gt;/* reset tty - useful also for restoring the terminal when this process&lt;/span&gt;
+&lt;span class="cm"&gt;   wishes to temporarily relinquish the tty&lt;/span&gt;
+&lt;span class="cm"&gt;*/&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="cm"&gt;/* flush and reset */&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 
 
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;atexit&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;tty_reset&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;tty_raw&lt;/span&gt;&lt;span class="pygments-p"&gt;();&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;FILE&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;fdopen&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-s"&gt;"r"&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;setvbuf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-nb"&gt;NULL&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_IONBF&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;];&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;fgets&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;printf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;/pre&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="cm"&gt;/* copy original and then modify below */&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* input modes - clear indicated ones giving: no break, no CR to NL,&lt;/span&gt;
+&lt;span class="cm"&gt;       no parity check, no strip char, no start/stop output (sic) control */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_iflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BRKINT&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ICRNL&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;INPCK&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ISTRIP&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;IXON&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* output modes - clear giving: no post processing such as NL to CR+NL */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_oflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;OPOST&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* control modes - set 8 bit chars */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cflag&lt;/span&gt; &lt;span class="o"&gt;|=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;CS8&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* local modes - clear giving: echoing off, canonical off (no erase with&lt;/span&gt;
+&lt;span class="cm"&gt;       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_lflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ECHO&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ICANON&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;IEXTEN&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ISIG&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* control chars - set return condition: min number of bytes and timer */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after 5 bytes or .8 seconds&lt;/span&gt;
+&lt;span class="cm"&gt;                                                after first byte seen      */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* immediate - anything       */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after two bytes, no timer  */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after a byte or .8 seconds */&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* put terminal in raw mode after flushing */&lt;/span&gt;
+    &lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;atexit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;setvbuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_IONBF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id4"&gt;
@@ -172,7 +164,7 @@ read(0, abc
 &lt;p&gt; 嗯理論上可以不用 ncurses  庫直接在 raw  模式操縱終端。 &lt;/p&gt;
 &lt;p&gt; 這裏稍微聊一下 terminfo/termcap 的歷史，詳細的歷史和吐槽參考 &lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater’s Handbook&lt;/a&gt;
  第 6 章 Terminal Insanity 。 &lt;/p&gt;
-&lt;p&gt; 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 &lt;span class="caps"&gt;HTML&lt;/span&gt; 要測試各種瀏覽器兼容性一樣。   通常的做法是 &lt;/p&gt;
+&lt;p&gt; 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 HTML 要測試各種瀏覽器兼容性一樣。   通常的做法是 &lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt; 使用最小功能子集 &lt;/li&gt;
 &lt;li&gt; 假設終端是某個特殊設備，不管別的設備。 &lt;/li&gt;
@@ -207,7 +199,7 @@ Delete&lt;/kbd&gt;
 &lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;p&gt; 當然你可以把它再拖回來，所以這個問題還無傷大雅，只是賣萌。 &lt;/p&gt;
 &lt;p&gt; 比比之前 Gnome3  那個跳動的界面真是好太多了： &lt;/p&gt;
 &lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;p&gt; 順便，今天還看到一個賣萌的 &lt;span class="caps"&gt;KDE5&lt;/span&gt; Plasma  靜音圖標的翻譯： &lt;/p&gt;
-&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;&lt;span class="caps"&gt;KDE5&lt;/span&gt; のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。 Vocaloid ファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen &lt;span class="caps"&gt;YANG&lt;/span&gt; (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12 月 8 日 &lt;/a&gt;&lt;/blockquote&gt;&lt;/body&gt;&lt;/html&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>“…if we do this work … ” —Bill Gates</title><link href="//farseerfc.github.io/if-we-do-this-work.html" rel="alternate"></link><updated>2011-03-14T20:34:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2011-03-14:if-we-do-this-work.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 導入自 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/716517729"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5 のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。 Vocaloid ファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen &lt;span class="caps"&gt;YANG&lt;/span&gt; (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12 月 8 日 &lt;/a&gt;&lt;/blockquote&gt;&lt;/body&gt;&lt;/html&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>“…if we do this work … ” —Bill Gates</title><link href="//farseerfc.github.io/if-we-do-this-work.html" rel="alternate"></link><updated>2011-03-14T20:34:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2011-03-14:if-we-do-this-work.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 導入自 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/716517729"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;From: Bill Gates&lt;/p&gt;
 &lt;p&gt;’— Sent: Sunday, January 24, 1999 8:41 &lt;span class="caps"&gt;AM&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Jeff Westorinon; Ben Fathi ;&lt;/p&gt;
@@ -223,5 +215,5 @@ the others even if they are open.&lt;/p&gt;
 &lt;p&gt;Or maybe we could patent something relaled to this.&lt;/p&gt;
 &lt;p&gt;From:&lt;/p&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://antitrust.slated.org/www.iowaconsumercase.org/011607/3000/PX03020.pdf"&gt;http://antitrust.slated.org/www.iowaconsumercase.org/011607/3000/&lt;span class="caps"&gt;PX03020&lt;/span&gt;.pdf&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt; 如果這就是我至今在 Xen4.0 上得不到 &lt;span class="caps"&gt;ACPI&lt;/span&gt; 3.0 的完善支持的原因，那麼我詛咒 Bill Gates ！ &lt;/p&gt;
+&lt;p&gt; 如果這就是我至今在 Xen4.0 上得不到 ACPI 3.0 的完善支持的原因，那麼我詛咒 Bill Gates ！ &lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="microsoft"></category><category term="linux"></category><category term="acpi"></category></entry></feed>

@@ -67,9 +67,9 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                         </ul>
                     </li>
 
@@ -155,7 +155,7 @@ Farseerfc的小窩            </a>
 <p> 首先提問，既然 I386 上 sizeof(int)==4 、 sizeof(char)==1 ，那麼如下結構 (struct)A 的 sizeof 是多少？ </p>
 <p>struct A{int i;char c;};</p>
 <p> 答案是 sizeof(A)==8……1+5=8 ？ </p>
-<p> 呵呵，這就是 I386 上的邊界對齊問題。我們知道， I386 上有整整 <span class="caps">4GB</span> 的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於 I386 平臺而言，類型爲 T 的變量必須放置在 sizeof(T) 的整數倍的地址上， char 可以隨便放置， short 必須放在 2 的整數倍的地址上， int 必須放在 4 的整數倍的地址上， double 必須放在 8 的整數倍的地址上。如果違反邊界對齊要求，從內存中讀取數據必須進行兩次，然後將獨到的兩半數據拼接起來，這會嚴重影響效率。 </p>
+<p> 呵呵，這就是 I386 上的邊界對齊問題。我們知道， I386 上有整整 4GB 的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於 I386 平臺而言，類型爲 T 的變量必須放置在 sizeof(T) 的整數倍的地址上， char 可以隨便放置， short 必須放在 2 的整數倍的地址上， int 必須放在 4 的整數倍的地址上， double 必須放在 8 的整數倍的地址上。如果違反邊界對齊要求，從內存中讀取數據必須進行兩次，然後將獨到的兩半數據拼接起來，這會嚴重影響效率。 </p>
 <p> 由於邊界對齊問題的要求，在計算 struct 的 sizeof 的時候，編譯器必須算入額外的字節填充，以保證每一個變量都能自然對齊。比如如下聲明的 struct:</p>
 <p>struct <span class="caps">WASTE</span></p>
 <p>{</p>
@@ -172,7 +172,7 @@ Farseerfc的小窩            </a>
 <p>char c2 ； </p>
 <p>char _filling2 [3];// 又三個字節填充 </p>
 <p>}</p>
-<p> 值得注意的是尾部的 3 個字節填充，這是爲了可以在一個數組中聲明 <span class="caps">WASTE</span> 變量，並且每一個都自然對齊。因爲有了這些填充，所以 sizeof(<span class="caps">WASTE</span>)==12 。這是一種浪費，因爲只要我們重新安排變量的聲明，就可以減少 sizeof ： </p>
+<p> 值得注意的是尾部的 3 個字節填充，這是爲了可以在一個數組中聲明 WASTE 變量，並且每一個都自然對齊。因爲有了這些填充，所以 sizeof(<span class="caps">WASTE</span>)==12 。這是一種浪費，因爲只要我們重新安排變量的聲明，就可以減少 sizeof ： </p>
 <p>struct <span class="caps">WASTE</span></p>
 <p>{</p>
 <p>int i;</p>
@@ -180,7 +180,7 @@ Farseerfc的小窩            </a>
 <p>}</p>
 <p> 像這樣的安排， sizeof 就減少到 8 ，只有 2 個字節的額外填充。爲了與彙編代碼相兼容， C 語言語法規定，編譯器無權擅自安排結構體內變量的佈局順序，必須從左向右逐一排列。所以，妥當安排成員順序以避免內存空間的浪費，就成了我們程序員的責任之一。一般的，總是將結構體的成員按照其 sizeof 從大到小排列， double 在最前， char 在最後，這樣總可以將結構的字節填充降至最小。 </p>
 <p>C++ 繼承了 C 語言關於結構體佈局的規定，所以以上的佈局準則也適用於 C++ 的 class 的成員變量。 C++ 進一步擴展了佈局規定，同一訪問區段 (private 、 public 、 protected) 中的變量，編譯器無權重新排列，不過編譯器有權排列訪問區段的前後順序。基於這個規則， C++ 中有的程序員建議給每一個成員變量放在單獨區段，在每一個成員聲明之前都加上 private: 、 public: 、 protected: 標誌，這可以最大限度的利用編譯器的決策優勢。 </p>
-<p> 在棧中按順序分配的變量，其邊界也受到對齊要求的限制。與在結構中不同的是，棧中的變量還必須保證其後續變量無論是何種類型都可以自由對齊，所以在棧中的變量通常都有平臺相關的對齊最小值。在 <span class="caps">MSVC</span> 編譯器上，這個最小值可以由宏 _INTSIZEOF(T) 查詢： </p>
+<p> 在棧中按順序分配的變量，其邊界也受到對齊要求的限制。與在結構中不同的是，棧中的變量還必須保證其後續變量無論是何種類型都可以自由對齊，所以在棧中的變量通常都有平臺相關的對齊最小值。在 MSVC 編譯器上，這個最小值可以由宏 _INTSIZEOF(T) 查詢： </p>
 <p>#define _INTSIZEOF(T) ( (sizeof(T) + sizeof(int) - 1) <span class="amp">&amp;</span> ~(sizeof(int) -
 1) )</p>
 <p>_INTSIZEOF(T) 會將 sizeof(T) 進位到 sizeof(int) 的整數倍。 </p>
@@ -330,63 +330,8 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/unix.html">
                     unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -395,93 +340,18 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
                 </a>
             </li>
             <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -492,6 +362,136 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/tag/software.html">
                     software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
     </ul>

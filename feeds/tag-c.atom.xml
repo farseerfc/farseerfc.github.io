@@ -6,21 +6,19 @@
 &lt;p&gt;WaterElement(UnChanged)  於 2014 年 12 月 09 日 23:29:51  星期二   問到： &lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt; 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-cp"&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;unistd.h&amp;gt;
-&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;FILE&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;fdopen&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-s"&gt;"r"&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;setvbuf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-nb"&gt;NULL&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_IONBF&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;];&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;fgets&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;printf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 
-&lt;/pre&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;setvbuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_IONBF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 似乎還是需要在命令行輸入後按回車纔會讓 &lt;code class="code"&gt;
 fgets&lt;/code&gt;
   返回，不帶緩衝究竟體現在哪裏？ &lt;/p&gt;
@@ -68,96 +66,90 @@ Ctrl-Shift-C&lt;/kbd&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;strace 查看了下 &lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三   回復： &lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 感謝 &lt;span class="caps"&gt;FC&lt;/span&gt; 的詳盡解答。 &lt;/p&gt;
+&lt;p&gt; 感謝 FC 的詳盡解答。 &lt;/p&gt;
 &lt;p&gt; 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 &lt;code class="code"&gt;
 read&lt;/code&gt;
   系統調用，   比如輸入 abc ： &lt;/p&gt;
-&lt;pre class="code strace literal-block"&gt;
-read(0, abc
+&lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
-
-&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 如果有緩存的話就只調用一次了 &lt;code class="code"&gt;
 read&lt;/code&gt;
   系統調用了： &lt;/p&gt;
-&lt;pre class="code strace literal-block"&gt;
-read(0, abc
+&lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "abc\n", 1024)                  = 4
-
-&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;/div&gt;
 &lt;div class="section" id="raw-mode"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt; 如果想感受一下 raw mode&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt; 沒錯，這個是你的進程內 C 庫做的緩存， tty 屬於字符設備所以是一個一個字符塞給你的   程序的。 &lt;/p&gt;
 &lt;p&gt; 如果想感受一下 raw mode  可以試試下面這段程序（沒有檢測錯誤返回值） &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-cp"&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;unistd.h&amp;gt;
-#include &amp;lt;termios.h&amp;gt;
-&lt;/span&gt;
-&lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;termios&lt;/span&gt; &lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;termios.h&amp;gt;&lt;/span&gt;
 
-&lt;span class="pygments-cm"&gt;/* reset tty - useful also for restoring the terminal when this process
-   wishes to temporarily relinquish the tty
-*/&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;tty_reset&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-p"&gt;){&lt;/span&gt;
-    &lt;span class="pygments-cm"&gt;/* flush and reset */&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;if&lt;/span&gt; &lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;tcsetattr&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-o"&gt;-&lt;/span&gt;&lt;span class="pygments-mi"&gt;1&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;ttyfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-
-&lt;span class="pygments-cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-nf"&gt;tty_raw&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt;
-&lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;termios&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;orig_termios&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;  &lt;span class="pygments-cm"&gt;/* copy original and then modify below */&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* input modes - clear indicated ones giving: no break, no CR to NL,
-       no parity check, no strip char, no start/stop output (sic) control */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_iflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;BRKINT&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ICRNL&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;INPCK&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ISTRIP&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;IXON&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* output modes - clear giving: no post processing such as NL to CR+NL */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_oflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;OPOST&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* control modes - set 8 bit chars */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cflag&lt;/span&gt; &lt;span class="pygments-o"&gt;|=&lt;/span&gt; &lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;CS8&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* local modes - clear giving: echoing off, canonical off (no erase with
-       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_lflag&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="pygments-o"&gt;~&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ECHO&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ICANON&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;IEXTEN&lt;/span&gt; &lt;span class="pygments-o"&gt;|&lt;/span&gt; &lt;span class="pygments-n"&gt;ISIG&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* control chars - set return condition: min number of bytes and timer */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;5&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;8&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after 5 bytes or .8 seconds
-                                                after first byte seen      */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* immediate - anything       */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;2&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after two bytes, no timer  */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VMIN&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;.&lt;/span&gt;&lt;span class="pygments-n"&gt;c_cc&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-n"&gt;VTIME&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;8&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-cm"&gt;/* after a byte or .8 seconds */&lt;/span&gt;
-
-    &lt;span class="pygments-cm"&gt;/* put terminal in raw mode after flushing */&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;tcsetattr&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="pygments-n"&gt;raw&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="cm"&gt;/* reset tty - useful also for restoring the terminal when this process&lt;/span&gt;
+&lt;span class="cm"&gt;   wishes to temporarily relinquish the tty&lt;/span&gt;
+&lt;span class="cm"&gt;*/&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="cm"&gt;/* flush and reset */&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 
 
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;atexit&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;tty_reset&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;tty_raw&lt;/span&gt;&lt;span class="pygments-p"&gt;();&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;FILE&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-n"&gt;fdopen&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;ttyfd&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-s"&gt;"r"&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;setvbuf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-nb"&gt;NULL&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_IONBF&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;];&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;[&lt;/span&gt;&lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;]&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;fgets&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-mi"&gt;20&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;fp&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;printf&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;buffer&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;return&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;/pre&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="cm"&gt;/* copy original and then modify below */&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* input modes - clear indicated ones giving: no break, no CR to NL,&lt;/span&gt;
+&lt;span class="cm"&gt;       no parity check, no strip char, no start/stop output (sic) control */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_iflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BRKINT&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ICRNL&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;INPCK&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ISTRIP&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;IXON&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* output modes - clear giving: no post processing such as NL to CR+NL */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_oflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;OPOST&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* control modes - set 8 bit chars */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cflag&lt;/span&gt; &lt;span class="o"&gt;|=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;CS8&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* local modes - clear giving: echoing off, canonical off (no erase with&lt;/span&gt;
+&lt;span class="cm"&gt;       backspace, ^U,...),  no extended functions, no signal chars (^Z,^C) */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_lflag&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;=&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ECHO&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ICANON&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;IEXTEN&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;ISIG&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* control chars - set return condition: min number of bytes and timer */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after 5 bytes or .8 seconds&lt;/span&gt;
+&lt;span class="cm"&gt;                                                after first byte seen      */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* immediate - anything       */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after two bytes, no timer  */&lt;/span&gt;
+    &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VMIN&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_cc&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;VTIME&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* after a byte or .8 seconds */&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* put terminal in raw mode after flushing */&lt;/span&gt;
+    &lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;atexit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;setvbuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_IONBF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer is:%s"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id4"&gt;
@@ -172,7 +164,7 @@ read(0, abc
 &lt;p&gt; 嗯理論上可以不用 ncurses  庫直接在 raw  模式操縱終端。 &lt;/p&gt;
 &lt;p&gt; 這裏稍微聊一下 terminfo/termcap 的歷史，詳細的歷史和吐槽參考 &lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater’s Handbook&lt;/a&gt;
  第 6 章 Terminal Insanity 。 &lt;/p&gt;
-&lt;p&gt; 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 &lt;span class="caps"&gt;HTML&lt;/span&gt; 要測試各種瀏覽器兼容性一樣。   通常的做法是 &lt;/p&gt;
+&lt;p&gt; 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 HTML 要測試各種瀏覽器兼容性一樣。   通常的做法是 &lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt; 使用最小功能子集 &lt;/li&gt;
 &lt;li&gt; 假設終端是某個特殊設備，不管別的設備。 &lt;/li&gt;
@@ -211,49 +203,47 @@ Delete&lt;/kbd&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt; 原問題 &lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt; 今天在書上看到模板演繹的時候可以允許 cast-down ，於是我寫了個東西： &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;bool&lt;/span&gt; &lt;span class="pygments-n"&gt;_Test&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;typedef&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt; &lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;B&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;false&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
-
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;BB&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;DD&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-k"&gt;public&lt;/span&gt; &lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BB&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DD&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt;
-&lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-n"&gt;a&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;B&lt;/span&gt; &lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-c1"&gt;//f(b);
-&lt;/span&gt;    &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;/pre&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;//f(b);&lt;/span&gt;
+    &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 奇怪的是重載決議的時候， &lt;code class="code"&gt;
 f&lt;/code&gt;
   的情況下它就不讓我特化的 &lt;code class="code"&gt;
@@ -264,7 +254,7 @@ ff&lt;/code&gt;
   的情況下， &lt;code class="code"&gt;
 ff&amp;lt;BB&amp;lt;long&amp;gt;&amp;gt;&lt;/code&gt;
   卻進來了。 &lt;/p&gt;
-&lt;p&gt; 在 &lt;span class="caps"&gt;VC10&lt;/span&gt; 和 &lt;span class="caps"&gt;GCC3&lt;/span&gt;.4 下測試 &lt;/p&gt;
+&lt;p&gt; 在 VC10 和 GCC3.4 下測試 &lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt; 我的解答 &lt;/a&gt;&lt;/h2&gt;
@@ -282,10 +272,8 @@ T&lt;/code&gt;
   之後實例化得到的結果。 &lt;/p&gt;
 &lt;div class="section" id="ff"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt; 首先看 ff 的情況。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 處理到這句的時候，編譯器看到了 &lt;code class="code"&gt;
 DD&amp;lt;long&amp;gt;&lt;/code&gt;
   的實例化，於是去實例化 &lt;code class="code"&gt;
@@ -293,10 +281,8 @@ DD#long&lt;/code&gt;
   ，繼而實例化了 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
   。 &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 這句，首先計算重載函數集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，需要從參數 &lt;code class="code"&gt;
 DD#long -&amp;gt; BB&amp;lt;T&amp;gt;&lt;/code&gt;
@@ -342,10 +328,8 @@ BB#long&lt;/code&gt;
 &lt;/div&gt;
 &lt;div class="section" id="f"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt; 再來看 f 的情況。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 計算候選重載函數集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，對所有 &lt;code class="code"&gt;
 f&lt;/code&gt;
@@ -386,7 +370,7 @@ enable_if#false&lt;/code&gt;
   沒有 &lt;code class="code"&gt;
 type&lt;/code&gt;
   ，出錯。 &lt;/p&gt;
-&lt;p&gt; 唯一的模板匹配出錯，重載函數集合爲空， &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 原則不能找到合適的匹配，於是報錯。 &lt;/p&gt;
+&lt;p&gt; 唯一的模板匹配出錯，重載函數集合爲空， SFINAE 原則不能找到合適的匹配，於是報錯。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry><entry><title>C++ Tricks 3.2 標號、goto，以及switch的實現</title><link href="//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch.html" rel="alternate"></link><updated>2007-09-16T13:08:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-09-16:c-tricks-3-2-label-goto-and-implementation-of-switch.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
@@ -469,7 +453,7 @@ type&lt;/code&gt;
 &lt;p&gt;3 、左值有地址，右值沒有地址。 &lt;/p&gt;
 &lt;p&gt; 根據左值右值的第二定義，值的左右性就是值的常量性 —— 常量是右值，非常量是左值。比如： &lt;/p&gt;
 &lt;p&gt;1=1;//Error&lt;/p&gt;
-&lt;p&gt; 這個複製操作在 C++ 中是語法錯誤， &lt;span class="caps"&gt;MSVC&lt;/span&gt; 給出的錯誤提示爲 “error C2106: ‘=’ :
+&lt;p&gt; 這個複製操作在 C++ 中是語法錯誤， MSVC 給出的錯誤提示爲 “error C2106: ‘=’ :
 left operand must be l-value” ，就是說 ’=’ 的左操作數必須是一個左值，而字面常數 1 是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。 &lt;/p&gt;
 &lt;p&gt; 根據第二定義，一個左值也是一個右值，因爲左值也可讀，而一個右值不是一個左值，因爲右值不可寫。 &lt;/p&gt;
 &lt;p&gt; 通常情況下，聲明的變量是一個左值，除非你指定 const 將它變成一個右值： &lt;/p&gt;
@@ -500,9 +484,9 @@ Complex&amp;amp; 。至於返回值，還是 Do as the ints do 。 int 的賦�
 &lt;p&gt;(i=1)=2;&lt;/p&gt;
 &lt;p&gt; 雖然比較傻，先將 i 賦爲 1 ，再將其改爲 2 ，但是這是被 C++ 語法支持的做法，我們就理應遵守。所以返回第一個參數的左值： &lt;/p&gt;
 &lt;p&gt;Complex&amp;amp; operator=(Complex&amp;amp;,const Complex&amp;amp;);&lt;/p&gt;
-&lt;p&gt;const 是 C++ 引入的語言特性，也被 &lt;span class="caps"&gt;ANSI&lt;/span&gt;
+&lt;p&gt;const 是 C++ 引入的語言特性，也被 ANSI
 C99 借鑑，在經典版本的 C 語言中是沒有的。關於 const 的歷史，有幾點值得玩味。最初 Bjarne
-Stroustrup 引入 const 時，可寫性是和可讀性分開的。那時使用關鍵字 readonly 和 writeonly 。這個特點被首先提交到 C 的 &lt;span class="caps"&gt;ANSI&lt;/span&gt; 標準化委員會 ( 當時還沒有 C++ 標準化的計劃 ) ，但是 &lt;span class="caps"&gt;ANSI&lt;/span&gt; C 標準只接受了 readonly 的概念，並將其命名爲 const 。隨後，有人發現在多線程同步的環境下，有些變量的值會在編譯器的預料之外改變，爲了防止過度優化破壞這些變量， C++ 又引入關鍵字 violate 。從語義特點來看， violate 是 const 的反義詞，因爲 const 表示不會變的量，而 violate 表示會不按照預期自行變化的量。從語法特點而言， violate 與 const 是極爲相似的，適用於 const 的一切語法規則同樣適用於 violate 。 &lt;/p&gt;
+Stroustrup 引入 const 時，可寫性是和可讀性分開的。那時使用關鍵字 readonly 和 writeonly 。這個特點被首先提交到 C 的 ANSI 標準化委員會 ( 當時還沒有 C++ 標準化的計劃 ) ，但是 ANSI C 標準只接受了 readonly 的概念，並將其命名爲 const 。隨後，有人發現在多線程同步的環境下，有些變量的值會在編譯器的預料之外改變，爲了防止過度優化破壞這些變量， C++ 又引入關鍵字 violate 。從語義特點來看， violate 是 const 的反義詞，因爲 const 表示不會變的量，而 violate 表示會不按照預期自行變化的量。從語法特點而言， violate 與 const 是極爲相似的，適用於 const 的一切語法規則同樣適用於 violate 。 &lt;/p&gt;
 &lt;p&gt; 值的常量性可以被劃分爲兩種：編譯期常量和運行期常量。 C++ 語法並沒有嚴格區分這兩種常量，導致了少許混亂： &lt;/p&gt;
 &lt;p&gt;const int i=5;const int * pi=&amp;amp;i;&lt;/p&gt;
 &lt;p&gt;const_cast&amp;lt;int&amp;amp;&amp;gt;i=1;// 對於運行期常量，在需要時可以去除它的常量性 &lt;/p&gt;
@@ -513,14 +497,14 @@ Stroustrup 引入 const 時，可寫性是和可讀性分開的。那時使用�
 &lt;p&gt;C++ 中的 const 的特點更傾向於 C# 中的 readonly ，雖然語法上允許使用 const 的編譯期常量性，但正如上文所展示的，這容易造成混亂。爲了得到 C# 中 const 的語義，在 C++ 中，我們不必迴歸惡魔 #define 的懷抱，可以使用所謂 “ 匿名 enum 技巧 ” 。當匿名聲明一個 enum 類型時，其中的枚舉值就是一個 int 類型的編譯期常量，比如： &lt;/p&gt;
 &lt;p&gt;enum{Size=5;};&lt;/p&gt;
 &lt;p&gt;int a[Size];&lt;/p&gt;
-&lt;p&gt; 這種使用匿名 enum 來聲明編譯期常量的做法，被廣泛應用於 &lt;span class="caps"&gt;STL&lt;/span&gt; 、 boost 等模板庫的實現代碼中。 &lt;/p&gt;
+&lt;p&gt; 這種使用匿名 enum 來聲明編譯期常量的做法，被廣泛應用於 STL 、 boost 等模板庫的實現代碼中。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 2.2 I386平臺的內存佈局</title><link href="//farseerfc.github.io/c-tricks-2-2-i386-memory-layout.html" rel="alternate"></link><updated>2007-08-28T14:30:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:c-tricks-2-2-i386-memory-layout.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
 &lt;div class="section" id="i386"&gt;
 &lt;h2&gt;2.2 I386 平臺的內存佈局 &lt;/h2&gt;
 &lt;p&gt; 衆所周知， I386 是 32 位體系結構。因此對於絕大多數 I386 平臺的 C++ 編譯器而言， sizeof(int)=sizeof(long)=sizeof(void*)=4 。當然 C++ 標準對此沒有任何保證，我們也不應該試圖編寫依賴於此的代碼。 &lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;32 位指針的可尋址空間爲 &lt;span class="caps"&gt;4GB&lt;/span&gt; 。爲充分利用這麼大的尋址空間，也是爲了支持其它更先進的技術比如多任務技術或者動態鏈接庫技術， WinNT 使用虛擬內存技術，給與每個應用程序全部 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的內存空間。 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的地址被一分爲二，前 &lt;span class="caps"&gt;2GB&lt;/span&gt; 供應用程序自己使用，後 &lt;span class="caps"&gt;2GB&lt;/span&gt; 由系統內核分配和管理。這 &lt;span class="caps"&gt;2GB&lt;/span&gt; 的內存地址，通常被劃分成 3 種內存區使用： &lt;/div&gt;
+&lt;div class="line"&gt;32 位指針的可尋址空間爲 4GB 。爲充分利用這麼大的尋址空間，也是爲了支持其它更先進的技術比如多任務技術或者動態鏈接庫技術， WinNT 使用虛擬內存技術，給與每個應用程序全部 4GB 的內存空間。 4GB 的地址被一分爲二，前 2GB 供應用程序自己使用，後 2GB 由系統內核分配和管理。這 2GB 的內存地址，通常被劃分成 3 種內存區使用： &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h3&gt;1  代碼及靜態數據區 &lt;/h3&gt;
@@ -532,10 +516,9 @@ Stroustrup 引入 const 時，可寫性是和可讀性分開的。那時使用�
 &lt;div class="section" id="stack"&gt;
 &lt;h3&gt;2  棧 (Stack)&lt;/h3&gt;
 &lt;p&gt; 棧是最常用的動態數據存儲區，所有函數的 non-static 對象和函數參數都在程序運行期在棧上分配內存。在數據結構中，術語 “ 棧 (Stack)” 意指先進後出 (&lt;span class="caps"&gt;FILO&lt;/span&gt; ， First
-In Last
-Out) ，與 “ 隊列 (Queue)” 所指的 &lt;span class="caps"&gt;FIFO&lt;/span&gt; 相對。相對於基於堆的對象分配技術，默認使用棧的對象分配有兩點優勢： &lt;/p&gt;
-&lt;p&gt; 一、棧的 &lt;span class="caps"&gt;FILO&lt;/span&gt; 與人的思維方式相同 &lt;/p&gt;
-&lt;p&gt; 現實生活中有許多事例都使用 &lt;span class="caps"&gt;FILO&lt;/span&gt; 的方式，比如人們必須先提起話筒再撥打號碼，而後掛斷電話之後再放下話筒。使用 &lt;span class="caps"&gt;FILO&lt;/span&gt; 的棧，可以保證事物的銷燬順序以其誕生順序相反的順序進行，不會產生在掛斷電話之前就放下話筒的尷尬。 &lt;/p&gt;
+In Last Out) ，與 “ 隊列 (Queue)” 所指的 FIFO 相對。相對於基於堆的對象分配技術，默認使用棧的對象分配有兩點優勢： &lt;/p&gt;
+&lt;p&gt; 一、棧的 FILO 與人的思維方式相同 &lt;/p&gt;
+&lt;p&gt; 現實生活中有許多事例都使用 FILO 的方式，比如人們必須先提起話筒再撥打號碼，而後掛斷電話之後再放下話筒。使用 FILO 的棧，可以保證事物的銷燬順序以其誕生順序相反的順序進行，不會產生在掛斷電話之前就放下話筒的尷尬。 &lt;/p&gt;
 &lt;p&gt; 二、棧的分配管理僅需要兩個額外指針：棧頂 (esp) 和棧底 (ebp) 指針 &lt;/p&gt;
 &lt;p&gt; 從實現的技術層面而言，棧的管理比其它動態分配技術要簡單很多。 I386 平臺上的動態棧管理，僅需要棧頂和棧底兩個指針。這兩個指針的存儲顯然不能放置於棧中，置於靜態數據區又有損效率。 I386 平臺爲管理動態棧專門預留了兩個通用寄存器變量 esp 與 ebp ，分別代表棧頂 (esp,Extended
 Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 代表它們是 32 位指針，以區分 16 位的 sp 和 bp 寄存器。 &lt;/p&gt;
@@ -547,7 +530,7 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
 &lt;h3&gt;3  堆 (Heap) 和自由存儲區 &lt;/h3&gt;
 &lt;p&gt; 棧中的變量對於分配與釋放的順序有特定要求，這在一定程度上限制了棧的適用範圍。面向對象 (&lt;span class="caps"&gt;OO&lt;/span&gt; ， Object Oriented) 的程序設計思想也要求能自由地控制變量的分配與銷燬。由此，現代操作系統都提供了被稱作 “ 堆 (Heap)” 的自由存儲區，以允許由程序員控制的對象創建和銷燬過程。 C 標準庫函數 malloc 和 free 則是對操作系統提供的堆操作的封裝。 C++ 提供的自由存儲區運算符 new 和 delete 則通常是 malloc 和 free 的又一層封裝。 &lt;/p&gt;
 &lt;p&gt; 操作系統經由 malloc 和 free 控制對堆的訪問。堆的存儲管理技術各不相同，簡單的使用雙鏈表管理，複雜的可以比擬一個完整的文件系統。 &lt;/p&gt;
-&lt;p&gt; 由於額外的管理需求，使用系統提供的通用分配器在堆上分配和銷燬變量的代價，無論從空間角度還是效率角度而言，都比在棧上分配對象要高昂很多。對於 sizeof 上百的大型對象，這樣的高昂代價還是可以接受的，但是對於 sizeof 只有個位數的小對象，這樣的代價通常是一個數量級的差距。正因爲這個原因， &lt;span class="caps"&gt;STL&lt;/span&gt; 不使用 new 和 delete ，轉而使用分配子 (alllocor) 分配對象。 &lt;/p&gt;
+&lt;p&gt; 由於額外的管理需求，使用系統提供的通用分配器在堆上分配和銷燬變量的代價，無論從空間角度還是效率角度而言，都比在棧上分配對象要高昂很多。對於 sizeof 上百的大型對象，這樣的高昂代價還是可以接受的，但是對於 sizeof 只有個位數的小對象，這樣的代價通常是一個數量級的差距。正因爲這個原因， STL 不使用 new 和 delete ，轉而使用分配子 (alllocor) 分配對象。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks</title><link href="//farseerfc.github.io/c-tricks.html" rel="alternate"></link><updated>2007-08-28T14:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:c-tricks.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
@@ -557,7 +540,7 @@ Stack Pointer) 與棧底 (Extended Bottom Pointer) 指針。其中的 extended 
 Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone.qq.com/"&gt;QQZone&lt;/a&gt; 同時發表一系列文章，暫定名爲 “C++Tricks” 。 &lt;/p&gt;
 &lt;p&gt; 本文旨在記錄和闡述一些本人學習 C++ 時所得的心得、技巧。總體來看，本文涉及的內容是每一個 C++ 程序員都應該知道的，但是很少見諸 C++ 教材。希望對各位同仁學習 C++ 有所幫助。 &lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt; 也可以通過 &lt;span class="caps"&gt;QQ&lt;/span&gt; 或 &lt;span class="caps"&gt;MSN&lt;/span&gt; 向我索要此文的 &lt;span class="caps"&gt;DOC&lt;/span&gt; 版或 &lt;span class="caps"&gt;PDF&lt;/span&gt; 版，會比網頁上的更新的快一點。 &lt;/div&gt;
+&lt;div class="line"&gt; 也可以通過 QQ 或 MSN 向我索要此文的 DOC 版或 PDF 版，會比網頁上的更新的快一點。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="lexical-problems"&gt;
 &lt;h2&gt;1       詞法問題 (Lexical Problems)&lt;/h2&gt;
@@ -714,7 +697,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt; 首先提問，既然 I386 上 sizeof(int)==4 、 sizeof(char)==1 ，那麼如下結構 (struct)A 的 sizeof 是多少？ &lt;/p&gt;
 &lt;p&gt;struct A{int i;char c;};&lt;/p&gt;
 &lt;p&gt; 答案是 sizeof(A)==8……1+5=8 ？ &lt;/p&gt;
-&lt;p&gt; 呵呵，這就是 I386 上的邊界對齊問題。我們知道， I386 上有整整 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於 I386 平臺而言，類型爲 T 的變量必須放置在 sizeof(T) 的整數倍的地址上， char 可以隨便放置， short 必須放在 2 的整數倍的地址上， int 必須放在 4 的整數倍的地址上， double 必須放在 8 的整數倍的地址上。如果違反邊界對齊要求，從內存中讀取數據必須進行兩次，然後將獨到的兩半數據拼接起來，這會嚴重影響效率。 &lt;/p&gt;
+&lt;p&gt; 呵呵，這就是 I386 上的邊界對齊問題。我們知道， I386 上有整整 4GB 的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於 I386 平臺而言，類型爲 T 的變量必須放置在 sizeof(T) 的整數倍的地址上， char 可以隨便放置， short 必須放在 2 的整數倍的地址上， int 必須放在 4 的整數倍的地址上， double 必須放在 8 的整數倍的地址上。如果違反邊界對齊要求，從內存中讀取數據必須進行兩次，然後將獨到的兩半數據拼接起來，這會嚴重影響效率。 &lt;/p&gt;
 &lt;p&gt; 由於邊界對齊問題的要求，在計算 struct 的 sizeof 的時候，編譯器必須算入額外的字節填充，以保證每一個變量都能自然對齊。比如如下聲明的 struct:&lt;/p&gt;
 &lt;p&gt;struct &lt;span class="caps"&gt;WASTE&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;{&lt;/p&gt;
@@ -731,7 +714,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt;char c2 ； &lt;/p&gt;
 &lt;p&gt;char _filling2 [3];// 又三個字節填充 &lt;/p&gt;
 &lt;p&gt;}&lt;/p&gt;
-&lt;p&gt; 值得注意的是尾部的 3 個字節填充，這是爲了可以在一個數組中聲明 &lt;span class="caps"&gt;WASTE&lt;/span&gt; 變量，並且每一個都自然對齊。因爲有了這些填充，所以 sizeof(&lt;span class="caps"&gt;WASTE&lt;/span&gt;)==12 。這是一種浪費，因爲只要我們重新安排變量的聲明，就可以減少 sizeof ： &lt;/p&gt;
+&lt;p&gt; 值得注意的是尾部的 3 個字節填充，這是爲了可以在一個數組中聲明 WASTE 變量，並且每一個都自然對齊。因爲有了這些填充，所以 sizeof(&lt;span class="caps"&gt;WASTE&lt;/span&gt;)==12 。這是一種浪費，因爲只要我們重新安排變量的聲明，就可以減少 sizeof ： &lt;/p&gt;
 &lt;p&gt;struct &lt;span class="caps"&gt;WASTE&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;{&lt;/p&gt;
 &lt;p&gt;int i;&lt;/p&gt;
@@ -739,7 +722,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 像這樣的安排， sizeof 就減少到 8 ，只有 2 個字節的額外填充。爲了與彙編代碼相兼容， C 語言語法規定，編譯器無權擅自安排結構體內變量的佈局順序，必須從左向右逐一排列。所以，妥當安排成員順序以避免內存空間的浪費，就成了我們程序員的責任之一。一般的，總是將結構體的成員按照其 sizeof 從大到小排列， double 在最前， char 在最後，這樣總可以將結構的字節填充降至最小。 &lt;/p&gt;
 &lt;p&gt;C++ 繼承了 C 語言關於結構體佈局的規定，所以以上的佈局準則也適用於 C++ 的 class 的成員變量。 C++ 進一步擴展了佈局規定，同一訪問區段 (private 、 public 、 protected) 中的變量，編譯器無權重新排列，不過編譯器有權排列訪問區段的前後順序。基於這個規則， C++ 中有的程序員建議給每一個成員變量放在單獨區段，在每一個成員聲明之前都加上 private: 、 public: 、 protected: 標誌，這可以最大限度的利用編譯器的決策優勢。 &lt;/p&gt;
-&lt;p&gt; 在棧中按順序分配的變量，其邊界也受到對齊要求的限制。與在結構中不同的是，棧中的變量還必須保證其後續變量無論是何種類型都可以自由對齊，所以在棧中的變量通常都有平臺相關的對齊最小值。在 &lt;span class="caps"&gt;MSVC&lt;/span&gt; 編譯器上，這個最小值可以由宏 _INTSIZEOF(T) 查詢： &lt;/p&gt;
+&lt;p&gt; 在棧中按順序分配的變量，其邊界也受到對齊要求的限制。與在結構中不同的是，棧中的變量還必須保證其後續變量無論是何種類型都可以自由對齊，所以在棧中的變量通常都有平臺相關的對齊最小值。在 MSVC 編譯器上，這個最小值可以由宏 _INTSIZEOF(T) 查詢： &lt;/p&gt;
 &lt;p&gt;#define _INTSIZEOF(T) ( (sizeof(T) + sizeof(int) - 1) &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~(sizeof(int) -
 1) )&lt;/p&gt;
 &lt;p&gt;_INTSIZEOF(T) 會將 sizeof(T) 進位到 sizeof(int) 的整數倍。 &lt;/p&gt;
@@ -808,7 +791,7 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 可以看出，如果參數類型一致，使用標準庫要多些幾行代碼。不過如果參數類型不一致或者未知 (printf 的情況 ) ，使用標準庫就要方便很多，因爲我們很難猜出編譯器處置邊界對齊 (align) 等彙編代碼的細節。使用標準庫的代碼是可以移植的，而使用上文所述的其它方法操縱可變參數表都是不可移植的，僅限於在 I386 平臺上使用。 &lt;/p&gt;
 &lt;p&gt; 縱使可變參數表有使用上的便利性，它的缺陷也有很多，不可移植性和平臺依賴性只是其一，最大的問題在於它的類型不安全性。使用可變參數表就意味着編譯器不對參數作任何類型檢查，這在 C 中算是一言難盡的歷史遺留問題，在 C++ 中就意味着惡魔 reinterpret_cast 被你喚醒。 C 的可變參數表是 C++ 代碼錯誤頻發的根源之一，以至於 C++ 標準將可變參數表列爲即將被廢除的 C 語言遺留特性。 C++ 語法中的許多新特性，比如重載函數、默認參數值、模板，都可以一定程度上替代可變參數表，並且比可變參數表更加安全。 &lt;/p&gt;
-&lt;p&gt; 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (&lt;span class="caps"&gt;TMP&lt;/span&gt;) 的 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int ： &lt;/p&gt;
+&lt;p&gt; 可變參數表在 C++ 中惟一值得嘉獎的貢獻，是在模板元編程 (&lt;span class="caps"&gt;TMP&lt;/span&gt;) 的 SFINAE 技術中利用可變參數表製作最差匹配重載。根據 C++ 標準中有關函數重載決議的規則，具有可變參數表的函數總是最差匹配，編譯器在被逼無奈走頭無路時纔會選擇可變參數表。利用這一點，我們可以精心製作重載函數來提取類型信息。比如，要判斷一個通過模板傳遞來的類型是不是 int ： &lt;/p&gt;
 &lt;p&gt;long isIntImp(int);&lt;/p&gt;
 &lt;p&gt;char isIntImp(…);&lt;/p&gt;
 &lt;p&gt;template&amp;lt;typename T&amp;gt;&lt;/p&gt;
@@ -818,8 +801,8 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 然後，在一個具有模板參數 T 的函數中，我們就可以寫 &lt;/p&gt;
 &lt;p&gt;if(isInt&amp;lt;T&amp;gt;::value)//…&lt;/p&gt;
-&lt;p&gt; 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int ，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long ，這樣 value 就爲 1 。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char ，這樣 value 就爲 0 。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int ，那它就是 int ，否則它就不是 int ，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; ，它和其它模板元編程技術被廣泛運用於 &lt;span class="caps"&gt;STL&lt;/span&gt; 、 Boost 等模板庫的開發實現之中。 &lt;/p&gt;
-&lt;p&gt; 值得注意的是，在上文 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 的運用中， isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。 &lt;/p&gt;
+&lt;p&gt; 在這個 ( 不怎麼精緻的 ) 例子中，如果 T 是 int ，那麼 isIntImp 的第一個重載版本就會被選中，返回值類型就是 long ，這樣 value 就爲 1 。否則，編譯器只能選中第二個具有可變參數表的重載版本，返回值類型成爲 char ，這樣 value 就爲 0 。把它說得再明白一些，上文的代碼所表達的意思是：如果類型 T 是 int ，那它就是 int ，否則它就不是 int ，呵呵簡單吧。這種通過重載決議規則來提取類型信息的技術，在模板元編程中被稱作 SFINAE ，它和其它模板元編程技術被廣泛運用於 STL 、 Boost 等模板庫的開發實現之中。 &lt;/p&gt;
+&lt;p&gt; 值得注意的是，在上文 SFINAE 的運用中， isIntImp 並沒有出現定義而只提供了聲明，因爲我們並沒有實際調用 isIntImp 函數，而只是讓它參與重載決議並用 sizeof 判斷其返回值類型。這是 C++ 的一個設計準則的完美體現：不需要的東西可以不出現。由於這一準則，我們避免了在 C++ 中調用具有可變參數表的函數這一危險舉動，而僅僅利用了可變參數表在語法分析過程中的特殊地位，這種對於危險語言特性的巧妙利用是善意而無害的。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 2.7 I386平臺的其它函數調用模型</title><link href="//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions.html" rel="alternate"></link><updated>2007-08-28T14:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:c-tricks-2-7-i386-calling-conventions.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
 &lt;div class="section" id="i386"&gt;
@@ -840,7 +823,7 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;p&gt; 參數壓棧順序：逆序 ( 從右至左 )&lt;/p&gt;
 &lt;p&gt; 參數堆棧恢復者：被調函數 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;__stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 Win32API 函數使用這種函數調用模型，希望在 &lt;span class="caps"&gt;DLL&lt;/span&gt; 之間，或者在程序和 WinNT 操作系統之間傳遞函數指針的函數也應該使用這種模型。與 __cdecl 模型的不同之處在於， __stdcall 模型下由被調函數恢復堆棧。主調函數在 call 語句之後，不需要再加上 add 語句。而被調函數的 ret 語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在 __stdcall 模型下不支持可變參數表，所有參數必須寫明。 &lt;/div&gt;
+&lt;div class="line"&gt;__stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 Win32API 函數使用這種函數調用模型，希望在 DLL 之間，或者在程序和 WinNT 操作系統之間傳遞函數指針的函數也應該使用這種模型。與 __cdecl 模型的不同之處在於， __stdcall 模型下由被調函數恢復堆棧。主調函數在 call 語句之後，不需要再加上 add 語句。而被調函數的 ret 語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在 __stdcall 模型下不支持可變參數表，所有參數必須寫明。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="thiscall"&gt;
@@ -848,7 +831,7 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;p&gt; 參數壓棧順序：逆序 ( 從右至左 ) ， this 用 ecx 傳遞。 &lt;/p&gt;
 &lt;p&gt; 參數堆棧恢復者：被調函數 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;__thiscall 是 &lt;span class="caps"&gt;VC&lt;/span&gt; 編譯器中類的非靜態成員函數 (non-static member functon) 的默認調用模型。但是如果此成員函數有可變參數表， &lt;span class="caps"&gt;VC&lt;/span&gt; 編譯器會使用 __cdecl 。和 __stdcall 一樣， __thiscall 由被調函數恢復堆棧。比較獨特的是 __thiscall 會通過 ecx 寄存器傳遞成員函數的 this 指針，而 __cdecl 下 this 指針是通過在參數表最前面增加一個函數參數來傳遞的。 __thiscall 是 &lt;span class="caps"&gt;VC&lt;/span&gt; 編譯器對 this 指針的使用的一種優化，大大提高了面向對象程序的效率。在 &lt;span class="caps"&gt;VC2003&lt;/span&gt; 及之前的編譯器上 __thiscall 不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定 __cdecl 來避免使用 __thiscall 。 &lt;/div&gt;
+&lt;div class="line"&gt;__thiscall 是 VC 編譯器中類的非靜態成員函數 (non-static member functon) 的默認調用模型。但是如果此成員函數有可變參數表， VC 編譯器會使用 __cdecl 。和 __stdcall 一樣， __thiscall 由被調函數恢復堆棧。比較獨特的是 __thiscall 會通過 ecx 寄存器傳遞成員函數的 this 指針，而 __cdecl 下 this 指針是通過在參數表最前面增加一個函數參數來傳遞的。 __thiscall 是 VC 編譯器對 this 指針的使用的一種優化，大大提高了面向對象程序的效率。在 VC2003 及之前的編譯器上 __thiscall 不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定 __cdecl 來避免使用 __thiscall 。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="fastcall"&gt;
@@ -864,7 +847,7 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;p&gt; 參數壓棧順序：正序 ( 從左至右 )&lt;/p&gt;
 &lt;p&gt; 參數堆棧恢復者：被調函數 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt; 過程式編程語言 Pascal 所使用的函數調用模型，由此得名。也是 16 位版本的 Windows 使用的 &lt;span class="caps"&gt;API&lt;/span&gt; 模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。 __pascal 是正序壓棧，這與大部分 I386 函數模型都不相同。與 __stdcall 一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名 &lt;span class="caps"&gt;PASCAL&lt;/span&gt; 、 pascal 、 _pascal( 單下劃線 ) ，現在都改成了 __stdcall 的別名，與 __pascal( 雙下劃線 ) 不同。 &lt;/div&gt;
+&lt;div class="line"&gt; 過程式編程語言 Pascal 所使用的函數調用模型，由此得名。也是 16 位版本的 Windows 使用的 API 模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。 __pascal 是正序壓棧，這與大部分 I386 函數模型都不相同。與 __stdcall 一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名 PASCAL 、 pascal 、 _pascal( 單下劃線 ) ，現在都改成了 __stdcall 的別名，與 __pascal( 雙下劃線 ) 不同。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id1"&gt;
@@ -888,12 +871,11 @@ Compare ，你必須確保填充的字節中的值也是相同的。這不僅要
 &lt;div class="section" id="x86"&gt;
 &lt;h2&gt;2.1   X86 概述 &lt;/h2&gt;
 &lt;p&gt; 所謂 X86 體系結構，是指以 Intel
-8086 芯片爲首的芯片所沿襲的 &lt;span class="caps"&gt;CPU&lt;/span&gt; 結構，一些文檔中又被稱作 &lt;span class="caps"&gt;IA32&lt;/span&gt; 體系結構。包括的芯片有但不限於 :Intel
-8086 至 80486 ，奔騰 (Pentium) 系列處理器 1 至 4 ，賽揚系列處理器，酷睿系列處理器，以及 &lt;span class="caps"&gt;AMD&lt;/span&gt; 的相應型號產品。 X86 體系結構在早期屬於 16 位處理器，自 80386 之後擴展爲 32 位處理器，所以一些文檔中又把 80386 之後的 32 位處理器體系稱作 I386 。自 Pentium4 後期， &lt;span class="caps"&gt;AMD&lt;/span&gt; 的 Athlon64 開始， I386 被進一步擴充爲 64 位處理器，含有 64 位尋址能力的 X86 體系結構被稱作 X86-64 或 &lt;span class="caps"&gt;IA32&lt;/span&gt;-64 。總之，市售的個人電腦用 &lt;span class="caps"&gt;CPU&lt;/span&gt; ，除蘋果的 Macintosh 之外，全部採用 X86 體系結構芯片。 &lt;/p&gt;
-&lt;p&gt; 在 X86 早期， 16 位的尋址能力只支持 &lt;span class="caps"&gt;64KB&lt;/span&gt;(2^16=64K) 內存，這顯然是不夠的。 Intel 採用分段尋址的方法，用 4 位段位 +16 位偏移量，提供了總共 &lt;span class="caps"&gt;1MB&lt;/span&gt;(2^20=1M) 的尋址能力。所以在 X86 的 16 位編程中，有兩種指針類型：長指針 (lp,long
-pointer) 和短指針 (sp,short
-pointer) ，長指針 (20 位 ) 提供整個內存空間尋址能力，短指針 (16 位 ) 僅支持同一段中的尋址。在 “ 古代 ”&lt;span class="caps"&gt;DOS&lt;/span&gt; 及 Win3.x 編程過程中，兩種類型的指針，以及總共 &lt;span class="caps"&gt;1MB&lt;/span&gt; 的內存大小，常常把程序員們折騰得焦頭爛額。 &lt;/p&gt;
-&lt;p&gt; 自 I386 之後， &lt;span class="caps"&gt;CPU&lt;/span&gt; 纔開始提供 32 位的尋址能力。有了整整 &lt;span class="caps"&gt;4GB&lt;/span&gt;(2^32=4G) 的尋址空間，所有指針統一爲長指針 (32 位 ) 。時至今日，我們仍可以看到微軟文檔中指針變量的 lp 前綴。由於內存管理的需要，分段機制被保留下來，但這一次不是因爲地址空間太小，而是因爲地址空間遠大於實際內存容量，從而採用了虛擬內存機制。 &lt;/p&gt;
+8086 芯片爲首的芯片所沿襲的 CPU 結構，一些文檔中又被稱作 IA32 體系結構。包括的芯片有但不限於 :Intel
+8086 至  80486 ，奔騰 (Pentium) 系列處理器 1 至 4 ，賽揚系列處理器，酷睿系列處理器，以及 AMD 的相應型號產品。 X86 體系結構在早期屬於 16 位處理器，自 80386 之後擴展爲 32 位處理器，所以一些文檔中又把 80386 之後的 32 位處理器體系稱作 I386 。自 Pentium4 後期， AMD 的 Athlon64 開始， I386 被進一步擴充爲 64 位處理器，含有 64 位尋址能力的 X86 體系結構被稱作 X86-64 或 IA32-64 。總之，市售的個人電腦用 CPU ，除蘋果的 Macintosh 之外，全部採用 X86 體系結構芯片。 &lt;/p&gt;
+&lt;p&gt; 在 X86 早期， 16 位的尋址能力只支持 64KB(2^16=64K) 內存，這顯然是不夠的。 Intel 採用分段尋址的方法，用 4 位段位 +16 位偏移量，提供了總共 1MB(2^20=1M) 的尋址能力。所以在 X86 的 16 位編程中，有兩種指針類型：長指針 (lp,long
+pointer) 和短指針 (sp,short pointer) ，長指針 (20 位 ) 提供整個內存空間尋址能力，短指針 (16 位 ) 僅支持同一段中的尋址。在 “ 古代 ”DOS 及 Win3.x 編程過程中，兩種類型的指針，以及總共 1MB 的內存大小，常常把程序員們折騰得焦頭爛額。 &lt;/p&gt;
+&lt;p&gt; 自 I386 之後， CPU 纔開始提供 32 位的尋址能力。有了整整 4GB(2^32=4G) 的尋址空間，所有指針統一爲長指針 (32 位 ) 。時至今日，我們仍可以看到微軟文檔中指針變量的 lp 前綴。由於內存管理的需要，分段機制被保留下來，但這一次不是因爲地址空間太小，而是因爲地址空間遠大於實際內存容量，從而採用了虛擬內存機制。 &lt;/p&gt;
 &lt;p&gt; 在從 16 位結構向 32 位結構轉變的過程中，由於向下兼容的歷史原因，曾一度長時間出現硬件 32 位 (I386) 、軟件 16 位 (Win3.x) 的情況。同樣也是爲了兼容 16 位軟件， Win9x 操作系統 (Win95 、 Win98 、 WinME) 保留了 16 位代碼和 32 位代碼。混合代碼的設計使得 Win9x 及其混亂和不穩定。直到完全 32 位內核的操作系統 WinNT( 以及構建於其上的 Win2000 ， WinXP ， Win2003) 的出現， X86 平臺上內存佈局混亂的局面才得以改善。有了從 16 位至 32 位移植的經驗和準備，現今的從 32 位到 64 位的操作系統移植顯得平穩順利很多。 WinXP 和 WinVista 系統都同時發佈了 32 位版本和 64 位版本，並且其 x86-64 系統都實現了對 32 位軟件的無縫銜接支持。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱</title><link href="//farseerfc.github.io/c-tricks-1-2-trap-in-comma-logical-operator.html" rel="alternate"></link><updated>2007-08-22T18:06:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-22:c-tricks-1-2-trap-in-comma-logical-operator.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
@@ -921,9 +903,9 @@ pointer) ，長指針 (20 位 ) 提供整個內存空間尋址能力，短指針
 &lt;p&gt; 在 C 時代使用函數調用時，壓棧順序並不是什麼大問題，畢竟大多數人會在函數調用的邊界稍稍小心一些。但是到了 C++ 中，事情變得有些複雜，因爲簡單如 a+b 的使用，就有可能被運算符重載機制替換爲函數調用。更何況有模板參與之後，我們寫代碼時不能確定對象的真實類型，也就無法預知一個運算符是否真的被重載過，唯一穩妥的方法是，假定任何有可能被重載的運算符的使用都是函數調用。 &lt;/p&gt;
 &lt;blockquote&gt;
 &amp;lt;p style="margin:0;"&amp;gt;&lt;/blockquote&gt;
-&lt;p&gt; 回到上文的示例中，由於 , 和 &amp;amp;&amp;amp; 都被替換爲函數調用，程序的執行順序將成爲壓棧順序，在 X86 上很有可能是從右到左，與標準定義的運算符的順序正好相反。逗號運算符原本就含有 “ 先 … 後 …” 的語義，這種顛倒的執行順序勢必造成程序和程序員的混亂。以我的經驗而言，含有 &lt;strong&gt;operator&lt;/strong&gt;, 的類，完全沒有辦法和 &lt;span class="caps"&gt;STL&lt;/span&gt; 或者 iostream 相互協作，反而會導致巨量的錯誤報告 ( 什麼叫巨量的錯誤報告有概念麼？如果沒有，那說明你還沒玩過範式編程 (&lt;span class="caps"&gt;GP&lt;/span&gt;,
+&lt;p&gt; 回到上文的示例中，由於 , 和 &amp;amp;&amp;amp; 都被替換爲函數調用，程序的執行順序將成爲壓棧順序，在 X86 上很有可能是從右到左，與標準定義的運算符的順序正好相反。逗號運算符原本就含有 “ 先 … 後 …” 的語義，這種顛倒的執行順序勢必造成程序和程序員的混亂。以我的經驗而言，含有 &lt;strong&gt;operator&lt;/strong&gt;, 的類，完全沒有辦法和 STL 或者 iostream 相互協作，反而會導致巨量的錯誤報告 ( 什麼叫巨量的錯誤報告有概念麼？如果沒有，那說明你還沒玩過範式編程 (&lt;span class="caps"&gt;GP&lt;/span&gt;,
 Generic
-Programming) 。去玩玩 &lt;span class="caps"&gt;GP&lt;/span&gt; 吧，看看你的編譯器對巨量的定義。在我手頭，針對 3.&lt;span class="caps"&gt;5KB&lt;/span&gt; 的代碼文件傾瀉出 3.8&lt;strong&gt;&lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; 的錯誤信息的編譯器不在少數 ……) 。有鑑於此，我的結論是，除非你有充足的依據支持你這麼做 ( 比如你的粗暴上司的鍵盤上只剩下逗號能用 ) ，並且你清楚的瞭解這麼做的後果的嚴重性 ( 比如至少要看過此文 ) ，否則我奉勸你，永遠不要碰 &lt;strong&gt;operator&lt;/strong&gt;, 、 &lt;strong&gt;operator&lt;/strong&gt;&amp;amp;&amp;amp; 以及 &lt;strong&gt;operator&lt;/strong&gt;|| ！ &lt;/p&gt;
+Programming) 。去玩玩 GP 吧，看看你的編譯器對巨量的定義。在我手頭，針對 3.5KB 的代碼文件傾瀉出 3.8&lt;strong&gt;&lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; 的錯誤信息的編譯器不在少數 ……) 。有鑑於此，我的結論是，除非你有充足的依據支持你這麼做 ( 比如你的粗暴上司的鍵盤上只剩下逗號能用 ) ，並且你清楚的瞭解這麼做的後果的嚴重性 ( 比如至少要看過此文 ) ，否則我奉勸你，永遠不要碰 &lt;strong&gt;operator&lt;/strong&gt;, 、 &lt;strong&gt;operator&lt;/strong&gt;&amp;amp;&amp;amp; 以及 &lt;strong&gt;operator&lt;/strong&gt;|| ！ &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 1.1 條件運算符(?:)</title><link href="//farseerfc.github.io/c-tricks-1-1-conditional-operator.html" rel="alternate"></link><updated>2007-08-22T18:05:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-22:c-tricks-1-1-conditional-operator.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 從 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  導入 &lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
@@ -942,7 +924,7 @@ operator) ，用於在表達式中作條件判斷，通常可以替換 if 語句
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; *pi=getInt();&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; i=iif(pi,*pi,0);//Error!&lt;/p&gt;
 &lt;p&gt; 這段代碼會導致上文提到的致命運行期錯誤。 C/C++ 標準規定，參數在被傳遞給函數之前求值，因此無論 pi 爲何值，都會被提領。又因爲函數傳回一個空指針的情況比較少見，所以這樣的錯誤在調試時很難被發現，一旦發生又勢必造成重大災難。這樣的代碼在實踐中應儘量避免。 &lt;/p&gt;
-&lt;p&gt; 有時，條件運算符控制流程的特點會不知不覺影響我們的代碼。在 C 時代，最大值 &lt;span class="caps"&gt;MAX&lt;/span&gt; 通常用宏實現： &lt;/p&gt;
+&lt;p&gt; 有時，條件運算符控制流程的特點會不知不覺影響我們的代碼。在 C 時代，最大值 MAX 通常用宏實現： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;#define&lt;/strong&gt;&lt;span class="caps"&gt;MAX&lt;/span&gt;(a,b) ((a)&amp;gt;(b)&lt;strong&gt;?&lt;/strong&gt;(a)&lt;strong&gt;:&lt;/strong&gt;(b))&lt;/p&gt;
 &lt;p&gt; 需要用額外的括號將宏參數和宏本體保護起來，以免運算符優先級擾亂邏輯，這是宏醜陋的特點之一，這裏暫且不提。矛盾在於，用具有副作用的表達式調用宏時，會出現問題： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; i=5,j=6;//…&lt;/p&gt;
@@ -950,10 +932,10 @@ operator) ，用於在表達式中作條件判斷，通常可以替換 if 語句
 &lt;p&gt; 代碼的作者原意顯然是想先將 i,j 分別遞增，再將其中較大的一個賦給 a 。執行這段代碼，當 i=5,j=6 時， a=8 ，知道爲什麼嗎？通過宏展開，賦值語句成這樣： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; a=(++i)&amp;gt;(++j)&lt;strong&gt;?&lt;/strong&gt;(++i)&lt;strong&gt;:&lt;/strong&gt;(++j);// 刪除了多餘括號 &lt;/p&gt;
 &lt;p&gt; 在判斷之前， i 、 j 被分別自增一次，然後捨棄 : 之前的部分， j 又被自增一次。執行之後， i=6,j=8 。 &lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;MAX&lt;/span&gt; 的更正確更安全的實現，是利用模板將類型參數化。 &lt;span class="caps"&gt;STL&lt;/span&gt; 標準算法中就有一個這樣的工具級模版函數 std::max 。 &lt;/p&gt;
+&lt;p&gt;MAX 的更正確更安全的實現，是利用模板將類型參數化。 STL 標準算法中就有一個這樣的工具級模版函數 std::max 。 &lt;/p&gt;
 &lt;p&gt; 條件運算符是表達式而不是語句，這使得它可以出現在任何需要表達式的地方，這擴大了它的適用範圍。在那些語法上只能出現表達式而不能出現語句的地方（比如變量初始化），條件運算符有着不可替代的作用。 &lt;/p&gt;
 &lt;p&gt; 條件運算符優於 &lt;strong&gt;if&lt;/strong&gt; 語句的另一個場合是 “ 模板元編程 ”(&lt;span class="caps"&gt;TMP&lt;/span&gt;, Template
-MetaProgramming) 。在 &lt;span class="caps"&gt;TMP&lt;/span&gt; 這個古怪奇異的編譯期運算編程技術中，一切舊有的技術和法則被全線擊破，我們所能仰仗的工具，只有模板特化 (Specialization) 、 &lt;strong&gt;typedef&lt;/strong&gt;s 、函數聲明 ( 無法調用它們 ) 、以及編譯期常量運算。已經有人很深入地論證過，僅有以上這些，就已經形成了一個 “ 圖靈完善 ” 的計算機語言。我們可以用模板特化技術，來模擬條件分支，循環迭代等一系列複雜的語言結構。由於可以參與編譯期常量運算，條件運算符在 &lt;span class="caps"&gt;TMP&lt;/span&gt; 世界中很自然地扮演起重要角色。 &lt;/p&gt;
+MetaProgramming) 。在 TMP 這個古怪奇異的編譯期運算編程技術中，一切舊有的技術和法則被全線擊破，我們所能仰仗的工具，只有模板特化 (Specialization) 、 &lt;strong&gt;typedef&lt;/strong&gt;s 、函數聲明 ( 無法調用它們 ) 、以及編譯期常量運算。已經有人很深入地論證過，僅有以上這些，就已經形成了一個 “ 圖靈完善 ” 的計算機語言。我們可以用模板特化技術，來模擬條件分支，循環迭代等一系列複雜的語言結構。由於可以參與編譯期常量運算，條件運算符在 TMP 世界中很自然地扮演起重要角色。 &lt;/p&gt;
 &lt;p&gt; 比如，給與類型 T 的一個變量 t ，我們想聲明一個緩衝區存放 t 和一個 int ，緩衝區的大小不小於 sizeof(T) 也不小於 sizeif(int) ，我們可以這樣寫： &lt;/p&gt;
 &lt;p&gt;char buffer[sizeof(T)&amp;gt;sizeof(int)? sizeof(T): sizeof(int)];&lt;/p&gt;
 &lt;p&gt; 我們不能用一個 if 語句替換這個運算： &lt;/p&gt;

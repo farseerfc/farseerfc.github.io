@@ -8,49 +8,47 @@
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt; 原问题 &lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt; 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;bool&lt;/span&gt; &lt;span class="pygments-n"&gt;_Test&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;typedef&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt; &lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;B&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;false&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
-
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;BB&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;DD&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-k"&gt;public&lt;/span&gt; &lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BB&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DD&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt;
-&lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-n"&gt;a&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;B&lt;/span&gt; &lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-c1"&gt;//f(b);
-&lt;/span&gt;    &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;/pre&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;//f(b);&lt;/span&gt;
+    &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 奇怪的是重载决议的时候， &lt;code class="code"&gt;
 f&lt;/code&gt;
   的情况下它就不让我特化的 &lt;code class="code"&gt;
@@ -61,7 +59,7 @@ ff&lt;/code&gt;
   的情况下， &lt;code class="code"&gt;
 ff&amp;lt;BB&amp;lt;long&amp;gt;&amp;gt;&lt;/code&gt;
   却进来了。 &lt;/p&gt;
-&lt;p&gt; 在 &lt;span class="caps"&gt;VC10&lt;/span&gt; 和 &lt;span class="caps"&gt;GCC3&lt;/span&gt;.4 下测试 &lt;/p&gt;
+&lt;p&gt; 在 VC10 和 GCC3.4 下测试 &lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt; 我的解答 &lt;/a&gt;&lt;/h2&gt;
@@ -79,10 +77,8 @@ T&lt;/code&gt;
   之后实例化得到的结果。 &lt;/p&gt;
 &lt;div class="section" id="ff"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt; 首先看 ff 的情况。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 处理到这句的时候，编译器看到了 &lt;code class="code"&gt;
 DD&amp;lt;long&amp;gt;&lt;/code&gt;
   的实例化，于是去实例化 &lt;code class="code"&gt;
@@ -90,10 +86,8 @@ DD#long&lt;/code&gt;
   ，继而实例化了 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
   。 &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 这句，首先计算重载函数集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，需要从参数 &lt;code class="code"&gt;
 DD#long -&amp;gt; BB&amp;lt;T&amp;gt;&lt;/code&gt;
@@ -139,10 +133,8 @@ BB#long&lt;/code&gt;
 &lt;/div&gt;
 &lt;div class="section" id="f"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt; 再来看 f 的情况。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 计算候选重载函数集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，对所有 &lt;code class="code"&gt;
 f&lt;/code&gt;
@@ -183,7 +175,7 @@ enable_if#false&lt;/code&gt;
   没有 &lt;code class="code"&gt;
 type&lt;/code&gt;
   ，出错。 &lt;/p&gt;
-&lt;p&gt; 唯一的模板匹配出错，重载函数集合为空， &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 原则不能找到合适的匹配，于是报错。 &lt;/p&gt;
+&lt;p&gt; 唯一的模板匹配出错，重载函数集合为空， SFINAE 原则不能找到合适的匹配，于是报错。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry></feed>

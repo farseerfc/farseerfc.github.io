@@ -154,7 +154,7 @@ Farseerfc的小窝            </a>
 <h2>2.2 I386 平台的内存布局 </h2>
 <p> 众所周知， I386 是 32 位体系结构。因此对于绝大多数 I386 平台的 C++ 编译器而言， sizeof(int)=sizeof(long)=sizeof(void*)=4 。当然 C++ 标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 </p>
 <div class="line-block">
-<div class="line">32 位指针的可寻址空间为 <span class="caps">4GB</span> 。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术， WinNT 使用虚拟内存技术，给与每个应用程序全部 <span class="caps">4GB</span> 的内存空间。 <span class="caps">4GB</span> 的地址被一分为二，前 <span class="caps">2GB</span> 供应用程序自己使用，后 <span class="caps">2GB</span> 由系统内核分配和管理。这 <span class="caps">2GB</span> 的内存地址，通常被划分成 3 种内存区使用： </div>
+<div class="line">32 位指针的可寻址空间为 4GB 。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术， WinNT 使用虚拟内存技术，给与每个应用程序全部 4GB 的内存空间。 4GB 的地址被一分为二，前 2GB 供应用程序自己使用，后 2GB 由系统内核分配和管理。这 2GB 的内存地址，通常被划分成 3 种内存区使用： </div>
 </div>
 <div class="section" id="id1">
 <h3>1  代码及静态数据区 </h3>
@@ -166,10 +166,9 @@ Farseerfc的小窝            </a>
 <div class="section" id="stack">
 <h3>2  栈 (Stack)</h3>
 <p> 栈是最常用的动态数据存储区，所有函数的 non-static 对象和函数参数都在程序运行期在栈上分配内存。在数据结构中，术语 “ 栈 (Stack)” 意指先进后出 (<span class="caps">FILO</span> ， First
-In Last
-Out) ，与 “ 队列 (Queue)” 所指的 <span class="caps">FIFO</span> 相对。相对于基于堆的对象分配技术，默认使用栈的对象分配有两点优势： </p>
-<p> 一、栈的 <span class="caps">FILO</span> 与人的思维方式相同 </p>
-<p> 现实生活中有许多事例都使用 <span class="caps">FILO</span> 的方式，比如人们必须先提起话筒再拨打号码，而后挂断电话之后再放下话筒。使用 <span class="caps">FILO</span> 的栈，可以保证事物的销毁顺序以其诞生顺序相反的顺序进行，不会产生在挂断电话之前就放下话筒的尴尬。 </p>
+In Last Out) ，与 “ 队列 (Queue)” 所指的 FIFO 相对。相对于基于堆的对象分配技术，默认使用栈的对象分配有两点优势： </p>
+<p> 一、栈的 FILO 与人的思维方式相同 </p>
+<p> 现实生活中有许多事例都使用 FILO 的方式，比如人们必须先提起话筒再拨打号码，而后挂断电话之后再放下话筒。使用 FILO 的栈，可以保证事物的销毁顺序以其诞生顺序相反的顺序进行，不会产生在挂断电话之前就放下话筒的尴尬。 </p>
 <p> 二、栈的分配管理仅需要两个额外指针：栈顶 (esp) 和栈底 (ebp) 指针 </p>
 <p> 从实现的技术层面而言，栈的管理比其它动态分配技术要简单很多。 I386 平台上的动态栈管理，仅需要栈顶和栈底两个指针。这两个指针的存储显然不能放置于栈中，置于静态数据区又有损效率。 I386 平台为管理动态栈专门预留了两个通用寄存器变量 esp 与 ebp ，分别代表栈顶 (esp,Extended
 Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 代表它们是 32 位指针，以区分 16 位的 sp 和 bp 寄存器。 </p>
@@ -181,7 +180,7 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
 <h3>3  堆 (Heap) 和自由存储区 </h3>
 <p> 栈中的变量对于分配与释放的顺序有特定要求，这在一定程度上限制了栈的适用范围。面向对象 (<span class="caps">OO</span> ， Object Oriented) 的程序设计思想也要求能自由地控制变量的分配与销毁。由此，现代操作系统都提供了被称作 “ 堆 (Heap)” 的自由存储区，以允许由程序员控制的对象创建和销毁过程。 C 标准库函数 malloc 和 free 则是对操作系统提供的堆操作的封装。 C++ 提供的自由存储区运算符 new 和 delete 则通常是 malloc 和 free 的又一层封装。 </p>
 <p> 操作系统经由 malloc 和 free 控制对堆的访问。堆的存储管理技术各不相同，简单的使用双链表管理，复杂的可以比拟一个完整的文件系统。 </p>
-<p> 由于额外的管理需求，使用系统提供的通用分配器在堆上分配和销毁变量的代价，无论从空间角度还是效率角度而言，都比在栈上分配对象要高昂很多。对于 sizeof 上百的大型对象，这样的高昂代价还是可以接受的，但是对于 sizeof 只有个位数的小对象，这样的代价通常是一个数量级的差距。正因为这个原因， <span class="caps">STL</span> 不使用 new 和 delete ，转而使用分配子 (alllocor) 分配对象。 </p>
+<p> 由于额外的管理需求，使用系统提供的通用分配器在堆上分配和销毁变量的代价，无论从空间角度还是效率角度而言，都比在栈上分配对象要高昂很多。对于 sizeof 上百的大型对象，这样的高昂代价还是可以接受的，但是对于 sizeof 只有个位数的小对象，这样的代价通常是一个数量级的差距。正因为这个原因， STL 不使用 new 和 delete ，转而使用分配子 (alllocor) 分配对象。 </p>
 </div>
 </div>
 </body></html>
@@ -315,63 +314,8 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/unix.html">
                     unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -380,93 +324,18 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
                 </a>
             </li>
             <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -477,6 +346,136 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/zhs/tag/software.html">
                     software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
     </ul>

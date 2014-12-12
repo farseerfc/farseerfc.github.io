@@ -67,9 +67,9 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                         </ul>
                     </li>
 
@@ -173,13 +173,13 @@ Reset  包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 
  的序列號，所以牆不知道序列號錯了）。所以，牆很高興的理解爲連接終止，舒了一口氣去重置其他連接了，   而這個連接，就成了殭屍，牆不管你客戶端了，而這時候，好戲纔剛剛開始。 </p>
 <p> 事實上，牆是雙向檢測的（或者說對每個包都檢測的），因此，對服務器和客戶端實現相同的對待方法，所以，牆不管客戶端還不行，假如服務端有關鍵詞傳給客戶端，牆還是有可能要發飆的（這裏說有可能，因爲我也不知道）。所以，最好的辦法就是，讓服務端也給牆一個終止連接的標誌就好了。可是這個說起來簡單，做起來難，怎麼能讓不受自己控制的服務器發一個自己想要的包呢？西廂計劃的那幫黑客，再次去讀幾百頁的 <span class="caps">RFC</span>,  令人驚訝的發現，他們居然在 <span class="caps">RFC</span>
  上發現了一個可以用的特性。我們上面說了，三次握手的時候，在收到 <span class="caps">SYN</span>/<span class="caps">ACK</span>
- 後，客戶端要給服務器發送一個序列號 +1  的 <span class="caps">ACK</span> ，可是，假如我不 +1 呢，直接發 <span class="caps">ACK</span>  包給服務器。牆已經認爲你客戶端是死老虎了，不理你了，不知道你搞什麼飛機，讓這個 <span class="caps">ACK</span>
+ 後，客戶端要給服務器發送一個序列號 +1  的 ACK ，可是，假如我不 +1 呢，直接發 <span class="caps">ACK</span>  包給服務器。牆已經認爲你客戶端是死老虎了，不理你了，不知道你搞什麼飛機，讓這個 <span class="caps">ACK</span>
  過了。可是服務器一看，不對啊，你給我的不是我期待的那個序列號， <span class="caps">RFC</span>
  上說了， <span class="caps">TCP</span>  包如果序列號錯了的話，就回復一個 Reset.
  所以，服務器就回復了一個 Reset 。這個 Reset
  過牆的時候，牆一看樂了，服務器也終止連接了，好吧，兩邊都是死老虎了，我就不監聽這條連接了。而至於客戶端，這個服務器過來的 Reset  非常好識別，忽略就是。隨後，客戶端開始正確的發送 <span class="caps">ACK</span>,
  至此，三次握手成功，真正的好戲開始，而牆則認爲客戶端和服務器都是死老虎，直接放過。所以，張生就這樣透明的過了牆。   至於過牆以後所有的事情，《西廂記》裏面都有記載，各位讀者自行買書學習。 </p>
-<p> 現在的西廂計劃客戶端，即 “ 張生 ” 模塊的防連接重置的原理就是這樣，服務器端，即鶯鶯模塊的實現也是類似的。防 <span class="caps">DNS</span> 那個，不懂 <span class="caps">DNS</span>
+<p> 現在的西廂計劃客戶端，即 “ 張生 ” 模塊的防連接重置的原理就是這樣，服務器端，即鶯鶯模塊的實現也是類似的。防 DNS 那個，不懂 <span class="caps">DNS</span>
  協議，所以看不懂。我猜想，因爲開發人員都是黑客，所以自然喜歡用最經得起折騰和高度定製的 Linux  開發。現在看西廂計劃的實現，因爲依賴於 Linux  內核模塊 netfilter,
  在 Linux  上如魚得水，但往其他平臺的移植可能是個亟待解決的問題。我覺得，在其他平臺上，可以通過 libpcap  和 libnet
  ，在用戶態實現相同的功能，就是有點麻煩而已，有興趣的懂網絡的可以照西廂計劃原理，在家自行做出此功能；當然，全中國人民都用 Linux  最好  :)</p>
@@ -205,7 +205,7 @@ Reset  包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 
                 <div class="col-xs-6">
                     <a href="//farseerfc.github.io/sine-cpu.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
-                        寫程序讓<span class="caps">CPU</span>佔用率保持正弦函數
+                        寫程序讓CPU佔用率保持正弦函數
                         </h4>
                     </a>
                 </div>
@@ -302,63 +302,8 @@ Reset  包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/unix.html">
                     unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -367,93 +312,18 @@ Reset  包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 
                 </a>
             </li>
             <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -464,6 +334,136 @@ Reset  包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/tag/software.html">
                     software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
     </ul>

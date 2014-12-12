@@ -67,9 +67,9 @@ Farseerfc的小窩            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                         </ul>
                     </li>
 
@@ -168,7 +168,7 @@ Farseerfc的小窩            </a>
 <p> 參數壓棧順序：逆序 ( 從右至左 )</p>
 <p> 參數堆棧恢復者：被調函數 (callee)</p>
 <div class="line-block">
-<div class="line">__stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 Win32API 函數使用這種函數調用模型，希望在 <span class="caps">DLL</span> 之間，或者在程序和 WinNT 操作系統之間傳遞函數指針的函數也應該使用這種模型。與 __cdecl 模型的不同之處在於， __stdcall 模型下由被調函數恢復堆棧。主調函數在 call 語句之後，不需要再加上 add 語句。而被調函數的 ret 語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在 __stdcall 模型下不支持可變參數表，所有參數必須寫明。 </div>
+<div class="line">__stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 Win32API 函數使用這種函數調用模型，希望在 DLL 之間，或者在程序和 WinNT 操作系統之間傳遞函數指針的函數也應該使用這種模型。與 __cdecl 模型的不同之處在於， __stdcall 模型下由被調函數恢復堆棧。主調函數在 call 語句之後，不需要再加上 add 語句。而被調函數的 ret 語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在 __stdcall 模型下不支持可變參數表，所有參數必須寫明。 </div>
 </div>
 </div>
 <div class="section" id="thiscall">
@@ -176,7 +176,7 @@ Farseerfc的小窩            </a>
 <p> 參數壓棧順序：逆序 ( 從右至左 ) ， this 用 ecx 傳遞。 </p>
 <p> 參數堆棧恢復者：被調函數 (callee)</p>
 <div class="line-block">
-<div class="line">__thiscall 是 <span class="caps">VC</span> 編譯器中類的非靜態成員函數 (non-static member functon) 的默認調用模型。但是如果此成員函數有可變參數表， <span class="caps">VC</span> 編譯器會使用 __cdecl 。和 __stdcall 一樣， __thiscall 由被調函數恢復堆棧。比較獨特的是 __thiscall 會通過 ecx 寄存器傳遞成員函數的 this 指針，而 __cdecl 下 this 指針是通過在參數表最前面增加一個函數參數來傳遞的。 __thiscall 是 <span class="caps">VC</span> 編譯器對 this 指針的使用的一種優化，大大提高了面向對象程序的效率。在 <span class="caps">VC2003</span> 及之前的編譯器上 __thiscall 不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定 __cdecl 來避免使用 __thiscall 。 </div>
+<div class="line">__thiscall 是 VC 編譯器中類的非靜態成員函數 (non-static member functon) 的默認調用模型。但是如果此成員函數有可變參數表， VC 編譯器會使用 __cdecl 。和 __stdcall 一樣， __thiscall 由被調函數恢復堆棧。比較獨特的是 __thiscall 會通過 ecx 寄存器傳遞成員函數的 this 指針，而 __cdecl 下 this 指針是通過在參數表最前面增加一個函數參數來傳遞的。 __thiscall 是 VC 編譯器對 this 指針的使用的一種優化，大大提高了面向對象程序的效率。在 VC2003 及之前的編譯器上 __thiscall 不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定 __cdecl 來避免使用 __thiscall 。 </div>
 </div>
 </div>
 <div class="section" id="fastcall">
@@ -192,7 +192,7 @@ Farseerfc的小窩            </a>
 <p> 參數壓棧順序：正序 ( 從左至右 )</p>
 <p> 參數堆棧恢復者：被調函數 (callee)</p>
 <div class="line-block">
-<div class="line"> 過程式編程語言 Pascal 所使用的函數調用模型，由此得名。也是 16 位版本的 Windows 使用的 <span class="caps">API</span> 模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。 __pascal 是正序壓棧，這與大部分 I386 函數模型都不相同。與 __stdcall 一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名 <span class="caps">PASCAL</span> 、 pascal 、 _pascal( 單下劃線 ) ，現在都改成了 __stdcall 的別名，與 __pascal( 雙下劃線 ) 不同。 </div>
+<div class="line"> 過程式編程語言 Pascal 所使用的函數調用模型，由此得名。也是 16 位版本的 Windows 使用的 API 模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。 __pascal 是正序壓棧，這與大部分 I386 函數模型都不相同。與 __stdcall 一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名 PASCAL 、 pascal 、 _pascal( 單下劃線 ) ，現在都改成了 __stdcall 的別名，與 __pascal( 雙下劃線 ) 不同。 </div>
 </div>
 </div>
 <div class="section" id="id1">
@@ -343,63 +343,8 @@ Farseerfc的小窩            </a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/unix.html">
                     unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -408,93 +353,18 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -505,6 +375,136 @@ Farseerfc的小窩            </a>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/tag/software.html">
                     software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
     </ul>

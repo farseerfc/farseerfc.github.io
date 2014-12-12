@@ -66,7 +66,7 @@ Ctrl-Shift-C&lt;/kbd&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;strace 查看了下 &lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;WaterElement(UnChanged)  于 2014 年 12 月 10 日 21:53:54  星期三   回复： &lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 感谢 &lt;span class="caps"&gt;FC&lt;/span&gt; 的详尽解答。 &lt;/p&gt;
+&lt;p&gt; 感谢 FC 的详尽解答。 &lt;/p&gt;
 &lt;p&gt; 用 strace 查看了下，设置标准输入没有缓存的话读每个字符都会调用一次 &lt;code class="code"&gt;
 read&lt;/code&gt;
   系统调用，   比如输入 abc ： &lt;/p&gt;
@@ -164,7 +164,7 @@ read&lt;/code&gt;
 &lt;p&gt; 嗯理论上可以不用 ncurses  库直接在 raw  模式操纵终端。 &lt;/p&gt;
 &lt;p&gt; 这里稍微聊一下 terminfo/termcap 的历史，详细的历史和吐槽参考 &lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater’s Handbook&lt;/a&gt;
  第 6 章 Terminal Insanity 。 &lt;/p&gt;
-&lt;p&gt; 首先一个真正意义上的终端就是一个输入设备（通常是键盘）加上一个输出设备（打印机或者显示器）。很显然不同的终端的能力不同，比如如果输出设备是打印机的话，显示出来的字符就不能删掉了（但是能覆盖），而且输出了一行之后就不能回到那一行了。再比如显示器终端有的支持粗体和下划线，有的支持颜色，而有的什么都不支持。早期 Unix 工作在电传打字机（ TeleTYpe ）终端上，后来 Unix 被 port 到越来越多的机器上，然后越来越多类型的终端会被连到 Unix 上，很可能同一台 Unix 主机连了多个不同类型的终端。由于是不同厂商提供的不同的终端，能力各有不同，自然控制他们工作的方式也是不一样的。所有终端都支持回显行编辑模式，所以一般的面向行的程序还比较好写，但是那时候要撰写支持所有终端的「全屏」程序就非常痛苦，这种情况就像现在浏览器没有统一标准下写 &lt;span class="caps"&gt;HTML&lt;/span&gt; 要测试各种浏览器兼容性一样。   通常的做法是 &lt;/p&gt;
+&lt;p&gt; 首先一个真正意义上的终端就是一个输入设备（通常是键盘）加上一个输出设备（打印机或者显示器）。很显然不同的终端的能力不同，比如如果输出设备是打印机的话，显示出来的字符就不能删掉了（但是能覆盖），而且输出了一行之后就不能回到那一行了。再比如显示器终端有的支持粗体和下划线，有的支持颜色，而有的什么都不支持。早期 Unix 工作在电传打字机（ TeleTYpe ）终端上，后来 Unix 被 port 到越来越多的机器上，然后越来越多类型的终端会被连到 Unix 上，很可能同一台 Unix 主机连了多个不同类型的终端。由于是不同厂商提供的不同的终端，能力各有不同，自然控制他们工作的方式也是不一样的。所有终端都支持回显行编辑模式，所以一般的面向行的程序还比较好写，但是那时候要撰写支持所有终端的「全屏」程序就非常痛苦，这种情况就像现在浏览器没有统一标准下写 HTML 要测试各种浏览器兼容性一样。   通常的做法是 &lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt; 使用最小功能子集 &lt;/li&gt;
 &lt;li&gt; 假设终端是某个特殊设备，不管别的设备。 &lt;/li&gt;
@@ -203,49 +203,47 @@ Delete&lt;/kbd&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt; 原问题 &lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt; 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;bool&lt;/span&gt; &lt;span class="pygments-n"&gt;_Test&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-k"&gt;typedef&lt;/span&gt; &lt;span class="pygments-n"&gt;_Type&lt;/span&gt; &lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-&lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;B&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;false&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;struct&lt;/span&gt; &lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-k"&gt;static&lt;/span&gt; &lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-k"&gt;const&lt;/span&gt; &lt;span class="pygments-n"&gt;value&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-nb"&gt;true&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-p"&gt;};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-o"&gt;=&lt;/span&gt; &lt;span class="pygments-mi"&gt;0&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-n"&gt;enable_if&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;traits&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;A&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;value&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="pygments-n"&gt;type&lt;/span&gt;&lt;span class="pygments-o"&gt;*&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{&lt;/span&gt; &lt;span class="pygments-p"&gt;}&lt;/span&gt;
-
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;BB&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="pygments-k"&gt;class&lt;/span&gt; &lt;span class="pygments-nc"&gt;DD&lt;/span&gt; &lt;span class="pygments-o"&gt;:&lt;/span&gt; &lt;span class="pygments-k"&gt;public&lt;/span&gt; &lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BB&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-k"&gt;template&lt;/span&gt; &lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-k"&gt;typename&lt;/span&gt; &lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-kt"&gt;void&lt;/span&gt; &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;BB&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-n"&gt;T&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="pygments-p"&gt;)&lt;/span&gt; &lt;span class="pygments-p"&gt;{};&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DD&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-nf"&gt;main&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-kt"&gt;int&lt;/span&gt; &lt;span class="pygments-n"&gt;argc&lt;/span&gt;&lt;span class="pygments-p"&gt;,&lt;/span&gt; &lt;span class="pygments-kt"&gt;char&lt;/span&gt; &lt;span class="pygments-o"&gt;*&lt;/span&gt; &lt;span class="pygments-n"&gt;argv&lt;/span&gt;&lt;span class="pygments-p"&gt;[])&lt;/span&gt;
-&lt;span class="pygments-p"&gt;{&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;A&lt;/span&gt; &lt;span class="pygments-n"&gt;a&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt; &lt;span class="pygments-n"&gt;B&lt;/span&gt; &lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-    &lt;span class="pygments-c1"&gt;//f(b);
-&lt;/span&gt;    &lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-&lt;span class="pygments-p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
 
-&lt;/pre&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;//f(b);&lt;/span&gt;
+    &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 奇怪的是重载决议的时候， &lt;code class="code"&gt;
 f&lt;/code&gt;
   的情况下它就不让我特化的 &lt;code class="code"&gt;
@@ -256,7 +254,7 @@ ff&lt;/code&gt;
   的情况下， &lt;code class="code"&gt;
 ff&amp;lt;BB&amp;lt;long&amp;gt;&amp;gt;&lt;/code&gt;
   却进来了。 &lt;/p&gt;
-&lt;p&gt; 在 &lt;span class="caps"&gt;VC10&lt;/span&gt; 和 &lt;span class="caps"&gt;GCC3&lt;/span&gt;.4 下测试 &lt;/p&gt;
+&lt;p&gt; 在 VC10 和 GCC3.4 下测试 &lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id3"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt; 我的解答 &lt;/a&gt;&lt;/h2&gt;
@@ -274,10 +272,8 @@ T&lt;/code&gt;
   之后实例化得到的结果。 &lt;/p&gt;
 &lt;div class="section" id="ff"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt; 首先看 ff 的情况。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;DD&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="pygments-kt"&gt;long&lt;/span&gt;&lt;span class="pygments-o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;;&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 处理到这句的时候，编译器看到了 &lt;code class="code"&gt;
 DD&amp;lt;long&amp;gt;&lt;/code&gt;
   的实例化，于是去实例化 &lt;code class="code"&gt;
@@ -285,10 +281,8 @@ DD#long&lt;/code&gt;
   ，继而实例化了 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
   。 &lt;/p&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;ff&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;dd&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 这句，首先计算重载函数集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，需要从参数 &lt;code class="code"&gt;
 DD#long -&amp;gt; BB&amp;lt;T&amp;gt;&lt;/code&gt;
@@ -334,10 +328,8 @@ BB#long&lt;/code&gt;
 &lt;/div&gt;
 &lt;div class="section" id="f"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt; 再来看 f 的情况。 &lt;/a&gt;&lt;/h3&gt;
-&lt;pre class="code c++ literal-block"&gt;
-&lt;span class="pygments-n"&gt;f&lt;/span&gt;&lt;span class="pygments-p"&gt;(&lt;/span&gt;&lt;span class="pygments-n"&gt;b&lt;/span&gt;&lt;span class="pygments-p"&gt;);&lt;/span&gt;
-
-&lt;/pre&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt; 计算候选重载函数集合。 &lt;/p&gt;
 &lt;p&gt; 第一步，对所有 &lt;code class="code"&gt;
 f&lt;/code&gt;
@@ -378,7 +370,7 @@ enable_if#false&lt;/code&gt;
   没有 &lt;code class="code"&gt;
 type&lt;/code&gt;
   ，出错。 &lt;/p&gt;
-&lt;p&gt; 唯一的模板匹配出错，重载函数集合为空， &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 原则不能找到合适的匹配，于是报错。 &lt;/p&gt;
+&lt;p&gt; 唯一的模板匹配出错，重载函数集合为空， SFINAE 原则不能找到合适的匹配，于是报错。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry><entry><title>C++ Tricks 3.2 标号、goto，以及switch的实现</title><link href="//farseerfc.github.io/zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html" rel="alternate"></link><updated>2007-09-16T13:08:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-09-16:zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
@@ -461,7 +453,7 @@ type&lt;/code&gt;
 &lt;p&gt;3 、左值有地址，右值没有地址。 &lt;/p&gt;
 &lt;p&gt; 根据左值右值的第二定义，值的左右性就是值的常量性 —— 常量是右值，非常量是左值。比如： &lt;/p&gt;
 &lt;p&gt;1=1;//Error&lt;/p&gt;
-&lt;p&gt; 这个复制操作在 C++ 中是语法错误， &lt;span class="caps"&gt;MSVC&lt;/span&gt; 给出的错误提示为 “error C2106: ‘=’ :
+&lt;p&gt; 这个复制操作在 C++ 中是语法错误， MSVC 给出的错误提示为 “error C2106: ‘=’ :
 left operand must be l-value” ，就是说 ’=’ 的左操作数必须是一个左值，而字面常数 1 是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。 &lt;/p&gt;
 &lt;p&gt; 根据第二定义，一个左值也是一个右值，因为左值也可读，而一个右值不是一个左值，因为右值不可写。 &lt;/p&gt;
 &lt;p&gt; 通常情况下，声明的变量是一个左值，除非你指定 const 将它变成一个右值： &lt;/p&gt;
@@ -492,9 +484,9 @@ Complex&amp;amp; 。至于返回值，还是 Do as the ints do 。 int 的赋�
 &lt;p&gt;(i=1)=2;&lt;/p&gt;
 &lt;p&gt; 虽然比较傻，先将 i 赋为 1 ，再将其改为 2 ，但是这是被 C++ 语法支持的做法，我们就理应遵守。所以返回第一个参数的左值： &lt;/p&gt;
 &lt;p&gt;Complex&amp;amp; operator=(Complex&amp;amp;,const Complex&amp;amp;);&lt;/p&gt;
-&lt;p&gt;const 是 C++ 引入的语言特性，也被 &lt;span class="caps"&gt;ANSI&lt;/span&gt;
+&lt;p&gt;const 是 C++ 引入的语言特性，也被 ANSI
 C99 借鉴，在经典版本的 C 语言中是没有的。关于 const 的历史，有几点值得玩味。最初 Bjarne
-Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用关键字 readonly 和 writeonly 。这个特点被首先提交到 C 的 &lt;span class="caps"&gt;ANSI&lt;/span&gt; 标准化委员会 ( 当时还没有 C++ 标准化的计划 ) ，但是 &lt;span class="caps"&gt;ANSI&lt;/span&gt; C 标准只接受了 readonly 的概念，并将其命名为 const 。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量， C++ 又引入关键字 violate 。从语义特点来看， violate 是 const 的反义词，因为 const 表示不会变的量，而 violate 表示会不按照预期自行变化的量。从语法特点而言， violate 与 const 是极为相似的，适用于 const 的一切语法规则同样适用于 violate 。 &lt;/p&gt;
+Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用关键字 readonly 和 writeonly 。这个特点被首先提交到 C 的 ANSI 标准化委员会 ( 当时还没有 C++ 标准化的计划 ) ，但是 ANSI C 标准只接受了 readonly 的概念，并将其命名为 const 。随后，有人发现在多线程同步的环境下，有些变量的值会在编译器的预料之外改变，为了防止过度优化破坏这些变量， C++ 又引入关键字 violate 。从语义特点来看， violate 是 const 的反义词，因为 const 表示不会变的量，而 violate 表示会不按照预期自行变化的量。从语法特点而言， violate 与 const 是极为相似的，适用于 const 的一切语法规则同样适用于 violate 。 &lt;/p&gt;
 &lt;p&gt; 值的常量性可以被划分为两种：编译期常量和运行期常量。 C++ 语法并没有严格区分这两种常量，导致了少许混乱： &lt;/p&gt;
 &lt;p&gt;const int i=5;const int * pi=&amp;amp;i;&lt;/p&gt;
 &lt;p&gt;const_cast&amp;lt;int&amp;amp;&amp;gt;i=1;// 对于运行期常量，在需要时可以去除它的常量性 &lt;/p&gt;
@@ -505,14 +497,14 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
 &lt;p&gt;C++ 中的 const 的特点更倾向于 C# 中的 readonly ，虽然语法上允许使用 const 的编译期常量性，但正如上文所展示的，这容易造成混乱。为了得到 C# 中 const 的语义，在 C++ 中，我们不必回归恶魔 #define 的怀抱，可以使用所谓 “ 匿名 enum 技巧 ” 。当匿名声明一个 enum 类型时，其中的枚举值就是一个 int 类型的编译期常量，比如： &lt;/p&gt;
 &lt;p&gt;enum{Size=5;};&lt;/p&gt;
 &lt;p&gt;int a[Size];&lt;/p&gt;
-&lt;p&gt; 这种使用匿名 enum 来声明编译期常量的做法，被广泛应用于 &lt;span class="caps"&gt;STL&lt;/span&gt; 、 boost 等模板库的实现代码中。 &lt;/p&gt;
+&lt;p&gt; 这种使用匿名 enum 来声明编译期常量的做法，被广泛应用于 STL 、 boost 等模板库的实现代码中。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 2.2 I386平台的内存布局</title><link href="//farseerfc.github.io/zhs/c-tricks-2-2-i386-memory-layout.html" rel="alternate"></link><updated>2007-08-28T14:30:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:zhs/c-tricks-2-2-i386-memory-layout.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
 &lt;div class="section" id="i386"&gt;
 &lt;h2&gt;2.2 I386 平台的内存布局 &lt;/h2&gt;
 &lt;p&gt; 众所周知， I386 是 32 位体系结构。因此对于绝大多数 I386 平台的 C++ 编译器而言， sizeof(int)=sizeof(long)=sizeof(void*)=4 。当然 C++ 标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 &lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;32 位指针的可寻址空间为 &lt;span class="caps"&gt;4GB&lt;/span&gt; 。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术， WinNT 使用虚拟内存技术，给与每个应用程序全部 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的内存空间。 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的地址被一分为二，前 &lt;span class="caps"&gt;2GB&lt;/span&gt; 供应用程序自己使用，后 &lt;span class="caps"&gt;2GB&lt;/span&gt; 由系统内核分配和管理。这 &lt;span class="caps"&gt;2GB&lt;/span&gt; 的内存地址，通常被划分成 3 种内存区使用： &lt;/div&gt;
+&lt;div class="line"&gt;32 位指针的可寻址空间为 4GB 。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术， WinNT 使用虚拟内存技术，给与每个应用程序全部 4GB 的内存空间。 4GB 的地址被一分为二，前 2GB 供应用程序自己使用，后 2GB 由系统内核分配和管理。这 2GB 的内存地址，通常被划分成 3 种内存区使用： &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h3&gt;1  代码及静态数据区 &lt;/h3&gt;
@@ -524,10 +516,9 @@ Stroustrup 引入 const 时，可写性是和可读性分开的。那时使用�
 &lt;div class="section" id="stack"&gt;
 &lt;h3&gt;2  栈 (Stack)&lt;/h3&gt;
 &lt;p&gt; 栈是最常用的动态数据存储区，所有函数的 non-static 对象和函数参数都在程序运行期在栈上分配内存。在数据结构中，术语 “ 栈 (Stack)” 意指先进后出 (&lt;span class="caps"&gt;FILO&lt;/span&gt; ， First
-In Last
-Out) ，与 “ 队列 (Queue)” 所指的 &lt;span class="caps"&gt;FIFO&lt;/span&gt; 相对。相对于基于堆的对象分配技术，默认使用栈的对象分配有两点优势： &lt;/p&gt;
-&lt;p&gt; 一、栈的 &lt;span class="caps"&gt;FILO&lt;/span&gt; 与人的思维方式相同 &lt;/p&gt;
-&lt;p&gt; 现实生活中有许多事例都使用 &lt;span class="caps"&gt;FILO&lt;/span&gt; 的方式，比如人们必须先提起话筒再拨打号码，而后挂断电话之后再放下话筒。使用 &lt;span class="caps"&gt;FILO&lt;/span&gt; 的栈，可以保证事物的销毁顺序以其诞生顺序相反的顺序进行，不会产生在挂断电话之前就放下话筒的尴尬。 &lt;/p&gt;
+In Last Out) ，与 “ 队列 (Queue)” 所指的 FIFO 相对。相对于基于堆的对象分配技术，默认使用栈的对象分配有两点优势： &lt;/p&gt;
+&lt;p&gt; 一、栈的 FILO 与人的思维方式相同 &lt;/p&gt;
+&lt;p&gt; 现实生活中有许多事例都使用 FILO 的方式，比如人们必须先提起话筒再拨打号码，而后挂断电话之后再放下话筒。使用 FILO 的栈，可以保证事物的销毁顺序以其诞生顺序相反的顺序进行，不会产生在挂断电话之前就放下话筒的尴尬。 &lt;/p&gt;
 &lt;p&gt; 二、栈的分配管理仅需要两个额外指针：栈顶 (esp) 和栈底 (ebp) 指针 &lt;/p&gt;
 &lt;p&gt; 从实现的技术层面而言，栈的管理比其它动态分配技术要简单很多。 I386 平台上的动态栈管理，仅需要栈顶和栈底两个指针。这两个指针的存储显然不能放置于栈中，置于静态数据区又有损效率。 I386 平台为管理动态栈专门预留了两个通用寄存器变量 esp 与 ebp ，分别代表栈顶 (esp,Extended
 Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 代表它们是 32 位指针，以区分 16 位的 sp 和 bp 寄存器。 &lt;/p&gt;
@@ -539,7 +530,7 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
 &lt;h3&gt;3  堆 (Heap) 和自由存储区 &lt;/h3&gt;
 &lt;p&gt; 栈中的变量对于分配与释放的顺序有特定要求，这在一定程度上限制了栈的适用范围。面向对象 (&lt;span class="caps"&gt;OO&lt;/span&gt; ， Object Oriented) 的程序设计思想也要求能自由地控制变量的分配与销毁。由此，现代操作系统都提供了被称作 “ 堆 (Heap)” 的自由存储区，以允许由程序员控制的对象创建和销毁过程。 C 标准库函数 malloc 和 free 则是对操作系统提供的堆操作的封装。 C++ 提供的自由存储区运算符 new 和 delete 则通常是 malloc 和 free 的又一层封装。 &lt;/p&gt;
 &lt;p&gt; 操作系统经由 malloc 和 free 控制对堆的访问。堆的存储管理技术各不相同，简单的使用双链表管理，复杂的可以比拟一个完整的文件系统。 &lt;/p&gt;
-&lt;p&gt; 由于额外的管理需求，使用系统提供的通用分配器在堆上分配和销毁变量的代价，无论从空间角度还是效率角度而言，都比在栈上分配对象要高昂很多。对于 sizeof 上百的大型对象，这样的高昂代价还是可以接受的，但是对于 sizeof 只有个位数的小对象，这样的代价通常是一个数量级的差距。正因为这个原因， &lt;span class="caps"&gt;STL&lt;/span&gt; 不使用 new 和 delete ，转而使用分配子 (alllocor) 分配对象。 &lt;/p&gt;
+&lt;p&gt; 由于额外的管理需求，使用系统提供的通用分配器在堆上分配和销毁变量的代价，无论从空间角度还是效率角度而言，都比在栈上分配对象要高昂很多。对于 sizeof 上百的大型对象，这样的高昂代价还是可以接受的，但是对于 sizeof 只有个位数的小对象，这样的代价通常是一个数量级的差距。正因为这个原因， STL 不使用 new 和 delete ，转而使用分配子 (alllocor) 分配对象。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks</title><link href="//farseerfc.github.io/zhs/c-tricks.html" rel="alternate"></link><updated>2007-08-28T14:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:zhs/c-tricks.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
@@ -549,7 +540,7 @@ Stack Pointer) 与栈底 (Extended Bottom Pointer) 指针。其中的 extended 
 Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone.qq.com/"&gt;QQZone&lt;/a&gt; 同时发表一系列文章，暂定名为 “C++Tricks” 。 &lt;/p&gt;
 &lt;p&gt; 本文旨在记录和阐述一些本人学习 C++ 时所得的心得、技巧。总体来看，本文涉及的内容是每一个 C++ 程序员都应该知道的，但是很少见诸 C++ 教材。希望对各位同仁学习 C++ 有所帮助。 &lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt; 也可以通过 &lt;span class="caps"&gt;QQ&lt;/span&gt; 或 &lt;span class="caps"&gt;MSN&lt;/span&gt; 向我索要此文的 &lt;span class="caps"&gt;DOC&lt;/span&gt; 版或 &lt;span class="caps"&gt;PDF&lt;/span&gt; 版，会比网页上的更新的快一点。 &lt;/div&gt;
+&lt;div class="line"&gt; 也可以通过 QQ 或 MSN 向我索要此文的 DOC 版或 PDF 版，会比网页上的更新的快一点。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="lexical-problems"&gt;
 &lt;h2&gt;1       词法问题 (Lexical Problems)&lt;/h2&gt;
@@ -706,7 +697,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt; 首先提问，既然 I386 上 sizeof(int)==4 、 sizeof(char)==1 ，那么如下结构 (struct)A 的 sizeof 是多少？ &lt;/p&gt;
 &lt;p&gt;struct A{int i;char c;};&lt;/p&gt;
 &lt;p&gt; 答案是 sizeof(A)==8……1+5=8 ？ &lt;/p&gt;
-&lt;p&gt; 呵呵，这就是 I386 上的边界对齐问题。我们知道， I386 上有整整 &lt;span class="caps"&gt;4GB&lt;/span&gt; 的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于 I386 平台而言，类型为 T 的变量必须放置在 sizeof(T) 的整数倍的地址上， char 可以随便放置， short 必须放在 2 的整数倍的地址上， int 必须放在 4 的整数倍的地址上， double 必须放在 8 的整数倍的地址上。如果违反边界对齐要求，从内存中读取数据必须进行两次，然后将独到的两半数据拼接起来，这会严重影响效率。 &lt;/p&gt;
+&lt;p&gt; 呵呵，这就是 I386 上的边界对齐问题。我们知道， I386 上有整整 4GB 的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于 I386 平台而言，类型为 T 的变量必须放置在 sizeof(T) 的整数倍的地址上， char 可以随便放置， short 必须放在 2 的整数倍的地址上， int 必须放在 4 的整数倍的地址上， double 必须放在 8 的整数倍的地址上。如果违反边界对齐要求，从内存中读取数据必须进行两次，然后将独到的两半数据拼接起来，这会严重影响效率。 &lt;/p&gt;
 &lt;p&gt; 由于边界对齐问题的要求，在计算 struct 的 sizeof 的时候，编译器必须算入额外的字节填充，以保证每一个变量都能自然对齐。比如如下声明的 struct:&lt;/p&gt;
 &lt;p&gt;struct &lt;span class="caps"&gt;WASTE&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;{&lt;/p&gt;
@@ -723,7 +714,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt;char c2 ； &lt;/p&gt;
 &lt;p&gt;char _filling2 [3];// 又三个字节填充 &lt;/p&gt;
 &lt;p&gt;}&lt;/p&gt;
-&lt;p&gt; 值得注意的是尾部的 3 个字节填充，这是为了可以在一个数组中声明 &lt;span class="caps"&gt;WASTE&lt;/span&gt; 变量，并且每一个都自然对齐。因为有了这些填充，所以 sizeof(&lt;span class="caps"&gt;WASTE&lt;/span&gt;)==12 。这是一种浪费，因为只要我们重新安排变量的声明，就可以减少 sizeof ： &lt;/p&gt;
+&lt;p&gt; 值得注意的是尾部的 3 个字节填充，这是为了可以在一个数组中声明 WASTE 变量，并且每一个都自然对齐。因为有了这些填充，所以 sizeof(&lt;span class="caps"&gt;WASTE&lt;/span&gt;)==12 。这是一种浪费，因为只要我们重新安排变量的声明，就可以减少 sizeof ： &lt;/p&gt;
 &lt;p&gt;struct &lt;span class="caps"&gt;WASTE&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;{&lt;/p&gt;
 &lt;p&gt;int i;&lt;/p&gt;
@@ -731,7 +722,7 @@ Space&lt;/a&gt; 和 &lt;a class="reference external" href="http://76635424.qzone
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 像这样的安排， sizeof 就减少到 8 ，只有 2 个字节的额外填充。为了与汇编代码相兼容， C 语言语法规定，编译器无权擅自安排结构体内变量的布局顺序，必须从左向右逐一排列。所以，妥当安排成员顺序以避免内存空间的浪费，就成了我们程序员的责任之一。一般的，总是将结构体的成员按照其 sizeof 从大到小排列， double 在最前， char 在最后，这样总可以将结构的字节填充降至最小。 &lt;/p&gt;
 &lt;p&gt;C++ 继承了 C 语言关于结构体布局的规定，所以以上的布局准则也适用于 C++ 的 class 的成员变量。 C++ 进一步扩展了布局规定，同一访问区段 (private 、 public 、 protected) 中的变量，编译器无权重新排列，不过编译器有权排列访问区段的前后顺序。基于这个规则， C++ 中有的程序员建议给每一个成员变量放在单独区段，在每一个成员声明之前都加上 private: 、 public: 、 protected: 标志，这可以最大限度的利用编译器的决策优势。 &lt;/p&gt;
-&lt;p&gt; 在栈中按顺序分配的变量，其边界也受到对齐要求的限制。与在结构中不同的是，栈中的变量还必须保证其后续变量无论是何种类型都可以自由对齐，所以在栈中的变量通常都有平台相关的对齐最小值。在 &lt;span class="caps"&gt;MSVC&lt;/span&gt; 编译器上，这个最小值可以由宏 _INTSIZEOF(T) 查询： &lt;/p&gt;
+&lt;p&gt; 在栈中按顺序分配的变量，其边界也受到对齐要求的限制。与在结构中不同的是，栈中的变量还必须保证其后续变量无论是何种类型都可以自由对齐，所以在栈中的变量通常都有平台相关的对齐最小值。在 MSVC 编译器上，这个最小值可以由宏 _INTSIZEOF(T) 查询： &lt;/p&gt;
 &lt;p&gt;#define _INTSIZEOF(T) ( (sizeof(T) + sizeof(int) - 1) &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~(sizeof(int) -
 1) )&lt;/p&gt;
 &lt;p&gt;_INTSIZEOF(T) 会将 sizeof(T) 进位到 sizeof(int) 的整数倍。 &lt;/p&gt;
@@ -800,7 +791,7 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 可以看出，如果参数类型一致，使用标准库要多些几行代码。不过如果参数类型不一致或者未知 (printf 的情况 ) ，使用标准库就要方便很多，因为我们很难猜出编译器处置边界对齐 (align) 等汇编代码的细节。使用标准库的代码是可以移植的，而使用上文所述的其它方法操纵可变参数表都是不可移植的，仅限于在 I386 平台上使用。 &lt;/p&gt;
 &lt;p&gt; 纵使可变参数表有使用上的便利性，它的缺陷也有很多，不可移植性和平台依赖性只是其一，最大的问题在于它的类型不安全性。使用可变参数表就意味着编译器不对参数作任何类型检查，这在 C 中算是一言难尽的历史遗留问题，在 C++ 中就意味着恶魔 reinterpret_cast 被你唤醒。 C 的可变参数表是 C++ 代码错误频发的根源之一，以至于 C++ 标准将可变参数表列为即将被废除的 C 语言遗留特性。 C++ 语法中的许多新特性，比如重载函数、默认参数值、模板，都可以一定程度上替代可变参数表，并且比可变参数表更加安全。 &lt;/p&gt;
-&lt;p&gt; 可变参数表在 C++ 中惟一值得嘉奖的贡献，是在模板元编程 (&lt;span class="caps"&gt;TMP&lt;/span&gt;) 的 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 技术中利用可变参数表制作最差匹配重载。根据 C++ 标准中有关函数重载决议的规则，具有可变参数表的函数总是最差匹配，编译器在被逼无奈走头无路时才会选择可变参数表。利用这一点，我们可以精心制作重载函数来提取类型信息。比如，要判断一个通过模板传递来的类型是不是 int ： &lt;/p&gt;
+&lt;p&gt; 可变参数表在 C++ 中惟一值得嘉奖的贡献，是在模板元编程 (&lt;span class="caps"&gt;TMP&lt;/span&gt;) 的 SFINAE 技术中利用可变参数表制作最差匹配重载。根据 C++ 标准中有关函数重载决议的规则，具有可变参数表的函数总是最差匹配，编译器在被逼无奈走头无路时才会选择可变参数表。利用这一点，我们可以精心制作重载函数来提取类型信息。比如，要判断一个通过模板传递来的类型是不是 int ： &lt;/p&gt;
 &lt;p&gt;long isIntImp(int);&lt;/p&gt;
 &lt;p&gt;char isIntImp(…);&lt;/p&gt;
 &lt;p&gt;template&amp;lt;typename T&amp;gt;&lt;/p&gt;
@@ -810,8 +801,8 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;p&gt;}&lt;/p&gt;
 &lt;p&gt; 然后，在一个具有模板参数 T 的函数中，我们就可以写 &lt;/p&gt;
 &lt;p&gt;if(isInt&amp;lt;T&amp;gt;::value)//…&lt;/p&gt;
-&lt;p&gt; 在这个 ( 不怎么精致的 ) 例子中，如果 T 是 int ，那么 isIntImp 的第一个重载版本就会被选中，返回值类型就是 long ，这样 value 就为 1 。否则，编译器只能选中第二个具有可变参数表的重载版本，返回值类型成为 char ，这样 value 就为 0 。把它说得再明白一些，上文的代码所表达的意思是：如果类型 T 是 int ，那它就是 int ，否则它就不是 int ，呵呵简单吧。这种通过重载决议规则来提取类型信息的技术，在模板元编程中被称作 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; ，它和其它模板元编程技术被广泛运用于 &lt;span class="caps"&gt;STL&lt;/span&gt; 、 Boost 等模板库的开发实现之中。 &lt;/p&gt;
-&lt;p&gt; 值得注意的是，在上文 &lt;span class="caps"&gt;SFINAE&lt;/span&gt; 的运用中， isIntImp 并没有出现定义而只提供了声明，因为我们并没有实际调用 isIntImp 函数，而只是让它参与重载决议并用 sizeof 判断其返回值类型。这是 C++ 的一个设计准则的完美体现：不需要的东西可以不出现。由于这一准则，我们避免了在 C++ 中调用具有可变参数表的函数这一危险举动，而仅仅利用了可变参数表在语法分析过程中的特殊地位，这种对于危险语言特性的巧妙利用是善意而无害的。 &lt;/p&gt;
+&lt;p&gt; 在这个 ( 不怎么精致的 ) 例子中，如果 T 是 int ，那么 isIntImp 的第一个重载版本就会被选中，返回值类型就是 long ，这样 value 就为 1 。否则，编译器只能选中第二个具有可变参数表的重载版本，返回值类型成为 char ，这样 value 就为 0 。把它说得再明白一些，上文的代码所表达的意思是：如果类型 T 是 int ，那它就是 int ，否则它就不是 int ，呵呵简单吧。这种通过重载决议规则来提取类型信息的技术，在模板元编程中被称作 SFINAE ，它和其它模板元编程技术被广泛运用于 STL 、 Boost 等模板库的开发实现之中。 &lt;/p&gt;
+&lt;p&gt; 值得注意的是，在上文 SFINAE 的运用中， isIntImp 并没有出现定义而只提供了声明，因为我们并没有实际调用 isIntImp 函数，而只是让它参与重载决议并用 sizeof 判断其返回值类型。这是 C++ 的一个设计准则的完美体现：不需要的东西可以不出现。由于这一准则，我们避免了在 C++ 中调用具有可变参数表的函数这一危险举动，而仅仅利用了可变参数表在语法分析过程中的特殊地位，这种对于危险语言特性的巧妙利用是善意而无害的。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 2.7 I386平台的其它函数调用模型</title><link href="//farseerfc.github.io/zhs/c-tricks-2-7-i386-calling-conventions.html" rel="alternate"></link><updated>2007-08-28T14:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-28:zhs/c-tricks-2-7-i386-calling-conventions.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
 &lt;div class="section" id="i386"&gt;
@@ -832,7 +823,7 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;p&gt; 参数压栈顺序：逆序 ( 从右至左 )&lt;/p&gt;
 &lt;p&gt; 参数堆栈恢复者：被调函数 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;__stdcall 是微软所谓的标准调用模型。可惜的是它与 __cdecl 不兼容。几乎所有的 Win32API 函数使用这种函数调用模型，希望在 &lt;span class="caps"&gt;DLL&lt;/span&gt; 之间，或者在程序和 WinNT 操作系统之间传递函数指针的函数也应该使用这种模型。与 __cdecl 模型的不同之处在于， __stdcall 模型下由被调函数恢复堆栈。主调函数在 call 语句之后，不需要再加上 add 语句。而被调函数的 ret 语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在 __stdcall 模型下不支持可变参数表，所有参数必须写明。 &lt;/div&gt;
+&lt;div class="line"&gt;__stdcall 是微软所谓的标准调用模型。可惜的是它与 __cdecl 不兼容。几乎所有的 Win32API 函数使用这种函数调用模型，希望在 DLL 之间，或者在程序和 WinNT 操作系统之间传递函数指针的函数也应该使用这种模型。与 __cdecl 模型的不同之处在于， __stdcall 模型下由被调函数恢复堆栈。主调函数在 call 语句之后，不需要再加上 add 语句。而被调函数的 ret 语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在 __stdcall 模型下不支持可变参数表，所有参数必须写明。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="thiscall"&gt;
@@ -840,7 +831,7 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;p&gt; 参数压栈顺序：逆序 ( 从右至左 ) ， this 用 ecx 传递。 &lt;/p&gt;
 &lt;p&gt; 参数堆栈恢复者：被调函数 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt;__thiscall 是 &lt;span class="caps"&gt;VC&lt;/span&gt; 编译器中类的非静态成员函数 (non-static member functon) 的默认调用模型。但是如果此成员函数有可变参数表， &lt;span class="caps"&gt;VC&lt;/span&gt; 编译器会使用 __cdecl 。和 __stdcall 一样， __thiscall 由被调函数恢复堆栈。比较独特的是 __thiscall 会通过 ecx 寄存器传递成员函数的 this 指针，而 __cdecl 下 this 指针是通过在参数表最前面增加一个函数参数来传递的。 __thiscall 是 &lt;span class="caps"&gt;VC&lt;/span&gt; 编译器对 this 指针的使用的一种优化，大大提高了面向对象程序的效率。在 &lt;span class="caps"&gt;VC2003&lt;/span&gt; 及之前的编译器上 __thiscall 不是一个关键字，不能被显式指定。但可以给成员函数显式指定 __cdecl 来避免使用 __thiscall 。 &lt;/div&gt;
+&lt;div class="line"&gt;__thiscall 是 VC 编译器中类的非静态成员函数 (non-static member functon) 的默认调用模型。但是如果此成员函数有可变参数表， VC 编译器会使用 __cdecl 。和 __stdcall 一样， __thiscall 由被调函数恢复堆栈。比较独特的是 __thiscall 会通过 ecx 寄存器传递成员函数的 this 指针，而 __cdecl 下 this 指针是通过在参数表最前面增加一个函数参数来传递的。 __thiscall 是 VC 编译器对 this 指针的使用的一种优化，大大提高了面向对象程序的效率。在 VC2003 及之前的编译器上 __thiscall 不是一个关键字，不能被显式指定。但可以给成员函数显式指定 __cdecl 来避免使用 __thiscall 。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="fastcall"&gt;
@@ -856,7 +847,7 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;p&gt; 参数压栈顺序：正序 ( 从左至右 )&lt;/p&gt;
 &lt;p&gt; 参数堆栈恢复者：被调函数 (callee)&lt;/p&gt;
 &lt;div class="line-block"&gt;
-&lt;div class="line"&gt; 过程式编程语言 Pascal 所使用的函数调用模型，由此得名。也是 16 位版本的 Windows 使用的 &lt;span class="caps"&gt;API&lt;/span&gt; 模型，过时的模型，现在已经废弃且禁止使用。你会看到有些书本仍会不时提到它，所以需要注意。 __pascal 是正序压栈，这与大部分 I386 函数模型都不相同。与 __stdcall 一样，由被调者恢复堆栈，不支持可变参数表。历史上曾有过的别名 &lt;span class="caps"&gt;PASCAL&lt;/span&gt; 、 pascal 、 _pascal( 单下划线 ) ，现在都改成了 __stdcall 的别名，与 __pascal( 双下划线 ) 不同。 &lt;/div&gt;
+&lt;div class="line"&gt; 过程式编程语言 Pascal 所使用的函数调用模型，由此得名。也是 16 位版本的 Windows 使用的 API 模型，过时的模型，现在已经废弃且禁止使用。你会看到有些书本仍会不时提到它，所以需要注意。 __pascal 是正序压栈，这与大部分 I386 函数模型都不相同。与 __stdcall 一样，由被调者恢复堆栈，不支持可变参数表。历史上曾有过的别名 PASCAL 、 pascal 、 _pascal( 单下划线 ) ，现在都改成了 __stdcall 的别名，与 __pascal( 双下划线 ) 不同。 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id1"&gt;
@@ -880,12 +871,11 @@ Compare ，你必须确保填充的字节中的值也是相同的。这不仅要
 &lt;div class="section" id="x86"&gt;
 &lt;h2&gt;2.1   X86 概述 &lt;/h2&gt;
 &lt;p&gt; 所谓 X86 体系结构，是指以 Intel
-8086 芯片为首的芯片所沿袭的 &lt;span class="caps"&gt;CPU&lt;/span&gt; 结构，一些文档中又被称作 &lt;span class="caps"&gt;IA32&lt;/span&gt; 体系结构。包括的芯片有但不限于 :Intel
-8086 至 80486 ，奔腾 (Pentium) 系列处理器 1 至 4 ，赛扬系列处理器，酷睿系列处理器，以及 &lt;span class="caps"&gt;AMD&lt;/span&gt; 的相应型号产品。 X86 体系结构在早期属于 16 位处理器，自 80386 之后扩展为 32 位处理器，所以一些文档中又把 80386 之后的 32 位处理器体系称作 I386 。自 Pentium4 后期， &lt;span class="caps"&gt;AMD&lt;/span&gt; 的 Athlon64 开始， I386 被进一步扩充为 64 位处理器，含有 64 位寻址能力的 X86 体系结构被称作 X86-64 或 &lt;span class="caps"&gt;IA32&lt;/span&gt;-64 。总之，市售的个人电脑用 &lt;span class="caps"&gt;CPU&lt;/span&gt; ，除苹果的 Macintosh 之外，全部采用 X86 体系结构芯片。 &lt;/p&gt;
-&lt;p&gt; 在 X86 早期， 16 位的寻址能力只支持 &lt;span class="caps"&gt;64KB&lt;/span&gt;(2^16=64K) 内存，这显然是不够的。 Intel 采用分段寻址的方法，用 4 位段位 +16 位偏移量，提供了总共 &lt;span class="caps"&gt;1MB&lt;/span&gt;(2^20=1M) 的寻址能力。所以在 X86 的 16 位编程中，有两种指针类型：长指针 (lp,long
-pointer) 和短指针 (sp,short
-pointer) ，长指针 (20 位 ) 提供整个内存空间寻址能力，短指针 (16 位 ) 仅支持同一段中的寻址。在 “ 古代 ”&lt;span class="caps"&gt;DOS&lt;/span&gt; 及 Win3.x 编程过程中，两种类型的指针，以及总共 &lt;span class="caps"&gt;1MB&lt;/span&gt; 的内存大小，常常把程序员们折腾得焦头烂额。 &lt;/p&gt;
-&lt;p&gt; 自 I386 之后， &lt;span class="caps"&gt;CPU&lt;/span&gt; 才开始提供 32 位的寻址能力。有了整整 &lt;span class="caps"&gt;4GB&lt;/span&gt;(2^32=4G) 的寻址空间，所有指针统一为长指针 (32 位 ) 。时至今日，我们仍可以看到微软文档中指针变量的 lp 前缀。由于内存管理的需要，分段机制被保留下来，但这一次不是因为地址空间太小，而是因为地址空间远大于实际内存容量，从而采用了虚拟内存机制。 &lt;/p&gt;
+8086 芯片为首的芯片所沿袭的 CPU 结构，一些文档中又被称作 IA32 体系结构。包括的芯片有但不限于 :Intel
+8086 至  80486 ，奔腾 (Pentium) 系列处理器 1 至 4 ，赛扬系列处理器，酷睿系列处理器，以及 AMD 的相应型号产品。 X86 体系结构在早期属于 16 位处理器，自 80386 之后扩展为 32 位处理器，所以一些文档中又把 80386 之后的 32 位处理器体系称作 I386 。自 Pentium4 后期， AMD 的 Athlon64 开始， I386 被进一步扩充为 64 位处理器，含有 64 位寻址能力的 X86 体系结构被称作 X86-64 或 IA32-64 。总之，市售的个人电脑用 CPU ，除苹果的 Macintosh 之外，全部采用 X86 体系结构芯片。 &lt;/p&gt;
+&lt;p&gt; 在 X86 早期， 16 位的寻址能力只支持 64KB(2^16=64K) 内存，这显然是不够的。 Intel 采用分段寻址的方法，用 4 位段位 +16 位偏移量，提供了总共 1MB(2^20=1M) 的寻址能力。所以在 X86 的 16 位编程中，有两种指针类型：长指针 (lp,long
+pointer) 和短指针 (sp,short pointer) ，长指针 (20 位 ) 提供整个内存空间寻址能力，短指针 (16 位 ) 仅支持同一段中的寻址。在 “ 古代 ”DOS 及 Win3.x 编程过程中，两种类型的指针，以及总共 1MB 的内存大小，常常把程序员们折腾得焦头烂额。 &lt;/p&gt;
+&lt;p&gt; 自 I386 之后， CPU 才开始提供 32 位的寻址能力。有了整整 4GB(2^32=4G) 的寻址空间，所有指针统一为长指针 (32 位 ) 。时至今日，我们仍可以看到微软文档中指针变量的 lp 前缀。由于内存管理的需要，分段机制被保留下来，但这一次不是因为地址空间太小，而是因为地址空间远大于实际内存容量，从而采用了虚拟内存机制。 &lt;/p&gt;
 &lt;p&gt; 在从 16 位结构向 32 位结构转变的过程中，由于向下兼容的历史原因，曾一度长时间出现硬件 32 位 (I386) 、软件 16 位 (Win3.x) 的情况。同样也是为了兼容 16 位软件， Win9x 操作系统 (Win95 、 Win98 、 WinME) 保留了 16 位代码和 32 位代码。混合代码的设计使得 Win9x 及其混乱和不稳定。直到完全 32 位内核的操作系统 WinNT( 以及构建于其上的 Win2000 ， WinXP ， Win2003) 的出现， X86 平台上内存布局混乱的局面才得以改善。有了从 16 位至 32 位移植的经验和准备，现今的从 32 位到 64 位的操作系统移植显得平稳顺利很多。 WinXP 和 WinVista 系统都同时发布了 32 位版本和 64 位版本，并且其 x86-64 系统都实现了对 32 位软件的无缝衔接支持。 &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</title><link href="//farseerfc.github.io/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html" rel="alternate"></link><updated>2007-08-22T18:06:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-22:zhs/c-tricks-1-2-trap-in-comma-logical-operator.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
@@ -913,9 +903,9 @@ pointer) ，长指针 (20 位 ) 提供整个内存空间寻址能力，短指针
 &lt;p&gt; 在 C 时代使用函数调用时，压栈顺序并不是什么大问题，毕竟大多数人会在函数调用的边界稍稍小心一些。但是到了 C++ 中，事情变得有些复杂，因为简单如 a+b 的使用，就有可能被运算符重载机制替换为函数调用。更何况有模板参与之后，我们写代码时不能确定对象的真实类型，也就无法预知一个运算符是否真的被重载过，唯一稳妥的方法是，假定任何有可能被重载的运算符的使用都是函数调用。 &lt;/p&gt;
 &lt;blockquote&gt;
 &amp;lt;p style="margin:0;"&amp;gt;&lt;/blockquote&gt;
-&lt;p&gt; 回到上文的示例中，由于 , 和 &amp;amp;&amp;amp; 都被替换为函数调用，程序的执行顺序将成为压栈顺序，在 X86 上很有可能是从右到左，与标准定义的运算符的顺序正好相反。逗号运算符原本就含有 “ 先 … 后 …” 的语义，这种颠倒的执行顺序势必造成程序和程序员的混乱。以我的经验而言，含有 &lt;strong&gt;operator&lt;/strong&gt;, 的类，完全没有办法和 &lt;span class="caps"&gt;STL&lt;/span&gt; 或者 iostream 相互协作，反而会导致巨量的错误报告 ( 什么叫巨量的错误报告有概念么？如果没有，那说明你还没玩过范式编程 (&lt;span class="caps"&gt;GP&lt;/span&gt;,
+&lt;p&gt; 回到上文的示例中，由于 , 和 &amp;amp;&amp;amp; 都被替换为函数调用，程序的执行顺序将成为压栈顺序，在 X86 上很有可能是从右到左，与标准定义的运算符的顺序正好相反。逗号运算符原本就含有 “ 先 … 后 …” 的语义，这种颠倒的执行顺序势必造成程序和程序员的混乱。以我的经验而言，含有 &lt;strong&gt;operator&lt;/strong&gt;, 的类，完全没有办法和 STL 或者 iostream 相互协作，反而会导致巨量的错误报告 ( 什么叫巨量的错误报告有概念么？如果没有，那说明你还没玩过范式编程 (&lt;span class="caps"&gt;GP&lt;/span&gt;,
 Generic
-Programming) 。去玩玩 &lt;span class="caps"&gt;GP&lt;/span&gt; 吧，看看你的编译器对巨量的定义。在我手头，针对 3.&lt;span class="caps"&gt;5KB&lt;/span&gt; 的代码文件倾泻出 3.8&lt;strong&gt;&lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; 的错误信息的编译器不在少数 ……) 。有鉴于此，我的结论是，除非你有充足的依据支持你这么做 ( 比如你的粗暴上司的键盘上只剩下逗号能用 ) ，并且你清楚的了解这么做的后果的严重性 ( 比如至少要看过此文 ) ，否则我奉劝你，永远不要碰 &lt;strong&gt;operator&lt;/strong&gt;, 、 &lt;strong&gt;operator&lt;/strong&gt;&amp;amp;&amp;amp; 以及 &lt;strong&gt;operator&lt;/strong&gt;|| ！ &lt;/p&gt;
+Programming) 。去玩玩 GP 吧，看看你的编译器对巨量的定义。在我手头，针对 3.5KB 的代码文件倾泻出 3.8&lt;strong&gt;&lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; 的错误信息的编译器不在少数 ……) 。有鉴于此，我的结论是，除非你有充足的依据支持你这么做 ( 比如你的粗暴上司的键盘上只剩下逗号能用 ) ，并且你清楚的了解这么做的后果的严重性 ( 比如至少要看过此文 ) ，否则我奉劝你，永远不要碰 &lt;strong&gt;operator&lt;/strong&gt;, 、 &lt;strong&gt;operator&lt;/strong&gt;&amp;amp;&amp;amp; 以及 &lt;strong&gt;operator&lt;/strong&gt;|| ！ &lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="C++"></category></entry><entry><title>C++ Tricks 1.1 条件运算符(?:)</title><link href="//farseerfc.github.io/zhs/c-tricks-1-1-conditional-operator.html" rel="alternate"></link><updated>2007-08-22T18:05:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2007-08-22:zhs/c-tricks-1-1-conditional-operator.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt;  导入 &lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
@@ -934,7 +924,7 @@ operator) ，用于在表达式中作条件判断，通常可以替换 if 语句
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; *pi=getInt();&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; i=iif(pi,*pi,0);//Error!&lt;/p&gt;
 &lt;p&gt; 这段代码会导致上文提到的致命运行期错误。 C/C++ 标准规定，参数在被传递给函数之前求值，因此无论 pi 为何值，都会被提领。又因为函数传回一个空指针的情况比较少见，所以这样的错误在调试时很难被发现，一旦发生又势必造成重大灾难。这样的代码在实践中应尽量避免。 &lt;/p&gt;
-&lt;p&gt; 有时，条件运算符控制流程的特点会不知不觉影响我们的代码。在 C 时代，最大值 &lt;span class="caps"&gt;MAX&lt;/span&gt; 通常用宏实现： &lt;/p&gt;
+&lt;p&gt; 有时，条件运算符控制流程的特点会不知不觉影响我们的代码。在 C 时代，最大值 MAX 通常用宏实现： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;#define&lt;/strong&gt;&lt;span class="caps"&gt;MAX&lt;/span&gt;(a,b) ((a)&amp;gt;(b)&lt;strong&gt;?&lt;/strong&gt;(a)&lt;strong&gt;:&lt;/strong&gt;(b))&lt;/p&gt;
 &lt;p&gt; 需要用额外的括号将宏参数和宏本体保护起来，以免运算符优先级扰乱逻辑，这是宏丑陋的特点之一，这里暂且不提。矛盾在于，用具有副作用的表达式调用宏时，会出现问题： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; i=5,j=6;//…&lt;/p&gt;
@@ -942,10 +932,10 @@ operator) ，用于在表达式中作条件判断，通常可以替换 if 语句
 &lt;p&gt; 代码的作者原意显然是想先将 i,j 分别递增，再将其中较大的一个赋给 a 。执行这段代码，当 i=5,j=6 时， a=8 ，知道为什么吗？通过宏展开，赋值语句成这样： &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; a=(++i)&amp;gt;(++j)&lt;strong&gt;?&lt;/strong&gt;(++i)&lt;strong&gt;:&lt;/strong&gt;(++j);// 删除了多余括号 &lt;/p&gt;
 &lt;p&gt; 在判断之前， i 、 j 被分别自增一次，然后舍弃 : 之前的部分， j 又被自增一次。执行之后， i=6,j=8 。 &lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;MAX&lt;/span&gt; 的更正确更安全的实现，是利用模板将类型参数化。 &lt;span class="caps"&gt;STL&lt;/span&gt; 标准算法中就有一个这样的工具级模版函数 std::max 。 &lt;/p&gt;
+&lt;p&gt;MAX 的更正确更安全的实现，是利用模板将类型参数化。 STL 标准算法中就有一个这样的工具级模版函数 std::max 。 &lt;/p&gt;
 &lt;p&gt; 条件运算符是表达式而不是语句，这使得它可以出现在任何需要表达式的地方，这扩大了它的适用范围。在那些语法上只能出现表达式而不能出现语句的地方（比如变量初始化），条件运算符有着不可替代的作用。 &lt;/p&gt;
 &lt;p&gt; 条件运算符优于 &lt;strong&gt;if&lt;/strong&gt; 语句的另一个场合是 “ 模板元编程 ”(&lt;span class="caps"&gt;TMP&lt;/span&gt;, Template
-MetaProgramming) 。在 &lt;span class="caps"&gt;TMP&lt;/span&gt; 这个古怪奇异的编译期运算编程技术中，一切旧有的技术和法则被全线击破，我们所能仰仗的工具，只有模板特化 (Specialization) 、 &lt;strong&gt;typedef&lt;/strong&gt;s 、函数声明 ( 无法调用它们 ) 、以及编译期常量运算。已经有人很深入地论证过，仅有以上这些，就已经形成了一个 “ 图灵完善 ” 的计算机语言。我们可以用模板特化技术，来模拟条件分支，循环迭代等一系列复杂的语言结构。由于可以参与编译期常量运算，条件运算符在 &lt;span class="caps"&gt;TMP&lt;/span&gt; 世界中很自然地扮演起重要角色。 &lt;/p&gt;
+MetaProgramming) 。在 TMP 这个古怪奇异的编译期运算编程技术中，一切旧有的技术和法则被全线击破，我们所能仰仗的工具，只有模板特化 (Specialization) 、 &lt;strong&gt;typedef&lt;/strong&gt;s 、函数声明 ( 无法调用它们 ) 、以及编译期常量运算。已经有人很深入地论证过，仅有以上这些，就已经形成了一个 “ 图灵完善 ” 的计算机语言。我们可以用模板特化技术，来模拟条件分支，循环迭代等一系列复杂的语言结构。由于可以参与编译期常量运算，条件运算符在 TMP 世界中很自然地扮演起重要角色。 &lt;/p&gt;
 &lt;p&gt; 比如，给与类型 T 的一个变量 t ，我们想声明一个缓冲区存放 t 和一个 int ，缓冲区的大小不小于 sizeof(T) 也不小于 sizeif(int) ，我们可以这样写： &lt;/p&gt;
 &lt;p&gt;char buffer[sizeof(T)&amp;gt;sizeof(int)? sizeof(T): sizeof(int)];&lt;/p&gt;
 &lt;p&gt; 我们不能用一个 if 语句替换这个运算： &lt;/p&gt;
