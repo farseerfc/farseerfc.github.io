@@ -152,14 +152,33 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+Table of Contents                    </div>
+                    <div class="panel-boy">
+                    <html><body><div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#original-discuss" id="id1">Original Discuss</a></li>
+<li><a class="reference internal" href="#the-problem" id="id2">The problem</a></li>
+<li><a class="reference internal" href="#my-answer-to-the-problem" id="id3">My answer to the problem</a><ul>
+<li><a class="reference internal" href="#first-we-discuss-ff" id="id4">First we discuss ff</a></li>
+<li><a class="reference internal" href="#then-we-discuss-f" id="id5">Then we discuss f</a></li>
+</ul>
+</li>
+</ul>
+</div></body></html>
+                    </div>
+                    </div>
     
-                <html><body><p>This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.</p>
+                <html><body>
+<p>This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.</p>
 <div class="section" id="original-discuss">
-<h2>Original Discuss</h2>
+<h2><a class="toc-backref" href="#id1">Original Discuss</a></h2>
 <p><a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html">http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html</a></p>
 </div>
 <div class="section" id="the-problem">
-<h2>The problem</h2>
+<h2><a class="toc-backref" href="#id2">The problem</a></h2>
 <p>Today I read a book about we can do cast-down in template, so I write this to test:</p>
 <div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
@@ -202,132 +221,133 @@ Farseerfc's Blog            </a>
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p>It is strange when </p><pre>
-f</pre>
- it don’t allow my specified <pre>
-f&lt;A&gt;</pre>
-.
-<p>But in </p><pre>
-ff</pre>
- it allowed <pre>
-ff&lt;BB&lt;long&gt;&gt;</pre>
-.
+<p>It is strange when <code class="code">
+f</code>
+ it don’t allow my specified <code class="code">
+f&lt;A&gt;`</code>
+.</p>
+<p>But in <code class="code">
+ff</code>
+ it allowed <code class="code">
+ff&lt;BB&lt;long&gt;&gt;`</code>
+.</p>
 <p>Tested under <span class="caps">VC10</span> and <span class="caps">GCC3</span>.4</p>
 </div>
 <div class="section" id="my-answer-to-the-problem">
-<h2>My answer to the problem</h2>
+<h2><a class="toc-backref" href="#id3">My answer to the problem</a></h2>
 <p>Let’s think ourself as compiler to see what happened there.</p>
-<p>Define mark </p><pre>
-#</pre>
- : <pre>
-A#B</pre>
- is the instantiated result when we put <pre>
-B</pre>
- into the parameter <pre>
-T</pre>
- of <pre>
-A&lt;T&gt;</pre>
- .
+<p>Define mark <code class="code">
+#</code>
+ : <code class="code">
+A#B</code>
+ is the instantiated result when we put <code class="code">
+B</code>
+ into the parameter <code class="code">
+T</code>
+ of <code class="code">
+A&lt;T&gt;</code>
+ .</p>
 <div class="section" id="first-we-discuss-ff">
-<h3>First we discuss ff</h3>
+<h3><a class="toc-backref" href="#id4">First we discuss ff</a></h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p>After this sentense, the compiler saw the instantiation of </p><pre>
-DD&lt;long&gt;</pre>
- , so it instantiate <pre>
-DD#long</pre>
- , and also <pre>
-BB#long</pre>
- .
+<p>After this sentense, the compiler saw the instantiation of <code class="code">
+DD&lt;long&gt;</code>
+ , so it instantiate <code class="code">
+DD#long</code>
+ , and also <code class="code">
+BB#long</code>
+ .</p>
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
 <p>This sentense required the compiler to calculate set of overloading functions.</p>
-<p>Step 1 we need to infer </p><pre>
-T</pre>
- of <pre>
-ff&lt;T&gt;</pre>
- from argument <pre>
-DD#long -&gt; BB&lt;T&gt;</pre>
- . Based on the inference rule:
+<p>Step 1 we need to infer <code class="code">
+T</code>
+ of <code class="code">
+ff&lt;T&gt;</code>
+ from argument <code class="code">
+DD#long -&gt; BB&lt;T&gt;</code>
+ . Based on the inference rule:</p>
 <pre class="literal-block">
-Argument with type ``class_template_name&lt;T&gt;`` can be use to infer ``T``.
+Argument with type :code:`class_template_name&lt;T&gt;` can be use to infer :code:`T``.
 </pre>
-<p>So compiler inferred </p><pre>
-T</pre>
- as <pre>
-long</pre>
- . Here if it is not <pre>
-BB</pre>
- but <pre>
-CC</pre>
- which is complete un-related, we can also infer, as long as <pre>
-CC</pre>
- is a template like <pre>
-CC&lt;T&gt;</pre>
- .
-<p>Step 2 Template Specialization Resolution. There is only one template here so we matched </p><pre>
-ff&lt;T&gt;</pre>
- .
+<p>So compiler inferred <code class="code">
+T</code>
+ as <code class="code">
+long</code>
+ . Here if it is not <code class="code">
+BB</code>
+ but <code class="code">
+CC</code>
+ which is complete un-related, we can also infer, as long as <code class="code">
+CC</code>
+ is a template like <code class="code">
+CC&lt;T&gt;</code>
+ .</p>
+<p>Step 2 Template Specialization Resolution. There is only one template here so we matched <code class="code">
+ff&lt;T&gt;</code>
+ .</p>
 <p>Step 3 Template Instantiation</p>
-<p>After inferred </p><pre>
-long -&gt; T</pre>
- , compiler instantiated <pre>
-ff#long</pre>
- .
-<p>Set of available overloading functions : </p><pre>
-{ff#long}</pre>
-<p>Then overloading resolution found the only match </p><pre>
-ff#long</pre>
-, checked its real parameter <pre>
-DD#long</pre>
- can be down-cast to formal parameter <pre>
-BB#long</pre>
- .
+<p>After inferred <code class="code">
+long -&gt; T</code>
+ , compiler instantiated <code class="code">
+ff#long</code>
+ .</p>
+<p>Set of available overloading functions : <code class="code">
+{ff#long}</code>
+</p>
+<p>Then overloading resolution found the only match <code class="code">
+ff#long`</code>
+, checked its real parameter <code class="code">
+DD#long</code>
+ can be down-cast to formal parameter <code class="code">
+BB#long</code>
+ .</p>
 </div>
 <div class="section" id="then-we-discuss-f">
-<h3>Then we discuss f</h3>
+<h3><a class="toc-backref" href="#id5">Then we discuss f</a></h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 <p>Calculate set of overloading functions.</p>
-<p>Step 1 infer all template parameters for template </p><pre>
-f</pre>
- . According to inference rule:
+<p>Step 1 infer all template parameters for template <code class="code">
+f</code>
+ . According to inference rule:</p>
 <pre class="literal-block">
-Parameter with type ``T`` can be used to infer ``T``  。 </pre>
-<p>So </p><pre>
-B -&gt; T</pre>
- is inferred.
+Parameter with type T can be used to infer T  。 </pre>
+<p>So <code class="code">
+B -&gt; T</code>
+ is inferred.</p>
 <p>Step 2 Template Specialization Resolution.</p>
-<p>Here </p><pre>
-B</pre>
- is not <pre>
-A</pre>
- so we can not apply specialization of <pre>
-f&lt;A&gt;</pre>
- , remaining <pre>
-f&lt;T&gt;</pre>
- as the only alternative.
+<p>Here <code class="code">
+B</code>
+ is not <code class="code">
+A</code>
+ so we can not apply specialization of <code class="code">
+f&lt;A&gt;</code>
+ , remaining <code class="code">
+f&lt;T&gt;</code>
+ as the only alternative.</p>
 <p>Step 3 Template Instantiation.</p>
-<p>When we put </p><pre>
-B</pre>
- into <pre>
-f&lt;T&gt;</pre>
- to instantiate as <pre>
-f#B</pre>
- , we need to instantiate <pre>
-traits#B</pre>
-.
-<p>There is no specialization for </p><pre>
-B</pre>
- so we use template <pre>
-traits&lt;T&gt;</pre>
-, <pre>
-traits#B::value=false</pre>
- , so <pre>
-enable_if#false</pre>
- didn’t contains a <pre>
-type</pre>
- , an error occurred.
+<p>When we put <code class="code">
+B</code>
+ into <code class="code">
+f&lt;T&gt;</code>
+ to instantiate as <code class="code">
+f#B</code>
+ , we need to instantiate <code class="code">
+traits#B`</code>
+.</p>
+<p>There is no specialization for <code class="code">
+B</code>
+ so we use template <code class="code">
+traits&lt;T&gt;</code>
+ , <code class="code">
+traits#B::value=false</code>
+ , so <code class="code">
+enable_if#false</code>
+ didn’t contains a <code class="code">
+type</code>
+ , an error occurred.</p>
 <p>The only template is mismatch, available overloading functions is empty set. So we got an error.</p>
 </div>
 </div>
@@ -442,28 +462,13 @@ About farseerfc</a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/icse.html">
-                    icse <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/c.html">
-                    C++ <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/will.html">
-                    will <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/linux.html">
+                    linux <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-1">
@@ -472,53 +477,8 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/java.html">
-                    java <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/software.html">
-                    software <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/en/tag/music.html">
                     music <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/en/tag/python.html">
-                    python <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -527,18 +487,33 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/template.html">
+                    template <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/msr.html">
-                    msr <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/java.html">
+                    java <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -547,8 +522,53 @@ About farseerfc</a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/en/tag/pelican.html">
-                    pelican <sup> 1</sup>
+                <a href="//farseerfc.github.io/en/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/c.html">
+                    C++ <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
     </ul>
