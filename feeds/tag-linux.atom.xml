@@ -67,14 +67,18 @@ Ctrl-Shift-C&lt;/kbd&gt;
 &lt;p&gt;WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三   回復： &lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt; 感謝 FC 的詳盡解答。 &lt;/p&gt;
-&lt;p&gt; 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 read 系統調用，   比如輸入 abc ： &lt;/p&gt;
+&lt;p&gt; 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 &lt;code class="code"&gt;
+read&lt;/code&gt;
+  系統調用，   比如輸入 abc ： &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 如果有緩存的話就只調用一次了 read 系統調用了： &lt;/p&gt;
+&lt;p&gt; 如果有緩存的話就只調用一次了 &lt;code class="code"&gt;
+read&lt;/code&gt;
+  系統調用了： &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "abc\n", 1024)                  = 4
 &lt;/pre&gt;&lt;/div&gt;

@@ -67,14 +67,18 @@ Ctrl-Shift-C&lt;/kbd&gt;
 &lt;p&gt;WaterElement(UnChanged)  于 2014 年 12 月 10 日 21:53:54  星期三   回复： &lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt; 感谢 FC 的详尽解答。 &lt;/p&gt;
-&lt;p&gt; 用 strace 查看了下，设置标准输入没有缓存的话读每个字符都会调用一次 read 系统调用，   比如输入 abc ： &lt;/p&gt;
+&lt;p&gt; 用 strace 查看了下，设置标准输入没有缓存的话读每个字符都会调用一次 &lt;code class="code"&gt;
+read&lt;/code&gt;
+  系统调用，   比如输入 abc ： &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 如果有缓存的话就只调用一次了 read 系统调用了： &lt;/p&gt;
+&lt;p&gt; 如果有缓存的话就只调用一次了 &lt;code class="code"&gt;
+read&lt;/code&gt;
+  系统调用了： &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "abc\n", 1024)                  = 4
 &lt;/pre&gt;&lt;/div&gt;
