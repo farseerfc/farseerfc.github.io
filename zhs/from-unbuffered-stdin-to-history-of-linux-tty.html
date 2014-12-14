@@ -22,7 +22,7 @@
         <meta property="og:url" content="//farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html"/>
         <meta property="og:description" content="这篇也是源自于水源 C 板上板友的一个问题，涉及 Linux 上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 原帖在这里 。 可以设置不带缓冲的标准输入流吗？ WaterElement(UnChanged) 于 2014 年 12 月 09 日 23:29:51 星期二 问到： 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer ..."/>
         <meta property="article:published_time" content="2014-12-12" />
-            <meta property="article:section" content="programming" />
+            <meta property="article:section" content="linux" />
             <meta property="article:tag" content="c" />
             <meta property="article:tag" content="linux" />
             <meta property="article:tag" content="stdio" />
@@ -70,30 +70,73 @@ Farseerfc的小窝            </a>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
 
-                    <li class="dropdown">
+                    <li class="dropdown hidden-xs hidden-lg">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="//farseerfc.github.io/">繁體中文</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
+                            <li class="active"><a href="//farseerfc.github.io/zhs/">简体中文</a></li>
                             <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
 
-                     <li class="hidden-sm "><a href="//farseerfc.github.io/zhs/pages/about.html">
+                    <ul class="nav navbar-nav hidden-md hidden-sm">
+                        <li><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體中文</a></li>
+                        <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li class="active"><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体中文</a></li>
+                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li>&nbsp;</li>
+
+                     <li class=""><a href="//farseerfc.github.io/zhs/pages/about.html"><i class="fa fa-user"></i>
                          About
                       </a></li>
                   <li>&nbsp;</li>
+
+                    <li class="dropdown hidden-xs hidden-md hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/c.html"><i class="fa fa-folder-o"></i> C</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.github.io/zhs/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-sm">
                         <li >
-                            <a href="//farseerfc.github.io/zhs/category/import.html">Import</a>
+                            <a href="//farseerfc.github.io/zhs/category/c.html"><i class="fa fa-folder-o"></i> C</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/zhs/category/life.html">Life</a>
+                            <a href="//farseerfc.github.io/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
                         </li>
                         <li class="active">
-                            <a href="//farseerfc.github.io/zhs/category/programming.html">Programming</a>
+                            <a href="//farseerfc.github.io/zhs/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
                         </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                        </li>
+                    </ul>
+
             </ul>
             <ul class="nav navbar-right navbar-form">
               <li><span>
@@ -102,7 +145,7 @@ Farseerfc的小窝            </a>
                 </form></span>
               </li>
             </ul>
-            <ul class="nav navbar-nav navbar-right hidden-sm">
+            <ul class="nav navbar-nav navbar-right">
               <li><a href="//farseerfc.github.io/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
               <li><a href="//farseerfc.github.io/zhs/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
             </ul>
@@ -118,7 +161,7 @@ Farseerfc的小窝            </a>
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.github.io/zhs" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
-                <li><a href="//farseerfc.github.io/zhs/category/programming.html" title="programming">programming</a></li>
+                <li><a href="//farseerfc.github.io/zhs/category/linux.html" title="linux">linux</a></li>
                 <li class="active">从非缓冲输入流到 Linux&nbsp;控制台的历史</li>
             </ol>
     <section id="content" class="article-content">
@@ -150,15 +193,15 @@ Farseerfc的小窝            </a>
 
     <a onclick="$.get('//farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
 <span><small><a href="//farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="from-unbuffered-stdin-to-history-of-linux-tty" data-disqus-url="http://farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
-	<a href="//farseerfc.github.io/zhs/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> c</a>
-	<a href="//farseerfc.github.io/zhs/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> linux</a>
-	<a href="//farseerfc.github.io/zhs/tag/stdio.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> stdio</a>
-	<a href="//farseerfc.github.io/zhs/tag/tty.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> tty</a>
-	<a href="//farseerfc.github.io/zhs/tag/unix.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> unix</a>
-	<a href="//farseerfc.github.io/zhs/tag/ugh.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> ugh</a>
-	<a href="//farseerfc.github.io/zhs/tag/ncurses.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> ncurses</a>
-	<a href="//farseerfc.github.io/zhs/tag/termcap.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> termcap</a>
-	<a href="//farseerfc.github.io/zhs/tag/terminfo.html" class="btn btn-primary btn-xs"><i class="fa fa-tags"></i> terminfo</a>
+	<a href="//farseerfc.github.io/zhs/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> c</a>
+	<a href="//farseerfc.github.io/zhs/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.github.io/zhs/tag/stdio.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> stdio</a>
+	<a href="//farseerfc.github.io/zhs/tag/tty.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> tty</a>
+	<a href="//farseerfc.github.io/zhs/tag/unix.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> unix</a>
+	<a href="//farseerfc.github.io/zhs/tag/ugh.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> ugh</a>
+	<a href="//farseerfc.github.io/zhs/tag/ncurses.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> ncurses</a>
+	<a href="//farseerfc.github.io/zhs/tag/termcap.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> termcap</a>
+	<a href="//farseerfc.github.io/zhs/tag/terminfo.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> terminfo</a>
 </span>
 </footer><!-- /.post-info -->                </div>
             </header>
@@ -457,7 +500,7 @@ Delete</kbd>
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
-<i class="fa fa-home fa-lg"></i>
+<i class="fa fa-user fa-lg"></i>
 <a href="//farseerfc.github.io/zhs/pages/about.html">
 关于 farseerfc</a>
         </h4>
@@ -496,109 +539,9 @@ Delete</kbd>
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.github.io/zhs/tag/software.html">
                     software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -607,18 +550,18 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/tty.html">
-                    tty <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -627,23 +570,68 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/template.html">
                     template <sup> 1</sup>
                 </a>
             </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -652,13 +640,68 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/pelican.html">
                     pelican <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
                 </a>
             </li>
     </ul>
