@@ -2,7 +2,7 @@
 <html lang="zh"
 >
 <head>
-    <title>C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc的小窩</title>
+    <title>C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc的小窩</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -18,7 +18,7 @@
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
-        <meta property="og:title" content="C++ Tricks 2.3 I386平臺C函數內部的棧分配"/>
+        <meta property="og:title" content="C++ Tricks 2.3 I386平臺C函數內部的棧分配"/>
         <meta property="og:url" content="//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"/>
         <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.3 I386 平臺 C 函數內部的棧分配 函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將 esp 減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將 esp 加上相應字節數，歸還棧空間。 爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂 esp 的位置在進入函數體時就已確定，但是由於 esp 會在函數執行期變動，所以將 esp 的值保存在 ebp 中，並事先將 ebp 的值壓棧。隨後，在函數體中通過 ebp 減去偏移量來訪問變量。以一個最簡單的函數爲例： void f ..."/>
         <meta property="article:published_time" content="2007-08-28" />
@@ -35,7 +35,6 @@
     <link href="//farseerfc.github.io/theme/css/pygments/monokai.css" rel="stylesheet">
     <link href="//farseerfc.github.io/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
         <link href="//farseerfc.github.io/theme/css/html4css1.css" rel="stylesheet">
-        <link href="//farseerfc.github.io/theme/css/typogrify.css" rel="stylesheet">
     <link rel="stylesheet" href="//farseerfc.github.io/theme/css/style.css" type="text/css"/>
 
         <link href="//farseerfc.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
@@ -45,7 +44,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc的小窩</div>
+<div style="display:none" id="title">C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -68,17 +67,17 @@ Farseerfc的小窩            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="active"><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
-                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-md hidden-sm">
                         <li class="active"><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                         <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
                         <li><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
-                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                     </ul>
 
                     <li>&nbsp;</li>
@@ -154,18 +153,18 @@ Farseerfc的小窩            </a>
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.github.io" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
                 <li><a href="//farseerfc.github.io/category/import.html" title="import">import</a></li>
-                <li class="active">C++ Tricks 2.3&nbsp;I386平臺C函數內部的棧分配</li>
+                <li class="active">C++ Tricks 2.3 I386平臺C函數內部的棧分配</li>
             </ol>
     <section id="content" class="article-content">
         <article>
             <header class="page-header jumbotron jumbotron-primary panel-primary">
                 <div class="panel-heading">
                     <h1>
-                        C++ Tricks 2.3&nbsp;I386平臺C函數內部的棧分配
+                        C++ Tricks 2.3 I386平臺C函數內部的棧分配
                         <a href="//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"
                            rel="bookmark"
                            class="btn btn-primary btn-lg"
-                           title="到 C++ Tricks 2.3 I386平臺C函數內部的棧分配 的永久鏈接">
+                           title="到 C++ Tricks 2.3 I386平臺C函數內部的棧分配 的永久鏈接">
                            <i class="mdi-action-launch"></i>
                         </a>
                     </h1>
@@ -192,53 +191,53 @@ Farseerfc的小窩            </a>
 
             <div class="entry-content jumbotron" id="article-content">
     
-                <html><body><p> 從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  導入 </p>
+                <html><body><p> 從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  導入 </p>
 <div class="section" id="i386c">
-<h2>2.3 I386 平臺 C 函數內部的棧分配 </h2>
+<h2>2.3 I386 平臺 C 函數內部的棧分配 </h2>
 <p> 函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將 esp 減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將 esp 加上相應字節數，歸還棧空間。 </p>
 <p> 爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂 esp 的位置在進入函數體時就已確定，但是由於 esp 會在函數執行期變動，所以將 esp 的值保存在 ebp 中，並事先將 ebp 的值壓棧。隨後，在函數體中通過 ebp 減去偏移量來訪問變量。以一個最簡單的函數爲例： </p>
-<p>void f()</p>
+<p>void f()</p>
 <p>{</p>
-<p>int a=0; //a 的地址被分配爲 ebp-4</p>
-<p>char c=1; //c 的地址被分配爲 ebp-8</p>
+<p>int a=0; //a 的地址被分配爲 ebp-4</p>
+<p>char c=1; //c 的地址被分配爲 ebp-8</p>
 <p>}</p>
 <p> 產生的彙編代碼爲： </p>
-<p>push ebp ; 將 ebp 壓棧 </p>
-<p>mov ebp,esp ;ebp=esp  用棧底備份棧頂指針 </p>
-<p>sub esp,8 ;esp-=8 ，爲 a 和 c 預留空間，包括邊界對齊 </p>
-<p>mov dword ptr[ebp-4],0 ;a=0</p>
-<p>mov byte ptr[ebp-8],1 ;c=1</p>
-<p>add esp,8 ;esp+=8 ，歸還 a 和 c 的空間 </p>
-<p>mov esp,ebp ;esp=ebp  從棧底恢復棧頂指針 </p>
-<p>pop ebp ; 恢復 ebp</p>
-<p>ret ; 返回 </p>
+<p>push ebp ; 將 ebp 壓棧 </p>
+<p>mov ebp,esp ;ebp=esp  用棧底備份棧頂指針 </p>
+<p>sub esp,8 ;esp-=8 ，爲 a 和 c 預留空間，包括邊界對齊 </p>
+<p>mov dword ptr[ebp-4],0 ;a=0</p>
+<p>mov byte ptr[ebp-8],1 ;c=1</p>
+<p>add esp,8 ;esp+=8 ，歸還 a 和 c 的空間 </p>
+<p>mov esp,ebp ;esp=ebp  從棧底恢復棧頂指針 </p>
+<p>pop ebp ; 恢復 ebp</p>
+<p>ret ; 返回 </p>
 <p> 相應的內存佈局是這樣： </p>
-<p>09992:c=1 &lt;-esp</p>
+<p>09992:c=1 &lt;-esp</p>
 <p>09996:a=0</p>
-<p>10000: 舊 ebp &lt;-ebp</p>
+<p>10000: 舊 ebp &lt;-ebp</p>
 <p>10004:……</p>
 <p> 注 : 彙編中的 pop 、 push 、 call 、 ret 語句是棧操作指令，其功能可以用普通指令替換 </p>
-<p>push ebp 相當於 :</p>
-<p>add esp,4</p>
-<p>mov dword ptr[esp],ebp</p>
-<p>pop ebp 相當於： </p>
-<p>mov ebp,dword ptr[esp]</p>
-<p>sub esp,4</p>
-<p>call fun_address 相當於： </p>
-<p>push eip</p>
-<p>jmp fun_address</p>
+<p>push ebp 相當於 :</p>
+<p>add esp,4</p>
+<p>mov dword ptr[esp],ebp</p>
+<p>pop ebp 相當於： </p>
+<p>mov ebp,dword ptr[esp]</p>
+<p>sub esp,4</p>
+<p>call fun_address 相當於： </p>
+<p>push eip</p>
+<p>jmp fun_address</p>
 <p>ret 相當於 </p>
-<p>add esp,4</p>
-<p>jmp dword ptr[esp-4]</p>
+<p>add esp,4</p>
+<p>jmp dword ptr[esp-4]</p>
 <p> 帶參數的 ret</p>
-<p>ret 8 相當於 </p>
-<p>add esp,12</p>
-<p>jmp dword ptr[esp-4]</p>
+<p>ret 8 相當於 </p>
+<p>add esp,12</p>
+<p>jmp dword ptr[esp-4]</p>
 <p> 所有局部變量都在棧中由函數統一分配，形成了類似逆序數組的結構，可以通過指針逐一訪問。這一特點具有很多有趣性質，比如，考慮如下函數，找出其中的錯誤及其造成的結果： </p>
-<p>void f()</p>
+<p>void f()</p>
 <p>{</p>
-<p>int i,a[10];</p>
-<p>for(i=0;i&lt;=10;++i)a[i]=0;/An error occurs here!</p>
+<p>int i,a[10];</p>
+<p>for(i=0;i&lt;=10;++i)a[i]=0;/An error occurs here!</p>
 <p>}</p>
 <p> 這個函數中包含的錯誤，即使是 C++ 新手也很容易發現，這是老生常談的越界訪問問題。但是這個錯誤造成的結果，是很多人沒有想到的。這次的越界訪問，並不會像很多新手預料的那樣造成一個 “ 非法操作 ” 消息，也不會像很多老手估計的那樣會默不作聲，而是導致一個，呃，死循環！ </p>
 <p> 錯誤的本質顯而易見，我們訪問了 a[10] ，但是 a[10] 並不存在。 C++ 標準對於越界訪問只是說 “ 未定義操作 ” 。我們知道， a[10] 是數組 a 所在位置之後的一個位置，但問題是，是誰在這個位置上。是 i!</p>
@@ -259,18 +258,18 @@ Farseerfc的小窩            </a>
 這篇文章是 "CPP_Tricks" 系列文章的第 6 篇：                </h4>
                 </div>
                 <div class="btn-group-vertical btn-group-flat" style="width:100%">
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks.html' style="text-align:left">C++&nbsp;Tricks</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-1-1-conditional-operator.html' style="text-align:left">C++ Tricks 1.1&nbsp;條件運算符(?:)</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-1-2-trap-in-comma-logical-operator.html' style="text-align:left">C++ Tricks 1.2&nbsp;逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-1-x86-architecture.html' style="text-align:left">C++ Tricks 2.1&nbsp;X86概述</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-2-i386-memory-layout.html' style="text-align:left">C++ Tricks 2.2&nbsp;I386平臺的內存佈局</a>
-                        <a class="btn btn-primary" href='//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions.html' style="text-align:left">C++ Tricks 2.3&nbsp;I386平臺C函數內部的棧分配</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html' style="text-align:left">C++ Tricks 2.4&nbsp;I386平臺C函數調用邊界的棧分配</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-5-address-alignment.html' style="text-align:left">C++ Tricks 2.5&nbsp;I386平臺的邊界對齊(Align)</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.html' style="text-align:left">C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable&nbsp;Arguments)</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions.html' style="text-align:left">C++ Tricks 2.7&nbsp;I386平臺的其它函數調用模型</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html' style="text-align:left">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue <span class="amp">&amp;</span>&nbsp;constant)</a>
-                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch.html' style="text-align:left">C++ Tricks 3.2&nbsp;標號、goto，以及switch的實現</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks.html' style="text-align:left">C++ Tricks</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-1-1-conditional-operator.html' style="text-align:left">C++ Tricks 1.1  條件運算符(?:)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-1-2-trap-in-comma-logical-operator.html' style="text-align:left">C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-1-x86-architecture.html' style="text-align:left">C++ Tricks 2.1 X86概述</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-2-i386-memory-layout.html' style="text-align:left">C++ Tricks 2.2 I386平臺的內存佈局</a>
+                        <a class="btn btn-primary" href='//farseerfc.github.io/c-tricks-2-3-i386-stack-allocation-in-c-functions.html' style="text-align:left">C++ Tricks 2.3 I386平臺C函數內部的棧分配</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html' style="text-align:left">C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-5-address-alignment.html' style="text-align:left">C++ Tricks 2.5 I386平臺的邊界對齊(Align)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-6-i386-variable-arguments.html' style="text-align:left">C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable Arguments)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-2-7-i386-calling-conventions.html' style="text-align:left">C++ Tricks 2.7 I386平臺的其它函數調用模型</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-3-1-lvalue-rvalue-constant.html' style="text-align:left">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)</a>
+                        <a class="btn btn-default" href='//farseerfc.github.io/c-tricks-3-2-label-goto-and-implementation-of-switch.html' style="text-align:left">C++ Tricks 3.2 標號、goto，以及switch的實現</a>
                 </div>
             </div>
 
@@ -278,14 +277,14 @@ Farseerfc的小窩            </a>
                 <div class="col-xs-6">
                     <a href="//farseerfc.github.io/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
-                        C++ Tricks 2.4&nbsp;I386平臺C函數調用邊界的棧分配
+                        C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配
                         </h4>
                     </a>
                 </div>
                 <div class="col-xs-6">
                     <a href="//farseerfc.github.io/c-tricks.html" class="btn btn-default btn-lg" style="float:left;clear:both">
                         <h4>
-                        C++&nbsp;Tricks<i class="fa fa-arrow-right"></i>
+                        C++ Tricks<i class="fa fa-arrow-right"></i>
                         </h4>
                     </a>
                 </div>
@@ -375,28 +374,18 @@ Farseerfc的小窩            </a>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -405,8 +394,118 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/terminfo.html">
                     terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -420,8 +519,13 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -430,113 +534,8 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
                 </a>
             </li>
     </ul>

@@ -2,7 +2,7 @@
 <html lang="zh"
 >
 <head>
-    <title>從非緩衝輸入流到 Linux 控制檯的歷史 - Farseerfc的小窩</title>
+    <title>從非緩衝輸入流到 Linux 控制檯的歷史 - Farseerfc的小窩</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="c,linux,stdio,tty,unix,ugh,ncurses,termcap,terminfo" />
-        <meta name="description" content="這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014 年 12 月 09 日 23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer ..." />
+        <meta name="description" content="這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014 年 12 月 09 日 23:29:51 星期二問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20 ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
-        <meta property="og:title" content="從非緩衝輸入流到 Linux 控制檯的歷史"/>
+        <meta property="og:title" content="從非緩衝輸入流到 Linux 控制檯的歷史"/>
         <meta property="og:url" content="//farseerfc.github.io/from-unbuffered-stdin-to-history-of-linux-tty.html"/>
-        <meta property="og:description" content="這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014 年 12 月 09 日 23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer ..."/>
+        <meta property="og:description" content="這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014 年 12 月 09 日 23:29:51 星期二問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20 ..."/>
         <meta property="article:published_time" content="2014-12-12" />
             <meta property="article:section" content="linux" />
             <meta property="article:tag" content="c" />
@@ -43,7 +43,6 @@
     <link href="//farseerfc.github.io/theme/css/pygments/monokai.css" rel="stylesheet">
     <link href="//farseerfc.github.io/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
         <link href="//farseerfc.github.io/theme/css/html4css1.css" rel="stylesheet">
-        <link href="//farseerfc.github.io/theme/css/typogrify.css" rel="stylesheet">
     <link rel="stylesheet" href="//farseerfc.github.io/theme/css/style.css" type="text/css"/>
 
         <link href="//farseerfc.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
@@ -53,7 +52,7 @@
         <link href="//farseerfc.github.io/theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">從非緩衝輸入流到 Linux 控制檯的歷史 - Farseerfc的小窩</div>
+<div style="display:none" id="title">從非緩衝輸入流到 Linux 控制檯的歷史 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -76,17 +75,17 @@ Farseerfc的小窩            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="active"><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                             <li><a href="//farseerfc.github.io/en/">English</a></li>
                             <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
-                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-md hidden-sm">
                         <li class="active"><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                         <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
                         <li><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
-                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                     </ul>
 
                     <li>&nbsp;</li>
@@ -162,18 +161,18 @@ Farseerfc的小窩            </a>
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.github.io" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
                 <li><a href="//farseerfc.github.io/category/linux.html" title="linux">linux</a></li>
-                <li class="active">從非緩衝輸入流到 Linux&nbsp;控制檯的歷史</li>
+                <li class="active">從非緩衝輸入流到 Linux 控制檯的歷史</li>
             </ol>
     <section id="content" class="article-content">
         <article>
             <header class="page-header jumbotron jumbotron-primary panel-primary">
                 <div class="panel-heading">
                     <h1>
-                        從非緩衝輸入流到 Linux&nbsp;控制檯的歷史
+                        從非緩衝輸入流到 Linux 控制檯的歷史
                         <a href="//farseerfc.github.io/from-unbuffered-stdin-to-history-of-linux-tty.html"
                            rel="bookmark"
                            class="btn btn-primary btn-lg"
-                           title="到 從非緩衝輸入流到 Linux 控制檯的歷史 的永久鏈接">
+                           title="到 從非緩衝輸入流到 Linux 控制檯的歷史 的永久鏈接">
                            <i class="mdi-action-launch"></i>
                         </a>
                     </h1>
@@ -217,7 +216,7 @@ Farseerfc的小窩            </a>
 <li><a class="reference internal" href="#id2" id="id7"> 可以設置不帶緩衝的標準輸入流嗎？ </a><ul>
 <li><a class="reference internal" href="#id3" id="id8"> 這和緩存無關，是控制檯的實現方式的問題。 </a></li>
 <li><a class="reference internal" href="#strace" id="id9">strace 查看了下 </a></li>
-<li><a class="reference internal" href="#raw-mode" id="id10"> 如果想感受一下 raw mode</a></li>
+<li><a class="reference internal" href="#raw-mode" id="id10"> 如果想感受一下 raw mode</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#id4" id="id11"> 終端上的字符編程 </a><ul>
@@ -230,10 +229,10 @@ Farseerfc的小窩            </a>
                     </div>
     
                 <html><body>
-<p> 這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 <a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"> 原帖在這裏 </a>  。 </p>
+<p> 這篇也是源自於水源 C 板上板友的一個問題，涉及 Linux 上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 <a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"> 原帖在這裏 </a>  。 </p>
 <div class="section" id="id2">
 <h2><a class="toc-backref" href="#id7"> 可以設置不帶緩衝的標準輸入流嗎？ </a></h2>
-<p>WaterElement(UnChanged)  於 2014 年 12 月 09 日 23:29:51  星期二   問到： </p>
+<p>WaterElement(UnChanged)  於 2014 年 12 月 09 日 23:29:51  星期二問到： </p>
 <blockquote>
 <p> 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 </p>
 <div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
@@ -255,14 +254,14 @@ fgets</code>
 </blockquote>
 <div class="section" id="id3">
 <h3><a class="toc-backref" href="#id8"> 這和緩存無關，是控制檯的實現方式的問題。 </a></h3>
-<p> 再講細節一點，這裏有很多個程序和設備。以下按 linux  的情況講： </p>
+<p> 再講細節一點，這裏有很多個程序和設備。以下按 linux  的情況講： </p>
 <ol class="arabic simple">
 <li> 終端模擬器窗口（比如 xterm ）收到鍵盤事件 </li>
-<li> 終端模擬器 (xterm) 把鍵盤事件發給虛擬終端  pty1</li>
-<li>pty1  檢查目前的輸入狀態，把鍵盤事件轉換成 stdin  的輸入，發給你的程序 </li>
-<li> 你的程序的 c  庫從 stdin  讀入一個輸入，處理 </li>
+<li> 終端模擬器 (xterm) 把鍵盤事件發給虛擬終端 pty1</li>
+<li>pty1  檢查目前的輸入狀態，把鍵盤事件轉換成 stdin  的輸入，發給你的程序 </li>
+<li> 你的程序的 c  庫從 stdin  讀入一個輸入，處理 </li>
 </ol>
-<p> 標準庫說的輸入緩存是在 4  的這一步進行的。而行輸入是在 3  的這一步被緩存起來的。 </p>
+<p> 標準庫說的輸入緩存是在 4  的這一步進行的。而行輸入是在 3  的這一步被緩存起來的。 </p>
 <p> 終端 pty 有多種狀態，一般控制檯程序所在的狀態叫「回顯行緩存」狀態，這個狀態的意思是 :</p>
 <ol class="arabic simple">
 <li> 所有普通字符的按鍵，會回顯到屏幕上，同時記錄在行緩存區裏。 </li>
@@ -274,32 +273,33 @@ Delete</kbd>
 <li> 收到回車的時候把整個一行的內容發給 stdin 。 </li>
 </ol>
 <p> 參考： <a class="reference external" href="http://en.wikipedia.org/wiki/Cooked_mode">http://en.wikipedia.org/wiki/Cooked_mode</a></p>
-<p> 同時在 Linux/Unix 下可以發特殊控制符號給 pty 讓它進入「 raw 」狀態，這種狀態下按鍵不會被回顯，顯示什麼內容都靠你程序自己控制。如果你想得到每一個按鍵事件需要用 raw 狀態，這需要自己控制回顯自己處理緩衝，簡單點的方法是用 readline  這樣的庫（基本就是「回顯行緩存」的高級擴展，支持了 Home/End ，支持歷史）或者 ncurses  這樣的庫（在 raw 狀態下實現了一個簡單的窗口 /  事件處理框架）。 </p>
+<p> 同時在 Linux/Unix 下可以發特殊控制符號給 pty 讓它進入「 raw 」狀態，這種狀態下按鍵不會被回顯，顯示什麼內容都靠你程序自己控制。如果你想得到每一個按鍵事件需要用 raw 狀態，這需要自己控制回顯自己處理緩衝，簡單點的方法是用 readline  這樣的庫（基本就是「回顯行緩存」的高級擴展，支持了 Home/End ，支持歷史）或者 ncurses  這樣的庫（在 raw 狀態下實現了一個簡單的窗口 /
+ 事件處理框架）。 </p>
 <p> 參考： <a class="reference external" href="http://en.wikipedia.org/wiki/POSIX_terminal_interface#History">http://en.wikipedia.org/wiki/POSIX_terminal_interface#History</a></p>
 <p> 除此之外， <kbd class="kbd">
 Ctrl-C</kbd>
-  轉換到 <span class="caps">SIGINT</span>  ， <kbd class="kbd">
+  轉換到 SIGINT  ， <kbd class="kbd">
 Ctrl-D</kbd>
-  轉換到 <span class="caps">EOF</span>  這種也是在 3  這一步做的。 </p>
+  轉換到 EOF  這種也是在 3  這一步做的。 </p>
 <p> 以及，有些終端模擬器提供的 <kbd class="kbd">
 Ctrl-Shift-C</kbd>
-  表示複製這種是在 2  這一步做的。 </p>
-<p> 以上是 Linux/unix  的方式。  Windows 的情況大體類似，只是細節上有很多地方不一樣： </p>
+  表示複製這種是在 2  這一步做的。 </p>
+<p> 以上是 Linux/unix  的方式。 Windows 的情況大體類似，只是細節上有很多地方不一樣： </p>
 <ol class="arabic simple">
-<li> 窗口事件的接收者是創建 cmd  窗口的 Win32  子系統。 </li>
-<li>Win32 子系統接收到事件之後，傳遞給位於命令行子系統的 cmd  程序 </li>
-<li>cmd  程序再傳遞給你的程序。 </li>
+<li> 窗口事件的接收者是創建 cmd  窗口的 Win32  子系統。 </li>
+<li>Win32 子系統接收到事件之後，傳遞給位於命令行子系統的 cmd  程序 </li>
+<li>cmd  程序再傳遞給你的程序。 </li>
 </ol>
 <p>Windows 上同樣有類似行緩存模式和 raw 模式的區別，只不過實現細節不太一樣。 </p>
 </div>
 <div class="section" id="strace">
 <h3><a class="toc-backref" href="#id9">strace 查看了下 </a></h3>
-<p>WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三   回復： </p>
+<p>WaterElement(UnChanged)  於 2014 年 12 月 10 日 21:53:54  星期三回復： </p>
 <blockquote>
 <p> 感謝 FC 的詳盡解答。 </p>
 <p> 用 strace 查看了下，設置標準輸入沒有緩存的話讀每個字符都會調用一次 <code class="code">
 read</code>
-  系統調用，   比如輸入 abc ： </p>
+  系統調用，比如輸入 abc ： </p>
 <div class="highlight"><pre>read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
@@ -315,9 +315,9 @@ read</code>
 </blockquote>
 </div>
 <div class="section" id="raw-mode">
-<h3><a class="toc-backref" href="#id10"> 如果想感受一下 raw mode</a></h3>
-<p> 沒錯，這個是你的進程內 C 庫做的緩存， tty 屬於字符設備所以是一個一個字符塞給你的   程序的。 </p>
-<p> 如果想感受一下 raw mode  可以試試下面這段程序（沒有檢測錯誤返回值） </p>
+<h3><a class="toc-backref" href="#id10"> 如果想感受一下 raw mode</a></h3>
+<p> 沒錯，這個是你的進程內 C 庫做的緩存， tty 屬於字符設備所以是一個一個字符塞給你的程序的。 </p>
+<p> 如果想感受一下 raw mode  可以試試下面這段程序（沒有檢測錯誤返回值） </p>
 <div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
 <span class="cp">#include &lt;unistd.h&gt;</span>
 <span class="cp">#include &lt;termios.h&gt;</span>
@@ -384,30 +384,31 @@ read</code>
 </div>
 <div class="section" id="id4">
 <h2><a class="toc-backref" href="#id11"> 終端上的字符編程 </a></h2>
-<p>vander( 大青蛙 )  於 2014 年 12 月 12 日 08:52:20  星期五   問到： </p>
+<p>vander( 大青蛙 )  於 2014 年 12 月 12 日 08:52:20  星期五問到： </p>
 <blockquote>
 <p> 學習了！ </p>
-<p> 進一步想請教一下 fc 大神。如果我在 Linux 上做終端上的字符編程，是否除了用 ncurses 庫之外，也可以不用該庫而直接與終端打交道，就是你所說的直接在 raw 模式？另外，終端類型 vt100 和 linux 的差別在哪裏？爲什麼 Kevin Boone 的 KBox 配置手冊裏面說必須把終端類型設成 linux ，而且要加上 terminfo 文件，才能讓終端上的 vim 正常工作？ term info 文件又是幹什麼的？ </p>
+<p> 進一步想請教一下 fc 大神。如果我在 Linux 上做終端上的字符編程，是否除了用 ncurses 庫之外，也可以不用該庫而直接與終端打交道，就是你所說的直接在 raw 模式？另外，終端類型 vt100 和 linux 的差別在哪裏？爲什麼 Kevin Boone 的 KBox 配置手冊裏面說必須把終端類型設成 linux ，而且要加上 terminfo 文件，才能讓終端上的 vim 正常工作？ term
+info 文件又是幹什麼的？ </p>
 </blockquote>
 <div class="section" id="id5">
 <h3><a class="toc-backref" href="#id12">Linux 控制檯的歷史 </a></h3>
-<p> 嗯理論上可以不用 ncurses  庫直接在 raw  模式操縱終端。 </p>
-<p> 這裏稍微聊一下 terminfo/termcap 的歷史，詳細的歷史和吐槽參考 <a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf">Unix hater’s Handbook</a>
- 第 6 章 Terminal Insanity 。 </p>
-<p> 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 HTML 要測試各種瀏覽器兼容性一樣。   通常的做法是 </p>
+<p> 嗯理論上可以不用 ncurses  庫直接在 raw  模式操縱終端。 </p>
+<p> 這裏稍微聊一下 terminfo/termcap 的歷史，詳細的歷史和吐槽參考 <a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf">Unix hater's Handbook</a>
+ 第 6 章 Terminal Insanity 。 </p>
+<p> 首先一個真正意義上的終端就是一個輸入設備（通常是鍵盤）加上一個輸出設備（打印機或者顯示器）。很顯然不同的終端的能力不同，比如如果輸出設備是打印機的話，顯示出來的字符就不能刪掉了（但是能覆蓋），而且輸出了一行之後就不能回到那一行了。再比如顯示器終端有的支持粗體和下劃線，有的支持顏色，而有的什麼都不支持。早期 Unix 工作在電傳打字機（ TeleTYpe ）終端上，後來 Unix 被 port 到越來越多的機器上，然後越來越多類型的終端會被連到 Unix 上，很可能同一臺 Unix 主機連了多個不同類型的終端。由於是不同廠商提供的不同的終端，能力各有不同，自然控制他們工作的方式也是不一樣的。所有終端都支持回顯行編輯模式，所以一般的面向行的程序還比較好寫，但是那時候要撰寫支持所有終端的「全屏」程序就非常痛苦，這種情況就像現在瀏覽器沒有統一標準下寫 HTML 要測試各種瀏覽器兼容性一樣。通常的做法是 </p>
 <ol class="arabic simple">
 <li> 使用最小功能子集 </li>
 <li> 假設終端是某個特殊設備，不管別的設備。 </li>
 </ol>
-<p> 水源的代碼源頭 Firebird2000  就是那樣的一個程序，只支持固定大小的 vt102 終端。 </p>
-<p> 這時有一個劃時代意義的程序出現了，就是 vi ，試圖要做到「全屏可視化編輯」。這在現在看起來很簡單，但是在當時基本是天方夜譚。 vi  的做法是提出一層抽象，記錄它所需要的所有終端操作，然後有一個終端類型數據庫，把那些操作映射到終端類型的具體指令上。當然並不是所有操作在所有終端類型上都支持，所以會有一堆 fallback ，比如要「強調」某段文字，在彩色終端上可能 fallback  到紅色，在黑白終端上可能 fallback  到粗體。 </p>
+<p> 水源的代碼源頭 Firebird2000  就是那樣的一個程序，只支持固定大小的 vt102 終端。 </p>
+<p> 這時有一個劃時代意義的程序出現了，就是 vi ，試圖要做到「全屏可視化編輯」。這在現在看起來很簡單，但是在當時基本是天方夜譚。 vi  的做法是提出一層抽象，記錄它所需要的所有終端操作，然後有一個終端類型數據庫，把那些操作映射到終端類型的具體指令上。當然並不是所有操作在所有終端類型上都支持，所以會有一堆 fallback ，比如要「強調」某段文字，在彩色終端上可能 fallback  到紅色，在黑白終端上可能 fallback  到粗體。 </p>
 <p>vi  一出現大家都覺得好頂讚，然後想要寫更多類似 vi  這樣的全屏程序。然後 vi  的作者就把終端抽象的這部分數據庫放出來形成一個單獨的項目，叫 termcap  （ Terminal
-Capibility ），對應的描述終端的數據庫就是 termcap  格式。然後 termcap  只是一個數據庫（所以無狀態）還不夠方便易用，所以後來又有人用 termcap  實現了 curses  。 </p>
-<p> 再後來大家用 curses/termcap  的時候漸漸發現這個數據庫有一點不足：它是爲 vi  設計的，所以只實現了 vi  需要的那部分終端能力。然後對它改進的努力就形成了新的 terminfo  數據庫和 pcurses  和後來的 ncurses  。然後 <span class="caps">VIM</span>  出現了自然也用 terminfo  實現這部分終端操作。 </p>
-<p> 然後麼就是 X  出現了， xterm  出現了，大家都用顯示器了，然後 xterm  爲了兼容各種老程序加入了各種老終端的模擬模式。不過因爲最普及的終端是 vt100  所以 xterm  默認是工作在兼容 vt100  的模式下。然後接下來各種新程序（偷懶不用 *curses 的那些）都以 xterm/vt100  的方式寫。 </p>
-<p> 嗯到此爲止是 Unix  世界的黑歷史。 </p>
-<p> 知道這段歷史的話就可以明白爲什麼需要 <span class="caps">TERM</span>  變量配合 terminfo  數據庫纔能用一些 Unix  下的全屏程序了。類比一下的話這就是現代瀏覽器的  user-agent 。 </p>
-<p> 然後話題回到 Linux  。大家知道 Linux  早期代碼不是一個 <span class="caps">OS</span> ，而是 Linus  大神想在他的嶄新蹭亮的 386-<span class="caps">PC</span>  上遠程登錄他學校的 Unix  主機，接收郵件和逛水源（咳咳）。於是 Linux  最早的那部分代碼並不是一個通用 <span class="caps">OS</span>  而只是一個 bootloader  加一個終端模擬器。所以現在 Linux  內核裏還留有他當年實現的終端模擬器的部分代碼，而這個終端模擬器的終端類型就是 linux  啦。然後他當時是爲了逛水源嘛所以 linux  終端基本上是 vt102  的一個接近完整子集。 </p>
+Capibility ），對應的描述終端的數據庫就是 termcap  格式。然後 termcap  只是一個數據庫（所以無狀態）還不夠方便易用，所以後來又有人用 termcap  實現了 curses  。 </p>
+<p> 再後來大家用 curses/termcap  的時候漸漸發現這個數據庫有一點不足：它是爲 vi  設計的，所以只實現了 vi  需要的那部分終端能力。然後對它改進的努力就形成了新的 terminfo  數據庫和 pcurses  和後來的 ncurses  。然後 VIM  出現了自然也用 terminfo  實現這部分終端操作。 </p>
+<p> 然後麼就是 X  出現了， xterm  出現了，大家都用顯示器了，然後 xterm  爲了兼容各種老程序加入了各種老終端的模擬模式。不過因爲最普及的終端是 vt100  所以 xterm  默認是工作在兼容 vt100  的模式下。然後接下來各種新程序（偷懶不用 *curses 的那些）都以 xterm/vt100  的方式寫。 </p>
+<p> 嗯到此爲止是 Unix  世界的黑歷史。 </p>
+<p> 知道這段歷史的話就可以明白爲什麼需要 TERM  變量配合 terminfo  數據庫纔能用一些 Unix  下的全屏程序了。類比一下的話這就是現代瀏覽器的 user-agent 。 </p>
+<p> 然後話題回到 Linux  。大家知道 Linux  早期代碼不是一個 OS ，而是 Linus  大神想在他的嶄新蹭亮的 386-PC  上遠程登錄他學校的 Unix  主機，接收郵件和逛水源（咳咳）。於是 Linux  最早的那部分代碼並不是一個通用 OS  而只是一個 bootloader  加一個終端模擬器。所以現在 Linux  內核裏還留有他當年實現的終端模擬器的部分代碼，而這個終端模擬器的終端類型就是 linux  啦。然後他當時是爲了逛水源嘛所以 linux  終端基本上是 vt102  的一個接近完整子集。 </p>
 <p> 說到這裏脈絡大概應該清晰了， xterm 終端類型基本模擬 vt100 ， linux 終端類型基本模擬 vt102 。這兩個的區別其實很細微，都是同一個廠商的兩代產品嘛。有差別的地方差不多就是 <kbd class="kbd">
 Home</kbd>
  / <kbd class="kbd">
@@ -419,9 +420,10 @@ PageDown</kbd>
  / <kbd class="kbd">
 Delete</kbd>
 
- 這些不在 <span class="caps">ASCII</span>  控制字符表裏的按鍵的映射關係不同。 </p>
-<p> 嗯這也就解釋了爲什麼在 linux 環境的圖形界面的終端裏 telnet  上水源的話，上面這些按鍵會錯亂 ……  如果設置終端類型是 linux/vt102  的話就不會亂了。在 linux  的 <span class="caps">TTY</span>  裏 telnet  也不會亂的樣子。 </p>
-<p> 寫到這裏纔發現貌似有點長 ……  總之可以參考 <a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf">Unix hater’s Handbook</a>  裏的相關歷史評論和吐槽，那一段非常有意思。 </p>
+ 這些不在 ASCII  控制字符表裏的按鍵的映射關係不同。 </p>
+<p> 嗯這也就解釋了爲什麼在 linux 環境的圖形界面的終端裏 telnet  上水源的話，上面這些按鍵會錯亂 ……  如果設置終端類型是 linux/vt102  的話就不會亂了。在 linux  的 TTY  裏 telnet  也不會亂的樣子。 </p>
+<p> 寫到這裏纔發現貌似有點長 ……  總之可以參考 <a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf">Unix hater's Handbook</a>
+ 裏的相關歷史評論和吐槽，那一段非常有意思。 </p>
 </div>
 </div>
 </body></html>
@@ -440,7 +442,7 @@ Delete</kbd>
                 </div>
                 <div class="btn-group-vertical btn-group-flat" style="width:100%">
                         <a class="btn btn-default" href='//farseerfc.github.io/discuss-cpp-template-downcast.html' style="text-align:left">關於C++模板的類型轉換的討論</a>
-                        <a class="btn btn-primary" href='//farseerfc.github.io/from-unbuffered-stdin-to-history-of-linux-tty.html' style="text-align:left">從非緩衝輸入流到 Linux&nbsp;控制檯的歷史</a>
+                        <a class="btn btn-primary" href='//farseerfc.github.io/from-unbuffered-stdin-to-history-of-linux-tty.html' style="text-align:left">從非緩衝輸入流到 Linux 控制檯的歷史</a>
                 </div>
             </div>
 
@@ -448,7 +450,7 @@ Delete</kbd>
                 <div class="col-xs-6">
                     <a href="//farseerfc.github.io/jumping-kde5-plasma-activities-button.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
-                        <span class="caps">KDE5</span> Plasma&nbsp;之跳動賣萌的活動按鈕
+                        KDE5 Plasma 之跳動賣萌的活動按鈕
                         </h4>
                     </a>
                 </div>
@@ -540,28 +542,18 @@ Delete</kbd>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ugh.html">
-                    ugh <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/you.html">
+                    you <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/tag/c.html">
-                    C++ <sup> 14</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/linux.html">
+                    linux <sup> 3</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/tty.html">
-                    tty <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/oop.html">
-                    oop <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -570,8 +562,118 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/tag/terminfo.html">
                     terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -585,8 +687,13 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -595,113 +702,8 @@ Delete</kbd>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/template.html">
-                    template <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/tag/msr.html">
-                    msr <sup> 1</sup>
+                <a href="//farseerfc.github.io/tag/oop.html">
+                    oop <sup> 1</sup>
                 </a>
             </li>
     </ul>
