@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh"
+>
+<head>
+    <title>C++ Tricks 2.7 I386平臺的其它函數調用模型 - Farseerfcの居場所</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++" />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386 平臺的其它函數調用模型 上文介紹的只是 I386 平臺上 C 函數調用的標準模型，被稱作 __cdecl 。事實上， Microsoft Visual C++ 編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序 ( 從右至左 ) 參數堆棧恢復者：主調函數 (caller) __cdecl 明確地指出函數使用 C 函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序 ( 從右至左 ) 參數堆棧恢復者：被調函數 (callee) __stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 ..." />
+
+        <meta property="og:site_name" content="Farseerfcの居場所" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 2.7 I386平臺的其它函數調用模型"/>
+        <meta property="og:url" content="//farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html"/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386 平臺的其它函數調用模型 上文介紹的只是 I386 平臺上 C 函數調用的標準模型，被稱作 __cdecl 。事實上， Microsoft Visual C++ 編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序 ( 從右至左 ) 參數堆棧恢復者：主調函數 (caller) __cdecl 明確地指出函數使用 C 函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序 ( 從右至左 ) 參數堆棧恢復者：被調函數 (callee) __stdcall 是微軟所謂的標準調用模型。可惜的是它與 __cdecl 不兼容。幾乎所有的 ..."/>
+        <meta property="article:published_time" content="2007-08-28" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/jp/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの居場所 ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/jp/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">C++ Tricks 2.7 I386平臺的其它函數調用模型 - Farseerfcの居場所</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">ナビの切り替え</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/jp/" class="navbar-brand">
+Farseerfcの居場所            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-xs hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
+                            <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-md hidden-sm">
+                        <li><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li>&nbsp;</li>
+
+                     <li class=""><a href="//farseerfc.github.io/jp/pages/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+
+                    <li class="dropdown hidden-xs hidden-md hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active">
+                                <a href="//farseerfc.github.io/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-sm">
+                        <li class="active">
+                            <a href="//farseerfc.github.io/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                        </li>
+                    </ul>
+
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="検索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.github.io/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.github.io/jp/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io/jp" title="Farseerfcの居場所"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/jp/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 2.7 I386平臺的其它函數調用模型</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        C++ Tricks 2.7 I386平臺的其它函數調用模型
+                        <a href="//farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="C++ Tricks 2.7 I386平臺的其它函數調用模型　へのパーマリンク">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 2007年08月28日(週二)</time>
+    </span>
+    
+
+
+
+    <a onclick="$.get('//farseerfc.github.io/jp/c-tricks-2-7-i386-calling-conventions.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-7-i386-calling-conventions" data-disqus-url="http://farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.github.io/jp/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
+</span>
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+    
+                <html><body><p>  從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>   導入 </p>
+<div class="section" id="i386">
+<h2>2.7 I386  平臺的其它函數調用模型 </h2>
+<div class="line-block">
+<div class="line">  上文介紹的只是 I386  平臺上 C  函數調用的標準模型，被稱作 __cdecl  。事實上， Microsoft Visual C++  編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： </div>
+</div>
+<div class="section" id="cdecl">
+<h3>1 __cdecl</h3>
+<p>  參數壓棧順序：逆序 (  從右至左 )</p>
+<p>  參數堆棧恢復者：主調函數 (caller)</p>
+<div class="line-block">
+<div class="line">__cdecl  明確地指出函數使用 C  函數調用模型，這是默認的調用模型。 </div>
+</div>
+</div>
+<div class="section" id="stdcall">
+<h3>2 __stdcall</h3>
+<p>  參數壓棧順序：逆序 (  從右至左 )</p>
+<p>  參數堆棧恢復者：被調函數 (callee)</p>
+<div class="line-block">
+<div class="line">__stdcall  是微軟所謂的標準調用模型。可惜的是它與 __cdecl  不兼容。幾乎所有的 Win32API  函數使用這種函數調用模型，希望在 DLL  之間，或者在程序和 WinNT  操作系統之間傳遞函數指針的函數也應該使用這種模型。與 __cdecl  模型的不同之處在於， __stdcall  模型下由被調函數恢復堆棧。主調函數在 call  語句之後，不需要再加上 add  語句。而被調函數的 ret  語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在 __stdcall  模型下不支持可變參數表，所有參數必須寫明。 </div>
+</div>
+</div>
+<div class="section" id="thiscall">
+<h3>3 __thiscall</h3>
+<p>  參數壓棧順序：逆序 (  從右至左 )  ， this  用 ecx  傳遞。 </p>
+<p>  參數堆棧恢復者：被調函數 (callee)</p>
+<div class="line-block">
+<div class="line">__thiscall  是 VC  編譯器中類的非靜態成員函數 (non-static member functon)  的默認調用模型。但是如果此成員函數有可變參數表， VC  編譯器會使用 __cdecl  。和 __stdcall  一樣， __thiscall  由被調函數恢復堆棧。比較獨特的是 __thiscall  會通過 ecx  寄存器傳遞成員函數的 this  指針，而 __cdecl  下 this  指針是通過在參數表最前面增加一個函數參數來傳遞的。 __thiscall  是 VC  編譯器對 this  指針的使用的一種優化，大大提高了面向對象程序的效率。在 VC2003  及之前的編譯器上 __thiscall  不是一個關鍵字，不能被顯式指定。但可以給成員函數顯式指定 __cdecl  來避免使用 __thiscall  。 </div>
+</div>
+</div>
+<div class="section" id="fastcall">
+<h3>4 __fastcall</h3>
+<p>  參數壓棧順序：逆序 (  從右至左 )  ，前兩個 32  位函數參數放入 ecx  和 edx  中 </p>
+<p>  參數堆棧恢復者：被調函數 (callee)</p>
+<div class="line-block">
+<div class="line">  快速函數調用模型，將前兩個 32  位函數參數放入 ecx  和 edx  中，其餘參數再逆序壓棧。使用的是和 __thiscall  類似的優化技術，加快函數調用，適合運用在小型 inline  函數上。同樣使用 __stdcall  形式的被調函數恢復堆棧，所以不支持可變參數表。 </div>
+</div>
+</div>
+<div class="section" id="pascal">
+<h3>5 __pascal</h3>
+<p>  參數壓棧順序：正序 (  從左至右 )</p>
+<p>  參數堆棧恢復者：被調函數 (callee)</p>
+<div class="line-block">
+<div class="line">  過程式編程語言 Pascal  所使用的函數調用模型，由此得名。也是 16  位版本的 Windows  使用的 API  模型，過時的模型，現在已經廢棄且禁止使用。你會看到有些書本仍會不時提到它，所以需要注意。 __pascal  是正序壓棧，這與大部分 I386  函數模型都不相同。與 __stdcall  一樣，由被調者恢復堆棧，不支持可變參數表。歷史上曾有過的別名 PASCAL  、 pascal  、 _pascal(  單下劃線 )  ，現在都改成了 __stdcall  的別名，與 __pascal(  雙下劃線 )  不同。 </div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>6   其它函數調用模型，以及模型別名。 </h3>
+<p>__syscall  ：操作系統內部使用的函數調用模型，由用戶模式向核心模式跳轉時使用的模型。由於用戶模式和核心模式使用不同的棧，所以沒辦法使用棧來傳遞參數，所有參數通過寄存器傳遞，這限制了參數的數量。用戶模式編程中不允許使用。 </p>
+<p>__fortran  ：數學運算語言 fortran  使用的函數模型，由此得名。在 C  中調用由 fortran  編譯的函數時使用。 </p>
+<p>__clrcall  ：微軟 .Net  框架使用的函數模型，託管 (Managed)C++  默認使用，也可以從非託管代碼調用託管函數時使用。參數在託管棧上正序 (  從左至右 )  壓棧，不使用普通棧。 </p>
+<p>CALLBACK  、 PASCAL  、 WINAPI  、 APIENTRY  、 APIPRIVATE  ： I386  平臺上是 __stdcall  的別名 </p>
+<div class="line-block">
+<div class="line">WINAPIV  ： I386  平臺上是 __cdecl  的別名 </div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>7   函數調用模型的指定 </h3>
+<p>  函數調用模型的指定方式和 inline  關鍵字的指定方式相同，事實上， inline  可以被看作是 C++  語言內建的一種函數調用模型。唯一不同的是，聲明函數指針時，也要指明函數調用模型，而 inline  的指針是不能指明的，根本不存在指向 inline  函數的指針。比如： </p>
+<p>int CALLBACK GetVersion();</p>
+<p>int (CALLBACK * pf)()=GetVersion;</p>
+</div>
+</div>
+</body></html>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <pre><code id="source-code">
+                </code></pre>
+            </div>
+
+ 
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7fcdfa591f70> 番目の文章：                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'c-tricks-2-7-i386-calling-conventions';
+                var disqus_url = 'http://farseerfc.github.io/jp/drafts/c-tricks-2-7-i386-calling-conventions-zh.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.github.io/jp/pages/about.html">
+farseerfc に連絡</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.github.io/jp/pages/about.html"><img width="100%" src="//farseerfc.github.io/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">友達リンク</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/4a0750751cf52f6dc1cf5629de3a20d0"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHubのリポ</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">ツイート</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-md-10 col-sm-9">&copy; 2014 farseerfc
+            &middot; このブログは次の技術で作られる：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 及び            <a href="https://www.python.org/" target="_blank">Python</a>.              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>戻る</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.github.io/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // $('.toc').affix({
+        //   offset: {
+        //     top: 100,
+        //     bottom: function () {
+        //       return (this.bottom = $('#article-content').outerHeight(true))
+        //     }
+        //   }
+        // })
+    });
+</script>
+
+</body>
+</html>

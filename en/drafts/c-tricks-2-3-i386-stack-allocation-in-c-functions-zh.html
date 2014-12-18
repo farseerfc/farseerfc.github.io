@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh"
+>
+<head>
+    <title>C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++" />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.3 I386 平臺 C 函數內部的棧分配 函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將 esp 減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將 esp 加上相應字節數，歸還棧空間。 爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂 esp 的位置在進入函數體時就已確定，但是由於 esp 會在函數執行期變動，所以將 esp 的值保存在 ebp 中，並事先將 ebp 的值壓棧。隨後，在函數體中通過 ebp 減去偏移量來訪問變量。以一個最簡單的函數爲例： void f ..." />
+
+        <meta property="og:site_name" content="Farseerfc's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 2.3 I386平臺C函數內部的棧分配"/>
+        <meta property="og:url" content="//farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html"/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.3 I386 平臺 C 函數內部的棧分配 函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將 esp 減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將 esp 加上相應字節數，歸還棧空間。 爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂 esp 的位置在進入函數體時就已確定，但是由於 esp 會在函數執行期變動，所以將 esp 的值保存在 ebp 中，並事先將 ebp 的值壓棧。隨後，在函數體中通過 ebp 減去偏移量來訪問變量。以一個最簡單的函數爲例： void f ..."/>
+        <meta property="article:published_time" content="2007-08-28" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/en/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/en/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/en/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/en/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/en/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/en/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/en/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc's Blog ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/en/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/en/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">C++ Tricks 2.3 I386平臺C函數內部的棧分配 - Farseerfc's Blog</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/en/" class="navbar-brand">
+Farseerfc's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-xs hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li class="active"><a href="//farseerfc.github.io/en/">English</a></li>
+                            <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-md hidden-sm">
+                        <li><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li class="active"><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li>&nbsp;</li>
+
+                     <li class=""><a href="//farseerfc.github.io/en/pages/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+
+                    <li class="dropdown hidden-xs hidden-md hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.github.io/en/category/c.html"><i class="fa fa-folder-o"></i> C</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.github.io/en/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/en/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/en/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/en/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-sm">
+                        <li >
+                            <a href="//farseerfc.github.io/en/category/c.html"><i class="fa fa-folder-o"></i> C</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.github.io/en/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/en/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/en/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/en/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                        </li>
+                    </ul>
+
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.github.io/en/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.github.io/en/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io/en" title="Farseerfc's Blog"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/en/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 2.3 I386平臺C函數內部的棧分配</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        C++ Tricks 2.3 I386平臺C函數內部的棧分配
+                        <a href="//farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to C++ Tricks 2.3 I386平臺C函數內部的棧分配">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2007-08-28T14:28:00+09:00"><i class="fa fa-calendar"></i> 2007年08月28日(週二)</time>
+    </span>
+    
+
+
+
+    <a onclick="$.get('//farseerfc.github.io/en/c-tricks-2-3-i386-stack-allocation-in-c-functions.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-3-i386-stack-allocation-in-c-functions" data-disqus-url="http://farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.github.io/en/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
+</span>
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+    
+                <html><body><p>  從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>   導入 </p>
+<div class="section" id="i386c">
+<h2>2.3 I386  平臺 C  函數內部的棧分配 </h2>
+<p>  函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將 esp  減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將 esp  加上相應字節數，歸還棧空間。 </p>
+<p>  爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂 esp  的位置在進入函數體時就已確定，但是由於 esp  會在函數執行期變動，所以將 esp  的值保存在 ebp  中，並事先將 ebp  的值壓棧。隨後，在函數體中通過 ebp  減去偏移量來訪問變量。以一個最簡單的函數爲例： </p>
+<p>void f()</p>
+<p>{</p>
+<p>int a=0; //a  的地址被分配爲 ebp-4</p>
+<p>char c=1; //c  的地址被分配爲 ebp-8</p>
+<p>}</p>
+<p>  產生的彙編代碼爲： </p>
+<p>push ebp ;  將 ebp  壓棧 </p>
+<p>mov ebp,esp ;ebp=esp   用棧底備份棧頂指針 </p>
+<p>sub esp,8 ;esp-=8  ，爲 a  和 c  預留空間，包括邊界對齊 </p>
+<p>mov dword ptr[ebp-4],0 ;a=0</p>
+<p>mov byte ptr[ebp-8],1 ;c=1</p>
+<p>add esp,8 ;esp+=8  ，歸還 a  和 c  的空間 </p>
+<p>mov esp,ebp ;esp=ebp   從棧底恢復棧頂指針 </p>
+<p>pop ebp ;  恢復 ebp</p>
+<p>ret ;  返回 </p>
+<p>  相應的內存佈局是這樣： </p>
+<p>09992:c=1 &lt;-esp</p>
+<p>09996:a=0</p>
+<p>10000:  舊 ebp &lt;-ebp</p>
+<p>10004:……</p>
+<p>  注 :  彙編中的 pop  、 push  、 call  、 ret  語句是棧操作指令，其功能可以用普通指令替換 </p>
+<p>push ebp  相當於 :</p>
+<p>add esp,4</p>
+<p>mov dword ptr[esp],ebp</p>
+<p>pop ebp  相當於： </p>
+<p>mov ebp,dword ptr[esp]</p>
+<p>sub esp,4</p>
+<p>call fun_address  相當於： </p>
+<p>push eip</p>
+<p>jmp fun_address</p>
+<p>ret  相當於 </p>
+<p>add esp,4</p>
+<p>jmp dword ptr[esp-4]</p>
+<p>  帶參數的 ret</p>
+<p>ret 8  相當於 </p>
+<p>add esp,12</p>
+<p>jmp dword ptr[esp-4]</p>
+<p>  所有局部變量都在棧中由函數統一分配，形成了類似逆序數組的結構，可以通過指針逐一訪問。這一特點具有很多有趣性質，比如，考慮如下函數，找出其中的錯誤及其造成的結果： </p>
+<p>void f()</p>
+<p>{</p>
+<p>int i,a[10];</p>
+<p>for(i=0;i&lt;=10;++i)a[i]=0;/An error occurs here!</p>
+<p>}</p>
+<p>  這個函數中包含的錯誤，即使是 C++  新手也很容易發現，這是老生常談的越界訪問問題。但是這個錯誤造成的結果，是很多人沒有想到的。這次的越界訪問，並不會像很多新手預料的那樣造成一個 “  非法操作 ”  消息，也不會像很多老手估計的那樣會默不作聲，而是導致一個，呃，死循環！ </p>
+<p>  錯誤的本質顯而易見，我們訪問了 a[10]  ，但是 a[10]  並不存在。 C++  標準對於越界訪問只是說 “  未定義操作 ”  。我們知道， a[10]  是數組 a  所在位置之後的一個位置，但問題是，是誰在這個位置上。是 i!</p>
+<p>  根據前面的討論， i  在數組 a  之前被聲明，所以在 a  之前分配在棧上。但是， I386  上棧是向下增長的，所以， a  的地址低於 i  的地址。其結果是在循環的最後， a[i]  引用到了 i  自己！接下來的事情就不難預見了， a[i]  ，也就是 i  ，被重置爲 0  ，然後繼續循環的條件仍然成立 ……  這個循環會一直繼續下去，直到在你的帳單上產生高額電費，直到耗光地球電能，直到太陽停止燃燒 ……  呵呵，或者直到聰明的你把程序 Kill  了 ……</p>
+</div>
+</body></html>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <pre><code id="source-code">
+                </code></pre>
+            </div>
+
+ 
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+This is part <built-in method index of str object at 0x7fcdfa6c9670> of the "" series:                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'c-tricks-2-3-i386-stack-allocation-in-c-functions';
+                var disqus_url = 'http://farseerfc.github.io/en/drafts/c-tricks-2-3-i386-stack-allocation-in-c-functions-zh.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.github.io/en/pages/about.html">
+About farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.github.io/en/pages/about.html"><img width="100%" src="//farseerfc.github.io/en/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/en/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/java.html">
+                    java <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/en/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/c.html">
+                    C <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/en/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/4a0750751cf52f6dc1cf5629de3a20d0"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-md-10 col-sm-9">&copy; 2014 farseerfc
+            &middot; Powered by            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> and            <a href="https://www.python.org/" target="_blank">Python</a>.              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>Top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/en/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/en/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/en/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/en/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/en/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/en/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/en/../theme/js/material.min.js"></script>
+<script src="//farseerfc.github.io/en/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // $('.toc').affix({
+        //   offset: {
+        //     top: 100,
+        //     bottom: function () {
+        //       return (this.bottom = $('#article-content').outerHeight(true))
+        //     }
+        //   }
+        // })
+    });
+</script>
+
+</body>
+</html>
