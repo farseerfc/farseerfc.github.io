@@ -10,7 +10,7 @@
 
 
 
-<link rel="canonical" href="//farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html">
+<link rel="canonical" href="//farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html">
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
@@ -19,7 +19,7 @@
         <meta property="og:site_name" content="Farseerfcの居場所" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱"/>
-        <meta property="og:url" content="//farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"/>
+        <meta property="og:url" content="//farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"/>
         <meta property="og:description" content="從 farseerfc.wordpress.com 導入 1.2 逗號運算符 (,) 、邏輯運算符 (&amp;&amp;,||) 與運算符重載的陷阱 很多人甚至不知道逗號 (,) 也是個 C++ 運算符。與語法上要求出現的逗號 ( 比如分隔函數參數的逗號 ) 不同的是，出現在表達式中的逗號運算符在語義上表示多個表達式操作的連續執行，類似於分隔多語句的分號。比如： for(inti=0,j=9;i&lt;10;++i,--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”; 在這句語句中，出現了兩個逗號，其中前者是語法上用來分隔聲明的變量的，並非逗號運算符，而後者則是一個逗號運算符。根據 C++ 標準，逗號運算符的執行順序爲從左到右依次執行，返回最後一個子表達式的結果。由於只有最後一個表達式返回結果，所以對於一個語義正常的逗號表達式而言，前幾個子表達式必須具有副作用。同時 ..."/>
         <meta property="article:published_time" content="2007-08-22" />
             <meta property="article:section" content="import" />
@@ -28,20 +28,20 @@
 
 
     <!-- Bootstrap -->
-        <link href="//farseerfc.github.io/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
     
-    <link href="//farseerfc.github.io/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="//farseerfc.github.io/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
-    <link href="//farseerfc.github.io/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
-        <link href="//farseerfc.github.io/jp/../theme/css/html4css1.css" rel="stylesheet">
-    <link rel="stylesheet" href="//farseerfc.github.io/jp/../theme/css/style.css" type="text/css"/>
+    <link href="//farseerfc.me/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/jp/../theme/css/style.css" type="text/css"/>
 
-        <link href="//farseerfc.github.io/jp/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="//farseerfc.me/jp/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Farseerfcの居場所 ATOM Feed"/>
 
-        <link href="//farseerfc.github.io/jp/../theme/css/material.min.css" rel="stylesheet">
-        <link href="//farseerfc.github.io/jp/../theme/css/ripples.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
 <div style="display:none" id="title">C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&&,||)與運算符重載的陷阱 - Farseerfcの居場所</div>
@@ -55,7 +55,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="//farseerfc.github.io/jp/" class="navbar-brand">
+            <a href="//farseerfc.me/jp/" class="navbar-brand">
 Farseerfcの居場所            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -66,23 +66,23 @@ Farseerfcの居場所            </a>
                             <i class="mdi-action-translate"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="//farseerfc.github.io/">繁體</a></li>
-                            <li class="active"><a href="//farseerfc.github.io/jp/">日本語</a></li>
-                            <li><a href="//farseerfc.github.io/en/">English</a></li>
-                            <li><a href="//farseerfc.github.io/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li class="active"><a href="//farseerfc.me/jp/">日本語</a></li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-md hidden-sm">
-                        <li><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
-                        <li class="active"><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
-                        <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
-                        <li><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li class="active"><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                     </ul>
 
                     <li>&nbsp;</li>
 
-                     <li class=""><a href="//farseerfc.github.io/jp/pages/about.html"><i class="fa fa-user"></i>
+                     <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
                          About
                       </a></li>
                   <li>&nbsp;</li>
@@ -93,32 +93,32 @@ Farseerfcの居場所            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="active">
-                                <a href="//farseerfc.github.io/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                                <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
                             </li>
                             <li >
-                                <a href="//farseerfc.github.io/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                                <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
                             </li>
                             <li >
-                                <a href="//farseerfc.github.io/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                                <a href="//farseerfc.me/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
                             </li>
                             <li >
-                                <a href="//farseerfc.github.io/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                                <a href="//farseerfc.me/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
                             </li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-sm">
                         <li class="active">
-                            <a href="//farseerfc.github.io/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            <a href="//farseerfc.me/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
                         </li>
                         <li >
-                            <a href="//farseerfc.github.io/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            <a href="//farseerfc.me/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
                         </li>
                     </ul>
 
@@ -131,8 +131,8 @@ Farseerfcの居場所            </a>
               </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="//farseerfc.github.io/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
-              <li><a href="//farseerfc.github.io/jp/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+              <li><a href="//farseerfc.me/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.me/jp/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -145,8 +145,8 @@ Farseerfcの居場所            </a>
         <div class="col-lg-10 col-md-9 col-sm-8">
             <div id="loading-block">
             <ol class="breadcrumb">
-                <li><a href="//farseerfc.github.io/jp" title="Farseerfcの居場所"><i class="fa fa-home fa-lg"></i></a></li>
-                <li><a href="//farseerfc.github.io/jp/category/import.html" title="import">import</a></li>
+                <li><a href="//farseerfc.me/jp" title="Farseerfcの居場所"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/jp/category/import.html" title="import">import</a></li>
                 <li class="active">C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱</li>
             </ol>
     <section id="content" class="article-content">
@@ -155,7 +155,7 @@ Farseerfcの居場所            </a>
                 <div class="panel-heading">
                     <h1>
                         C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱
-                        <a href="//farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"
+                        <a href="//farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"
                            rel="bookmark"
                            class="btn btn-primary btn-lg"
                            title="C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&&,||)與運算符重載的陷阱　へのパーマリンク">
@@ -172,9 +172,9 @@ Farseerfcの居場所            </a>
 
 
 
-    <a onclick="$.get('//farseerfc.github.io/jp/c-tricks-1-2-trap-in-comma-logical-operator.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
-<span><small><a href="//farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operator" data-disqus-url="http://farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
-	<a href="//farseerfc.github.io/jp/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
+    <a onclick="$.get('//farseerfc.me/jp/c-tricks-1-2-trap-in-comma-logical-operator.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operator" data-disqus-url="http://farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.me/jp/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
 </span>
 </footer><!-- /.post-info -->                </div>
             </header>
@@ -223,7 +223,7 @@ Programming)  。去玩玩 GP  吧，看看你的編譯器對巨量的定義。�
             <div class="panel panel-default">
                 <div class="panel-heading">
                 <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7ff13c400830> 番目の文章：                </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7fccfc987670> 番目の文章：                </h4>
                 </div>
                 <div class="btn-group-vertical btn-group-flat" style="width:100%">
                 </div>
@@ -244,7 +244,7 @@ Programming)  。去玩玩 GP  吧，看看你的編譯器對巨量的定義。�
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'c-tricks-1-2-trap-in-comma-logical-operator';
-                var disqus_url = 'http://farseerfc.github.io/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html';
+                var disqus_url = 'http://farseerfc.me/jp/drafts/c-tricks-1-2-trap-in-comma-logical-operator-zh.html';
 
             var disqus_config = function () {
 
@@ -281,12 +281,12 @@ Programming)  。去玩玩 GP  吧，看看你的編譯器對巨量的定義。�
 	<div class="panel-heading">
         <h4>
 <i class="fa fa-user fa-lg"></i>
-<a href="//farseerfc.github.io/jp/pages/about.html">
+<a href="//farseerfc.me/jp/pages/about.html">
 farseerfc に連絡</a>
         </h4>
     </div>
 <div class="panel-body" id="aboutme">
-        <a href="//farseerfc.github.io/jp/pages/about.html"><img width="100%" src="//farseerfc.github.io/jp/../images/avatar.jpg"/></a>
+        <a href="//farseerfc.me/jp/pages/about.html"><img width="100%" src="//farseerfc.me/jp/../images/avatar.jpg"/></a>
     <h3 style="text-align:center">
 <a href="https://twitter.com/farseerfc"                  target="_blank">
 <i class="fa fa-twitter" style="text-align:center"></i></a>
@@ -314,99 +314,99 @@ farseerfc に連絡</a>
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
-<a href="//farseerfc.github.io/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+<a href="//farseerfc.me/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
         </h4>
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/software.html">
-                    software <sup> 1</sup>
+                <a href="//farseerfc.me/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/icse.html">
-                    icse <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/jp/tag/python.html">
-                    python <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/jp/tag/linux.html">
-                    linux <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/marry.html">
+                <a href="//farseerfc.me/jp/tag/marry.html">
                     marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/microsoft.html">
+                <a href="//farseerfc.me/jp/tag/microsoft.html">
                     microsoft <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/pelican.html">
+                <a href="//farseerfc.me/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/pelican.html">
                     pelican <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/jp/tag/plasma.html">
-                    plasma <sup> 1</sup>
+                <a href="//farseerfc.me/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/software.html">
+                    software <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -564,13 +564,13 @@ oldOnload();
       </div>
    </div>
 </footer>
-<script src="//farseerfc.github.io/jp/../theme/js/jquery.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="//farseerfc.github.io/jp/../theme/js/bootstrap.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="//farseerfc.github.io/jp/../theme/js/respond.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/respond.min.js"></script>
 
     <!-- GitHub JS -->
     <script type="text/javascript">
@@ -578,7 +578,7 @@ oldOnload();
             if (!window.jXHR) {
                 var jxhr = document.createElement('script');
                 jxhr.type = 'text/javascript';
-                jxhr.src = '//farseerfc.github.io/jp/../theme/js/jXHR.js';
+                jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
                 var s = document.getElementsByTagName('script')[0];
                 s.parentNode.insertBefore(jxhr, s);
             }
@@ -591,7 +591,7 @@ oldOnload();
             });
         });
     </script>
-    <script src="//farseerfc.github.io/jp/../theme/js/github.js" type="text/javascript"></script>
+    <script src="//farseerfc.me/jp/../theme/js/github.js" type="text/javascript"></script>
     <!-- End GitHub JS Code -->
     <!-- Disqus -->
     <script type="text/javascript">
@@ -626,9 +626,9 @@ oldOnload();
     </script>
     <!-- End Google Analytics Code -->
 
-<script src="//farseerfc.github.io/jp/../theme/js/ripples.min.js"></script>
-<script src="//farseerfc.github.io/jp/../theme/js/material.min.js"></script>
-<script src="//farseerfc.github.io/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
 <script>
     $(document).ready(function() {
         $.material.init();
