@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh"
+>
+<head>
+    <title>[zz]“西廂計劃”原理小解 - Farseerfcの居場所</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="zz" />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 好神奇的想法，先存着，以後慢慢研究 原文： http://blog.youxu.info/2010/03/14/west- chamber/ 待月西廂下，迎風戶半開。隔牆花影動，疑是玉人來。 最近推上最流行的一個關鍵詞是 ” 西廂計劃 ”, 這個計劃名字取得很浪漫，客戶端叫做張生，對，就是西廂記裏面那個翻牆去見崔鶯鶯小姐的張生；顯然，服務器端必然叫做崔鶯鶯。客戶端的張生是最重要的部件，可以不依賴於服務端工作。因爲西廂計劃的作者只是簡要的介紹了一下原理，其他報道又語焉不詳，我當時就覺得很好奇，花了昨天一個晚上詳細讀了一下源代碼，終於知道怎麼回事了，覺得原理非常漂亮，所以寫篇文章介紹總結一下。 先說大方向。大家都知道，連接被重置的本質，是因爲收到了破壞連接的一個 TCP Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 Reset, 則通信可以不受影響 ..." />
+
+        <meta property="og:site_name" content="Farseerfcの居場所" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="[zz]“西廂計劃”原理小解"/>
+        <meta property="og:url" content="//farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html"/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 好神奇的想法，先存着，以後慢慢研究 原文： http://blog.youxu.info/2010/03/14/west- chamber/ 待月西廂下，迎風戶半開。隔牆花影動，疑是玉人來。 最近推上最流行的一個關鍵詞是 ” 西廂計劃 ”, 這個計劃名字取得很浪漫，客戶端叫做張生，對，就是西廂記裏面那個翻牆去見崔鶯鶯小姐的張生；顯然，服務器端必然叫做崔鶯鶯。客戶端的張生是最重要的部件，可以不依賴於服務端工作。因爲西廂計劃的作者只是簡要的介紹了一下原理，其他報道又語焉不詳，我當時就覺得很好奇，花了昨天一個晚上詳細讀了一下源代碼，終於知道怎麼回事了，覺得原理非常漂亮，所以寫篇文章介紹總結一下。 先說大方向。大家都知道，連接被重置的本質，是因爲收到了破壞連接的一個 TCP Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 Reset, 則通信可以不受影響 ..."/>
+        <meta property="article:published_time" content="2010-03-17" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="zz" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.me/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/jp/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの居場所 ATOM Feed"/>
+
+        <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">[zz]“西廂計劃”原理小解 - Farseerfcの居場所</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">ナビの切り替え</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/jp/" class="navbar-brand">
+Farseerfcの居場所            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-xs hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li class="active"><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li class="active"><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                    </ul>
+
+                    <li>&nbsp;</li>
+
+                     <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+
+                    <li class="dropdown hidden-xs hidden-md hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active">
+                                <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-sm">
+                        <li class="active">
+                            <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                        </li>
+                    </ul>
+
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="検索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.me/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.me/jp/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/jp" title="Farseerfcの居場所"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/jp/category/import.html" title="import">import</a></li>
+                <li class="active">[zz]“西廂計劃”原理小解</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        [zz]“西廂計劃”原理小解
+                        <a href="//farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="[zz]“西廂計劃”原理小解　へのパーマリンク">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2010-03-17T09:40:00+09:00"><i class="fa fa-calendar"></i> 2010年03月17日(週三)</time>
+    </span>
+    
+
+
+
+    <a onclick="$.get('//farseerfc.me/jp/zz-introducing-scholarzhang.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="zz-introducing-scholarzhang" data-disqus-url="http://farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.me/jp/tag/zz.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> zz</a>
+</span>
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+    
+                <html><body><p>  從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>   導入 </p>
+<p>  好神奇的想法，先存着，以後慢慢研究 </p>
+<p>  原文： <a class="reference external" href="http://blog.youxu.info/2010/03/14/west-chamber/">http://blog.youxu.info/2010/03/14/west-
+chamber/</a></p>
+<p>  待月西廂下，迎風戶半開。隔牆花影動，疑是玉人來。 </p>
+<p>  最近推上最流行的一個關鍵詞是 ”  西廂計劃 ”,
+  這個計劃名字取得很浪漫，客戶端叫做張生，對，就是西廂記裏面那個翻牆去見崔鶯鶯小姐的張生；顯然，服務器端必然叫做崔鶯鶯。客戶端的張生是最重要的部件，可以不依賴於服務端工作。因爲西廂計劃的作者只是簡要的介紹了一下原理，其他報道又語焉不詳，我當時就覺得很好奇，花了昨天一個晚上詳細讀了一下源代碼，終於知道怎麼回事了，覺得原理非常漂亮，所以寫篇文章介紹總結一下。 </p>
+<p>  先說大方向。大家都知道，連接被重置的本質，是因爲收到了破壞連接的一個 TCP
+Reset   包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 Reset,
+  則通信可以不受影響。但是這個方法其實只有理論價值，因爲絕大多數服務器都不可能忽略 Reset   的 (  比如 Linux,   需要 root   權限配置 iptables,   而且這本身也把正常的 Reset   給忽略了 )  。只要服務器不忽略 Reset,
+  客戶端再怎麼弄都沒用，因爲服務器會停止發送數據， Reset
+  這條連接。所以，很多報道說西廂計劃是忽略 Reset,
+  我從源代碼來看應該不是這樣。在我看來，西廂計劃是利用了牆的一個可能的弱點 –  牆只在連接發起的時候把一個 TCP
+  連接加入監聽序列，如果牆認爲這個連接終止了，就會從監聽序列中去掉這條記錄，這樣，這條連接上後續的包就不會被監聽。西廂計劃就是讓牆 “  認爲 ”  這個連接終止的一個絕妙的方法。只要牆認爲這個連接兩端都是死老虎，牆就不會觸發關鍵詞檢測，其後所有的數據，都不存在連接被重置的問題了。 </p>
+<p>  如何讓一個連接置之死地而後生，就是西廂計劃那幫黑客神奇的地方了。這也不是一日之功。首先，這幫牛人發現，牆的是一個入侵檢測系統，把含有關鍵字的包當成一種 “  入侵 ”  來對待。採取這種設計有很多好處，但缺點是入侵檢測系統可能具有的問題，牆都可能有。西廂計劃主頁上那篇著名的論文就是講這些七七八八的漏洞的。可以說處理這些七七八八的漏洞是非常困難的，迫使牆的設計者 “  拆東牆，補西牆 ”  。這樣補來補去，外表看起來好像很牛逼的牆，其實有很多本質上無法簡單修補的漏洞，其中有一個致命的，就是 TCP   連接狀態的判定問題。出於入侵檢測系統這種設計的侷限，牆沒有，也沒辦法準確判定一條 TCP
+  連接的狀態，而只是根據兩邊收到的數據來 “  推測 ”  連接的狀態。而所有的關鍵詞檢測功能，都是基於 “  連接還活着 ”  的這個推測的結果的。因爲牆的規則是在連接發起的時候開始對這條連接的檢測，在連接終止的時候停止對這條連接的檢測，所以，一旦對連接的狀態推測錯誤，把還活着的連接當成已經關閉的連接，牆就會放棄對這條連接上隨後所有的包的檢測，他們都會都透明的穿過牆的入侵檢測。 </p>
+<p>  上面只是想法，具體到 TCP
+  協議實現這一層，就要只迷惑牆，還不能觸及我要通信的服務器。最理想的情況下，在任何有效通信之前，就能讓牆出現錯誤判斷，這些，就需要對 TCP   協議有深刻理解了。西廂計劃的那幫黑客，居然真的去讀 TCP   幾百頁的 RFC  ，還居然就發現了方法（這裏我假設讀者都知道 TCP
+  的三次握手過程和序列號每次加一的規則）。我們都知道，三次握手的時候，在收到服務器的 SYN/ACK
+  的時候，客戶端如果發送 ACK   並且序列號 +1
+  就算建立連接了，但是客戶端如果發送一個序列號沒 +1   的 FIN
+  （表示連接終止，但是服務器知道，這時候連接還沒建立呢， FIN
+  這個包狀態是錯的，加上序列號也是錯的，服務器自己一判斷，就知道這個包是壞包，按照標準協議，服務器隨手丟棄了這個包） ,
+  但這個包，過牆的時候，在牆看來，是表示連接終止的 (  牆是 ma de in china,
+  是比較山寨的，不維護連接狀態，並且，牆並沒有記下剛纔服務器出去的 SYN/ACK
+  的序列號，所以牆不知道序列號錯了）。所以，牆很高興的理解爲連接終止，舒了一口氣去重置其他連接了，而這個連接，就成了殭屍，牆不管你客戶端了，而這時候，好戲纔剛剛開始。 </p>
+<p>  事實上，牆是雙向檢測的（或者說對每個包都檢測的），因此，對服務器和客戶端實現相同的對待方法，所以，牆不管客戶端還不行，假如服務端有關鍵詞傳給客戶端，牆還是有可能要發飆的（這裏說有可能，因爲我也不知道）。所以，最好的辦法就是，讓服務端也給牆一個終止連接的標誌就好了。可是這個說起來簡單，做起來難，怎麼能讓不受自己控制的服務器發一個自己想要的包呢？西廂計劃的那幫黑客，再次去讀幾百頁的 RFC,   令人驚訝的發現，他們居然在 RFC
+  上發現了一個可以用的特性。我們上面說了，三次握手的時候，在收到 SYN/ACK
+  後，客戶端要給服務器發送一個序列號 +1   的 ACK  ，可是，假如我不 +1  呢，直接發 ACK   包給服務器。牆已經認爲你客戶端是死老虎了，不理你了，不知道你搞什麼飛機，讓這個 ACK
+  過了。可是服務器一看，不對啊，你給我的不是我期待的那個序列號， RFC
+  上說了， TCP   包如果序列號錯了的話，就回復一個 Reset.
+  所以，服務器就回復了一個 Reset  。這個 Reset
+  過牆的時候，牆一看樂了，服務器也終止連接了，好吧，兩邊都是死老虎了，我就不監聽這條連接了。而至於客戶端，這個服務器過來的 Reset   非常好識別，忽略就是。隨後，客戶端開始正確的發送 ACK,
+  至此，三次握手成功，真正的好戲開始，而牆則認爲客戶端和服務器都是死老虎，直接放過。所以，張生就這樣透明的過了牆。至於過牆以後所有的事情，《西廂記》裏面都有記載，各位讀者自行買書學習。 </p>
+<p>  現在的西廂計劃客戶端，即 “  張生 ”  模塊的防連接重置的原理就是這樣，服務器端，即鶯鶯模塊的實現也是類似的。防 DNS  那個，不懂 DNS
+  協議，所以看不懂。我猜想，因爲開發人員都是黑客，所以自然喜歡用最經得起折騰和高度定製的 Linux   開發。現在看西廂計劃的實現，因爲依賴於 Linux   內核模塊 netfilter,
+  在 Linux   上如魚得水，但往其他平臺的移植可能是個亟待解決的問題。我覺得，在其他平臺上，可以通過 libpcap   和 libnet
+  ，在用戶態實現相同的功能，就是有點麻煩而已，有興趣的懂網絡的可以照西廂計劃原理，在家自行做出此功能；當然，全中國人民都用 Linux   最好 :)</p>
+<div class="line-block">
+<div class="line">PS 1:   據說是西廂計劃一個作者畫的原理圖： <a class="reference external" href="http://img.ly/DIi">http://img.ly/DIi</a></div>
+<div class="line-block">
+<div class="line">PS 2:   我對 TCP   的理解僅限於課本，如果上面的對技術的理解有錯，請大家指出。 </div>
+<div class="line">PS 3:   有些漏洞，可能是設計上本質缺陷，不是那麼容易修復的。 </div>
+<div class="line">PS 4:   除了最後一個圖，本文沒有其他相關鏈接，如需相關資料，自行 Google  。 </div>
+</div>
+</div>
+</body></html>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <pre><code id="source-code">
+                </code></pre>
+            </div>
+
+ 
+
+
+            <div class="row">
+                <div class="col-xs-6">
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'zz-introducing-scholarzhang';
+                var disqus_url = 'http://farseerfc.me/jp/drafts/zz-introducing-scholarzhang-zh.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/jp/pages/about.html">
+farseerfc に連絡</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/jp/pages/about.html"><img width="100%" src="//farseerfc.me/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">友達リンク</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/4a0750751cf52f6dc1cf5629de3a20d0"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHubのリポ</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">ツイート</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+    </div>
+</section>
+
+            
+            </aside>
+        </div>
+    </div>
+</div>
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-md-10 col-sm-9">&copy; 2014 farseerfc
+            &middot; このブログは次の技術で作られる：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 及び            <a href="https://www.python.org/" target="_blank">Python</a>.              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>戻る</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.me/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // $('#sidebar_toc').affix({
+        //   offset: {
+        //     top: 100,
+        //     bottom: function () {
+        //       return (this.bottom = $('#article-content').outerHeight(true))
+        //     }
+        //   }
+        // })
+    });
+</script>
+
+</body>
+</html>
