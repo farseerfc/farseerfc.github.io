@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zhs"
+>
+<head>
+    <title>总结一下 Material Design 的 CSS 框架 - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="css,material,paper" />
+        <meta name="description" content="现在这里的界面风格要从 Google 在 I/O 2014 大会 上公布 Android L 也即后来的 Lollipop 说起。他们在谈论界面设计的时候公布了他们的设计准则： Material Design ( 中文非官方翻译 ) 。当然这只是一些准则，总结并描述了之前在 Web 设计和移动端 App 界面设计方面的一些规范，并且用材料的类比来形象化的比喻这个准则。关于 Material Design 的更多中文资料可 参考这里 。 看到 Material Design 之后就觉得这个设计风格非常符合直觉，于是想在这边也用上 Material Design 。但是我在 Web 前端科技树上没点多少技能点，所以想找找别人实现好的模板或者框架直接套用上。在网络上搜索数日找到了这几个： Polymer Paper Elements Polymer Polymer logo Google 官方提供的参考实现应该是 Polymer ..." />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="总结一下 Material Design 的 CSS 框架"/>
+        <meta property="og:url" content="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html"/>
+        <meta property="og:description" content="现在这里的界面风格要从 Google 在 I/O 2014 大会 上公布 Android L 也即后来的 Lollipop 说起。他们在谈论界面设计的时候公布了他们的设计准则： Material Design ( 中文非官方翻译 ) 。当然这只是一些准则，总结并描述了之前在 Web 设计和移动端 App 界面设计方面的一些规范，并且用材料的类比来形象化的比喻这个准则。关于 Material Design 的更多中文资料可 参考这里 。 看到 Material Design 之后就觉得这个设计风格非常符合直觉，于是想在这边也用上 Material Design 。但是我在 Web 前端科技树上没点多少技能点，所以想找找别人实现好的模板或者框架直接套用上。在网络上搜索数日找到了这几个： Polymer Paper Elements Polymer Polymer logo Google 官方提供的参考实现应该是 Polymer ..."/>
+        <meta property="article:published_time" content="2015-01-16" />
+            <meta property="article:section" content="python" />
+            <meta property="article:tag" content="css" />
+            <meta property="article:tag" content="material" />
+            <meta property="article:tag" content="paper" />
+            <meta property="article:author" content="farseerfc" />
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.github.io/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//farseerfc.github.io/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.github.io/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.github.io/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/zhs/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.github.io/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.github.io/zhs/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.github.io/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.github.io/zhs/../theme/css/ripples.min.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">总结一下 Material Design 的 CSS 框架 - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.github.io/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-xs hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.github.io/">繁體</a></li>
+                            <li><a href="//farseerfc.github.io/jp/">日本語</a></li>
+                            <li class="active"><a href="//farseerfc.github.io/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.github.io/en/">English</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-md hidden-sm">
+                        <li><a href="//farseerfc.github.io/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.github.io/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li class="active"><a href="//farseerfc.github.io/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.github.io/en/"><i class="mdi-action-translate"></i>English</a></li>
+                    </ul>
+
+                    <li>&nbsp;</li>
+
+                     <li class=""><a href="//farseerfc.github.io/zhs/pages/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                  <li>&nbsp;</li>
+
+                    <li class="dropdown hidden-xs hidden-md hidden-lg">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/c.html"><i class="fa fa-folder-o"></i> C</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.github.io/zhs/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.github.io/zhs/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-sm">
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/c.html"><i class="fa fa-folder-o"></i> C</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.github.io/zhs/category/linux.html"><i class="fa fa-folder-o"></i> Linux</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.github.io/zhs/category/python.html"><i class="fa fa-folder-o"></i> Python</a>
+                        </li>
+                    </ul>
+
+            </ul>
+            <ul class="nav navbar-right navbar-form">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-8" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="//farseerfc.github.io/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
+              <li><a href="//farseerfc.github.io/zhs/feeds/all.atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-9 col-sm-8">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.github.io/zhs" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.github.io/zhs/category/python.html" title="python">python</a></li>
+                <li class="active">总结一下 Material Design 的 CSS 框架</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary">
+                <div class="panel-heading">
+                    <h1>
+                        总结一下 Material Design 的 CSS 框架
+                        <a href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 总结一下 Material Design 的 CSS 框架 的永久链接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<footer class="post-info">
+    <span class="published">
+        <time datetime="2015-01-16T03:27:00+09:00"><i class="fa fa-calendar"></i> 2015年01月16日(周五)</time>
+    </span>
+    
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
+<ul class="dropdown-menu"><li><a href="//farseerfc.github.io/zhs/../summarize-material-design-css-framework.html" class="translate">繁體</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.github.io/zhs/summarize-material-design-css-framework.text', function(data){$('#source-code').text(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
+<span><small><a href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="summarize-material-design-css-framework" data-disqus-url="http://farseerfc.github.io/zhs/summarize-material-design-css-framework.html"><i class="fa fa-comments-o"></i></a></small></span><span class="btn-group">
+	<a href="//farseerfc.github.io/zhs/tag/css.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> css</a>
+	<a href="//farseerfc.github.io/zhs/tag/material.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> material</a>
+	<a href="//farseerfc.github.io/zhs/tag/paper.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> paper</a>
+</span>
+</footer><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+    
+                <html><body><p> 现在这里的界面风格要从 Google  在 <a class="reference external" href="https://www.google.com/events/io">I/O 2014  大会 </a>
+ 上公布 Android L  也即后来的 Lollipop  说起。他们在谈论界面设计的时候公布了他们的设计准则： <a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a> (<a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"> 中文非官方翻译 </a> ) 。当然这只是一些准则，总结并描述了之前在 Web  设计和移动端 App  界面设计方面的一些规范，并且用材料的类比来形象化的比喻这个准则。关于 Material Design  的更多中文资料可 <a class="reference external" href="http://www.ui.cn/Material/"> 参考这里 </a>  。 </p>
+<p> 看到 Material Design  之后就觉得这个设计风格非常符合直觉，于是想在这边也用上 Material Design 。但是我在 Web  前端科技树上没点多少技能点，所以想找找别人实现好的模板或者框架直接套用上。在网络上搜索数日找到了这几个： </p>
+<div class="section" id="polymer-paper-elements">
+<h2>Polymer Paper Elements</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+Polymer</div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="https://www.polymer-project.org/images/logos/p-logo.svg" type="image/svg+xml">
+Polymer logo</object>
+</div>
+</div>
+<p>Google  官方提供的参考实现应该是 <a class="reference external" href="https://www.polymer-project.org/">Polymer</a>  中的 <a class="reference external" href="https://www.polymer-project.org/docs/elements/paper-elements.html">Paper Elements</a>  。 </p>
+<p> 由于是 <strong> 官方参考实现 </strong>  ，这个框架的确非常忠实地实现了 Material Design  的设计，但是同时由于它基于 <a class="reference external" href="http://webcomponents.org/">HTML5 Web Components</a>  构建，相关技术我还不太懂，浏览器兼容性和其余 HTML  技术的兼容性也还不太完善的样子 ……</p>
+<p> 并且对于我这个 Web  开发的半吊子来说， Polymer  只是提供了一组设计组建，没有完善的 <strong> 响应式 </strong> (responsive)  布局支持，也没有 Navbar  这种常见的框架组建，真的要用起来的话还需要手工实现不少东西。于是口水了半天之后只好放弃 …… 以后可能真的会换用这个，只是目前需要学的东西太多了。 </p>
+</div>
+<div class="section" id="angular-material-design">
+<h2>Angular Material Design</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+AngularJS</div>
+<div class="panel-body">
+<img alt="AngularJS logo" class="img-responsive" src="https://angularjs.org/img/AngularJS-large.png"/>
+</div>
+</div>
+<p><a class="reference external" href="https://angularjs.org/">AngularJS</a>  是 Google  对 Web Components  技术的另一个尝试。而这额 <a class="reference external" href="https://material.angularjs.org/">Angular Material Design</a>  项目就是基于 AngularJS  构建的 Material Design  库啦，同样是 Google  出品所以应该算得上半个官方实现吧。相比于 Polymer, AngularJS  算是实用了很多，提供了基于 <a class="reference external" href="http://www.w3.org/TR/css3-flexbox/">CSS Flexbox</a>  的布局。有人对这两者的评价是，如果说 Polymer  代表了 <strong> 未来趋势 </strong>  ，那么 AngularJS  就是 <strong> 眼下可用 </strong>  的 Web
+Components  实现了。 </p>
+<p> 只不过同样是因为它是 Components  的框架，对 WebApp  的支持很丰富，大量采用 Ajax  等 JavaScript  技术，对于我这个静态博客来说仍然稍显高级了 …… 非常担心还不支持 HTML5  的浏览器比如 w3m  甚至 cURL  对它的支持程度。于是最终也没有使用它。 </p>
+</div>
+<div class="section" id="materialize">
+<h2>Materialize</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+Materialize</div>
+<div class="panel-body">
+<img alt="Materialize logo" class="img-responsive" src="https://raw.githubusercontent.com/Dogfalo/materialize/master/images/materialize.gif"/>
+</div>
+</div>
+<p><a class="reference external" href="http://materializecss.com/">Materialize</a>  这是一批 ( 自称 ?) 熟悉 Android  上 Material Design  的设计师们新近出炉的框架，试图提供一个接近 Bootstrap  的方案。最早是在 <a class="reference external" href="http://www.reddit.com/r/web_design/comments/2lt4qy/what_do_you_think_of_materialize_a_responsive/">Reddit</a>  上看到对它的讨论的，立刻觉得这个想法不错。 </p>
+<p> 体验一下官网的设计就可以看出，他们的动画效果非常接近 Polymer  的感觉，响应式设计的布局也还不错。只是同样体验一下他们现在的官网就可以看出，他们目前的 <a class="reference external" href="https://github.com/Dogfalo/materialize/issues">bug  还比较多 </a>  ，甚至一些 bug
+ 在他们自己的主页上也有显现。虽然不想给这个新出炉的项目泼凉水，不过看来要达到他们声称的接近 Bootstrap  的易用度还任重而道远 ……</p>
+</div>
+<div class="section" id="bootstrap-material-design-bootstrap3">
+<h2>bootstrap-material-design + bootstrap3</h2>
+<p> 这是我最终选择的方案。这个方案将三个项目组合在了一起，分别是 <a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/">bootstrap-material-design</a>
+, <a class="reference external" href="https://github.com/DandyDev/pelican-bootstrap3">pelican-bootstrap3</a>
+ 和 <a class="reference external" href="http://getbootstrap.com/">Bootstrap 3</a>  。 Bootstrap 3  想必不用再介绍了，很多网站都在使用这套框架，定制性很高。 bootstrap-material-design  是在 Bootstrap 3  的基础上套用 Material Design  风格制作的一套 CSS  库，当然也不是很完善并且在不断改进中，一些细节其实并不是很符合我的要求。最后 pelican-bootstrap3  是用 Bootstrap 3  做的 pelican  模板。这三个项目或多或少都有点不合我的口味，于是嘛就把 pelican-bootstrap3 fork 了一套放在 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"> 这里 </a>  ，其中还包括我自己改过的 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap">Bootstrap3  样式 </a>
+ 和 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material">Material  样式 </a>
+ ，需要的可以自取。 </p>
+<p> 至于细节上我定制了哪些地方，敬请听下回分解 ……</p>
+</div>
+</body></html>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <pre><code id="source-code">
+                </code></pre>
+            </div>
+
+ 
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                <h4>
+这篇文章是 "pelican" 系列文章的第 2 篇：                </h4>
+                </div>
+                <div class="btn-group-vertical btn-group-flat" style="width:100%">
+                        <a class="btn btn-default" href='//farseerfc.github.io/zhs/try-pelican.html' style="text-align:left">尝试一下 Pelican</a>
+                        <a class="btn btn-primary" href='//farseerfc.github.io/zhs/summarize-material-design-css-framework.html' style="text-align:left">总结一下 Material Design 的 CSS 框架</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <a href="//farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html" class="btn btn-default btn-lg" style="float:right;clear:both">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        从非缓冲输入流到 Linux 控制台的历史
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'summarize-material-design-css-framework';
+                var disqus_url = 'http://farseerfc.github.io/zhs/summarize-material-design-css-framework.html';
+
+            var disqus_config = function () {
+
+                this.language = "zh";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-4" id="sidebar">
+            <aside>
+
+<section>
+    <div class="row">
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.github.io/zhs/pages/about.html">
+关于 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.github.io/zhs/pages/about.html"><img width="100%" src="//farseerfc.github.io/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.github.io/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">标签云</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/material.html">
+                    material <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">友情链接</span>
+        </h4>
+    </div>
+<div class="panel-body list-group"  id="links">
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/03/Vulpes_vulpes_laying_in_snow.jpg"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://lilydjwg.is-programmer.com/" target="_blank">lilydjwg</a>
+                </h6>
+                <small class="list-group-item-text">依雲（aka. 百合仙子）</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/48b2061f9e9a00023417bc1174532e81"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.felixc.at/" target="_blank">felixonmars</a>
+                </h6>
+                <small class="list-group-item-text">火星貓大大</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/4a0750751cf52f6dc1cf5629de3a20d0"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://blog.phoenixlzx.com/" target="_blank">phoenixlzx</a>
+                </h6>
+                <small class="list-group-item-text">鳳凰菊苣</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://avatars3.githubusercontent.com/u/673448"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="https://fbq.github.io/" target="_blank">fixme</a>
+                </h6>
+                <small class="list-group-item-text">水源技站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/efc02b78d248419a55b36d945dcfdeca"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://quininer.github.io/" target="_blank">quininer</a>
+                </h6>
+                <small class="list-group-item-text">純JavaScript的帥氣博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://www.gravatar.com/avatar/9b77f023df87d33060c3689208a8d970"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://acgtyrant.com/" target="_blank">acgtyrant</a>
+                </h6>
+                <small class="list-group-item-text">御宅暴君，維護這個人和Arch兩個博客</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+        <div class="list-group-item">
+            <div class="row-action-primary">
+                <img src="https://bbs.sjtu.edu.cn/favicon.ico"/>
+            </div>
+            <div class="row-content">
+                <h6 class="list-group-item-heading">
+                    <a href="http://bbs.sjtu.edu.cn/" target="_blank">飲水思源</a>
+                </h6>
+                <small class="list-group-item-text">上海交通大學飲水思源BBS站</small>
+            </div>
+        </div>
+        <div class="list-group-separator"></div>
+</div>
+</div>
+</div>
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub仓库</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+<div class="col-md-12 col-sm-12 hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-twitter fa-lg"></i><span class="icon-label">最新推文</span>
+        </h4>
+    </div>
+<div id="twitter_timeline">
+    <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/farseerfc" data-widget-id="538997172142759936">Tweets by farseerfc</a>
+</div>
+<script>
+var oldOnload = window.onload || function () {};
+window.onload = function ()
+{
+oldOnload();
+!function(d,s,id){
+	var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+	if(!d.getElementById(id)){
+		js=d.createElement(s);
+		js.id=id;
+		js.src=p+"://platform.twitter.com/widgets.js";
+		fjs.parentNode.insertBefore(js,fjs);}
+}(document,"script","twitter-wjs");
+}</script>
+</div>
+</div>
+    </div>
+</section>
+
+            
+            </aside>
+        </div>
+    </div>
+</div>
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-md-10 col-sm-9">&copy; 2015 farseerfc
+            &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
+            <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 以及            <a href="https://www.python.org/" target="_blank">Python</a>.              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="//farseerfc.github.io/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.github.io/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.github.io/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.github.io/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.github.io/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.github.io/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.github.io/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.github.io/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+
+        // $('#sidebar_toc').affix({
+        //   offset: {
+        //     top: 100,
+        //     bottom: function () {
+        //       return (this.bottom = $('#article-content').outerHeight(true))
+        //     }
+        //   }
+        // })
+    });
+</script>
+
+</body>
+</html>
