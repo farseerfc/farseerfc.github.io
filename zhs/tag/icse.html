@@ -161,29 +161,613 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body>
-<div class="section" id="june-6">
-<h2><a class="toc-backref" href="#id1">June 6</a></h2>
+                    <div class="summary">
 <div class="section" id="keynote-1">
 <h3><a class="toc-backref" href="#id2">Keynote 1</a></h3>
-<p> 没怎么听懂，只记得讲到了 finance is not money 但是没听懂这个和软件有什么关系。 </p>
+<p>没怎么听懂，只记得讲到了finance is not money但是没听懂这个和软件有什么关系。</p>
 </div>
 <div class="section" id="cost-estimation-for-distributed-software-project">
 <h3><a class="toc-backref" href="#id3">Cost Estimation for Distributed Software Project</a></h3>
-<p> 讲到他们试图改善现有的模型去更精确地评估软件开发的开销。 </p>
-<p> 他们会给 PM 建议之前的项目的历史数据，然后对于新项目，他们建议历史上已有的项目的数据，从而帮助 PM 得到更精确的评估。他们试图尽量减少项目评估对 PM
- 的经验的需求，从而帮助即使经验很少的 PM 也能准确评估项目的开销。 </p>
-<p> 他们的观点： </p>
-<blockquote>
-<p>Context-specfic solutions needed!</p>
-<p> 我们需要更上下文相关的解决方案！ </p>
-<p>Early user paticipation is key!</p>
-<p> 早期用户的参与是关键 </p>
-</blockquote>
+<p>讲到他们试图改善现有的模型去更精确地评估软件开发的开销。</p>
+<p>他们会给PM建议之前的项目的历史数据，然后对于新项目，他们建议历史上已有
+的项目的数据，从而帮助PM得到更精确的评估。他们试图尽量减少项目评估对PM
+的经验的需求，从而帮助即使经验很少的PM也能准确评估项目的开销。</p>
+<p>他们的观点：</p>
+<!-- PELICAN_END_SUMMARY
+
+
+Context-specfic solutions needed!
+
+我们需要更上下文相关的解决方案！
+
+Early user paticipation is key!
+
+早期用户的参与是关键 -->
 </div>
 <div class="section" id="characterizing-logging-practices-in-open-source-software">
 <h3><a class="toc-backref" href="#id4">Characterizing Logging Practices in Open-Source Software</a></h3>
-<p>Common ...</p></div></div></body></html>
+<p>Common mistakes in logging messages</p>
+<p>在日志记录中容易犯的错误</p>
+<p>他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
+中存在的问题。他们首先确定修改是事后修改。</p>
+<p>通常的修改的比例（9027个修改）</p>
+<table border="1" class=" table-striped docutils table-hover table">
+<colgroup>
+<col width="10%"></col>
+<col width="90%"></col>
+</colgroup>
+<tbody valign="top">
+<tr><td>45%</td>
+<td>静态文本</td>
+</tr>
+<tr><td>27%</td>
+<td>打印出的变量</td>
+</tr>
+<tr><td>26%</td>
+<td>调试等级verbosity</td>
+</tr>
+<tr><td>2%</td>
+<td>日志输出的位置</td>
+</tr>
+</tbody>
+</table>
+<p>他们发现有调试等级的变化，是因为安全漏洞之类的原因，或者在开销和数据
+之间的权衡。</p>
+<p>大多数对log的变量的修改都是为了增加一个参数。他们之前的LogEnhancer是为了
+解决这个问题而提出的，通过静态检查，提醒程序员是否忘记了某个参数</p>
+<p>对text的修改是因为要改掉过时的代码信息，避免误导用户。</p>
+<p>他们的实验是采用了基于code clone 的技术，找到所有log语句，然后找不一致
+的clone，然后自动提出建议。</p>
+</div>
+<div class="section" id="combine-functional-and-imperative-pgrm-for-multicore-sw-scala-java">
+<h3><a class="toc-backref" href="#id5">Combine Functional and Imperative Pgrm for Multicore Sw: Scala &amp; Java</a></h3>
+<p>趋势：到处都是多核，但是并发程序呢？</p>
+<p>他们研究的对象是Scala和Java，因为可以编译后确认JVM字节码的语义。</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Java:</dt>
+<dd><ul class="first last simple">
+<li>共享内存</li>
+<li>显示创建的线程</li>
+<li>手动同步</li>
+<li>Wait/Notify机制</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Scala:</dt>
+<dd><ul class="first last simple">
+<li>高阶函数</li>
+<li>Actors, 消息传递</li>
+<li>lists, filters, iterators</li>
+<li>while</li>
+<li>共享状态, OO</li>
+<li>import java.* 能从java导入任何库</li>
+<li>auto type inferance 自动类型推导</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>实验的参与者都经过4周的训练，实验项目是工业等级的开发项目</p>
+<p>结果：</p>
+<p>scala 的项目平均比java多花38%的时间，主要都是花在Test和debug上的时间。</p>
+<p>程序员的经验和总体时间相关，但是对test和debug没有显著影响。</p>
+<p>scala的为了让编程更有效率的设计，导致debug更困难。比如类型推导，debug
+的时候需要手动推导，来理解正在发生什么。</p>
+<p>scala的程序比java小，中位数2.6%，平均15.2%</p>
+<ul>
+<li><dl class="first docutils">
+<dt>性能比较：</dt>
+<dd><ul class="first last">
+<li><p class="first">单核：scala的线性程序的性能比java好</p>
+</li>
+<li><dl class="first docutils">
+<dt>4核：</dt>
+<dd><ul class="first last">
+<li><p class="first">scala 7s @ 4 threads</p>
+</li>
+<li><p class="first">java 4si @ 8 threads</p>
+</li>
+<li><dl class="first docutils">
+<dt>median</dt>
+<dd><ul class="first last simple">
+<li>83s scala</li>
+<li>98s java</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">32core: best scala 34s @ 64 threads</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>结论</dt>
+<dd><ul class="first last simple">
+<li>java有更好的scalability</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>scala类型推导</dt>
+<dd><ul class="first last simple">
+<li>45%说对携带码有帮助</li>
+<li>85%说导致程序错误</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>调试</dt>
+<dd><ul class="first last simple">
+<li>23%认为scala简单</li>
+<li>77%认为java简单</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>multi-paradigram are better</p>
+</div>
+<div class="section" id="sound-empirical-evidence-in-software-testing">
+<h3><a class="toc-backref" href="#id6">Sound Empirical Evidence in Software Testing</a></h3>
+<p>Test data generation 测试数据自动生成</p>
+<p>Large Empirical Studies - not always possible</p>
+<p>For open source software - big enough</p>
+</div>
+<div class="section" id="identifing-linux-bug-fixing-patch">
+<h3><a class="toc-backref" href="#id7">Identifing Linux Bug Fixing Patch</a></h3>
+<ul>
+<li><dl class="first docutils">
+<dt>current practice:</dt>
+<dd><ul class="first last simple">
+<li>manual</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Current research:</dt>
+<dd><ul class="first last simple">
+<li>keywords in commits</li>
+<li>link bug reports in bugzilla</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Try to solve classification problem</p>
+<ul>
+<li><dl class="first docutils">
+<dt>issue</dt>
+<dd><ul class="first last simple">
+<li>pre-identified</li>
+<li>post-identified</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>data</dt>
+<dd><ul class="first last simple">
+<li>from commit log</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>feature extraction</dt>
+<dd><ul class="first last simple">
+<li>text pre-process stemmed non-stop words</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">model learning</p>
+</li>
+</ul>
+<p>research questions</p>
+</div>
+<div class="section" id="active-refinement-of-clone-anomaly-reports">
+<h3><a class="toc-backref" href="#id8">Active Refinement of Clone Anomaly Reports</a></h3>
+<p>motivating</p>
+<ul class="simple">
+<li>code clones, clone groups</li>
+<li>clone used to detect bugs</li>
+<li>anomaly : inconsistent clone group
+many anomaly clone are note bug, high false positive</li>
+</ul>
+<dl class="docutils">
+<dt>approach</dt>
+<dd><ul class="first last simple">
+<li>reorder by sorted bug reports</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils"/>
+<div class="section" id="june7">
+<h2><a class="toc-backref" href="#id9">June7</a></h2>
+<div class="section" id="keynotes-2-sustainability-with-software-an-industrial-perspective">
+<h3><a class="toc-backref" href="#id10">Keynotes 2: Sustainability with Software - An Industrial Perspective</a></h3>
+<p>Sustainability</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Classic View: Idenpendent view with overlap</dt>
+<dd><ul class="first last simple">
+<li>Social</li>
+<li>Environment</li>
+<li>Economic</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Nested viw</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>Environment</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>Social</dt>
+<dd><ul class="first last simple">
+<li>Economic</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="docutils">
+<dt>Triple bottom line</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>economic</dt>
+<dd><p class="first last">-global business, networks , global econ</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>env</dt>
+<dd><ul class="first last simple">
+<li>natural res, climate change, population grow</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>social</dt>
+<dd><ul class="first last simple">
+<li>awareness, connectivity, accountability</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="green-it">
+<h4><a class="toc-backref" href="#id11">Green IT</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt>reduce IT energy</dt>
+<dd><ul class="first last simple">
+<li>more than 50% cooling - doing nothing</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>mini e-waste: not properly recycled</dt>
+<dd><ul class="first last simple">
+<li>80% in EU</li>
+<li>75% in US</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">foster dematerialization</p>
+</li>
+</ul>
+<p>In-Memory Technology: Expected Sustainable Benefits</p>
+</div>
+<div class="section" id="what-can-we-do">
+<h4><a class="toc-backref" href="#id12">What can we do?</a></h4>
+<blockquote>
+<ul class="simple">
+<li>consider all software lifecycle phases in your design</li>
+<li>avoid energy expensive behavior in your codes</li>
+<li>design lean architectures</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="green-by-it">
+<h4><a class="toc-backref" href="#id13">Green by IT</a></h4>
+<blockquote>
+<ul class="simple">
+<li>2% green IT</li>
+<li>98% green IT</li>
+</ul>
+</blockquote>
+</div>
+</div>
+<div class="section" id="on-how-often-code-is-cloned-across-repositories">
+<h3><a class="toc-backref" href="#id14">On How Often code is cloned across repositories</a></h3>
+<p>Line based hashing code clone detection</p>
+<p>never do anything harder than sorting</p>
+<p>hashing a window of 5 lines of normalized (tokenized) code, dropping
+3/4 of the hashing</p>
+<p>把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。</p>
+<table border="1" class=" table-striped docutils table-hover table">
+<colgroup>
+<col width="11%"></col>
+<col width="89%"></col>
+</colgroup>
+<tbody valign="top">
+<tr><td>14%</td>
+<td>type1</td>
+</tr>
+<tr><td>16%</td>
+<td>type2</td>
+</tr>
+<tr><td>17%</td>
+<td>type3 (not really type2)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="graph-based-analysis-and-prediction-for-sw-evolution">
+<h3><a class="toc-backref" href="#id15">Graph-based analysis and prediction for sw evolution</a></h3>
+<div class="section" id="graph-are-everywhere">
+<h4><a class="toc-backref" href="#id16">graph are everywhere</a></h4>
+<ul class="simple">
+<li>internet topology</li>
+<li>social net</li>
+<li>chemistry</li>
+<li>biology</li>
+</ul>
+<p>in sw
+- func call graph
+- module dependency graph</p>
+<p>developer interaction graph
+- commit logs
+- bug reports</p>
+<p>experiment 11 oss, 27~171 release, &gt; 9 years</p>
+</div>
+<div class="section" id="predictors">
+<h4><a class="toc-backref" href="#id17">predictors</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt>NodeRank</dt>
+<dd><ul class="first last">
+<li><p class="first">similar to pagerank of google</p>
+</li>
+<li><p class="first">measure relative importance of each node</p>
+</li>
+<li><dl class="first docutils">
+<dt>func call graph with noderank</dt>
+<dd><ul class="first last simple">
+<li>compare rank with severity scale on bugzilla</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>correlation between noderank and BugSeverity</dt>
+<dd><ul class="first last simple">
+<li>func level 0.48 ~ 0.86 varies among projects.</li>
+<li>model level &gt; func level</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>ModularityRatio</dt>
+<dd><ul class="first last">
+<li><p class="first">cohesion/coupling ratio:  IntraDep(M)/InterDep(M)</p>
+</li>
+<li><p class="first">forecast mantencance effort</p>
+</li>
+<li><dl class="first docutils">
+<dt>use for</dt>
+<dd><ul class="first last simple">
+<li>identify modules that need redesign or refactoring</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>EditDistance</dt>
+<dd><ul class="first last">
+<li><p class="first">bug-based developer collaboration graphs</p>
+</li>
+<li><p class="first">ED(G1,G2)=|V1|+|V2|-2|V1交V2|+|E1|+|E2|-2|E1交E2|</p>
+</li>
+<li><dl class="first docutils">
+<dt>use for</dt>
+<dd><ul class="first last simple">
+<li>release planning</li>
+<li>resource allocation</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>graph metrics</p>
+<ul>
+<li><dl class="first docutils">
+<dt>graph diameter</dt>
+<dd><ul class="first last simple">
+<li>average node degree indicates reuse</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">clustering coefficient</p>
+</li>
+<li><p class="first">assortativity</p>
+</li>
+<li><p class="first">num of cycles</p>
+</li>
+</ul>
+</div>
+<div class="section" id="conclusion">
+<h4><a class="toc-backref" href="#id18">Conclusion</a></h4>
+<p>"Actionable intelligence" from graph evolution</p>
+<ul class="simple">
+<li>studie 11 large long-live projs</li>
+<li>predictors</li>
+<li>identify pivotal moments in evolution</li>
+</ul>
+</div>
+</div>
+<div class="section" id="what-make-long-term-contributors-willingness-and-opportunity-in-oss">
+<h3><a class="toc-backref" href="#id19">What make long term contributors: willingness and opportunity in OSS</a></h3>
+<p>OSS don't work without contributors form community</p>
+<p>mozilla (2000-2008)</p>
+<p>10^2.2 LTC &lt;- 2 order -&gt; 10^4.2 new contributors &lt;- 3.5 order -&gt; 10^7.7 users</p>
+<p>gnome (1999-2007)</p>
+<p>10^2.5 LTC &lt;- 1.5 order -&gt; 10^4.0 new contributors &lt;- 3.5 order -&gt; 10^6.5 users</p>
+<div class="section" id="approach">
+<h4><a class="toc-backref" href="#id20">approach</a></h4>
+<ul class="simple">
+<li>read issues of 20 LTC and 20 non-LTC</li>
+<li>suvery 56 (36 non-LTC and 20 LTC)</li>
+<li>extract practices published on project web sites</li>
+</ul>
+</div>
+<div class="section" id="summeray">
+<h4><a class="toc-backref" href="#id21">summeray</a></h4>
+<ul>
+<li><p class="first">Ability/Willingness distinguishes LTCs</p>
+</li>
+<li><dl class="first docutils">
+<dt>Environment</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>macro-climate</dt>
+<dd><ul class="first last simple">
+<li>popularity</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>micro-climate</dt>
+<dd><ul class="first last simple">
+<li>attention</li>
+<li>bumber of peers</li>
+<li>performance of peers</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>regression model</p>
+<p>newcomers to LTC conversion drops</p>
+<dl class="docutils">
+<dt>actions in first month predicts LTCs</dt>
+<dd><ul class="first last simple">
+<li>24% recall</li>
+<li>37% precision</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="develop-of-auxiliary-functions-should-you-be-agile">
+<h3><a class="toc-backref" href="#id22">develop of auxiliary functions: should you be agile?</a></h3>
+<p>a empirial assessment of pair programming and test-first programming</p>
+<p>can agile help auxiliary functions?</p>
+<div class="section" id="experiment">
+<h4><a class="toc-backref" href="#id23">experiment</a></h4>
+<ul class="simple">
+<li>pair vs solo</li>
+<li>test-first vs test-last</li>
+<li>students vs professors</li>
+</ul>
+</div>
+<div class="section" id="research-questions">
+<h4><a class="toc-backref" href="#id24">research questions</a></h4>
+<ul class="simple">
+<li>r1: can pair help obtain more correct impl</li>
+<li>r2: can test-first</li>
+<li>r3: dst test1 encourage the impl or more test cases?</li>
+<li>r4: does test1 course more coverage</li>
+</ul>
+</div>
+<div class="section" id="result">
+<h4><a class="toc-backref" href="#id25">result</a></h4>
+<ul>
+<li><dl class="first docutils">
+<dt>test-first</dt>
+<dd><ul class="first last simple">
+<li>higher coverage</li>
+<li>non change with correctness</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>pair</dt>
+<dd><ul class="first last simple">
+<li>improve on correctness</li>
+<li>longer total programming time</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="static-detection-of-resource-contention-problems-in-server-side-script">
+<h3><a class="toc-backref" href="#id26">Static Detection of Resource Contention Problems in Server-side script</a></h3>
+<p>Addressed the race condition of accessing database or filesystem of PHP</p>
+</div>
+<div class="section" id="amplifying-tests-to-validate-exception-handling-code">
+<h3><a class="toc-backref" href="#id27">Amplifying Tests to Validate Exception Handling Code</a></h3>
+<p>异常处理的代码不但难写，而且难以验证。各种组合情况难以估计，尤其是手机
+系统上。</p>
+</div>
+<div class="section" id="a-tactic-centric-approach-automating-traceability-of-quality-concerns">
+<h3><a class="toc-backref" href="#id28">A tactic-centric approach automating traceability of quality concerns</a></h3>
+<p>tactic traceability information models</p>
+</div>
+</div>
+</body></html>
                     </div>
                 </div>
             </article>
