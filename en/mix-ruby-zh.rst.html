@@ -1,0 +1,87 @@
+<div class="highlight"><pre><span class="gh">PyRuby</span>
+<span class="gh">======</span>
+
+<span class="nc">:slug:</span> <span class="nf">mix-ruby</span>
+<span class="nc">:lang:</span> <span class="nf">zh</span>
+<span class="nc">:date:</span> <span class="nf">2012-03-02 23:09</span>
+<span class="nc">:tags:</span> <span class="nf">python, ruby</span>
+
+今天在GitHub上閒逛的時候看到一個叫做 <span class="s">`PyRuby </span><span class="si">&lt;https://github.com/danielfm/pyruby&gt;</span><span class="s">`_</span> 的項目。項目的Readme說得很好：
+
+<span class="se">::</span>
+
+<span class="s">    PyRuby - Some Ruby for your Python!</span>
+<span class="s">    PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.</span>
+<span class="s">    </span>
+<span class="s">    Usage</span>
+<span class="s">    All you have to do is import the ruby module:</span>
+<span class="s">    </span>
+<span class="s">    import ruby</span>
+<span class="s">    From now on you should be able to write Ruby code within a regular Python module. An example:</span>
+<span class="s">    </span>
+<span class="s">    1.upto(10) { |n| puts n }</span>
+
+甚至 <span class="s">`PyPI </span><span class="si">&lt;http://pypi.python.org/pypi/pyruby/1.0.0&gt;</span><span class="s">`_</span> 上還有這個項目的包。
+
+一開始我還以爲這又是一個野心勃勃的基於PyPy的Ruby實現，或者某種trick在Python裏面直接調用Ruby解釋器。
+
+<span class="gh">然後我想看看這個的源代碼</span>
+<span class="gh">++++++++++++++++++++++++++++++++++++</span>
+
+只有一個ruby.py文件，內容是：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">python</span>
+    
+    <span class="c"># -*- coding: utf-8 -*-</span>
+    
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+    <span class="s">                                                                                                    </span>
+    <span class="s">                              `.-:/+ossyhhddmmmmNNNNNNNmmmmmdddddhhhyyyyhhhyo:`                     </span>
+    <span class="s">                       .:+sydNNNmmdhhysso++/+++++++////::::::-.```......--/oymms.                   </span>
+    <span class="s">                  `:ohmdys+//::/::--::::////:-.```......`````.://:-`         `/dNs.                 </span>
+    <span class="s">               .+hNds:`-:-:///::------::///++///:--....--::///::-`.///.        `oMm/                </span>
+    <span class="s">             /hNmo.`   ``    `....```````````      ...------:::-:/+/-.:/:`       /NMs               </span>
+    <span class="s">            oMd/`      `::::--.---://+`           //`     `````-:::::+/-`::.`     :NM+              </span>
+    <span class="s">            yN`       -+.`         `/`           o.               ``::.-:. ``      :NN:             </span>
+    <span class="s">           :Nm        -             ./           :    `.-://///:-.   `-` ``         :NN-            </span>
+    <span class="s">          /NM/           .-:::-.`   `/            `:sdmdhyMMMMMMNNmy/`               :mNo`          </span>
+    <span class="s">        :hMd:          /dmddddNNmdy+-.          `smmy/-```hMMMMMMMhydm/ `-.``     `...:mMm+.        </span>
+    <span class="s">      -hNd/-/o/-..-::`.ydmmmmNMMMMMMNh:/+-      dMN-`-+hmmmmdhhhhdddmMN-`-/o:    .-::::/oydms-      </span>
+    <span class="s">     oNMo:+/::.         ``...--:/+ohNMNhs-      :hNmmdyo:..``yo-```.--. `-`-+shdddhs+-` `.//yms.    </span>
+    <span class="s">    .MMo:/`o:.:+sso+:-`             sM+           ./-`       /mNh+-....-/ymNNdo::--/shd+`  -`:mm:   </span>
+    <span class="s">    /MM-o ./ ohhsooohNmy::sh.      `yM/                       `:oyyyyyyhys+:.` hy    `/Nh`  : -NN.  </span>
+    <span class="s">    -MM// -: ``   y: odddhh+     -omNh-          `--.` ``          ````    .:ohMMs.    +Ms  /  yMo  </span>
+    <span class="s">     hMoo .+.    :Mh  ````    `/hNd/.`           ohdddy::...`..`      `-/sdmdyo+NMNh+- :Mh  /  sMs  </span>
+    <span class="s">     .mmh:..:.  :NMm       `-/dMNM+         ./+++/:`.hM:`.````.` `-/shmNmh+-`  /Mmooso.hM/ .: `mM/  </span>
+    <span class="s">      .mNs://: .NMNMs-   -:-.`/+-sms.   `  `shyyyhy`sNd`   `.:+sdmmmdMM-.    .oNM+    :m/ `s``yMh   </span>
+    <span class="s">       -mMo  . sMNdMNNh+-.        .ydyoyy`        ``+o::+shdddhs+:-.:MM.`.-+hNMMh-    `.`-/::dNs`   </span>
+    <span class="s">        -NM-   mMMMh:MMdNmhs+:-..```-ohs-`...-:/+syhddmMMs:-.`    `/mMMdmmddNMm+`      ..-/hNh-     </span>
+    <span class="s">         sMy   NMMM`:Mh`-/mMmmmdddddddddhhhdNNdhyo+:--.yMs  `..:+ymMMMMd+--yNh.        `+hNh:       </span>
+    <span class="s">         -Mm   NMMM/yMh  -NM-`..--:NMo:--.`+My         :MNoydmNMMNmhdMh` -dNs`        `yMd:         </span>
+    <span class="s">         `MN   mMMMMMMMyshMN+:---.-MN-.....+My...-:/oyhdMMMMNmdy+-` +Mh:sNm/          yMy`          </span>
+    <span class="s">          MN   yMMMMMMMMMMMMMMMMMNMMMMNNNNNMMMNNNMMMMMNmhMM/-.      `yMMNs.          /My            </span>
+    <span class="s">         `MN   :MMmMMMMMMMMMMMMMMMMMMMMMMMMMMMMNmmdy+:-``NM-      ./hNNy-           /Nd`            </span>
+    <span class="s">         -Mh    dMydMmsNMNdNNMMmmmNMMMdddhys+yMo``       /Nm:  `:yNNdo.           .sNd.             </span>
+    <span class="s">         +Ms    .mMsMN::NN:.:MN: `.+NM.      +Mo          +Mm+ymNdo-            .omm+`              </span>
+    <span class="s">         yM:     .hNMd+:sMN. oMm.   oMo      +Mh   ```.:+shMNmy+-``.-:-..-//-`:yNmo`                </span>
+    <span class="s">         mM.       :ohmNNMMdhyMMdo//+Mm//////sMNhyhhdmNNmhs/-``./+/:--+so/-:smNy/`                  </span>
+    <span class="s">        .Mm        ``  .-:/+osyyhhddddddddddhhyysoo+/:-.  `./+//--+oo/--+ymmy/.                     </span>
+    <span class="s">        :Mh   .:   `+:`        `.------------`      ```-////:/++/:../ydNdo:`                        </span>
+    <span class="s">        +Ms   `/`    :+o+:-```              ``..-::///++///:-.`-+ydNdo:`                            </span>
+    <span class="s">        oMs     :/:.``  `..---.``` ````````..-:/:::---.`  `-ohmmh+:`                                </span>
+    <span class="s">        /Mh       .://///:::-----.-----.......`       `-+hmmy+-                                     </span>
+    <span class="s">         sMy`                                ``````-+ydmy+-                                         </span>
+    <span class="s">          /mNs-`                        `./ohmNMNNNmy+-                                             </span>
+    <span class="s">            /yNmho/:.``````````.-:/+syhdNmdyso+/-.`                                                 </span>
+    <span class="s">              `:+ydmNMNNNNNNNNNmdhys+/:.`                                                           </span>
+    <span class="s">                     ``.....`                                                                       </span>
+    <span class="s">                                                                                                    </span>
+    <span class="s">    LOL U MAD?</span>
+    <span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+    
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    
+    
+是的……的確……這種嘗試把Python和Ruby放在一起的想法絕對是瘋了……
+</pre></div>
