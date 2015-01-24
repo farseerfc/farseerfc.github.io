@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="kde5,plasma,linux,gnome3" />
-        <meta name="description" content="今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。 只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。 视频如下： 当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。 比比之前 Gnome3 那个跳动的界面真是好太多了： 顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译：" />
+        <meta name="description" content="今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。视频如下： 当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。 比比之前 Gnome3 那个跳动的界面真是好太多了： 顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译：" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="KDE5 Plasma 之跳动卖萌的活动按钮"/>
         <meta property="og:url" content="//farseerfc.github.io/zhs/jumping-kde5-plasma-activities-button.html"/>
-        <meta property="og:description" content="今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。 只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。 视频如下： 当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。 比比之前 Gnome3 那个跳动的界面真是好太多了： 顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译："/>
+        <meta property="og:description" content="今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。视频如下： 当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。 比比之前 Gnome3 那个跳动的界面真是好太多了： 顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译："/>
         <meta property="article:published_time" content="2014-12-09" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="kde5" />
@@ -256,6 +256,16 @@ Farseerfc的小窝            </a>
 
 
             </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
         </div>
         <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
             <aside>
@@ -633,6 +643,7 @@ oldOnload();
     </div>
 </div>
 
+
 <footer>
    <div class="container">
       <hr>
@@ -719,7 +730,11 @@ oldOnload();
     $(document).ready(function() {
         $.material.init();
         $("div.navbar").autoHidingNavbar();
-
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src'); 
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
         // $('#sidebar_toc').affix({
         //   offset: {
         //     top: 100,
