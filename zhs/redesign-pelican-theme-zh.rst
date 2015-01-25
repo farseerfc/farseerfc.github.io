@@ -482,7 +482,8 @@ twitter_bootstrap_rst_directives 這個插件則是增加了幾個 reStructuredT
 除此以外我還在 twitter_bootstrap_rst_directives 這個插件裏套用它的框架實現了兩個額外
 的 :ruby:`行內角色|role`， 分別是 :code:`:ruby:` ：通過 html 的 :code:`<ruby>` 標籤實現
 文字上方的注音（firefox下不支持，會使用文字後的括號顯示）， 以及 :code:`:html:` 在
-行內插入 :ruby:`裸|raw` html 標籤。
+行內插入 :ruby:`裸|raw` html 標籤。這兩個 :ruby:`行內角色|role` 的
+`實現代碼在這裏 <https://github.com/farseerfc/pelican-plugins/blob/master/twitter_bootstrap_rst_directives/bootstrap_rst_directives.py#L140>`_ 。
 
 extract_toc 和 summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
