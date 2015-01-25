@@ -143,6 +143,38 @@ Farseerfc的小窝            </a>
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
+                            <a href="//farseerfc.github.io/zhs/c-tricks-2-5-address-alignment.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.5 I386平台的边界对齐(Align)
+                            </h2></a>
+                        </div>
+                        <div class="col-lg-4 col-md-3 hidden-sm hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
+<ul class="dropdown-menu"><li><a href="//farseerfc.github.io/zhs/../c-tricks-2-5-address-alignment.html" class="translate">繁體</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.github.io/zhs/c-tricks-2-5-address-alignment.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-5-address-alignment" data-disqus-url="http://farseerfc.github.io/zhs/c-tricks-2-5-address-alignment.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="i386-align">
+<h2>2.5 I386平台的边界对齐(Align)</h2>
+<p>首先提问，既然I386上sizeof(int)==4、sizeof(char)==1，那么如下结构(struct)A的sizeof是多少？</p>
+<p>struct A{int i;char c;};</p>
+<p>答案是sizeof(A)==8……1+5=8？</p>
+<p>呵呵，这就是I386上的边界对齐问题。我们知道，I386上有整整4GB的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于I386平台而言，类型为T的变量必须放置在sizeof(T)的整数倍的地址上，char可以随便放置，short必须放在2的整数倍的地址上，int必须放在4的整数倍的地址上，double必须放在8的整数倍的地址上。如果违反边界对齐要求 ...</p></div></body></html>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
                             <a href="//farseerfc.github.io/zhs/c-tricks-2-6-i386-variable-arguments.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments)
                             </h2></a>
                         </div>
@@ -159,12 +191,14 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="i386c-variable-arguments">
-<h2>2.6 I386 平台 C 函数的可变参数表 (Variable Arguments)</h2>
-<p> 基于前文 (2.4 节 ) 分析，我们可以不通过函数签名，直接通过指针运算，来得到函数的参数。由于参数的压栈和弹出操作都由主调函数进行，所以被调函数对于参数的真实数量不需要知晓。因此，函数签名中的变量声明不是必需的。为了支持这种参数使用形式， C 语言提供可变参数表。可变参数表的语法形式是在参数表末尾添加三个句点形成的省略号 “...” ： </p>
+<h2>2.6 I386平台C函数的可变参数表(Variable Arguments)</h2>
+<p>基于前文(2.4节)分析，我们可以不通过函数签名，直接通过指针运算，来得到函数的参数。由于参数的压栈和弹出操作都由主调函数进行，所以被调函数对于参数的真实数量不需要知晓。因此，函数签名中的变量声明不是必需的。为了支持这种参数使用形式，C语言提供可变参数表。可变参数表的语法形式是在参数表末尾添加三个句点形成的省略号“...”：</p>
 <p>void g(int a,char* c,...);</p>
-<p> 省略号之前的逗号是可选的，并不影响词法语法分析。上面的函数 g 可以接受 2 个或 2 个以上的参数，前两个参数的类型固定，其后的参数类型未知，参数的个数也未知。为了知道参数个数，我们必须通过其他方法，比如通过第一个参数传递 ...</p></div></body></html>
+<p>省略号之前的逗号是可选的，并不影响词法语法分析。上面的函数g可以接受2个或2个以上的参数，前两个参数的类型固定，其后的参数类型未知，参数的个数也未知。为了知道参数个数，我们必须通过其他方法，比如通过第一个参数传递：</p>
+<p>g(3,”Hello”,2,4,5);//调用g并传递5个参数，其中后3个为可变参数。</p>
+<p>在函数的实现代码中，可以通过2.4节叙述的 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -190,26 +224,26 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="i386">
-<h2>2.7 I386 平台的其它函数调用模型 </h2>
+<h2>2.7 I386平台的其它函数调用模型</h2>
 <div class="line-block">
-<div class="line"> 上文介绍的只是 I386 平台上 C 函数调用的标准模型，被称作 __cdecl 。事实上， Microsoft Visual C++ 编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同： </div>
+<div class="line">上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同：</div>
 </div>
 <div class="section" id="cdecl">
 <h3>1 __cdecl</h3>
-<p> 参数压栈顺序：逆序 ( 从右至左 )</p>
-<p> 参数堆栈恢复者：主调函数 (caller)</p>
+<p>参数压栈顺序：逆序(从右至左)</p>
+<p>参数堆栈恢复者：主调函数(caller)</p>
 <div class="line-block">
-<div class="line">__cdecl 明确地指出函数使用 C 函数调用模型，这是默认的调用模型。 </div>
+<div class="line">__cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。</div>
 </div>
 </div>
 <div class="section" id="stdcall">
 <h3>2 __stdcall</h3>
-<p> 参数压栈顺序：逆序 ( 从右至左 )</p>
-<p> 参数堆栈恢复者：被调函数 (callee)</p>
+<p>参数压栈顺序：逆序(从右至左)</p>
+<p>参数堆栈恢复者：被调函数(callee)</p>
 <div class="line-block">
-<div class="line">__stdcall 是微软所谓的标准调用模型。可惜的是它与 __cdecl 不兼容。几乎所有的 ...</div></div></div></div></body></html>
+<div class="line">__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明 ...</div></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -235,12 +269,14 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="x86">
-<h2>2.1   X86 概述 </h2>
-<p> 所谓 X86 体系结构，是指以 Intel
-8086 芯片为首的芯片所沿袭的 CPU 结构，一些文档中又被称作 IA32 体系结构。包括的芯片有但不限于 :Intel
-8086 至 80486 ，奔腾 (Pentium) 系列处理器 1 至 4 ，赛扬系列处理器，酷睿系列处理器，以及 AMD 的相应型号产品。 X86 体系结构在早期属于 16 位处理器，自 80386 之后扩展为 32 位处理器，所以一些文档中又把 80386 之后的 32 ...</p></div></body></html>
+<h2>2.1   X86概述</h2>
+<p>所谓X86体系结构，是指以Intel
+8086芯片为首的芯片所沿袭的CPU结构，一些文档中又被称作IA32体系结构。包括的芯片有但不限于:Intel
+8086至
+80486，奔腾(Pentium)系列处理器1至4，赛扬系列处理器，酷睿系列处理器，以及AMD的相应型号产品。X86体系结构在早期属于16位处理器，自80386之后扩展为32位处理器，所以一些文档中又把80386之后的32位处理器体系称作I386。自Pentium4后期，AMD的Athlon64开始，I386被进一步扩充为64位处理器，含有64位寻址能力的X86体系结构被称作X86-64或IA32-64。总之，市售的个人电脑用CPU，除苹果的Macintosh之外，全部采用X86体系结构芯片。</p>
+<p>在X86早期，16位的寻址能力只支持64KB(2^16=64K)内存，这显然是不够的。Intel采用分段寻址的方法，用4位段位+16位偏移量，提供了总共1MB(2^20=1M)的寻址能力。所以在X86的16位编程中，有两种指针类型 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -266,12 +302,12 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="id1">
-<h2>1.2    逗号运算符 (,) 、逻辑运算符 (&amp;&amp;,||) 与运算符重载的陷阱 </h2>
-<p> 很多人甚至不知道逗号 (,) 也是个 C++ 运算符。与语法上要求出现的逗号 ( 比如分隔函数参数的逗号 ) 不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如： </p>
+<h2>1.2   逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</h2>
+<p>很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如：</p>
 <p><strong>for</strong>(<strong>int</strong>i=0,j=9;i&lt;10;++i<strong>,</strong>--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”;</p>
-<p> 在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据 C++ 标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时 ...</p></div></body></html>
+<p>在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -297,49 +333,18 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="id1">
-<h2>1.1    条件运算符 (?:)</h2>
-<p> 条件运算符 (?:) 是 C++ 中唯一的三目运算符 (trinary
-operator) ，用于在表达式中作条件判断，通常可以替换 if 语句，与 Visual
-Basic 中的 iif 函数、 Excel 中的 if 函数有同样的作用。语法形式如下： </p>
+<h2>1.1   条件运算符(?:)</h2>
+<p>条件运算符(?:)是C++中唯一的三目运算符(trinary
+operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual
+Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下：</p>
 <p><em>condition</em> ? <em>true_value</em> : <em>false_value</em></p>
-<p> 其中 <em>condition
-* 条件是任何可以转换为 bool 类型的表达式，包括但不仅限于 **bool*</em> 、 <strong>int</strong> 、指针。与 <strong>if</strong> 和 <strong>while</strong> 的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。 </p>
-<p> 另外，条件语句会切实地控制执行流程 ...</p></div></body></html>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
-                            <a href="//farseerfc.github.io/zhs/filling-believings-calling-conscience.html" class="btn btn-primary btn-lg"><h2>填补信仰、唤醒良知
-                            </h2></a>
-                        </div>
-                        <div class="col-lg-4 col-md-3 hidden-sm hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.github.io/zhs/../filling-believings-calling-conscience.html" class="translate">繁體</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.github.io/zhs/filling-believings-calling-conscience.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="filling-believings-calling-conscience" data-disqus-url="http://farseerfc.github.io/zhs/filling-believings-calling-conscience.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
-<p> 填补信仰、唤醒良知 </p>
-<p> 我们听尽了呼吁与号召，对于良知，我不必谴责丧失它的国人，不必盛赞良知的美好。我只想讨论，丧失了良知的原因 —— 空缺的信仰。 </p>
-<p> 一、空缺信仰丧失良知 </p>
-<p> 现代的国人缺少信仰，以至于丧失良知。曾几何时，中华民族由良好的信仰凝聚而成。三皇五帝时，族民们以炎黄为信仰；春秋战国时，士大夫之族以周制礼乐为信仰；汉代以后，百姓延习孔孟之说、老聃之道，以儒家学说为信仰；自大唐起，以佛教为首的现代宗教纷纷传入中原，人民开始以它们作为信仰。 </p>
-<p> 直至鸦片战争、五四运动，西方文化入侵中华，国人开始抛弃国学，转而去研究科学；文化大革命，十年文化浩劫，人们批判旧的信仰，却没有合适的新的信仰前来填补。从此，国人的信仰出现空缺，国人的良知也被一块块蚕食殆尽。 </p>
-<p> 二、信仰、科学、迷信 </p>
-<p> 在许多国人的心目中，信仰就等于迷信。从小到大的教育告诉我们 ...</p></body></html>
+<p>其中<em>condition
+*条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*</em>、<strong>int</strong>、指针。与<strong>if</strong>和<strong>while</strong>的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。</p>
+<p>另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如：</p>
+<p><strong>int</strong> *pi=getInt();</p>
+<p><strong>int</strong> i=pi ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -359,7 +364,10 @@ Basic 中的 iif 函数、 Excel 中的 if 函数有同样的作用。语法形�
                             href="//farseerfc.github.io/zhs/index4.html">4</a></li>
                     <li class="active"><a
                             href="//farseerfc.github.io/zhs/index5.html">5</a></li>
-                <li class="next disabled"><a href="#">&raquo;</a></li>
+                    <li class=""><a
+                            href="//farseerfc.github.io/zhs/index6.html">6</a></li>
+                <li class="next"><a
+                        href="//farseerfc.github.io/zhs/index6.html">&raquo;</a></li>
         </ul>
             </div>
 <!-- Modal -->
@@ -422,18 +430,8 @@ Basic 中的 iif 函数、 Excel 中的 if 函数有同样的作用。语法形�
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -441,154 +439,14 @@ Basic 中的 iif 函数、 Excel 中的 if 函数有同样的作用。语法形�
                     tty <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/material.html">
-                    material <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/css.html">
-                    css <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/paper.html">
-                    paper <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/ugh.html">
                     ugh <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
+                    pelican <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -597,8 +455,158 @@ Basic 中的 iif 函数、 Excel 中的 if 函数有同样的作用。语法形�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/msr.html">
                     msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/material.html">
+                    material <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

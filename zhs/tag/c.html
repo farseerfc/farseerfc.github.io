@@ -162,19 +162,23 @@ Farseerfc的小窝            </a>
                 </div>
                 <div class="panel-body">
                     <div class="summary"><html><body>
-<p> 这篇也是源自于水源 C 板上板友的一个问题，涉及 Linux 上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 <a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"> 原帖在这里 </a>  。 </p>
+<p>这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。
+<a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html">原帖在这里</a> 。</p>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id7"> 可以设置不带缓冲的标准输入流吗？ </a></h2>
-<p>WaterElement(UnChanged)  于 2014 年 12 月 09 日 23:29:51  星期二问到： </p>
+<h2><a class="toc-backref" href="#id7">可以设置不带缓冲的标准输入流吗？</a></h2>
+<p>WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到：</p>
 <blockquote>
-<p> 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 </p>
+<p>请问对于标准输入流可以设置不带缓冲吗？比如以下程序</p>
 <div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
 <span class="cp">#include &lt;unistd.h&gt;</span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
     <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">,</span> <span class="s">"r"</span><span class="p">);</span>
     <span class="n">setvbuf</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">_IONBF</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">20 ...</span></pre></div></blockquote></div></body></html>
+    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
+    <span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">fgets</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">fp</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"buffer ...</span></pre></div></blockquote></div></body></html>
                     </div>
                 </div>
             </article>
@@ -201,14 +205,14 @@ Farseerfc的小窝            </a>
                 </div>
                 <div class="panel-body">
                     <div class="summary"><html><body>
-<p> 这两天在饮水思源的 C 板，关于 C++ 模板的类型转换的一个讨论，后面是我的解答。 </p>
+<p>这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。</p>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id4"> 讨论地址 </a></h2>
+<h2><a class="toc-backref" href="#id4">讨论地址</a></h2>
 <p><a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html">http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html</a></p>
 </div>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id5"> 原问题 </a></h2>
-<p> 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： </p>
+<h2><a class="toc-backref" href="#id5">原问题</a></h2>
+<p>今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：</p>
 <div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
 
@@ -218,7 +222,10 @@ Farseerfc的小窝            </a>
 <span class="p">};</span>
 
 <span class="k">class</span> <span class="nc">A</span> <span class="p">{</span> <span class="p">};</span>
-<span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A ...</span></pre></div></div></body></html>
+<span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A</span> <span class="p">{</span> <span class="p">};</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">struct ...</span></pre></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -244,17 +251,19 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="goto-switch">
-<h2>3.2  标号、 goto ，以及 switch 的实现 </h2>
-<p>goto 语句及标号 (label) 是最古老的 C 语言特性，也是最早被人们抛弃的语言特性之一。像汇编语言中的 jmp 指令一样， goto 语句可以跳转到同一函数体中任何标号位置： </p>
+<h2>3.2 标号、goto，以及switch的实现</h2>
+<p>goto语句及标号(label)是最古老的C语言特性，也是最早被人们抛弃的语言特性之一。像汇编语言中的jmp指令一样，goto语句可以跳转到同一函数体中任何标号位置：</p>
 <p>void f()</p>
 <p>{int i=0;</p>
 <p>Loop: //A label</p>
 <p>++i;</p>
 <p>if(i&lt;10)goto Loop; //Jump to the label</p>
 <p>}</p>
-<p> 在原始而和谐的早期 Fortran 和 Basic 时代，我们没有 if then ...</p></div></body></html>
+<p>在原始而和谐的早期Fortran和Basic时代，我们没有if then
+else，没有for和while，甚至没有函数的概念，一切控制结构都靠goto(带条件的或无条件的)构件。软件工程师将这样的代码称作“意大利面条”代码。实践证明这样的代码极容易造成混乱。</p>
+<p>自从证明了结构化的程序可以做意大利面条做到的任何事情，人们就开始不遗余力地推广结构化设计思想，将goto像猛兽一般囚禁在牢笼 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -280,18 +289,19 @@ Farseerfc的小窝            </a>
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="lvalue-rvalue-constant">
-<h2>3.1  左值右值与常量性 (lvalue ， rvalue &amp; constant)</h2>
-<p> 首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义： </p>
-<p>1 、左值是可以出现在等号 (=) 左边的值，右值是只能出现在等号右边的值。 </p>
-<p>2 、左值是可读可写的值，右值是只读的值。 </p>
-<p>3 、左值有地址，右值没有地址。 </p>
-<p> 根据左值右值的第二定义，值的左右性就是值的常量性 —— 常量是右值，非常量是左值。比如： </p>
+<h2>3.1 左值右值与常量性(lvalue，rvalue &amp; constant)</h2>
+<p>首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义：</p>
+<p>1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。</p>
+<p>2、左值是可读可写的值，右值是只读的值。</p>
+<p>3、左值有地址，右值没有地址。</p>
+<p>根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：</p>
 <p>1=1;//Error</p>
-<p> 这个复制操作在 C++ 中是语法错误， MSVC 给出的错误提示为 “error C2106: '=' :
+<p>这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: '=' :
 left operand must be
-l-value” ，就是说 ’=’ 的左操作数必须是一个左值，而字面常数 1 是一个右值 ...</p></div></body></html>
+l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。</p>
+<p>根据第二定义，一个左值也是一个右值 ...</p></div></body></html>
                     </div>
                 </div>
             </article>
@@ -317,12 +327,18 @@ l-value” ，就是说 ’=’ 的左操作数必须是一个左值，而字面
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="i386">
-<h2>2.2 I386 平台的内存布局 </h2>
-<p> 众所周知， I386 是 32 位体系结构。因此对于绝大多数 I386 平台的 C++ 编译器而言， sizeof(int)=sizeof(long)=sizeof(void*)=4 。当然 C++ 标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 </p>
+<h2>2.2 I386平台的内存布局</h2>
+<p>众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。</p>
 <div class="line-block">
-<div class="line">32 位指针的可寻址空间为 4GB 。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术， WinNT 使用虚拟内存技术，给与每个应用程序全部 4GB 的内存空间。 4GB 的地址被一分为二，前 2GB 供应用程序自己使用，后 2GB 由系统内核分配和管理。这 2GB ...</div></div></div></body></html>
+<div class="line">32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用：</div>
+</div>
+<div class="section" id="id1">
+<h3>1 代码及静态数据区</h3>
+<p>由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。</p>
+<div class="line-block">
+<div class="line">在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 ...</div></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -348,22 +364,33 @@ l-value” ，就是说 ’=’ 的左操作数必须是一个左值，而字面
 
                 </div>
                 <div class="panel-body">
-                    <div class="summary"><html><body><p> 从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a>  导入 </p>
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <p><strong>C++ Tricks</strong></p>
 <p><strong>By  FarseerFc</strong></p>
-<p> 从今天起，我再将在 <a class="reference external" href="http://firechildren.spaces.live.com/">Live
-Space</a> 和 <a class="reference external" href="http://76635424.qzone.qq.com/">QQZone</a> 同时发表一系列文章，暂定名为 “C++Tricks” 。 </p>
-<p> 本文旨在记录和阐述一些本人学习 C++ 时所得的心得、技巧。总体来看，本文涉及的内容是每一个 C++ 程序员都应该知道的，但是很少见诸 C++ 教材。希望对各位同仁学习 C++ 有所帮助。 </p>
+<p>从今天起，我再将在<a class="reference external" href="http://firechildren.spaces.live.com/">Live
+Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">QQZone</a>同时发表一系列文章，暂定名为“C++Tricks”。</p>
+<p>本文旨在记录和阐述一些本人学习C++时所得的心得、技巧。总体来看，本文涉及的内容是每一个C++程序员都应该知道的，但是很少见诸C++教材。希望对各位同仁学习C++有所帮助。</p>
 <div class="line-block">
-<div class="line"> 也可以通过 QQ 或 MSN 向我索要此文的 DOC 版或 PDF 版，会比网页上的更新的快一点。 </div>
+<div class="line">也可以通过QQ或MSN向我索要此文的DOC版或PDF版，会比网页上的更新的快一点。</div>
 </div>
 <div class="section" id="lexical-problems">
-<h2>1       词法问题 (Lexical Problems)</h2>
+<h2>1      词法问题(Lexical Problems)</h2>
 <div class="line-block">
 <div class="line"><br/></div>
 </div>
 <div class="section" id="id1">
-<h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!139.entry">1.1  条件运算符 ...</a></h3></div></div></body></html>
+<h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!139.entry">1.1 条件运算符(?:)</a></h3>
+</div>
+<div class="section" id="id2">
+<h3><a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!140.entry">1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</a></h3>
+</div>
+<div class="section" id="x86">
+<h3>2      X86体系结构</h3>
+<div class="section" id="id3">
+<h4>     <a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!146.entry">2.1 X86概述</a></h4>
+</div>
+<div class="section" id="i386">
+<h4>     <a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!147.entry">2.2 ...</a></h4></div></div></div></body></html>
                     </div>
                 </div>
             </article>
@@ -442,18 +469,8 @@ Space</a> 和 <a class="reference external" href="http://76635424.qzone.qq.com/"
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -461,154 +478,14 @@ Space</a> 和 <a class="reference external" href="http://76635424.qzone.qq.com/"
                     tty <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/material.html">
-                    material <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/css.html">
-                    css <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/paper.html">
-                    paper <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/ugh.html">
                     ugh <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
+                    pelican <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -617,8 +494,158 @@ Space</a> 和 <a class="reference external" href="http://76635424.qzone.qq.com/"
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/msr.html">
                     msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/material.html">
+                    material <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>

@@ -1,7 +1,639 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.github.io/zhs/" rel="alternate"></link><link href="//farseerfc.github.io/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.github.io/zhs/</id><updated>2015-01-16T03:27:00+09:00</updated><entry><title>总结一下 Material Design 的 CSS 框架</title><link href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html" rel="alternate"></link><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2015-01-16:zhs/summarize-material-design-css-framework.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 现在这里的界面风格要从 Google  在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014  大会 &lt;/a&gt;
- 上公布 Android L  也即后来的 Lollipop  说起。他们在谈论界面设计的时候公布了他们的设计准则： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt; 中文非官方翻译 &lt;/a&gt; ) 。当然这只是一些准则，总结并描述了之前在 Web  设计和移动端 App  界面设计方面的一些规范，并且用材料的类比来形象化的比喻这个准则。关于 Material Design  的更多中文资料可 &lt;a class="reference external" href="http://www.ui.cn/Material/"&gt; 参考这里 &lt;/a&gt;  。 &lt;/p&gt;
-&lt;p&gt; 看到 Material Design  之后就觉得这个设计风格非常符合直觉，于是想在这边也用上 Material Design 。但是我在 Web  前端科技树上没点多少技能点，所以想找找别人实现好的模板或者框架直接套用上。在网络上搜索数日找到了这几个： &lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.github.io/zhs/" rel="alternate"></link><link href="//farseerfc.github.io/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.github.io/zhs/</id><updated>2015-01-25T22:45:00+09:00</updated><entry><title>重新设计了 Pelican 的主题与插件</title><link href="//farseerfc.github.io/zhs/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2015-01-25:zhs/redesign-pelican-theme.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id35"&gt;前言: 新天新地，将一切都更新了 &lt;/a&gt;&lt;a class="footnote-reference" href="#id34" id="id1"&gt;[1]&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;不知不觉间放任这边长草很久了，从上次
+&lt;a class="reference external" href="//farseerfc.github.io/zhs/try-pelican.html"&gt;折腾主题&lt;/a&gt; 到现在都快三年了，
+而从上次 &lt;a class="reference external" href="//farseerfc.github.io/zhs/marry-me.html"&gt;写了篇告白信&lt;/a&gt; 到现在也有快两年了。
+这期间曾经把主题配色从 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默认的
+白底黑字改成了让眼睛更舒适的黑底白字，也不过是用 drop-in 的配色方案而已，没有本质上的改进。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千载，两年里 Bootstrap 已经升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 则已经升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。&lt;/p&gt;
+&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;strong&gt;两个月&lt;/strong&gt; 的时间重新设计了一遍
+Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
+（以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧。）&lt;/p&gt;
+
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+在迈阿密参加 &lt;a class="reference external" href="http://icsr2015.ipd.kit.edu/"&gt;ICSR 2015&lt;/a&gt; 的时候
+拍到的街边一家叫 Pelican 的旅馆&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Pelican Hotel" class="img-responsive" src="//farseerfc.github.io/zhs/../images/pelican.jpg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bootstrap-3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id36"&gt;Bootstrap 3 的新设计&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;全新的 &lt;ruby&gt;&lt;rb&gt;优先移动设备&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mobile-first&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;响应式&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;responsive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 设计。
+原本Bootstrap 2虽然有响应式设计，
+不过诸多细节不能符合我的需求，最终还是得手工 hack &lt;code class="code"&gt;
+@media&lt;/code&gt;
+ 查询去微调。
+现在的 &lt;ruby&gt;&lt;rb&gt;优先移动设备&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mobile-first&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;响应式&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;responsive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+&lt;ruby&gt;&lt;rb&gt;栅格系统&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;grid system&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 则相对显得科学很多了，也终于能在手持
+设备上看起来能舒服很多。诸位可以尝试改变窗口宽度，或者在不同的手持设备上打开这个
+blog ，体验一下这个页面在不同显示器大小中的效果。如果仍有问题欢迎
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/issues"&gt;发 Issue 给我&lt;/a&gt;  。&lt;/li&gt;
+&lt;li&gt;科学的 &lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+比 Bootstrap 2 那个科学很多了。无论是 &lt;ruby&gt;&lt;rb&gt;保持&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sticky&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在上端还是跟着浮动，
+或者像这边这样 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;自动隐藏&lt;/a&gt; 都很简单。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;更多细节参考 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3 主页&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pelican-3-5"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id37"&gt;Pelican 3.5 的新功能&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Python 2 和 Python 3 统一代码：
+再没有恼人的 unicode 相关的问题了。这对 blog 系统来说相当重要啊。
+而且还能方便切换 pypy 等不同的解释器。&lt;/li&gt;
+&lt;li&gt;全新的插件系统：非常多功能强大的 &lt;a class="reference external" href="https://github.com/getpelican/pelican-plugins"&gt;插件&lt;/a&gt; 等着你。&lt;/li&gt;
+&lt;li&gt;增强了导入系统：嗯总算可以导入我的中文的 wordpress 博客了。（虽然那边长草更久了……）&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/content.html#linking-to-internal-content"&gt;站内链接&lt;/a&gt;
+：不用 &lt;ruby&gt;&lt;rb&gt;硬编码&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;hard code&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 目标页面的链接了，可以直接写源文件的位置然后让 pelican
+处理，这样能简化各种 &lt;ruby&gt;&lt;rb&gt;插件&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;plugin&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;ruby&gt;&lt;rb&gt;主题&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;theme&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的实现。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;更多细节参考 &lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/"&gt;Pelican 文档&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id38"&gt;新的文件夹布局&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Pelican 的新文件夹布局&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;pre&gt;
+&lt;span style="color:blue;font-weight:bold;"&gt;.&lt;/span&gt;
+├── &lt;span style="color:blue;font-weight:bold;"&gt;cache&lt;/span&gt;             生成页面的 pickle 缓存
+├── &lt;span style="color:blue;font-weight:bold;"&gt;content&lt;/span&gt;           读取的全部内容
+│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;&amp;lt;categories&amp;gt;&lt;/span&gt;      按分类存放的文章
+│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;pages&lt;/span&gt;             像 About 这样的固定页面
+│   └── &lt;span style="color:blue;font-weight:bold;"&gt;static&lt;/span&gt;            文章内用到的静态内容
+├── &lt;span style="color:blue;font-weight:bold;"&gt;drafts&lt;/span&gt;            文章的草稿箱
+├── &lt;span style="color:green;font-weight:bold;"&gt;Makefile&lt;/span&gt;          生成用的 makefile
+├── &lt;span style="color:green;font-weight:bold;"&gt;pelicanconf.py&lt;/span&gt;    测试时用的快速 Pelican 配置
+├── &lt;span style="color:green;font-weight:bold;"&gt;publishconf.py&lt;/span&gt;    部署时用的耗时 Pelican 配置
+├── &lt;span style="color:teal;font-weight:bold;"&gt;output&lt;/span&gt;          -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../farseerfc.github.io&lt;/span&gt;
+├── &lt;span style="color:teal;font-weight:bold;"&gt;plugins&lt;/span&gt;         -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-plugins&lt;/span&gt;
+└── &lt;span style="color:teal;font-weight:bold;"&gt;theme&lt;/span&gt;           -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-bootstrap3&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.com"&gt;之前的博客&lt;/a&gt; 仍然留在
+github 上，其中的内容完全搬过来了。开始写老博客的时候 Pelican 版本较早，没有形成好的
+文件夹布局，导致生成的文章、使用的模板和撰写的内容全都混在一起，非常难以管理，
+于是趁改版之际用了新的文件夹布局方式，并分为 4 个 git repo 分别管理历史。&lt;/p&gt;
+&lt;p&gt;首先是存放 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc"&gt;总的博客内容的 repo&lt;/a&gt; ，
+其布局是如图那样的。这样将生成的静态网站和生成网站用的配置啦内容啦分开之后，顿时清晰了很多。&lt;/p&gt;
+&lt;p&gt;然后这个内容 repo 中的三个符号链接分别指向三个子 repo（没用 &lt;code class="code"&gt;
+git submodule&lt;/code&gt;
+
+管理纯粹是因为偷懒）。 theme 指向
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt;pelican-bootstrap3&lt;/a&gt;
+，是我修改过的 pelican 主题。
+plugins 指向 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins"&gt;pelican-plugins&lt;/a&gt;
+，由于 plugins 的质量有些参差不齐，其中不少 plugin
+都按我的需要做了些许修改，一些是功能改进，另一些则是修bug（比如不少plugin只支持 python 2）。
+最后 output 指向
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.io"&gt;farseerfc.github.io&lt;/a&gt;
+也就是发布的静态网站啦。&lt;/p&gt;
+&lt;p&gt;接下来从 &lt;strong&gt;主题&lt;/strong&gt; 和 &lt;strong&gt;插件&lt;/strong&gt; 两个方面介绍一下改版的细节。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="material-design-bootstrap-3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id39"&gt;主题： Material Design 风格的 Bootstrap 3&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html"&gt;博文&lt;/a&gt;
+就总结了我为了这个博客寻找了一堆 CSS 框架，并且最终决定用
+&lt;a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/"&gt;bootstrap-material-design&lt;/a&gt;
+, &lt;a class="reference external" href="https://github.com/DandyDev/pelican-bootstrap3"&gt;DandyDev/pelican-bootstrap3&lt;/a&gt;
+和 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3&lt;/a&gt; 这三个项目结合的方式实现这个模板的主题。
+这三个项目都或多或少经过了我的修改，修改后的项目以 pelican-bootstrap3 为基础放在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt;这里&lt;/a&gt; ，包括 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap"&gt;Bootstrap3 样式&lt;/a&gt;
+和 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material"&gt;Material 样式&lt;/a&gt;。&lt;/p&gt;
+&lt;div class="section" id="id16"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id40"&gt;对 Bootstrap 3 的定制&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;由于架构完善，修改 Bootstrap 3 感觉非常简单。另一方面我在 Web 前端技术上的技能点也不多，
+所以修改的地方非常有限，只能按我自己的需求定制而已。&lt;/p&gt;
+&lt;div class="section" id="id17"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id41"&gt;响应式设备的大小&lt;/a&gt;&lt;/h4&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+修改了 Bootstrap 3 响应式设备的大小&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;@screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@screen-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;598px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  768px; */&lt;/span&gt;
+&lt;span class="k"&gt;@screen-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;952px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  992px; */&lt;/span&gt;
+&lt;span class="k"&gt;@screen-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;1350px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1200px; */&lt;/span&gt;
+&lt;span class="k"&gt;@screen-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;2030px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@container-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;582px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  750px; */&lt;/span&gt;
+&lt;span class="k"&gt;@container-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;930px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  970px; */&lt;/span&gt;
+&lt;span class="k"&gt;@container-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1170px; */&lt;/span&gt;
+&lt;span class="k"&gt;@container-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1990px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;首先把 Bootstrap 3 默认适配的几个 &lt;a class="reference external" href="http://getbootstrap.com/css/#grid"&gt;响应式设备的大小&lt;/a&gt;
+改成了我需要的大小。&lt;code class="code"&gt;
+xs&lt;/code&gt;
+ 和 &lt;code class="code"&gt;
+sm&lt;/code&gt;
+ 的大小分别按照我的手机屏幕 &lt;strong&gt;竖屏&lt;/strong&gt; 和
+&lt;strong&gt;横屏&lt;/strong&gt; 时候的浏览器页面宽度来算， &lt;code class="code"&gt;
+md&lt;/code&gt;
+ 是想兼容 Nexus 7 横屏 960 的宽度以及
+一个常见上网本 1024 的宽度。&lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 的大小则按照常见的笔记本 1366 宽的屏幕来适配。
+这里 Bootstrap 3 支持的设备大小的一个问题是，它最多考虑到 1200 像素宽的显示器，而更大的
+比如 1600、 2048 甚至 2560 宽的显示器现在也并不少见，其结果就是页面中左右两侧
+有很大的空间被浪费掉了。作为深受这一问题困扰的用户之一，我用
+&lt;a class="reference external" href="http://stackoverflow.com/a/25644266"&gt;这里介绍的方法&lt;/a&gt;
+给 bootstrap 增加了一类「 &lt;ruby&gt;&lt;rb&gt;比大更大&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;bigger than bigger&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 」的
+&lt;code class="code"&gt;
+xl&lt;/code&gt;
+ 响应式设备尺寸，宽度设为支持 2048 像素宽的显示器，具体的修改反映在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/variables.less"&gt;variables.less&lt;/a&gt;
+文件里。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id20"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id42"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
+显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
+&lt;table border="1" class=" table-striped docutils table-hover table"&gt;
+&lt;colgroup&gt;
+&lt;col width="29%"&gt;&lt;/col&gt;
+&lt;col width="71%"&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code class="code"&gt;
+xs&lt;/code&gt;
+ 用单栏 &lt;ruby&gt;&lt;rb&gt;流动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;fluid&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 布局&lt;/td&gt;
+&lt;td&gt;&lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 用双栏文章列表、单栏 &lt;ruby&gt;&lt;rb&gt;侧边栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sidebar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 固定布局&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="100%"&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;折叠的导航栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;侧边栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="33%"&gt;&lt;/col&gt;
+&lt;col width="33%"&gt;&lt;/col&gt;
+&lt;col width="33%"&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="3"&gt;&lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 3&lt;/td&gt;
+&lt;td&gt;文章 4&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code class="code"&gt;
+sm&lt;/code&gt;
+ 和 &lt;code class="code"&gt;
+md&lt;/code&gt;
+ 用单栏文章列表、单栏 &lt;ruby&gt;&lt;rb&gt;侧边栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sidebar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 固定布局&lt;/td&gt;
+&lt;td&gt;&lt;code class="code"&gt;
+xl&lt;/code&gt;
+ 用三栏文章列表、双栏 &lt;ruby&gt;&lt;rb&gt;侧边栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sidebar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 固定布局&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="53%"&gt;&lt;/col&gt;
+&lt;col width="47%"&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="20%"&gt;&lt;/col&gt;
+&lt;col width="20%"&gt;&lt;/col&gt;
+&lt;col width="22%"&gt;&lt;/col&gt;
+&lt;col width="18%"&gt;&lt;/col&gt;
+&lt;col width="20%"&gt;&lt;/col&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="5"&gt;&lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;文章 3&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 4&lt;/td&gt;
+&lt;td&gt;文章 5&lt;/td&gt;
+&lt;td&gt;文章 6&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="5"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;一开始纯粹用 Bootstrap3 的响应式栅格实现这个分栏布局，结果发现效果不太理想，
+因为文章列表和侧边栏的高度是变化的，会导致栅格间留下大片空白。后来改用
+&lt;a class="reference external" href="http://cssdeck.com/labs/pinterest-like-waterfall-design-purely-css"&gt;这里示范的纯CSS瀑布式布局&lt;/a&gt;
+实现文章和侧边栏的布局，具体的实现代码在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/waterfall.less"&gt;waterfall.less&lt;/a&gt;
+，总算达到了想要的布局了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id21"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id43"&gt;正文的样式&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;最最重要的是文章正文的样式。这里我想要达到的效果是，在大屏幕上用更大的字号，让读者
+看起来更舒适，同时在小屏幕上用比较小的字号，最终保证基本上「一行」的文字数接近。这个修改
+主要针对 &lt;code class="code"&gt;
+.jumbotron&lt;/code&gt;
+，
+用了 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/jumbotron.less"&gt;不太科学的方式&lt;/a&gt;
+代码太长就不贴全了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id23"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id44"&gt;一些细微的定制&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;把主题配色改成了现在这样的淡紫色
+&lt;code class="code"&gt;
+@brand-primary: darken(#6B5594, 6.5%);&lt;/code&gt;
+
+，配合我的头像风格， 这个修改只需要一行。
+接着删掉了 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 的 &lt;code class="code"&gt;
+white-space: nowrap;&lt;/code&gt;
+ 让按钮的文字可以换行，
+这也只是一行修改。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id24"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id45"&gt;对 bootstrap-material-design 的定制&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这里定制的地方不多。原样式中一个不太科学的做法是所有 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 都强制加上了阴影
+效果，这在已经有阴影的环境里用的话非常碍眼，像是 Win9x 风格的厚重睫毛膏。既然可以单独
+给每个样式加阴影，于是就把 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 强制的阴影去掉了，只保留鼠标悬停之后强调的阴影。&lt;/p&gt;
+&lt;p&gt;其它定制的细节么就是统一配色风格，修补漏洞错误，微调响应式效果而已，这里不细说。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id25"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id46"&gt;将以上两者整合在 pelican-bootstrap3 里&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Pelican 实现显示源代码按钮&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;显示源代码按钮借用了 Pelican 配置中自带的 &lt;code class="code"&gt;
+OUTPUT_SOURCES&lt;/code&gt;
+ 选项将源文件复制到输出文件夹：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;OUTPUT_SOURCES_EXTENSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'.rst'&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后在 Makefile 里用 pygmentize 把所有源代码文件着色：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;最后在按钮按下的时候用 jQuery 载入源代码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;onclick=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;虽然难看的 hack 比较多，但是能用！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;虽说 pelican-bootstrap3 是我 fork 出来的，不过由于我修改的地方实在太多，代码看来基本上
+接近重写了一份。好在之前有给 pelican 写 bootstrap 2 主题的经验，这次修改算得上驾轻就熟。
+可以对比一下 &lt;a class="reference external" href="http://dandydev.net/"&gt;上游作者的博客&lt;/a&gt; 和这里的样子体会一下感觉。
+具体修改过的地方包括：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;套用 bootstrap-material-design 的各个元素样式。&lt;/li&gt;
+&lt;li&gt;在文章列表模板应用上面提到的 Bootstrap 3 的栅格布局和瀑布式布局。&lt;/li&gt;
+&lt;li&gt;翻译到多个语言，这里在后面的 i18n-subsite 插件里详述。&lt;/li&gt;
+&lt;li&gt;套用后面会介绍到的各种插件。&lt;/li&gt;
+&lt;li&gt;统一侧边栏的样式到一个模板里。&lt;/li&gt;
+&lt;li&gt;添加 Atom 订阅按钮和 breadcrumb 条。&lt;/li&gt;
+&lt;li&gt;对正文中出现的插图，添加点击放大的功能，通过 Bootstrap 的 &lt;code class="code"&gt;
+modal&lt;/code&gt;
+ 实现。&lt;/li&gt;
+&lt;li&gt;上面提到的用 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;这个bootstrap插件&lt;/a&gt;
+让导航栏自动隐藏。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;显示源代码按钮&lt;/strong&gt; ，也就是每篇文章信息栏中的
+&lt;button class="btn btn-primary"&gt;&lt;i class="fa fa-code"&gt;&lt;/i&gt;&lt;/button&gt; 按钮。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pelican-restructuredtext"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id47"&gt;插件: 发挥 Pelican 和 reStructuredText 的优势&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;先列举一下我目前用到的所有插件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;"plantuml"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;"youku"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;"youtube"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'tipue_search'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'neighbors'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'series'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'bootstrapify'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'twitter_bootstrap_rst_directives'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;"render_math"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'extract_toc'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+           &lt;span class="s"&gt;'summary'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;嗯其实不算多。接下来逐一介绍一下这些各具特色的插件。&lt;/p&gt;
+&lt;div class="section" id="i18n-subsites"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id48"&gt;i18n-subsites&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这个插件的目的是创建 &lt;ruby&gt;&lt;rb&gt;国际化&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;internationalization&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+&lt;ruby&gt;&lt;rb&gt;子站&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subsite&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。&lt;/p&gt;
+&lt;p&gt;之前介绍 Pelican 配置的时候就提到过，
+原本的 Pelican 就支持一篇文章用多种语言书写，有 &lt;code class="code"&gt;
+lang&lt;/code&gt;
+ 属性注明这篇文章使用的
+语言，以及 &lt;code class="code"&gt;
+slug&lt;/code&gt;
+ 属性注明多语言的翻译之间的关联，换句话说同一篇文章的多个语言
+版本应该有相同的 &lt;code class="code"&gt;
+slug&lt;/code&gt;
+ 和不同的 &lt;code class="code"&gt;
+lang&lt;/code&gt;
+。然后原本 Pelican 里对多语言的
+实现方式是，首先有一个 &lt;strong&gt;主语言&lt;/strong&gt; 是模板和大部分文章采用的语言，文章列表中会优先列出
+用 &lt;strong&gt;主语言&lt;/strong&gt; 撰写的文章，然后从 &lt;strong&gt;主语言&lt;/strong&gt; 的文章链接到别的翻译版本。
+很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 &lt;strong&gt;主语言&lt;/strong&gt;
+的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 &lt;strong&gt;主语言&lt;/strong&gt; 都是英语。&lt;/p&gt;
+&lt;p&gt;而这个插件做的事情描述起来很简单：将文章按语言属性分到多个子站，然后分别对多个子站生成
+静态页面。具体的实现方式是对 pelican 的页面生成步骤做了拆分：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pelican 按正常情况读入文章，生成元信息。&lt;/li&gt;
+&lt;li&gt;i18n-subsites 针对每个语言，覆盖掉 pelican 的一些选项设置，然后调用 pelican 的
+页面生成器按模板生成文章。&lt;/li&gt;
+&lt;li&gt;对静态内容，全部从子站链接回主站。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;虽然描述起来简单，但是这个插件可以说最大化利用了 Pelican 的插件系统了，实现细节相对比较
+复杂，大概是我用的这些插件里面最复杂的了。至于它会覆盖哪些 Pelican 的配置，请参阅它的
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/README.rst"&gt;README.md文件&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;按内容拆分多语言子站的做法只解决了问题的一半，还留下另一个问题，也即对模板的翻译。
+对这个问题， i18n-subsites 提供了两套方案：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;用覆盖配置的方式让每个子站套用不同的模板。这配置起来简单，但是对模板维护起来有点困难。&lt;/li&gt;
+&lt;li&gt;用 jinja2 的 i18n 插件，配合 Python 的 gettext 库实现内容翻译。这个方案
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/localizing_using_jinja2.rst"&gt;配置起来比较复杂&lt;/a&gt; ，
+但是配置好之后用起来就很方便了（除了要记得更新翻译，处理 po 和 mo 文件等等琐碎事宜）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这里我用 jinja2 的 i18n 插件的方式实现了模板的翻译，
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/translations"&gt;各个语言的翻译在这里&lt;/a&gt; ，
+然后用 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/SConstruct"&gt;这里的 SCons 脚本&lt;/a&gt;
+根据内容是否变化自动更新 po 和 mo 文件。&lt;/p&gt;
+&lt;p&gt;配置好这一套方案之后，还要注意在模板和文章中处理好链接。用 Pelican 推荐的新的文章间链接
+的写法以及 &lt;code class="code"&gt;
+SITEURL&lt;/code&gt;
+ 设置为实际 URL 并且关闭 &lt;code class="code"&gt;
+RELATIVE_URLS&lt;/code&gt;
+ 之后就没
+什么问题了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="plantuml"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id49"&gt;plantuml&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+嵌入 PlantUML 的示例&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="uml diagram" class="uml img-responsive" src="//localhost:8000/zhs/uml/8e4b1ee3.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一个Java实现的，
+用接近文字描述的语言绘制 UML 图或者 GUI 界面图的工具，非常适合嵌入在
+Markdown、 reStructuredText、 AsciiDoc 这种轻量级标记语言里。
+然后么这个 plantuml 插件就是定义了一个新的 reStructuredText
+&lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;code class="code"&gt;
+.. uml::&lt;/code&gt;
+，把嵌入的内容提取出来调用 plantuml 命令处理
+成图像然后再插入到文章中。&lt;/p&gt;
+&lt;p&gt;比如示例里的这个 UML 图就是用这样一段简单的文字描述生成的：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;
+
+    Object &amp;lt;|-- ArrayList
+
+    Object : equals()
+    ArrayList : Object[] elementData
+    ArrayList : size()
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;实际用起来这个插件实现得稍微有点小问题：首先它只支持 python2，所以我把它改写成了 python
+2 和 3 都通用的语法;其次它原本输出的文件夹会被 pelican 删掉，所以把它改了个位置。
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/tree/master/plantuml"&gt;修改之后的代码在这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="render-math"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id50"&gt;render-math&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+嵌入公式的示例&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;示范行内公式 &lt;span class="math"&gt;\(A_\text{c} = (\pi/4) d^2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;整行公式&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+\alpha{}_t(i) = P(O_1, O_2, \ldots  O_t, q_t = S_i \lambda{})
+\end{equation*}
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这个插件提供在 reStructuredText 中用 LaTeX 语法插入数学公式的能力，定义了
+&lt;code class="code"&gt;
+:math:&lt;/code&gt;
+&lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;code class="code"&gt;
+.. math::&lt;/code&gt;
+&lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+后台库当然是大名鼎鼎简单好用的 &lt;a class="reference external" href="http://www.mathjax.org/"&gt;MathJax&lt;/a&gt; ，这个库
+会用 MathJax 的 CDN 载入，所以也没有额外的依赖文件。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="youtube-youku"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id51"&gt;youtube 和 youku&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;顾名思义，这两个插件分别实现嵌入 youtube 和 youku 视频。其中 youtube 是原本就有的插件，
+youku 是我照猫画虎抄的。
+之前写了一篇
+&lt;a class="reference external" href="//farseerfc.github.io/zhs/jumping-kde5-plasma-activities-button.html"&gt;KDE5 Plasma 之跳动卖萌的活动按钮&lt;/a&gt;
+用到了这两个插件。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tipue-search"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id52"&gt;tipue_search&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.tipue.com/search/"&gt;Tipue search&lt;/a&gt; 是一个非常有意思也很强大的搜索工具，
+通过 jQuery 实现静态博客的站内搜索功能。实现方式是，它需要你写一个 json 文件，包含
+整个网站的 &lt;strong&gt;全部&lt;/strong&gt; 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
+虽然听起来会有性能问题，但是应用在小型的静态博客上效果意外很不错，比如本站的所有文章内容
+放在一起的 json 也只有 300KiB 左右。&lt;/p&gt;
+&lt;p&gt;这个插件就是自动在 pelican 输出完全部静态网页之后，调用 beautifulsoup4 从所有网页中抽取出
+纯文本，产生这个 json 给 Tipue 用。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="neighbors-series"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id53"&gt;neighbors 和 series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这两个插件比较类似也都比较简单， neighbors 提供一篇文章的前后文章信息，
+在主题模板里可以用来制作「上一篇」和「下一篇按钮。
+series 提供将多篇文章归类位一个系列的支持，当然也需要在
+主题模板中定义显示「文章系列」的列表。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bootstrapify-twitter-bootstrap-rst-directives"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id54"&gt;bootstrapify 和 twitter_bootstrap_rst_directives&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这两个插件让文章的 &lt;strong&gt;正文&lt;/strong&gt; 套用上 Bootstrap 的样式。&lt;/p&gt;
+&lt;p&gt;bootstrapify 这个插件实现得比较简单，用 beautifulsoup4 在静态网页的结果里面过滤元素，
+对 &lt;code class="code"&gt;
+table&lt;/code&gt;
+ , &lt;code class="code"&gt;
+img&lt;/code&gt;
+ , &lt;code class="code"&gt;
+embed&lt;/code&gt;
+ , &lt;code class="code"&gt;
+iframe&lt;/code&gt;
+ ,
+&lt;code class="code"&gt;
+video&lt;/code&gt;
+ , &lt;code class="code"&gt;
+object&lt;/code&gt;
+ 这几个标签套用上
+&lt;a class="reference external" href="http://getbootstrap.com/components/#responsive-embed"&gt;响应式嵌入对象的类&lt;/a&gt;
+让他们更美观。&lt;/p&gt;
+&lt;p&gt;twitter_bootstrap_rst_directives 这个插件则是增加了几个 reStructuredText 的
+&lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+它实现的 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 包括：
+用 &lt;code class="code"&gt;
+:kbd:&lt;/code&gt;
+ 实现如 &lt;kbd class="kbd"&gt;
+Ctrl+C&lt;/kbd&gt;
+ 这样的键盘快捷键，
+用 &lt;code class="code"&gt;
+:code:&lt;/code&gt;
+ 嵌入代码片段，用 &lt;code class="code"&gt;
+:glyph:&lt;/code&gt;
+ 嵌入字符图标。
+它实现的 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 包括：
+&lt;a class="reference external" href="http://getbootstrap.com/components/#labels"&gt;labels 行内标签&lt;/a&gt; ，
+&lt;a class="reference external" href="http://getbootstrap.com/components/#alerts"&gt;alerts 提示段落&lt;/a&gt; ，
+&lt;a class="reference external" href="http://getbootstrap.com/components/#panels"&gt;panels 嵌入面板&lt;/a&gt; ，
+以及还有一个 &lt;a class="reference external" href="http://getbootstrap.com/components/#media"&gt;media 混排图标&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;对其中的 &lt;code class="code"&gt;
+panel&lt;/code&gt;
+ 我改写了它在文章正文中的样式，在 &lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 或者 &lt;code class="code"&gt;
+xl&lt;/code&gt;
+
+的屏幕宽度下，分别用 &lt;span class="math"&gt;\(\frac{1}{2}\)&lt;/span&gt; 和 &lt;span class="math"&gt;\(\frac{1}{3}\)&lt;/span&gt; 大小的嵌入面板，
+简单实现和正文文字的图文混排。&lt;/p&gt;
+&lt;p&gt;除此以外我还在 twitter_bootstrap_rst_directives 这个插件里套用它的框架实现了两个额外
+的 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;， 分别是 &lt;code class="code"&gt;
+:ruby:&lt;/code&gt;
+ ：通过 html 的 &lt;code class="code"&gt;
+&amp;lt;ruby&amp;gt;&lt;/code&gt;
+ 标签实现
+文字上方的注音（firefox下不支持，会使用文字后的括号显示）， 以及 &lt;code class="code"&gt;
+:html:&lt;/code&gt;
+ 在
+行内插入 &lt;ruby&gt;&lt;rb&gt;裸&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;raw&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; html 标签。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="extract-toc-summary"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id55"&gt;extract_toc 和 summary&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;最后是这两个有点「名不副实」的插件。&lt;/p&gt;
+&lt;p&gt;reStructuredText 原本就有自动生成
+&lt;ruby&gt;&lt;rb&gt;目录&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;toc&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的功能，用起来也非常简单，只需要在想要插入目录的地方写一行
+&lt;code class="code"&gt;
+.. contents::&lt;/code&gt;
+ ，剩下的都由 docutils 自动生成了。
+只是当然，这样生成的目录肯定会出现在文章的正文里，而 extract_toc 的作用就是简单地
+把这个目录抽取出来，让模板能在别的地方放置这个目录。 比如我这里就把目录放在了一个
+&lt;code class="code"&gt;
+panel&lt;/code&gt;
+ 里。&lt;/p&gt;
+&lt;p&gt;然后 Pelican 也原本就有从文章中抽取 &lt;ruby&gt;&lt;rb&gt;总结&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;summary&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 显示在文章列表的功能。
+Pelican 原始的实现似乎是按照文字数抽取前半段，不总是合适作为总结。 于是这个 summary
+插件的作用其实是允许在正文中以特殊的注释的方式标注哪些部分应该被抽出来作为总结。
+summary 这个插件的实现只允许抽取一小段文字，我又对它的实现做了少许扩充，允许标注多段
+文字合并起来作为总结。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id33"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id56"&gt;结语&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这个博客的配置都可以在
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/pelicanconf.py"&gt;github 上找到&lt;/a&gt;
+，包括用来
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/Makefile"&gt;自动生成整个博客的 Makefile&lt;/a&gt;
+，由于比较长，这里就不再贴了。&lt;/p&gt;
+&lt;p&gt;折腾这个主题前后历时两个月，期间学会了不少东西，也算是不错的收获吧。
+现在既然基础打好了，接下来就要开始多写博客了。（希望拖延症不会再犯）&lt;/p&gt;
+&lt;p&gt;最近发现除了我的博客之外还有一个网站
+&lt;a class="reference external" href="http://www.kansaslinuxfest.us/"&gt;Kansas Linux Fest&lt;/a&gt; fork
+了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
+bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢。&lt;/p&gt;
+&lt;table class="footnote docutils table-hover table-striped table" frame="void" id="id34" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="python"></category><category term="pelican"></category></entry><entry><title>总结一下 Material Design 的 CSS 框架</title><link href="//farseerfc.github.io/zhs/summarize-material-design-css-framework.html" rel="alternate"></link><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2015-01-16:zhs/summarize-material-design-css-framework.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;现在这里的界面风格要从 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大会&lt;/a&gt;
+上公布Android L 也即 后来的 Lollipop 说起。 他们在谈论界面设计的时候公布了他们的
+设计准则： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻译&lt;/a&gt; )。
+当然这只是一些准则，总结并描述了之前在 Web 设计和移动端 App 界面设计方面的一些规范，
+并且用材料的类比来形象化的比喻这个准则。关于 Material Design 的更多中文资料可
+&lt;a class="reference external" href="http://www.ui.cn/Material/"&gt;参考这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;看到 Material Design 之后就觉得这个设计风格非常符合直觉，于是想在这边也用上
+Material Design。 但是我在 Web 前端科技树上没点多少技能点，所以想找找别人实现好的模板
+或者框架直接套用上。在网络上搜索数日找到了这几个：&lt;/p&gt;
 &lt;div class="section" id="polymer-paper-elements"&gt;
 &lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
 
@@ -14,10 +646,16 @@ Polymer logo&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
-&lt;p&gt;Google  官方提供的参考实现应该是 &lt;a class="reference external" href="https://www.polymer-project.org/"&gt;Polymer&lt;/a&gt;  中的 &lt;a class="reference external" href="https://www.polymer-project.org/docs/elements/paper-elements.html"&gt;Paper Elements&lt;/a&gt;  。 &lt;/p&gt;
+&lt;p&gt;Google 官方提供的参考实现应该是 &lt;a class="reference external" href="https://www.polymer-project.org/"&gt;Polymer&lt;/a&gt; 中的
+&lt;a class="reference external" href="https://www.polymer-project.org/docs/elements/paper-elements.html"&gt;Paper Elements&lt;/a&gt; 。&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
-&lt;p&gt; 由于是 &lt;strong&gt; 官方参考实现 &lt;/strong&gt;  ，这个框架的确非常忠实地实现了 Material Design  的设计，但是同时由于它基于 &lt;a class="reference external" href="http://webcomponents.org/"&gt;HTML5 Web Components&lt;/a&gt;  构建，相关技术我还不太懂，浏览器兼容性和其余 HTML  技术的兼容性也还不太完善的样子 ……&lt;/p&gt;
-&lt;p&gt; 并且对于我这个 Web  开发的半吊子来说， Polymer  只是提供了一组设计组建，没有完善的 &lt;strong&gt; 响应式 &lt;/strong&gt; (responsive)  布局支持，也没有 Navbar  这种常见的框架组建，真的要用起来的话还需要手工实现不少东西。于是口水了半天之后只好放弃 …… 以后可能真的会换用这个，只是目前需要学的东西太多了。 &lt;/p&gt;
+&lt;p&gt;由于是 &lt;strong&gt;官方参考实现&lt;/strong&gt; ，这个框架的确非常忠实地实现了 Material Design 的设计，但是同时
+由于它基于 &lt;a class="reference external" href="http://webcomponents.org/"&gt;HTML5 Web Components&lt;/a&gt; 构建，相关技术我还
+不太懂，浏览器兼容性和其余 HTML 技术的兼容性也还不太完善的样子……&lt;/p&gt;
+&lt;p&gt;并且对于我这个 Web 开发的半吊子来说，Polymer 只是提供了一组设计组建，没有完善的
+&lt;strong&gt;响应式&lt;/strong&gt; (responsive) 布局支持，也没有 Navbar 这种常见的框架组建，真的要用起来的话还
+需要手工实现不少东西。于是口水了半天之后只好放弃……以后可能真的会换用这个，只是目前需要学
+的东西太多了。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="angular-material-design"&gt;
 &lt;h2&gt;Angular Material Design&lt;/h2&gt;
@@ -28,9 +666,16 @@ AngularJS&lt;/div&gt;
 &lt;img alt="AngularJS logo" class="img-responsive" src="https://angularjs.org/img/AngularJS-large.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://angularjs.org/"&gt;AngularJS&lt;/a&gt;  是 Google  对 Web Components  技术的另一个尝试。而这额 &lt;a class="reference external" href="https://material.angularjs.org/"&gt;Angular Material Design&lt;/a&gt;  项目就是基于 AngularJS  构建的 Material Design  库啦，同样是 Google  出品所以应该算得上半个官方实现吧。相比于 Polymer, AngularJS  算是实用了很多，提供了基于 &lt;a class="reference external" href="http://www.w3.org/TR/css3-flexbox/"&gt;CSS Flexbox&lt;/a&gt;  的布局。有人对这两者的评价是，如果说 Polymer  代表了 &lt;strong&gt; 未来趋势 &lt;/strong&gt;  ，那么 AngularJS  就是 &lt;strong&gt; 眼下可用 &lt;/strong&gt;  的 Web
-Components  实现了。 &lt;/p&gt;
-&lt;p&gt; 只不过同样是因为它是 Components  的框架，对 WebApp  的支持很丰富，大量采用 Ajax  等 JavaScript  技术，对于我这个静态博客来说仍然稍显高级了 …… 非常担心还不支持 HTML5  的浏览器比如 w3m  甚至 cURL  对它的支持程度。于是最终也没有使用它。 &lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://angularjs.org/"&gt;AngularJS&lt;/a&gt; 是 Google 对 Web Components 技术的另一个
+尝试。而这额 &lt;a class="reference external" href="https://material.angularjs.org/"&gt;Angular Material Design&lt;/a&gt; 项目
+就是基于 AngularJS 构建的Material Design 库啦，同样是 Google 出品所以应该算得上半个
+官方实现吧。 相比于 Polymer, AngularJS 算是实用了很多，提供了基于
+&lt;a class="reference external" href="http://www.w3.org/TR/css3-flexbox/"&gt;CSS Flexbox&lt;/a&gt; 的布局。有人对这两者的评价是，
+如果说 Polymer 代表了 &lt;strong&gt;未来趋势&lt;/strong&gt; ，那么 AngularJS 就是 &lt;strong&gt;眼下可用&lt;/strong&gt; 的 Web
+Components 实现了。&lt;/p&gt;
+&lt;p&gt;只不过同样是因为它是 Components 的框架，对 WebApp 的支持很丰富，大量采用 Ajax 等
+JavaScript 技术， 对于我这个静态博客来说仍然稍显高级了……非常担心还不支持 HTML5 的浏览器
+比如 w3m 甚至 cURL 对它的支持程度。 于是最终也没有使用它。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="materialize"&gt;
 &lt;h2&gt;Materialize&lt;/h2&gt;
@@ -41,26 +686,40 @@ Materialize&lt;/div&gt;
 &lt;img alt="Materialize logo" class="img-responsive" src="https://raw.githubusercontent.com/Dogfalo/materialize/master/images/materialize.gif"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;a class="reference external" href="http://materializecss.com/"&gt;Materialize&lt;/a&gt;  这是一批 ( 自称 ?) 熟悉 Android  上 Material Design  的设计师们新近出炉的框架，试图提供一个接近 Bootstrap  的方案。最早是在 &lt;a class="reference external" href="http://www.reddit.com/r/web_design/comments/2lt4qy/what_do_you_think_of_materialize_a_responsive/"&gt;Reddit&lt;/a&gt;  上看到对它的讨论的，立刻觉得这个想法不错。 &lt;/p&gt;
-&lt;p&gt; 体验一下官网的设计就可以看出，他们的动画效果非常接近 Polymer  的感觉，响应式设计的布局也还不错。只是同样体验一下他们现在的官网就可以看出，他们目前的 &lt;a class="reference external" href="https://github.com/Dogfalo/materialize/issues"&gt;bug  还比较多 &lt;/a&gt;  ，甚至一些 bug
- 在他们自己的主页上也有显现。虽然不想给这个新出炉的项目泼凉水，不过看来要达到他们声称的接近 Bootstrap  的易用度还任重而道远 ……&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://materializecss.com/"&gt;Materialize&lt;/a&gt; 这是一批(自称?)熟悉 Android 上
+Material Design 的设计师们新近出炉的框架，试图提供一个接近 Bootstrap 的方案。
+最早是在 &lt;a class="reference external" href="http://www.reddit.com/r/web_design/comments/2lt4qy/what_do_you_think_of_materialize_a_responsive/"&gt;Reddit&lt;/a&gt; 上看到对它的讨论的，立刻觉得这个想法不错。&lt;/p&gt;
+&lt;p&gt;体验一下官网的设计就可以看出，他们的动画效果非常接近 Polymer 的感觉，响应式设计的布局
+也还不错。 只是同样体验一下他们现在的官网就可以看出，他们目前的
+&lt;a class="reference external" href="https://github.com/Dogfalo/materialize/issues"&gt;bug 还比较多&lt;/a&gt; ，甚至一些 bug
+在他们自己的主页上也有显现。 虽然不想给这个新出炉的项目泼凉水，不过看来要达到他们声称的接近
+Bootstrap 的易用度还任重而道远……&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bootstrap-material-design-bootstrap3"&gt;
 &lt;h2&gt;bootstrap-material-design + bootstrap3&lt;/h2&gt;
-&lt;p&gt; 这是我最终选择的方案。这个方案将三个项目组合在了一起，分别是 &lt;a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/"&gt;bootstrap-material-design&lt;/a&gt;
+&lt;p&gt;这是我最终选择的方案。这个方案将三个项目组合在了一起，分别是
+&lt;a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/"&gt;bootstrap-material-design&lt;/a&gt;
 , &lt;a class="reference external" href="https://github.com/DandyDev/pelican-bootstrap3"&gt;pelican-bootstrap3&lt;/a&gt;
- 和 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3&lt;/a&gt;  。 Bootstrap 3  想必不用再介绍了，很多网站都在使用这套框架，定制性很高。 bootstrap-material-design  是在 Bootstrap 3  的基础上套用 Material Design  风格制作的一套 CSS  库，当然也不是很完善并且在不断改进中，一些细节其实并不是很符合我的要求。最后 pelican-bootstrap3  是用 Bootstrap 3  做的 pelican  模板。这三个项目或多或少都有点不合我的口味，于是嘛就把 pelican-bootstrap3 fork 了一套放在 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt; 这里 &lt;/a&gt;  ，其中还包括我自己改过的 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap"&gt;Bootstrap3  样式 &lt;/a&gt;
- 和 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material"&gt;Material  样式 &lt;/a&gt;
- ，需要的可以自取。 &lt;/p&gt;
-&lt;p&gt; 至于细节上我定制了哪些地方，敬请听下回分解 ……&lt;/p&gt;
+和 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3&lt;/a&gt; 。
+Bootstrap 3 想必不用再介绍了，很多网站都在使用这套框架，定制性很高。
+bootstrap-material-design 是在 Bootstrap 3 的基础上套用 Material Design 风格
+制作的一套 CSS 库，当然也不是很完善并且在不断改进中，一些细节其实并不是很符合我的要求。
+最后 pelican-bootstrap3 是用 Bootstrap 3 做的 pelican 模板。
+这三个项目或多或少都有点不合我的口味，于是嘛就把 pelican-bootstrap3 fork了一套放在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt;这里&lt;/a&gt; ，其中还包括我自己改
+过的 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap"&gt;Bootstrap3 样式&lt;/a&gt;
+和 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material"&gt;Material 样式&lt;/a&gt;
+，需要的可以自取。&lt;/p&gt;
+&lt;p&gt;至于细节上我定制了哪些地方，敬请听下回分解……&lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="css"></category><category term="material"></category><category term="paper"></category></entry><entry><title>从非缓冲输入流到 Linux 控制台的历史</title><link href="//farseerfc.github.io/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html" rel="alternate"></link><updated>2014-12-12T17:06:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2014-12-12:zhs/from-unbuffered-stdin-to-history-of-linux-tty.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
-&lt;p&gt; 这篇也是源自于水源 C 板上板友的一个问题，涉及 Linux 上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 &lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"&gt; 原帖在这里 &lt;/a&gt;  。 &lt;/p&gt;
+&lt;p&gt;这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。
+&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"&gt;原帖在这里&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt; 可以设置不带缓冲的标准输入流吗？ &lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;WaterElement(UnChanged)  于 2014 年 12 月 09 日 23:29:51  星期二问到： &lt;/p&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;可以设置不带缓冲的标准输入流吗？&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到：&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 &lt;/p&gt;
+&lt;p&gt;请问对于标准输入流可以设置不带缓冲吗？比如以下程序&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 
@@ -74,76 +733,82 @@ Materialize&lt;/div&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 似乎还是需要在命令行输入后按回车才会让 &lt;code class="code"&gt;
+&lt;p&gt;似乎还是需要在命令行输入后按回车才会让 &lt;code class="code"&gt;
 fgets&lt;/code&gt;
-  返回，不带缓冲究竟体现在哪里？ &lt;/p&gt;
+ 返回，不带缓冲究竟体现在哪里？&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id3"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt; 这和缓存无关，是控制台的实现方式的问题。 &lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt; 再讲细节一点，这里有很多个程序和设备。以下按 linux  的情况讲： &lt;/p&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;这和缓存无关，是控制台的实现方式的问题。&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;再讲细节一点，这里有很多个程序和设备。以下按 linux 的情况讲：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt; 终端模拟器窗口（比如 xterm ）收到键盘事件 &lt;/li&gt;
-&lt;li&gt; 终端模拟器 (xterm) 把键盘事件发给虚拟终端 pty1&lt;/li&gt;
-&lt;li&gt;pty1  检查目前的输入状态，把键盘事件转换成 stdin  的输入，发给你的程序 &lt;/li&gt;
-&lt;li&gt; 你的程序的 c  库从 stdin  读入一个输入，处理 &lt;/li&gt;
+&lt;li&gt;终端模拟器窗口（比如xterm）收到键盘事件&lt;/li&gt;
+&lt;li&gt;终端模拟器(xterm)把键盘事件发给虚拟终端 pty1&lt;/li&gt;
+&lt;li&gt;pty1 检查目前的输入状态，把键盘事件转换成 stdin 的输入，发给你的程序&lt;/li&gt;
+&lt;li&gt;你的程序的 c 库从 stdin 读入一个输入，处理&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt; 标准库说的输入缓存是在 4  的这一步进行的。而行输入是在 3  的这一步被缓存起来的。 &lt;/p&gt;
-&lt;p&gt; 终端 pty 有多种状态，一般控制台程序所在的状态叫「回显行缓存」状态，这个状态的意思是 :&lt;/p&gt;
+&lt;p&gt;标准库说的输入缓存是在 4 的这一步进行的。而行输入是在 3 的这一步被缓存起来的。&lt;/p&gt;
+&lt;p&gt;终端pty有多种状态，一般控制台程序所在的状态叫「回显行缓存」状态，这个状态的意思是:&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt; 所有普通字符的按键，会回显到屏幕上，同时记录在行缓存区里。 &lt;/li&gt;
-&lt;li&gt; 处理退格 ( &lt;kbd class="kbd"&gt;
+&lt;li&gt;所有普通字符的按键，会回显到屏幕上，同时记录在行缓存区里。&lt;/li&gt;
+&lt;li&gt;处理退格( &lt;kbd class="kbd"&gt;
 BackSpace&lt;/kbd&gt;
- ) ，删除 ( &lt;kbd class="kbd"&gt;
+ )，删除( &lt;kbd class="kbd"&gt;
 Delete&lt;/kbd&gt;
- ) 按键为删掉字符，左右按键移动光标。 &lt;/li&gt;
-&lt;li&gt; 收到回车的时候把整个一行的内容发给 stdin 。 &lt;/li&gt;
+ )按键为删掉字符，左右按键移动光标。&lt;/li&gt;
+&lt;li&gt;收到回车的时候把整个一行的内容发给stdin。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt; 参考： &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Cooked_mode"&gt;http://en.wikipedia.org/wiki/Cooked_mode&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt; 同时在 Linux/Unix 下可以发特殊控制符号给 pty 让它进入「 raw 」状态，这种状态下按键不会被回显，显示什么内容都靠你程序自己控制。如果你想得到每一个按键事件需要用 raw 状态，这需要自己控制回显自己处理缓冲，简单点的方法是用 readline  这样的库（基本就是「回显行缓存」的高级扩展，支持了 Home/End ，支持历史）或者 ncurses  这样的库（在 raw 状态下实现了一个简单的窗口 /
- 事件处理框架）。 &lt;/p&gt;
-&lt;p&gt; 参考： &lt;a class="reference external" href="http://en.wikipedia.org/wiki/POSIX_terminal_interface#History"&gt;http://en.wikipedia.org/wiki/POSIX_terminal_interface#History&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt; 除此之外， &lt;kbd class="kbd"&gt;
+&lt;p&gt;参考： &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Cooked_mode"&gt;http://en.wikipedia.org/wiki/Cooked_mode&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;同时在Linux/Unix下可以发特殊控制符号给pty让它进入「raw」状态，这种状态下按键
+不会被回显，显示什么内容都靠你程序自己控制。
+如果你想得到每一个按键事件需要用raw状态，这需要自己控制回显自己处理缓冲，
+简单点的方法是用 readline 这样的库（基本就是「回显行缓存」的高级扩展，支持了
+Home/End，支持历史）或者 ncurses 这样的库（在raw状态下实现了一个简单的窗口/
+事件处理框架）。&lt;/p&gt;
+&lt;p&gt;参考： &lt;a class="reference external" href="http://en.wikipedia.org/wiki/POSIX_terminal_interface#History"&gt;http://en.wikipedia.org/wiki/POSIX_terminal_interface#History&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;除此之外， &lt;kbd class="kbd"&gt;
 Ctrl-C&lt;/kbd&gt;
-  转换到 SIGINT  ， &lt;kbd class="kbd"&gt;
+ 转换到 SIGINT ， &lt;kbd class="kbd"&gt;
 Ctrl-D&lt;/kbd&gt;
-  转换到 EOF  这种也是在 3  这一步做的。 &lt;/p&gt;
-&lt;p&gt; 以及，有些终端模拟器提供的 &lt;kbd class="kbd"&gt;
+ 转换到 EOF 这种也是在 3 这一步做的。&lt;/p&gt;
+&lt;p&gt;以及，有些终端模拟器提供的 &lt;kbd class="kbd"&gt;
 Ctrl-Shift-C&lt;/kbd&gt;
-  表示复制这种是在 2  这一步做的。 &lt;/p&gt;
-&lt;p&gt; 以上是 Linux/unix  的方式。 Windows 的情况大体类似，只是细节上有很多地方不一样： &lt;/p&gt;
+ 表示复制这种是在 2 这一步做的。&lt;/p&gt;
+&lt;p&gt;以上是 Linux/unix 的方式。 Windows的情况大体类似，只是细节上有很多地方不一样：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt; 窗口事件的接收者是创建 cmd  窗口的 Win32  子系统。 &lt;/li&gt;
-&lt;li&gt;Win32 子系统接收到事件之后，传递给位于命令行子系统的 cmd  程序 &lt;/li&gt;
-&lt;li&gt;cmd  程序再传递给你的程序。 &lt;/li&gt;
+&lt;li&gt;窗口事件的接收者是创建 cmd 窗口的 Win32 子系统。&lt;/li&gt;
+&lt;li&gt;Win32子系统接收到事件之后，传递给位于 命令行子系统 的 cmd 程序&lt;/li&gt;
+&lt;li&gt;cmd 程序再传递给你的程序。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Windows 上同样有类似行缓存模式和 raw 模式的区别，只不过实现细节不太一样。 &lt;/p&gt;
+&lt;p&gt;Windows上同样有类似行缓存模式和raw模式的区别，只不过实现细节不太一样。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="strace"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;strace 查看了下 &lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;WaterElement(UnChanged)  于 2014 年 12 月 10 日 21:53:54  星期三回复： &lt;/p&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;strace查看了下&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;WaterElement(UnChanged) 于 2014年12月10日21:53:54 星期三 回复：&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 感谢 FC 的详尽解答。 &lt;/p&gt;
-&lt;p&gt; 用 strace 查看了下，设置标准输入没有缓存的话读每个字符都会调用一次 &lt;code class="code"&gt;
+&lt;p&gt;感谢FC的详尽解答。&lt;/p&gt;
+&lt;p&gt;用strace查看了下，设置标准输入没有缓存的话读每个字符都会调用一次 &lt;code class="code"&gt;
 read&lt;/code&gt;
-  系统调用，比如输入 abc ： &lt;/p&gt;
+ 系统调用，
+比如输入abc：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "a", 1)                         = 1
 read(0, "b", 1)                         = 1
 read(0, "c", 1)                         = 1
 read(0, "\n", 1)                        = 1
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 如果有缓存的话就只调用一次了 &lt;code class="code"&gt;
+&lt;p&gt;如果有缓存的话就只调用一次了 &lt;code class="code"&gt;
 read&lt;/code&gt;
-  系统调用了： &lt;/p&gt;
+ 系统调用了：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;read(0, abc
 "abc\n", 1024)                  = 4
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;/div&gt;
 &lt;div class="section" id="raw-mode"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt; 如果想感受一下 raw mode&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt; 没错，这个是你的进程内 C 库做的缓存， tty 属于字符设备所以是一个一个字符塞给你的程序的。 &lt;/p&gt;
-&lt;p&gt; 如果想感受一下 raw mode  可以试试下面这段程序（没有检测错误返回值） &lt;/p&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;如果想感受一下 raw mode&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;没错，这个是你的进程内C库做的缓存，tty属于字符设备所以是一个一个字符塞给你的
+程序的。&lt;/p&gt;
+&lt;p&gt;如果想感受一下 raw mode 可以试试下面这段程序（没有检测错误返回值）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include &amp;lt;termios.h&amp;gt;&lt;/span&gt;
@@ -209,33 +874,68 @@ read&lt;/code&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id4"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt; 终端上的字符编程 &lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;vander( 大青蛙 )  于 2014 年 12 月 12 日 08:52:20  星期五问到： &lt;/p&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;终端上的字符编程&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;vander(大青蛙) 于 2014年12月12日08:52:20 星期五 问到：&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt; 学习了！ &lt;/p&gt;
-&lt;p&gt; 进一步想请教一下 fc 大神。如果我在 Linux 上做终端上的字符编程，是否除了用 ncurses 库之外，也可以不用该库而直接与终端打交道，就是你所说的直接在 raw 模式？另外，终端类型 vt100 和 linux 的差别在哪里？为什么 Kevin Boone 的 KBox 配置手册里面说必须把终端类型设成 linux ，而且要加上 terminfo 文件，才能让终端上的 vim 正常工作？ term
-info 文件又是干什么的？ &lt;/p&gt;
+&lt;p&gt;学习了！&lt;/p&gt;
+&lt;p&gt;进一步想请教一下fc大神。如果我在Linux上做终端上的字符编程，是否除了用ncurses库
+之外，也可以不用该库而直接与终端打交道，就是你所说的直接在raw模式？
+另外，终端类型vt100和linux的差别在哪里？为什么Kevin Boone的KBox配置手册里面说必
+须把终端类型设成linux，而且要加上terminfo文件，才能让终端上的vim正常工作？term
+info文件又是干什么的？&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id5"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;Linux 控制台的历史 &lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt; 嗯理论上可以不用 ncurses  库直接在 raw  模式操纵终端。 &lt;/p&gt;
-&lt;p&gt; 这里稍微聊一下 terminfo/termcap 的历史，详细的历史和吐槽参考 &lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater's Handbook&lt;/a&gt;
- 第 6 章 Terminal Insanity 。 &lt;/p&gt;
-&lt;p&gt; 首先一个真正意义上的终端就是一个输入设备（通常是键盘）加上一个输出设备（打印机或者显示器）。很显然不同的终端的能力不同，比如如果输出设备是打印机的话，显示出来的字符就不能删掉了（但是能覆盖），而且输出了一行之后就不能回到那一行了。再比如显示器终端有的支持粗体和下划线，有的支持颜色，而有的什么都不支持。早期 Unix 工作在电传打字机（ TeleTYpe ）终端上，后来 Unix 被 port 到越来越多的机器上，然后越来越多类型的终端会被连到 Unix 上，很可能同一台 Unix 主机连了多个不同类型的终端。由于是不同厂商提供的不同的终端，能力各有不同，自然控制他们工作的方式也是不一样的。所有终端都支持回显行编辑模式，所以一般的面向行的程序还比较好写，但是那时候要撰写支持所有终端的「全屏」程序就非常痛苦，这种情况就像现在浏览器没有统一标准下写 HTML 要测试各种浏览器兼容性一样。通常的做法是 &lt;/p&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;Linux控制台的历史&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;嗯理论上可以不用 ncurses 库直接在 raw 模式操纵终端。&lt;/p&gt;
+&lt;p&gt;这里稍微聊一下terminfo/termcap的历史，详细的历史和吐槽参考
+&lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater's Handbook&lt;/a&gt;
+第6章 Terminal Insanity。&lt;/p&gt;
+&lt;p&gt;首先一个真正意义上的终端就是一个输入设备（通常是键盘）加上一个输出设备（打印
+机或者显示器）。很显然不同的终端的能力不同，比如如果输出设备是打印机的话，显
+示出来的字符就不能删掉了（但是能覆盖），而且输出了一行之后就不能回到那一行了
+。再比如显示器终端有的支持粗体和下划线，有的支持颜色，而有的什么都不支持。
+早期Unix工作在电传打字机（TeleTYpe）终端上，后来Unix被port到越来越多的机器上
+，然后越来越多类型的终端会被连到Unix上，很可能同一台Unix主机连了多个不同类型
+的终端。由于是不同厂商提供的不同的终端，能力各有不同，自然控制他们工作的方式
+也是不一样的。所有终端都支持回显行编辑模式，所以一般的面向行的程序还比较好写
+，但是那时候要撰写支持所有终端的「全屏」程序就非常痛苦，这种情况就像现在浏览
+器没有统一标准下写HTML要测试各种浏览器兼容性一样。
+通常的做法是&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt; 使用最小功能子集 &lt;/li&gt;
-&lt;li&gt; 假设终端是某个特殊设备，不管别的设备。 &lt;/li&gt;
+&lt;li&gt;使用最小功能子集&lt;/li&gt;
+&lt;li&gt;假设终端是某个特殊设备，不管别的设备。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt; 水源的代码源头 Firebird2000  就是那样的一个程序，只支持固定大小的 vt102 终端。 &lt;/p&gt;
-&lt;p&gt; 这时有一个划时代意义的程序出现了，就是 vi ，试图要做到「全屏可视化编辑」。这在现在看起来很简单，但是在当时基本是天方夜谭。 vi  的做法是提出一层抽象，记录它所需要的所有终端操作，然后有一个终端类型数据库，把那些操作映射到终端类型的具体指令上。当然并不是所有操作在所有终端类型上都支持，所以会有一堆 fallback ，比如要「强调」某段文字，在彩色终端上可能 fallback  到红色，在黑白终端上可能 fallback  到粗体。 &lt;/p&gt;
-&lt;p&gt;vi  一出现大家都觉得好顶赞，然后想要写更多类似 vi  这样的全屏程序。然后 vi  的作者就把终端抽象的这部分数据库放出来形成一个单独的项目，叫 termcap  （ Terminal
-Capibility ），对应的描述终端的数据库就是 termcap  格式。然后 termcap  只是一个数据库（所以无状态）还不够方便易用，所以后来又有人用 termcap  实现了 curses  。 &lt;/p&gt;
-&lt;p&gt; 再后来大家用 curses/termcap  的时候渐渐发现这个数据库有一点不足：它是为 vi  设计的，所以只实现了 vi  需要的那部分终端能力。然后对它改进的努力就形成了新的 terminfo  数据库和 pcurses  和后来的 ncurses  。然后 VIM  出现了自然也用 terminfo  实现这部分终端操作。 &lt;/p&gt;
-&lt;p&gt; 然后么就是 X  出现了， xterm  出现了，大家都用显示器了，然后 xterm  为了兼容各种老程序加入了各种老终端的模拟模式。不过因为最普及的终端是 vt100  所以 xterm  默认是工作在兼容 vt100  的模式下。然后接下来各种新程序（偷懒不用 *curses 的那些）都以 xterm/vt100  的方式写。 &lt;/p&gt;
-&lt;p&gt; 嗯到此为止是 Unix  世界的黑历史。 &lt;/p&gt;
-&lt;p&gt; 知道这段历史的话就可以明白为什么需要 TERM  变量配合 terminfo  数据库才能用一些 Unix  下的全屏程序了。类比一下的话这就是现代浏览器的 user-agent 。 &lt;/p&gt;
-&lt;p&gt; 然后话题回到 Linux  。大家知道 Linux  早期代码不是一个 OS ，而是 Linus  大神想在他的崭新蹭亮的 386-PC  上远程登录他学校的 Unix  主机，接收邮件和逛水源（咳咳）。于是 Linux  最早的那部分代码并不是一个通用 OS  而只是一个 bootloader  加一个终端模拟器。所以现在 Linux  内核里还留有他当年实现的终端模拟器的部分代码，而这个终端模拟器的终端类型就是 linux  啦。然后他当时是为了逛水源嘛所以 linux  终端基本上是 vt102  的一个接近完整子集。 &lt;/p&gt;
-&lt;p&gt; 说到这里脉络大概应该清晰了， xterm 终端类型基本模拟 vt100 ， linux 终端类型基本模拟 vt102 。这两个的区别其实很细微，都是同一个厂商的两代产品嘛。有差别的地方差不多就是 &lt;kbd class="kbd"&gt;
+&lt;p&gt;水源的代码源头 Firebird2000 就是那样的一个程序，只支持固定大小的vt102终端。&lt;/p&gt;
+&lt;p&gt;这时有一个划时代意义的程序出现了，就是 vi，试图要做到「全屏可视化编辑」。这在
+现在看起来很简单，但是在当时基本是天方夜谭。
+vi 的做法是提出一层抽象，记录它所需要的所有终端操作，然后有一个终端类型数据库
+，把那些操作映射到终端类型的具体指令上。当然并不是所有操作在所有终端类型上都
+支持，所以会有一堆 fallback，比如要「强调」某段文字，在彩色终端上可能
+fallback 到红色，在黑白终端上可能 fallback 到粗体。&lt;/p&gt;
+&lt;p&gt;vi 一出现大家都觉得好顶赞，然后想要写更多类似 vi 这样的全屏程序。然后 vi 的作
+者就把终端抽象的这部分数据库放出来形成一个单独的项目，叫 termcap （Terminal
+Capibility），对应的描述终端的数据库就是 termcap 格式。然后 termcap 只是一个
+数据库（所以无状态）还不够方便易用，所以后来又有人用 termcap 实现了 curses 。&lt;/p&gt;
+&lt;p&gt;再后来大家用 curses/termcap 的时候渐渐发现这个数据库有一点不足：它是为 vi 设
+计的，所以只实现了 vi 需要的那部分终端能力。然后对它改进的努力就形成了新的
+terminfo 数据库和 pcurses 和后来的 ncurses 。 然后 VIM 出现了自然也用
+terminfo 实现这部分终端操作。&lt;/p&gt;
+&lt;p&gt;然后么就是 X 出现了， xterm 出现了，大家都用显示器了，然后 xterm 为了兼容各种
+老程序加入了各种老终端的模拟模式。不过因为最普及的终端是 vt100 所以 xterm 默
+认是工作在兼容 vt100 的模式下。然后接下来各种新程序（偷懒不用*curses的那些）
+都以 xterm/vt100 的方式写。&lt;/p&gt;
+&lt;p&gt;嗯到此为止是 Unix 世界的黑历史。&lt;/p&gt;
+&lt;p&gt;知道这段历史的话就可以明白为什么需要 TERM 变量配合 terminfo 数据库才能用一些
+Unix 下的全屏程序了。类比一下的话这就是现代浏览器的 user-agent。&lt;/p&gt;
+&lt;p&gt;然后话题回到 Linux 。 大家知道 Linux 早期代码不是一个 OS， 而是 Linus 大神想
+在他的崭新蹭亮的 386-PC 上远程登录他学校的 Unix 主机，接收邮件和逛水源（咳咳
+）。于是 Linux 最早的那部分代码并不是一个通用 OS 而只是一个 bootloader 加一个
+终端模拟器。所以现在 Linux 内核里还留有他当年实现的终端模拟器的部分代码，而这
+个终端模拟器的终端类型就是 linux 啦。然后他当时是为了逛水源嘛所以 linux 终端
+基本上是 vt102 的一个接近完整子集。&lt;/p&gt;
+&lt;p&gt;说到这里脉络大概应该清晰了， xterm终端类型基本模拟 vt100，linux终端类型基本模
+拟 vt102。这两个的区别其实很细微，都是同一个厂商的两代产品嘛。有差别的地方差
+不多就是 &lt;kbd class="kbd"&gt;
 Home&lt;/kbd&gt;
  / &lt;kbd class="kbd"&gt;
 End&lt;/kbd&gt;
@@ -246,41 +946,47 @@ PageDown&lt;/kbd&gt;
  / &lt;kbd class="kbd"&gt;
 Delete&lt;/kbd&gt;
 
- 这些不在 ASCII  控制字符表里的按键的映射关系不同。 &lt;/p&gt;
-&lt;p&gt; 嗯这也就解释了为什么在 linux 环境的图形界面的终端里 telnet  上水源的话，上面这些按键会错乱 ……  如果设置终端类型是 linux/vt102  的话就不会乱了。在 linux  的 TTY  里 telnet  也不会乱的样子。 &lt;/p&gt;
-&lt;p&gt; 写到这里才发现貌似有点长 ……  总之可以参考 &lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater's Handbook&lt;/a&gt;
- 里的相关历史评论和吐槽，那一段非常有意思。 &lt;/p&gt;
+这些不在 ASCII 控制字符表里的按键的映射关系不同。&lt;/p&gt;
+&lt;p&gt;嗯这也就解释了为什么在linux环境的图形界面的终端里 telnet 上水源的话，上面这些
+按键会错乱…… 如果设置终端类型是 linux/vt102 的话就不会乱了。在 linux 的
+TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
+&lt;p&gt;写到这里才发现貌似有点长…… 总之可以参考
+&lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix hater's Handbook&lt;/a&gt;
+里的相关历史评论和吐槽，那一段非常有意思。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳动卖萌的活动按钮</title><link href="//farseerfc.github.io/zhs/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2014-12-09:zhs/jumping-kde5-plasma-activities-button.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 今天尝试 KDE5 Plasma  的活动的时候无意间发现这个现象。只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。视频如下： &lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</summary><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳动卖萌的活动按钮</title><link href="//farseerfc.github.io/zhs/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2014-12-09:zhs/jumping-kde5-plasma-activities-button.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。
+只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。
+视频如下：&lt;/p&gt;
 
 &lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
-&lt;p&gt; 当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。 &lt;/p&gt;
-&lt;p&gt; 比比之前 Gnome3  那个跳动的界面真是好太多了： &lt;/p&gt;
+&lt;p&gt;当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。&lt;/p&gt;
+&lt;p&gt;比比之前 Gnome3 那个跳动的界面真是好太多了：&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
-&lt;p&gt; 顺便，今天还看到一个卖萌的 KDE5 Plasma  静音图标的翻译： &lt;/p&gt;
+&lt;p&gt;顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译：&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
-&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5 のミュート画面の中国语翻訳、「静音」のはずだが「镜音」になっている。 Vocaloid ファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12 月 8 日 &lt;/a&gt;&lt;/blockquote&gt;&lt;/body&gt;&lt;/html&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>Pyssy 项目</title><link href="//farseerfc.github.io/zhs/pyssy.html" rel="alternate"></link><updated>2012-04-02T12:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-04-02:zhs/pyssy.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;div class="section" id="id1"&gt;
-&lt;h2&gt; 简介 &lt;/h2&gt;
-&lt;p&gt;Pyssy  是用于 &lt;a class="reference external" href="https://bbs.sjtu.edu.cn"&gt; 上海交通大学饮水思源站 &lt;/a&gt;  的一系列 Python  脚本和工具。 &lt;/p&gt;
-&lt;p&gt;Pyssy  被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt;  上，也可以在单机上独立使用。 &lt;/p&gt;
-&lt;p&gt; 项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Github 上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table class="footnote table docutils  table-striped table-hover" frame="void" id="sae" rules="none"&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国语翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;&lt;/body&gt;&lt;/html&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>Pyssy 项目</title><link href="//farseerfc.github.io/zhs/pyssy.html" rel="alternate"></link><updated>2012-04-02T12:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-04-02:zhs/pyssy.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;简介&lt;/h2&gt;
+&lt;p&gt;Pyssy 是用于 &lt;a class="reference external" href="https://bbs.sjtu.edu.cn"&gt;上海交通大学 饮水思源站&lt;/a&gt; 的一系列 Python 脚本和工具。&lt;/p&gt;
+&lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
+&lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt;  ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt;  的东西。 &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id4"&gt;
-&lt;h2&gt; 依赖关系 &lt;/h2&gt;
-&lt;p&gt;Pyssy  使用 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt;  作为网页服务器，并且使用 Memcached  或者 Redis  作为抓取 &lt;em&gt; 水源 Web&lt;/em&gt;  的缓存。 &lt;/p&gt;
-&lt;p&gt;SAE Python  环境下请开启 Memcached  支持。 &lt;/p&gt;
-&lt;p&gt; 本地环境下请安装 Redis-py  并运行 redis-server  服务器程序。 &lt;/p&gt;
+&lt;h2&gt;依赖关系&lt;/h2&gt;
+&lt;p&gt;Pyssy 使用 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 作为网页服务器，
+并且使用 Memcached 或者 Redis 作为抓取 &lt;em&gt;水源Web&lt;/em&gt; 的缓存。&lt;/p&gt;
+&lt;p&gt;SAE Python 环境下请开启 Memcached 支持。&lt;/p&gt;
+&lt;p&gt;本地环境下请安装 Redis-py 并运行 redis-server 服务器程序。&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="sjtu"></category><category term="yssy"></category></entry><entry><title>PyRuby</title><link href="//farseerfc.github.io/zhs/mix-ruby.html" rel="alternate"></link><updated>2012-03-02T23:09:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-03-02:zhs/mix-ruby.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 今天在 GitHub 上闲逛的时候看到一个叫做 &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt;  的项目。项目的 Readme 说得很好： &lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="sjtu"></category><category term="yssy"></category></entry><entry><title>PyRuby</title><link href="//farseerfc.github.io/zhs/mix-ruby.html" rel="alternate"></link><updated>2012-03-02T23:09:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-03-02:zhs/mix-ruby.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;今天在GitHub上闲逛的时候看到一个叫做 &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; 的项目。项目的Readme说得很好：&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
 PyRuby - Some Ruby for your Python!
 PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.
@@ -293,11 +999,11 @@ From now on you should be able to write Ruby code within a regular Python module
 
 1.upto(10) { |n| puts n }
 &lt;/pre&gt;
-&lt;p&gt; 甚至 &lt;a class="reference external" href="http://pypi.python.org/pypi/pyruby/1.0.0"&gt;PyPI&lt;/a&gt;  上还有这个项目的包。 &lt;/p&gt;
-&lt;p&gt; 一开始我还以为这又是一个野心勃勃的基于 PyPy 的 Ruby 实现，或者某种 trick 在 Python 里面直接调用 Ruby 解释器。 &lt;/p&gt;
+&lt;p&gt;甚至 &lt;a class="reference external" href="http://pypi.python.org/pypi/pyruby/1.0.0"&gt;PyPI&lt;/a&gt; 上还有这个项目的包。&lt;/p&gt;
+&lt;p&gt;一开始我还以为这又是一个野心勃勃的基于PyPy的Ruby实现，或者某种trick在Python里面直接调用Ruby解释器。&lt;/p&gt;
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt; 然后我想看看这个的源代码 &lt;/h2&gt;
-&lt;p&gt; 只有一个 ruby.py 文件，内容是： &lt;/p&gt;
+&lt;h2&gt;然后我想看看这个的源代码&lt;/h2&gt;
+&lt;p&gt;只有一个ruby.py文件，内容是：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
 
 &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"""&lt;/span&gt;
@@ -348,17 +1054,17 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
 &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 是的 …… 的确 …… 这种尝试把 Python 和 Ruby 放在一起的想法绝对是疯了 ……&lt;/p&gt;
+&lt;p&gt;是的……的确……这种尝试把Python和Ruby放在一起的想法绝对是疯了……&lt;/p&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="ruby"></category></entry><entry><title>关于C++模板的类型转换的讨论</title><link href="//farseerfc.github.io/zhs/discuss-cpp-template-downcast.html" rel="alternate"></link><updated>2012-02-26T05:54:57+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-02-26:zhs/discuss-cpp-template-downcast.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
-&lt;p&gt; 这两天在饮水思源的 C 板，关于 C++ 模板的类型转换的一个讨论，后面是我的解答。 &lt;/p&gt;
+&lt;p&gt;这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt; 讨论地址 &lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;讨论地址&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html"&gt;http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt; 原问题 &lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt; 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： &lt;/p&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;原问题&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
 &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
 
@@ -400,194 +1106,205 @@ From now on you should be able to write Ruby code within a regular Python module
     &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 奇怪的是重载决议的时候， &lt;code class="code"&gt;
+&lt;p&gt;奇怪的是重载决议的时候， &lt;code class="code"&gt;
 f&lt;/code&gt;
-  的情况下它就不让我特化的 &lt;code class="code"&gt;
+ 的情况下它就不让我特化的 &lt;code class="code"&gt;
 f&amp;lt;A&amp;gt;&lt;/code&gt;
-  进来。 &lt;/p&gt;
-&lt;p&gt; 但是在 &lt;code class="code"&gt;
+ 进来。&lt;/p&gt;
+&lt;p&gt;但是在 &lt;code class="code"&gt;
 ff&lt;/code&gt;
-  的情况下， &lt;code class="code"&gt;
+ 的情况下， &lt;code class="code"&gt;
 ff&amp;lt;BB&amp;lt;long&amp;gt;&amp;gt;&lt;/code&gt;
-  却进来了。 &lt;/p&gt;
-&lt;p&gt; 在 VC10 和 GCC3.4 下测试 &lt;/p&gt;
+ 却进来了。&lt;/p&gt;
+&lt;p&gt;在VC10和GCC3.4下测试&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id3"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt; 我的解答 &lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt; 我们来设身处地地作为编译器，看一遍到底发生了什么。 &lt;/p&gt;
-&lt;p&gt; 约定符号 &lt;code class="code"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;我的解答&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;我们来设身处地地作为编译器，看一遍到底发生了什么。&lt;/p&gt;
+&lt;p&gt;约定符号 &lt;code class="code"&gt;
 #&lt;/code&gt;
  : &lt;code class="code"&gt;
 A#B&lt;/code&gt;
-  是把 &lt;code class="code"&gt;
+ 是把 &lt;code class="code"&gt;
 B&lt;/code&gt;
-  带入 &lt;code class="code"&gt;
+ 带入 &lt;code class="code"&gt;
 A&amp;lt;T&amp;gt;&lt;/code&gt;
-  的参数 &lt;code class="code"&gt;
+ 的参数 &lt;code class="code"&gt;
 T&lt;/code&gt;
-  之后实例化得到的结果。 &lt;/p&gt;
+ 之后实例化得到的结果。&lt;/p&gt;
 &lt;div class="section" id="ff"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt; 首先看 ff 的情况。 &lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;首先看ff的情况。&lt;/a&gt;&lt;/h3&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 处理到这句的时候，编译器看到了 &lt;code class="code"&gt;
+&lt;p&gt;处理到这句的时候，编译器看到了 &lt;code class="code"&gt;
 DD&amp;lt;long&amp;gt;&lt;/code&gt;
-  的实例化，于是去实例化 &lt;code class="code"&gt;
+ 的实例化，于是去实例化 &lt;code class="code"&gt;
 DD#long&lt;/code&gt;
-  ，继而实例化了 &lt;code class="code"&gt;
+ ，继而实例
+化了 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
-  。 &lt;/p&gt;
+ 。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 这句，首先计算重载函数集合。 &lt;/p&gt;
-&lt;p&gt; 第一步，需要从参数 &lt;code class="code"&gt;
+&lt;p&gt;这句，首先计算重载函数集合。&lt;/p&gt;
+&lt;p&gt;第一步，需要从参数 &lt;code class="code"&gt;
 DD#long -&amp;gt; BB&amp;lt;T&amp;gt;&lt;/code&gt;
-  推断 &lt;code class="code"&gt;
+ 推断 &lt;code class="code"&gt;
 ff&amp;lt;T&amp;gt;&lt;/code&gt;
-  的 &lt;code class="code"&gt;
+ 的 &lt;code class="code"&gt;
 T&lt;/code&gt;
-  。根据函数模板参数推断规则： &lt;/p&gt;
+ 。根据函数模板参数推断规则：&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
-:code:`class_template_name&amp;lt;T&amp;gt;`  类型的参数，可以用于推断 :code:`T`  。 &lt;/pre&gt;
-&lt;p&gt; 于是编译器推断 &lt;code class="code"&gt;
+:code:`class_template_name&amp;lt;T&amp;gt;` 类型的参数，可以用于推断 :code:`T` 。
+&lt;/pre&gt;
+&lt;p&gt;于是编译器推断 &lt;code class="code"&gt;
 T&lt;/code&gt;
-  为 &lt;code class="code"&gt;
+ 为 &lt;code class="code"&gt;
 long&lt;/code&gt;
-  。这里就算不是 &lt;code class="code"&gt;
+ 。这里就算不是 &lt;code class="code"&gt;
 BB&lt;/code&gt;
-  而是完全无关的 &lt;code class="code"&gt;
+ 而是完全无关的 &lt;code class="code"&gt;
 CC&lt;/code&gt;
-  都可以推断成功，只要 &lt;code class="code"&gt;
+ 都可以推断成功，只要 &lt;code class="code"&gt;
 CC&lt;/code&gt;
-  也是一个 &lt;code class="code"&gt;
+ 也
+是一个 &lt;code class="code"&gt;
 CC&amp;lt;T&amp;gt;&lt;/code&gt;
-  形式的模板。 &lt;/p&gt;
-&lt;p&gt; 第二步，模板特化匹配。因为只有一个模板，所以匹配了最泛化的 &lt;code class="code"&gt;
+ 形式的模板。&lt;/p&gt;
+&lt;p&gt;第二步，模板特化匹配。因为只有一个模板，所以匹配了最泛化的 &lt;code class="code"&gt;
 ff&amp;lt;T&amp;gt;&lt;/code&gt;
-  。 &lt;/p&gt;
-&lt;p&gt; 第三步，模板实例化。 &lt;/p&gt;
-&lt;p&gt; 推断了 &lt;code class="code"&gt;
+ 。&lt;/p&gt;
+&lt;p&gt;第三步，模板实例化。&lt;/p&gt;
+&lt;p&gt;推断了 &lt;code class="code"&gt;
 long -&amp;gt; T&lt;/code&gt;
-  之后，编译器实例化 &lt;code class="code"&gt;
+ 之后，编译器实例化 &lt;code class="code"&gt;
 ff#long&lt;/code&gt;
-  。 &lt;/p&gt;
-&lt;p&gt; 重载函数集合： &lt;code class="code"&gt;
+ 。&lt;/p&gt;
+&lt;p&gt;重载函数集合： &lt;code class="code"&gt;
 {ff#long}&lt;/code&gt;
 &lt;/p&gt;
-&lt;p&gt; 然后重载抉择找到唯一的可匹配的实例 &lt;code class="code"&gt;
+&lt;p&gt;然后重载抉择找到唯一的可匹配的实例 &lt;code class="code"&gt;
 ff#long&lt;/code&gt;
-  ，检查实际参数 &lt;code class="code"&gt;
+ ，检查实际参数 &lt;code class="code"&gt;
 DD#long&lt;/code&gt;
-  可以隐式转换到形式参数 &lt;code class="code"&gt;
+ 可以隐式转换到
+形式参数 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
-  ，从而生成了这次函数调用。 &lt;/p&gt;
+ ，从而生成了这次函数调用。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="f"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt; 再来看 f 的情况。 &lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;再来看f的情况。&lt;/a&gt;&lt;/h3&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 计算候选重载函数集合。 &lt;/p&gt;
-&lt;p&gt; 第一步，对所有 &lt;code class="code"&gt;
+&lt;p&gt;计算候选重载函数集合。&lt;/p&gt;
+&lt;p&gt;第一步，对所有 &lt;code class="code"&gt;
 f&lt;/code&gt;
-  模板推断实参。根据函数模板参数推断规则： &lt;/p&gt;
+ 模板推断实参。根据函数模板参数推断规则：&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
- 带有 :code:`T`  类型的参数，可以用于推断 :code:`T`  。 &lt;/pre&gt;
-&lt;p&gt; 于是 &lt;code class="code"&gt;
+带有 :code:`T` 类型的参数，可以用于推断 :code:`T` 。
+&lt;/pre&gt;
+&lt;p&gt;于是 &lt;code class="code"&gt;
 B -&amp;gt; T&lt;/code&gt;
-  被推断出来了。 &lt;/p&gt;
-&lt;p&gt; 第二步，模板特化匹配。 &lt;/p&gt;
-&lt;p&gt; 这里 &lt;code class="code"&gt;
+ 被推断出来了。&lt;/p&gt;
+&lt;p&gt;第二步，模板特化匹配。&lt;/p&gt;
+&lt;p&gt;这里 &lt;code class="code"&gt;
 B&lt;/code&gt;
-  不是 &lt;code class="code"&gt;
+ 不是 &lt;code class="code"&gt;
 A&lt;/code&gt;
-  ，所以不能用 &lt;code class="code"&gt;
+ ，所以不能用 &lt;code class="code"&gt;
 f&amp;lt;A&amp;gt;&lt;/code&gt;
-  特化，只能用 &lt;code class="code"&gt;
+ 特化，只能用 &lt;code class="code"&gt;
 f&amp;lt;T&amp;gt;&lt;/code&gt;
-  模板。 &lt;/p&gt;
-&lt;p&gt; 第三步，模板实例化。 &lt;/p&gt;
+ 模板。&lt;/p&gt;
+&lt;p&gt;第三步，模板实例化。&lt;/p&gt;
 &lt;p&gt;&lt;code class="code"&gt;
 B&lt;/code&gt;
-  带入 &lt;code class="code"&gt;
+ 带入 &lt;code class="code"&gt;
 f&amp;lt;T&amp;gt;&lt;/code&gt;
-  实例化成 &lt;code class="code"&gt;
+ 实例化成 &lt;code class="code"&gt;
 f#B&lt;/code&gt;
-  的过程中，实例化 &lt;code class="code"&gt;
+ 的过程中，实例化 &lt;code class="code"&gt;
 traits#B&lt;/code&gt;
-  。 &lt;/p&gt;
-&lt;p&gt; 由于没有针对 &lt;code class="code"&gt;
+ 。&lt;/p&gt;
+&lt;p&gt;由于没有针对 &lt;code class="code"&gt;
 B&lt;/code&gt;
-  的特化，所以用 &lt;code class="code"&gt;
+ 的特化，所以用 &lt;code class="code"&gt;
 traits&amp;lt;T&amp;gt;&lt;/code&gt;
-  模板， &lt;code class="code"&gt;
+ 模板， &lt;code class="code"&gt;
 traits#B::value=false&lt;/code&gt;
-  ，进而 &lt;code class="code"&gt;
+ ，进而 &lt;code class="code"&gt;
 enable_if#false&lt;/code&gt;
-  没有 &lt;code class="code"&gt;
+ 没有 &lt;code class="code"&gt;
 type&lt;/code&gt;
-  ，出错。 &lt;/p&gt;
-&lt;p&gt; 唯一的模板匹配出错，重载函数集合为空， SFINAE 原则不能找到合适的匹配，于是报错。 &lt;/p&gt;
+ ，出错。&lt;/p&gt;
+&lt;p&gt;唯一的模板匹配出错，重载函数集合为空，SFINAE原则不能找到合适的匹配，于是报错。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry><entry><title>尝试一下 Pelican</title><link href="//farseerfc.github.io/zhs/try-pelican.html" rel="alternate"></link><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-02-24:zhs/try-pelican.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt; 似乎一夜之间所有的 &lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt; 极客们 &lt;/a&gt;
-&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt; 都 &lt;/a&gt;
-&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt; 有了 &lt;/a&gt;
-&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt; 自己 &lt;/a&gt;
- 的 &lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github 主页 &lt;/a&gt;
- 和 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;  博客。就像所有人在他们的博客中指出的，静态博客的确比传统的 WordPress 方式具有更多优势。自从看到这些我就一直在想着自己搭一个 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;  。 &lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry><entry><title>尝试一下 Pelican</title><link href="//farseerfc.github.io/zhs/try-pelican.html" rel="alternate"></link><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.github.io,2012-02-24:zhs/try-pelican.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;似乎一夜之间所有的
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;极客们&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;都&lt;/a&gt;
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;有了&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;自己&lt;/a&gt;
+的 &lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github主页&lt;/a&gt;
+和 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 博客。就像所有人在他们的博客中指出的，静态博客的确比传统的WordPress方式具有更多优势。 自从看到这些
+我就一直在想着自己搭一个 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="section" id="id6"&gt;
-&lt;h2&gt; 但是似乎 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;  不适合我 &lt;/h2&gt;
-&lt;p&gt; 一上手就被 &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Octopress 的搭建步骤 &lt;/a&gt;  烦到了。 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt;  是什么？ &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt;  又是什么？看来 Ruby  社区的快节奏发展已经超过了我的想象，他们似乎需要一套发行版管理器来调和不同版本之间的 Ruby  的兼容性问题。虽然同样的兼容性问题在 Python  社区也有 &lt;a class="footnote-reference" href="#id10" id="id8"&gt;[1]&lt;/a&gt;  ，不过总觉得 Python  至少还没到需要一个发行版管理器的程度 &lt;a class="footnote-reference" href="#id11" id="id9"&gt;[2]&lt;/a&gt;  。 &lt;/p&gt;
-&lt;p&gt; 真正的问题是我手上还没有一个可以让我随便玩的 Linux  环境（真的想要 …… ）。而无论是 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt;  还是 &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt;  似乎都只支持 Unix/Linux/MacOSX  。身为极客就注定不能用 Windows  么？（或许是的 …… ）。 &lt;/p&gt;
-&lt;p&gt; 剩下的问题就是 Ruby  和 Python  两大阵营的对立问题了。我不熟悉 &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt;  ，相对来说比较喜欢 &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt;  。似乎无论哪边都要依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt;  作为代码着色器，那么其实 Rubyist  也至少需要安装 Python  。我倾向于不依赖任何 Ruby  组件，最好没有 C  扩展的纯 Python  实现。 &lt;/p&gt;
-&lt;p&gt; 于是我开始在 Github  上找 Python  的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt;  的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt;  写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt;  看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt;  似乎很完善，不过默认的标记语言是 MarkDown  ，又依赖于几个 Ruby  组建，而且官方网站的设计实在太前卫。最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  。 &lt;/p&gt;
-&lt;table class="footnote table docutils  table-striped table-hover" frame="void" id="id10" rules="none"&gt;
+&lt;h2&gt;但是似乎 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 不适合我&lt;/h2&gt;
+&lt;p&gt;一上手就被 &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Octopress的搭建步骤&lt;/a&gt; 烦到了。 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 是什么？ &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 又是什么？
+看来 Ruby 社区的快节奏发展已经超过了我的想象，他们似乎需要一套发行版管理器来调和不同版本之间的 Ruby 的兼容性问题。
+虽然同样的兼容性问题在 Python 社区也有 &lt;a class="footnote-reference" href="#id10" id="id8"&gt;[1]&lt;/a&gt; ，不过总觉得 Python 至少还没到需要一个发行版管理器的程度 &lt;a class="footnote-reference" href="#id11" id="id9"&gt;[2]&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;真正的问题是我手上还没有一个可以让我随便玩的 Linux 环境（真的想要……）。 而无论是 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 还是 &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 似乎都只支持 Unix/Linux/MacOSX 。 身为极客就注定不能用 Windows 么？（或许是的……）。&lt;/p&gt;
+&lt;p&gt;剩下的问题就是 Ruby 和 Python 两大阵营的对立问题了。我不熟悉 &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; ， 相对来说比较喜欢 &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; 。 似乎无论哪边都要
+依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
+的纯 Python 实现。&lt;/p&gt;
+&lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt; 比如 Python 2.x  与 3.x  之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt;  、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt;  、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt;  、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt;  等各个实现之间的微妙差别。 &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table class="footnote table docutils  table-striped table-hover" frame="void" id="id11" rules="none"&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt; 是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt;  ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt;  ，不过这些都是包管理器，都是装好特定的 Python 实现之后的事情。 Python 实现本身还不需要包管理器来管理。 Python  的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt;  和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt;  这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python  。如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt;  ，不过这又是另一回事情了。 &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id12"&gt;
-&lt;h2&gt; 那么就 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  吧 &lt;/h2&gt;
-&lt;p&gt; 对我而言， &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  相比于 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;  有几个好处： &lt;/p&gt;
+&lt;h2&gt;那么就 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 吧&lt;/h2&gt;
+&lt;p&gt;对我而言， &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 相比于 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 有几个好处：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt; 纯 Python  实现。这意味着我可以换用任何 Python  解释器而不必担心兼容性问题。比如我就换成了 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 。 &lt;/li&gt;
-&lt;li&gt; 多语言支持。因为 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  的作者似乎是个法国人。不过这个似乎大部分人不需要 ……  我是想尽量把一篇博客写成三种语言作为锻炼吧。 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt;  。这样我就可以用 &lt;a class="reference external" href="http://webpages.charter.net/edreamleo/front.html"&gt;Leo&lt;/a&gt;  的 @auto-rst  直接写 ReST 了。简单方便快捷有效。 &lt;/li&gt;
+&lt;li&gt;纯 Python 实现。 这意味着我可以换用任何 Python 解释器而不必担心兼容性问题。比如我就换成了 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;多语言支持。因为 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 的作者似乎是个法国人。不过这个似乎大部分人不需要…… 我是想尽量把一篇博客写成三种语言作为锻炼吧。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; 。这样我就可以用 &lt;a class="reference external" href="http://webpages.charter.net/edreamleo/front.html"&gt;Leo&lt;/a&gt; 的 @auto-rst 直接写 ReST了。简单方便快捷有效。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/blockquote&gt;
-&lt;p&gt; 不过似乎 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  的关注度不如 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;  那么高，现在一些部分还有细微的问题： &lt;/p&gt;
+&lt;p&gt;不过似乎 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 的关注度不如 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 那么高，现在一些部分还有细微的问题：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt;pelican-import  从 WordPress  导入的时候对中文、日文的支持似乎很成问题。 &lt;/li&gt;
-&lt;li&gt; 日期格式、时区、字符集、和多语言功能的结合度还不够。 &lt;strong&gt; 我在尝试改善它。 &lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt; 模板还不够丰富。 &lt;/li&gt;
-&lt;li&gt; 插件也不够多 ……&lt;/li&gt;
+&lt;li&gt;pelican-import 从 WordPress 导入的时候对中文、日文的支持似乎很成问题。&lt;/li&gt;
+&lt;li&gt;日期格式、时区、字符集、和多语言功能的结合度还不够。  &lt;strong&gt;我在尝试改善它。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;模板还不够丰富。&lt;/li&gt;
+&lt;li&gt;插件也不够多……&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/blockquote&gt;
-&lt;p&gt; 希望这么优秀的工具能够受到更多关注，以上这些问题都是增加关注度之后很快就能解决的问题。 &lt;/p&gt;
+&lt;p&gt;希望这么优秀的工具能够受到更多关注，以上这些问题都是增加关注度之后很快就能解决的问题。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="settings-py"&gt;
-&lt;h2&gt; 我的设置 settings.py&lt;/h2&gt;
-&lt;p&gt; 安装 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;  很容易，一句话就够了： &lt;/p&gt;
+&lt;h2&gt;我的设置 settings.py&lt;/h2&gt;
+&lt;p&gt;安装 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 很容易，一句话就够了：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 然后把文章写成 ReST 的格式，放在 `pages` 文件夹里面。 ( 重新 ) 生成只要： &lt;/p&gt;
+&lt;p&gt;然后把文章写成ReST的格式，放在`pages`文件夹里面。(重新)生成只要：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 上传到 Github:&lt;/p&gt;
+&lt;p&gt;上传到 Github:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;
 &lt;span class="gp"&gt;$&lt;/span&gt; git push
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt; 就这么简单。附上我的配置文件： &lt;/p&gt;
+&lt;p&gt;就这么简单。附上我的配置文件：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
 
 &lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Asia/Tokyo'&lt;/span&gt;

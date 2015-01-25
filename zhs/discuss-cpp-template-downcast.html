@@ -14,13 +14,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="template,C" />
-        <meta name="description" content="这两天在饮水思源的 C 板，关于 C++ 模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..." />
+        <meta name="description" content="这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="关于C++模板的类型转换的讨论"/>
         <meta property="og:url" content="//farseerfc.github.io/zhs/discuss-cpp-template-downcast.html"/>
-        <meta property="og:description" content="这两天在饮水思源的 C 板，关于 C++ 模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A ..."/>
+        <meta property="og:description" content="这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。 讨论地址 http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html 原问题 今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西： template &lt;bool _Test, class _Type = void&gt; struct enable_if { }; template&lt;class _Type&gt; struct enable_if&lt;true, _Type&gt; { typedef _Type type; }; class A { }; class B : A { }; template &lt;typename T&gt; struct ..."/>
         <meta property="article:published_time" content="2012-02-26" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="template" />
@@ -187,11 +187,11 @@ Farseerfc的小窝            </a>
                     <html><body><div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id4"> 讨论地址 </a></li>
-<li><a class="reference internal" href="#id2" id="id5"> 原问题 </a></li>
-<li><a class="reference internal" href="#id3" id="id6"> 我的解答 </a><ul>
-<li><a class="reference internal" href="#ff" id="id7"> 首先看 ff 的情况。 </a></li>
-<li><a class="reference internal" href="#f" id="id8"> 再来看 f 的情况。 </a></li>
+<li><a class="reference internal" href="#id1" id="id4">讨论地址</a></li>
+<li><a class="reference internal" href="#id2" id="id5">原问题</a></li>
+<li><a class="reference internal" href="#id3" id="id6">我的解答</a><ul>
+<li><a class="reference internal" href="#ff" id="id7">首先看ff的情况。</a></li>
+<li><a class="reference internal" href="#f" id="id8">再来看f的情况。</a></li>
 </ul>
 </li>
 </ul>
@@ -200,14 +200,14 @@ Farseerfc的小窝            </a>
                     </div>
     
                 <html><body>
-<p> 这两天在饮水思源的 C 板，关于 C++ 模板的类型转换的一个讨论，后面是我的解答。 </p>
+<p>这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。</p>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id4"> 讨论地址 </a></h2>
+<h2><a class="toc-backref" href="#id4">讨论地址</a></h2>
 <p><a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html">http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html</a></p>
 </div>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id5"> 原问题 </a></h2>
-<p> 今天在书上看到模板演绎的时候可以允许 cast-down ，于是我写了个东西： </p>
+<h2><a class="toc-backref" href="#id5">原问题</a></h2>
+<p>今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：</p>
 <div class="highlight"><pre><span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
 
@@ -249,133 +249,138 @@ Farseerfc的小窝            </a>
     <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
-<p> 奇怪的是重载决议的时候， <code class="code">
+<p>奇怪的是重载决议的时候， <code class="code">
 f</code>
-  的情况下它就不让我特化的 <code class="code">
+ 的情况下它就不让我特化的 <code class="code">
 f&lt;A&gt;</code>
-  进来。 </p>
-<p> 但是在 <code class="code">
+ 进来。</p>
+<p>但是在 <code class="code">
 ff</code>
-  的情况下， <code class="code">
+ 的情况下， <code class="code">
 ff&lt;BB&lt;long&gt;&gt;</code>
-  却进来了。 </p>
-<p> 在 VC10 和 GCC3.4 下测试 </p>
+ 却进来了。</p>
+<p>在VC10和GCC3.4下测试</p>
 </div>
 <div class="section" id="id3">
-<h2><a class="toc-backref" href="#id6"> 我的解答 </a></h2>
-<p> 我们来设身处地地作为编译器，看一遍到底发生了什么。 </p>
-<p> 约定符号 <code class="code">
+<h2><a class="toc-backref" href="#id6">我的解答</a></h2>
+<p>我们来设身处地地作为编译器，看一遍到底发生了什么。</p>
+<p>约定符号 <code class="code">
 #</code>
  : <code class="code">
 A#B</code>
-  是把 <code class="code">
+ 是把 <code class="code">
 B</code>
-  带入 <code class="code">
+ 带入 <code class="code">
 A&lt;T&gt;</code>
-  的参数 <code class="code">
+ 的参数 <code class="code">
 T</code>
-  之后实例化得到的结果。 </p>
+ 之后实例化得到的结果。</p>
 <div class="section" id="ff">
-<h3><a class="toc-backref" href="#id7"> 首先看 ff 的情况。 </a></h3>
+<h3><a class="toc-backref" href="#id7">首先看ff的情况。</a></h3>
 <div class="highlight"><pre><span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
 </pre></div>
-<p> 处理到这句的时候，编译器看到了 <code class="code">
+<p>处理到这句的时候，编译器看到了 <code class="code">
 DD&lt;long&gt;</code>
-  的实例化，于是去实例化 <code class="code">
+ 的实例化，于是去实例化 <code class="code">
 DD#long</code>
-  ，继而实例化了 <code class="code">
+ ，继而实例
+化了 <code class="code">
 BB#long</code>
-  。 </p>
+ 。</p>
 <div class="highlight"><pre><span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
 </pre></div>
-<p> 这句，首先计算重载函数集合。 </p>
-<p> 第一步，需要从参数 <code class="code">
+<p>这句，首先计算重载函数集合。</p>
+<p>第一步，需要从参数 <code class="code">
 DD#long -&gt; BB&lt;T&gt;</code>
-  推断 <code class="code">
+ 推断 <code class="code">
 ff&lt;T&gt;</code>
-  的 <code class="code">
+ 的 <code class="code">
 T</code>
-  。根据函数模板参数推断规则： </p>
+ 。根据函数模板参数推断规则：</p>
 <pre class="literal-block">
-:code:`class_template_name&lt;T&gt;`  类型的参数，可以用于推断 :code:`T`  。 </pre>
-<p> 于是编译器推断 <code class="code">
+:code:`class_template_name&lt;T&gt;` 类型的参数，可以用于推断 :code:`T` 。
+</pre>
+<p>于是编译器推断 <code class="code">
 T</code>
-  为 <code class="code">
+ 为 <code class="code">
 long</code>
-  。这里就算不是 <code class="code">
+ 。这里就算不是 <code class="code">
 BB</code>
-  而是完全无关的 <code class="code">
+ 而是完全无关的 <code class="code">
 CC</code>
-  都可以推断成功，只要 <code class="code">
+ 都可以推断成功，只要 <code class="code">
 CC</code>
-  也是一个 <code class="code">
+ 也
+是一个 <code class="code">
 CC&lt;T&gt;</code>
-  形式的模板。 </p>
-<p> 第二步，模板特化匹配。因为只有一个模板，所以匹配了最泛化的 <code class="code">
+ 形式的模板。</p>
+<p>第二步，模板特化匹配。因为只有一个模板，所以匹配了最泛化的 <code class="code">
 ff&lt;T&gt;</code>
-  。 </p>
-<p> 第三步，模板实例化。 </p>
-<p> 推断了 <code class="code">
+ 。</p>
+<p>第三步，模板实例化。</p>
+<p>推断了 <code class="code">
 long -&gt; T</code>
-  之后，编译器实例化 <code class="code">
+ 之后，编译器实例化 <code class="code">
 ff#long</code>
-  。 </p>
-<p> 重载函数集合： <code class="code">
+ 。</p>
+<p>重载函数集合： <code class="code">
 {ff#long}</code>
 </p>
-<p> 然后重载抉择找到唯一的可匹配的实例 <code class="code">
+<p>然后重载抉择找到唯一的可匹配的实例 <code class="code">
 ff#long</code>
-  ，检查实际参数 <code class="code">
+ ，检查实际参数 <code class="code">
 DD#long</code>
-  可以隐式转换到形式参数 <code class="code">
+ 可以隐式转换到
+形式参数 <code class="code">
 BB#long</code>
-  ，从而生成了这次函数调用。 </p>
+ ，从而生成了这次函数调用。</p>
 </div>
 <div class="section" id="f">
-<h3><a class="toc-backref" href="#id8"> 再来看 f 的情况。 </a></h3>
+<h3><a class="toc-backref" href="#id8">再来看f的情况。</a></h3>
 <div class="highlight"><pre><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
-<p> 计算候选重载函数集合。 </p>
-<p> 第一步，对所有 <code class="code">
+<p>计算候选重载函数集合。</p>
+<p>第一步，对所有 <code class="code">
 f</code>
-  模板推断实参。根据函数模板参数推断规则： </p>
+ 模板推断实参。根据函数模板参数推断规则：</p>
 <pre class="literal-block">
- 带有 :code:`T`  类型的参数，可以用于推断 :code:`T`  。 </pre>
-<p> 于是 <code class="code">
+带有 :code:`T` 类型的参数，可以用于推断 :code:`T` 。
+</pre>
+<p>于是 <code class="code">
 B -&gt; T</code>
-  被推断出来了。 </p>
-<p> 第二步，模板特化匹配。 </p>
-<p> 这里 <code class="code">
+ 被推断出来了。</p>
+<p>第二步，模板特化匹配。</p>
+<p>这里 <code class="code">
 B</code>
-  不是 <code class="code">
+ 不是 <code class="code">
 A</code>
-  ，所以不能用 <code class="code">
+ ，所以不能用 <code class="code">
 f&lt;A&gt;</code>
-  特化，只能用 <code class="code">
+ 特化，只能用 <code class="code">
 f&lt;T&gt;</code>
-  模板。 </p>
-<p> 第三步，模板实例化。 </p>
+ 模板。</p>
+<p>第三步，模板实例化。</p>
 <p><code class="code">
 B</code>
-  带入 <code class="code">
+ 带入 <code class="code">
 f&lt;T&gt;</code>
-  实例化成 <code class="code">
+ 实例化成 <code class="code">
 f#B</code>
-  的过程中，实例化 <code class="code">
+ 的过程中，实例化 <code class="code">
 traits#B</code>
-  。 </p>
-<p> 由于没有针对 <code class="code">
+ 。</p>
+<p>由于没有针对 <code class="code">
 B</code>
-  的特化，所以用 <code class="code">
+ 的特化，所以用 <code class="code">
 traits&lt;T&gt;</code>
-  模板， <code class="code">
+ 模板， <code class="code">
 traits#B::value=false</code>
-  ，进而 <code class="code">
+ ，进而 <code class="code">
 enable_if#false</code>
-  没有 <code class="code">
+ 没有 <code class="code">
 type</code>
-  ，出错。 </p>
-<p> 唯一的模板匹配出错，重载函数集合为空， SFINAE 原则不能找到合适的匹配，于是报错。 </p>
+ ，出错。</p>
+<p>唯一的模板匹配出错，重载函数集合为空，SFINAE原则不能找到合适的匹配，于是报错。</p>
 </div>
 </div>
 </body></html>
@@ -510,18 +515,8 @@ type</code>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -529,154 +524,14 @@ type</code>
                     tty <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.github.io/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/material.html">
-                    material <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/css.html">
-                    css <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
-                    creationism <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/python.html">
-                    python <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/paper.html">
-                    paper <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.github.io/zhs/tag/linux.html">
-                    linux <sup> 3</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/you.html">
-                    you <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/ugh.html">
                     ugh <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-3">
-                <a href="//farseerfc.github.io/zhs/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/pelican.html">
-                    pelican <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
-                    plasma <sup> 1</sup>
+                    pelican <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -685,8 +540,158 @@ type</code>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/java.html">
+                    Java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.github.io/zhs/tag/msr.html">
                     msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.github.io/zhs/tag/python.html">
+                    python <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/material.html">
+                    material <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.github.io/zhs/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.github.io/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.github.io/zhs/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>
