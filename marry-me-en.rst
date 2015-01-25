@@ -7,10 +7,10 @@ Will You Marry Me?
 :tags: will, you, marry, me
 
 .. panel-default::
-    :title: 渲染的樣子
+    :title: After rendering
 
 	.. PELICAN_BEGIN_SUMMARY
-	
+
 	.. image:: /images/marry-me.png
 		:alt: will you marry me
 

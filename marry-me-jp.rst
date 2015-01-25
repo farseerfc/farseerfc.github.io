@@ -7,7 +7,7 @@
 :tags: will, you, marry, me
 
 .. panel-default::
-    :title: 渲染的樣子
+    :title: 画像はこのように
 
 	.. PELICAN_BEGIN_SUMMARY
 
