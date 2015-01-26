@@ -143,6 +143,39 @@ Farseerfc的小窝            </a>
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
+                            <a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.4 I386平台C函数调用边界的栈分配
+                            </h2></a>
+                        </div>
+                        <div class="col-lg-4 col-md-3 hidden-sm hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
+<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="translate">繁體</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-4-i386-stack-allocation-accross-function-invocation" data-disqus-url="http://farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="i386c">
+<h2>2.4 I386平台C函数调用边界的栈分配</h2>
+<p>当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。</p>
+<p>函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。</p>
+<p>同样以最简单的函数为例：</p>
+<p>void f(){</p>
+<p>int i ...</p></div></body></html>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
                             <a href="//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.5 I386平台的边界对齐(Align)
                             </h2></a>
                         </div>
@@ -312,43 +345,6 @@ Farseerfc的小窝            </a>
                 </div>
             </article>
         </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
-                            <a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.1  条件运算符(?:)
-                            </h2></a>
-                        </div>
-                        <div class="col-lg-4 col-md-3 hidden-sm hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-1-1-conditional-operator.html" class="translate">繁體</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-1-conditional-operator" data-disqus-url="http://farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
-<div class="section" id="id1">
-<h2>1.1   条件运算符(?:)</h2>
-<p>条件运算符(?:)是C++中唯一的三目运算符(trinary
-operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual
-Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下：</p>
-<p><em>condition</em> ? <em>true_value</em> : <em>false_value</em></p>
-<p>其中<em>condition
-*条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*</em>、<strong>int</strong>、指针。与<strong>if</strong>和<strong>while</strong>的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。</p>
-<p>另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如：</p>
-<p><strong>int</strong> *pi=getInt();</p>
-<p><strong>int</strong> i=pi ...</p></div></body></html>
-                    </div>
-                </div>
-            </article>
-        </div>
     </div>
 
         <ul class="pagination">
@@ -444,9 +440,14 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                     ugh <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
+            <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/zhs/tag/pelican.html">
-                    pelican <sup> 2</sup>
+                    pelican <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -515,6 +516,11 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/plasma.html">
                     plasma <sup> 1</sup>
                 </a>
@@ -577,6 +583,11 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
             <li class="list-group-item tag-1">
                 <a href="//farseerfc.me/zhs/tag/c.html">
                     C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/github.html">
+                    github <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">

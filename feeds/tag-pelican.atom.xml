@@ -1,5 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pelican.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-01-25T22:45:00+09:00</updated><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:redesign-pelican-theme.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pelican.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-01-26T23:32:00+09:00</updated><entry><title>換到 farseerfc.me 域名</title><link href="//farseerfc.me/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;上個月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上買了個自己的域名 &lt;code class="code"&gt;
+farseerfc.me&lt;/code&gt;
+ 準備用在這個
+博客上，當時試着轉到過這個域名，發現 &lt;ruby&gt;&lt;rb&gt;自定義域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+只支持 http 不支持 https ，想着還要買自己的證書，於是就扔在了一旁。不用自定義域名的話，
+放在 github.io 上是可以用 HTTPS 的。
+今天在IRC #archlinux-cn 上受大牛 &lt;em&gt;quininer&lt;/em&gt; 和 &lt;em&gt;百合仙子&lt;/em&gt; 點播，發現 cloudflare 有提供
+&lt;a class="reference external" href="https://blog.cloudflare.com/introducing-universal-ssl/"&gt;免費的支持 SSL 的 CDN 服務&lt;/a&gt;
+趕快去申請了一個，感覺非常讚，於是就換過來了。&lt;/p&gt;
+&lt;p&gt;設置的方法按照 &lt;a class="reference external" href="https://me.net.nz/blog/github-pages-secure-with-cloudflare/"&gt;這篇博文&lt;/a&gt;
+說的一步步做下來，如它所述，用 CloudFlare 的優點如下：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;CDN 加速&lt;/li&gt;
+&lt;li&gt;SSL (HTTPS) 加密&lt;/li&gt;
+&lt;li&gt;支持 SPDY 協議&lt;/li&gt;
+&lt;li&gt;支持 IPv6&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;然後 &lt;strong&gt;免費賬戶&lt;/strong&gt; 的一些缺點有：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;CloudFlare 和 github.io 之間的數據不是加密的，因爲 github
+&lt;ruby&gt;&lt;rb&gt;自定義域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 還不支持使用自己的證書。這也是一開始我沒用
+自定義域名的原因嘛，這沒有辦法……&lt;/li&gt;
+&lt;li&gt;CloudFlare 給免費賬戶簽名的 SSL 證書比較新，不支持一些老的設備和瀏覽器，比如不支持
+老的 XP 系統的 IE 或者 2.x 的 Android。這種情況下沒辦法只能用沒有加密的 HTTP 了。&lt;/li&gt;
+&lt;li&gt;不支持 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security"&gt;HSTS 頭&lt;/a&gt;
+，所以不能從服務器這邊強制瀏覽器用 HTTPS。當然可以放個 javascript 跳轉，
+也可以用 &lt;a class="reference external" href="https://www.eff.org/https-everywhere"&gt;HTTPSEverywhere&lt;/a&gt; 這種方案。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;設置步驟&lt;/h2&gt;
+&lt;p&gt;基本按照默認的選項下一步就可以了。&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;和那個博主一樣我把 &lt;ruby&gt;&lt;rb&gt;安全級別&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Security profile&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 降到了 Low ，即使是可疑流量也
+不會要求輸入 CAPTCHA 。&lt;/li&gt;
+&lt;li&gt;把 SSL 方式開在 Flexible SSL，訪客到 CloudFlare 是加密的，而 CloudFlare 到
+github.io 是不加密的。&lt;/li&gt;
+&lt;li&gt;把 CDN 開到了 CDT+Full Optimization ，可以對訪問加速。由於是完全靜態的博客，沒有
+動態變化的內容，所以應該比較安全。&lt;/li&gt;
+&lt;li&gt;服務器設置的一步需要將 &lt;ruby&gt;&lt;rb&gt;域名解析服務器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;DNS nameservers&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 從狗爹的服務器改到
+CloudFlare 的，如下圖：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="更改狗爹的域名服務器" class="img-responsive" src="//farseerfc.me/images/godaddy.png"/&gt;
+&lt;p class="caption"&gt;更改狗爹的域名服務器&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;申請好之後就由 CloudFlare 接管域名解析了，接下來在 CloudFlare 的 DNS 設置添加一條
+&lt;a class="reference external" href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/"&gt;A 類規則指向 github pages 的 IP&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="更改CloudFlare的DNS規則" class="img-responsive" src="//farseerfc.me/images/cloudflaredns.png"/&gt;
+&lt;p class="caption"&gt;更改CloudFlare的DNS規則&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;等一切都反映到 DNS 服務器上就設置完成了，接下來給
+&lt;a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/"&gt;farseerfc.github.io push 一個 CNAME 文件&lt;/a&gt;
+寫上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做這個：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;
+  &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; find &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -mindepth &lt;span class="m"&gt;1&lt;/span&gt; -not -wholename &lt;span class="s2"&gt;"*/.git*"&lt;/span&gt; -delete
+  rm -rf cache
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;SITEURL&lt;span class="k"&gt;)&lt;/span&gt; &amp;gt; content/static/CNAME
+  &lt;span class="k"&gt;$(&lt;/span&gt;PELICAN&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;INPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -o &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -s &lt;span class="k"&gt;$(&lt;/span&gt;PUBLISHCONF&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;PELICANOPTS&lt;span class="k"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; rsthtml
+
+&lt;span class="nf"&gt;github&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout master&lt;span class="o"&gt;)&lt;/span&gt;
+  env &lt;span class="nv"&gt;SITEURL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"farseerfc.me"&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; publish
+  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;"update"&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;STATIC_PATHS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;'static'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'uml'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;EXTRA_PATH_METADATA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'CNAME'&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然後把生成的靜態網站 push 到 github 之後可以從項目設置裏看到域名的變化：&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="Github 配置好自定義域名之後的變化" class="img-responsive" src="//farseerfc.me/images/githubdomain.png"/&gt;
+&lt;p class="caption"&gt;Github 配置好自定義域名之後的變化&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;這樣就一切都設置妥當了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;致謝&lt;/h2&gt;
+&lt;p&gt;最後要感謝提供消息的 &lt;em&gt;quininer大大&lt;/em&gt; 和 &lt;em&gt;百合仙子大大&lt;/em&gt; ，感謝撰寫設置步驟的
+&lt;em&gt;Jonathan J Hunt&lt;/em&gt; ， 感謝 CloudFlare 提供免費 SSL CDN 服務，感謝 Github 提供
+方便免費的 Pages 託管。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;</summary><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:redesign-pelican-theme.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id37"&gt;前言: 新天新地，將一切都更新了 &lt;/a&gt;&lt;a class="footnote-reference" href="#id36" id="id1"&gt;[1]&lt;/a&gt;&lt;/h2&gt;
 
