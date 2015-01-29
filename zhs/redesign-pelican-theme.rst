@@ -9,6 +9,16 @@
 
 .. contents::
 
+
+.. PELICAN_BEGIN_SUMMARY
+
+.. label-warning::
+    
+    **2015年1月30日更新**
+
+.. PELICAN_END_SUMMARY
+
+
 前言: 新天新地，将一切都更新了 [#]_
 ++++++++++++++++++++++++++++++++++++++++
 
@@ -419,6 +429,60 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 2 和 3 都通用的语法；其次它原本输出的文件夹似乎会被 pelican 删掉，所以把它改了个位置；
 然后它输出的 URL 也和 i18n-subsites 插件间有不兼容的问题，也顺带修掉了。
 `修改之后的代码在这里 <https://github.com/farseerfc/pelican-plugins/tree/master/plantuml>`_ 。
+
+.. label-warning::
+    
+    **2015年1月30日更新**
+
+.. panel-default::
+    :title: 嵌入 Ditaa 的示例
+
+    .. ditaa::
+
+                           +-------------+
+                           |   ditaa     |-------+
+                           |  Diagram    |       |
+                           +-------------+       | PNG out
+                               ^                 |
+                               | ditaa in        |
+                               |                 v
+         +--------+   +--------+----+    /----------------\
+         |        | --+   Pelican   +--> |                |
+         |  Text  |   +-------------+    | Beautiful Blog |
+         |Document|   |   !magic!   |    |                |
+         |     {d}|   |             |    |                |
+         +---+----+   +-------------+    \----------------/
+             :                                   ^
+             |          Lots of work             |
+             +-----------------------------------+
+
+
+plantuml 是绘制UML的，除此之外还有一个类似的工具是绘制一般的 :ruby:`流程图|diagram`
+的，叫 `ditaa <http://ditaa.sourceforge.net/>`_ ，和 plantuml 非常像，也比较像
+reStructuredText 的表格。
+于是我也照猫画虎实现了一个 ditaa 的 :ruby:`指示符|directive` ，用起来类似这样：
+
+.. code-block:: rst
+
+    .. ditaa::
+
+                           +-------------+
+                           |   ditaa     |-------+
+                           |  Diagram    |       |
+                           +-------------+       | PNG out
+                               ^                 |
+                               | ditaa in        |
+                               |                 v
+         +--------+   +--------+----+    /----------------\
+         |        | --+   Pelican   +--> |                |
+         |  Text  |   +-------------+    | Beautiful Blog |
+         |Document|   |   !magic!   |    |                |
+         |     {d}|   |             |    |                |
+         +---+----+   +-------------+    \----------------/
+             :                                   ^
+             |          Lots of work             |
+             +-----------------------------------+
+
 
 render-math
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
