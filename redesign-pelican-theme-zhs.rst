@@ -183,7 +183,7 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 |     |xs|          |     |sm|                 |     |md|                            |
 +-------------------+--------------------------+-------------------------------------+
 | +-----------+     | +---------+--------+     | +---------+--------+                |
-| | |NavbarC| |     | |     |Navbarr|    |     | | |Navbar|         |                |
+| | |Navbarr| |     | |     |Navbar|     |     | | |Navbar|         |                |
 | +-----------+     | +---------+--------+     | +---------+--------+                |
 | | |art|     |     | | |art|            |     | | |art| 1 | |sb| 1 |                |
 | +-----------+     | +---------+--------+     | +---------+--------+                |
@@ -212,7 +212,6 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 .. |xl| replace:: :code:`xl` 用三栏文章列表、双栏 |sb| 固定布局
 .. |Navbarr| replace:: :ruby:`导航栏|Navbar`
 .. |Navbar| replace:: 导航栏
-.. |NavbarC| replace:: 折叠的导航栏
 .. |Footer| replace:: :ruby:`底栏|footer`
 .. |Footerr| replace:: 底栏
 .. |sidebarr| replace:: :ruby:`侧边栏|sidebar`
@@ -246,6 +245,16 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 ，配合我的头像风格， 这个修改只需要一行。
 接着删掉了 :code:`.btn` 的 :code:`white-space: nowrap;` 让按钮的文字可以换行，
 这也只是一行修改。
+
+.. label-warning::
+    
+    **2015年1月29日更新**
+
+另外我也不太喜欢 Bootstrap 3 默认在手机上的 :ruby:`折叠导航栏|collapsed navbar` ，
+折叠之后的操作不够直观方便而且依赖 javascript 所以有 bug …… 于是我把它关掉了，
+具体方式是在 variables.less 把 :code:`@grid-float-breakpoint` 和
+:code:`@grid-float-breakpoint-max` 都设为0就可以了。
+
 
 对 bootstrap-material-design 的定制
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -518,7 +527,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 
 .. label-warning::
     
-    **2015年1月29日更新：**
+    **2015年1月29日更新**
 
 今天在 extract_toc 插件的帮助下，在侧边栏里放了一个 Bootstrap affix 的目录，
 它保持在页面的右侧位置不变，方便导航到文章的各个地方。具体实现方法除了 Bootstrap 3 的
