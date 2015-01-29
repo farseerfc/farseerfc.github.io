@@ -179,39 +179,42 @@ plugins 指向 <span class="s">`pelican-plugins </span><span class="si">&lt;http
 接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：
 
-+----------------------+-----------------------------------------------------+
-<span class="o">|</span>     |xs|             |       |lg|                                          |
-+----------------------+-----------------------------------------------------+
-<span class="o">|</span> +-----------+        |   +---------+---------+---------+                   |
-<span class="o">|</span> | |NavbarC| |        |   |      |Navbar|               |                   |
-<span class="o">|</span> +-----------+        |   +---------+---------+---------+                   |
-<span class="o">|</span> | |art|     |        |   | |art| 1 | |art| 2 |  |sb| 1 |                   |
-<span class="o">|</span> +-----------+        |   +---------+---------+---------+                   |
-<span class="o">|</span> | |sb|      |        |   | |art| 3 | |art| 4 |  |sb| 2 |                   |
-<span class="o">|</span> +-----------+        |   +---------+---------+---------+                   |
-<span class="o">|</span> | |Footer|  |        |   |      |Footer|               |                   |
-<span class="o">|</span> +-----------+        |   +---------+---------+---------+                   |
-+----------------------+-----------------------------------------------------+
-<span class="o">|</span>     |sm|             |     |xl|                                            |
-+----------------------+-----------------------------------------------------+
-<span class="o">|</span> +---------+--------+ | +---------+---------+----------+--------+---------+ |
-<span class="o">|</span> | |Navbar|         | | |      |Navbar|                                   | |
-<span class="o">|</span> +---------+--------+ | +---------+---------+----------+--------+---------+ |
-<span class="o">|</span> | |art| 1 | |sb| 1 | | | |art| 1 | |art| 2 | |art| 3  | |sb| 1 |  |sb| 2 | |
-<span class="o">|</span> +---------+--------+ | +---------+---------+----------+--------+---------+ |
-<span class="o">|</span> | |art| 2 | |sb| 2 | | | |art| 4 | |art| 5 | |art| 6  | |sb| 1 |  |sb| 2 | |
-<span class="o">|</span> +---------+--------+ | +---------+---------+----------+--------+---------+ |
-<span class="o">|</span> | |Footer|         | | |      |Footer|                                   | |
-<span class="o">|</span> +---------+--------+ | +---------+---------+----------+--------+---------+ |
-+----------------------+-----------------------------------------------------+
++-------------------+--------------------------+-------------------------------------+
+<span class="o">|</span>     |xs|          |     |sm|                 |     |md|                            |
++-------------------+--------------------------+-------------------------------------+
+<span class="o">|</span> +-----------+     | +---------+--------+     | +---------+--------+                |
+<span class="o">|</span> | |NavbarC| |     | |     |Navbarr|    |     | | |Navbar|         |                |
+<span class="o">|</span> +-----------+     | +---------+--------+     | +---------+--------+                |
+<span class="o">|</span> | |art|     |     | | |art|            |     | | |art| 1 | |sb| 1 |                |
+<span class="o">|</span> +-----------+     | +---------+--------+     | +---------+--------+                |
+<span class="o">|</span> | |sb|      |     | | |sb| 1  | |sb| 2 |     | | |art| 2 | |sb| 2 |                |
+<span class="o">|</span> +-----------+     | +---------+--------+     | +---------+--------+                |
+<span class="o">|</span> | |Footerr| |     | | |Footer|         |     | | |Footer|         |                |
+<span class="o">|</span> +-----------+     | +---------+--------+     | +---------+--------+                |
++-------------------+------------+-------------+-------------------------------------+
+<span class="o">|</span>     |lg|                       |     |xl|                                          |
++--------------------------------+---------------------------------------------------+
+<span class="o">|</span> +---------+---------+--------+ | +---------+---------+---------+--------+--------+ |
+<span class="o">|</span> |      |Navbar|              | | |      |Navbar|                                 | |
+<span class="o">|</span> +---------+---------+--------+ | +---------+---------+---------+--------+--------+ |
+<span class="o">|</span> | |art| 1 | |art| 2 | |sb| 1 | | | |art| 1 | |art| 2 | |art| 3 | |sb| 1 | |sb| 2 | |
+<span class="o">|</span> +---------+---------+--------+ | +---------+---------+---------+--------+--------+ |
+<span class="o">|</span> | |art| 3 | |art| 4 | |sb| 2 | | | |art| 4 | |art| 5 | |art| 6 | |sb| 3 | |sb| 4 | |
+<span class="o">|</span> +---------+---------+--------+ | +---------+---------+---------+--------+--------+ |
+<span class="o">|</span> |      |Footer|              | | |      |Footer|                                 | |
+<span class="o">|</span> +---------+---------+--------+ | +---------+---------+---------+--------+--------+ |
++--------------------------------+---------------------------------------------------+
 
 <span class="p">..</span> <span class="nt">|xs|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`xs`</span> 用單欄 <span class="na">:ruby:</span><span class="nv">`流動|fluid`</span> 佈局
-<span class="p">..</span> <span class="nt">|sm|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`sm`</span> 和 <span class="na">:code:</span><span class="nv">`md`</span> 用單欄文章列表、單欄 |sidebarr| 固定佈局
-<span class="p">..</span> <span class="nt">|lg|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`lg`</span> 用雙欄文章列表、單欄 |sidebarr| 固定佈局
-<span class="p">..</span> <span class="nt">|xl|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`xl`</span> 用三欄文章列表、雙欄 |sidebarr| 固定佈局
-<span class="p">..</span> <span class="nt">|Navbar|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:ruby:</span><span class="nv">`導航欄|Navbar`</span>
+<span class="p">..</span> <span class="nt">|sm|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`sm`</span> 用上方單欄文章列表、下方雙欄 |sidebarr| 固定佈局
+<span class="p">..</span> <span class="nt">|md|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`md`</span> 用單欄文章列表、單欄 |sb| 固定佈局
+<span class="p">..</span> <span class="nt">|lg|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`lg`</span> 用雙欄文章列表、單欄 |sb| 固定佈局
+<span class="p">..</span> <span class="nt">|xl|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:code:</span><span class="nv">`xl`</span> 用三欄文章列表、雙欄 |sb| 固定佈局
+<span class="p">..</span> <span class="nt">|Navbarr|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:ruby:</span><span class="nv">`導航欄|Navbar`</span>
+<span class="p">..</span> <span class="nt">|Navbar|</span> <span class="ow">replace</span><span class="p">::</span> 導航欄
 <span class="p">..</span> <span class="nt">|NavbarC|</span> <span class="ow">replace</span><span class="p">::</span> 摺疊的導航欄
 <span class="p">..</span> <span class="nt">|Footer|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:ruby:</span><span class="nv">`底欄|footer`</span>
+<span class="p">..</span> <span class="nt">|Footerr|</span> <span class="ow">replace</span><span class="p">::</span> 底欄
 <span class="p">..</span> <span class="nt">|sidebarr|</span> <span class="ow">replace</span><span class="p">::</span> <span class="na">:ruby:</span><span class="nv">`側邊欄|sidebar`</span>
 <span class="p">..</span> <span class="nt">|sb|</span> <span class="ow">replace</span><span class="p">::</span> 側邊欄
 <span class="p">..</span> <span class="nt">|art|</span> <span class="ow">replace</span><span class="p">::</span> 文章
@@ -298,6 +301,7 @@ plugins 指向 <span class="s">`pelican-plugins </span><span class="si">&lt;http
    讓導航欄自動隱藏。
 <span class="m">#.</span> <span class="gs">**顯示源代碼按鈕**</span> ，也就是每篇文章信息欄中的 
    <span class="na">:html:</span><span class="nv">`&lt;button class=&quot;btn btn-primary&quot;&gt;&lt;i class=&quot;fa fa-code&quot;&gt;&lt;/i&gt;&lt;/button&gt;`</span> 按鈕。
+
 
 
 <span class="gh">插件: 發揮 Pelican 和 reStructuredText 的優勢 </span>
@@ -511,6 +515,15 @@ Pelican 原始的實現似乎是按照文字數抽取前半段，不總是適合
 summary 這個插件原本的實現只允許抽取一段文字，我又對它的實現做了少許擴充，允許標註多段
 文字合併起來作爲總結。
 
+
+<span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
+    
+    <span class="gs">**2015年1月29日更新：**</span>
+
+今天在 extract_toc 插件的幫助下，在側邊欄裏放了一個 Bootstrap affix 的目錄，
+它保持在頁面的右側位置不變，方便導航到文章的各個地方。具體實現方法除了 Bootstrap 3 的
+<span class="s">`Affix 文檔 </span><span class="si">&lt;http://getbootstrap.com/javascript/#affix&gt;</span><span class="s">`_</span> ，還參考了
+<span class="s">`這篇更詳細的說明 </span><span class="si">&lt;http://tutsme-webdesign.info/bootstrap-3-affix/&gt;</span><span class="s">`_</span> 。
 
 <span class="gh">結語</span>
 <span class="gh">++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
