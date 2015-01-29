@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 
         <meta name="author" content="farseerfc" />
@@ -38,7 +39,7 @@
         <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/jp/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">検索 - Farseerfcの居場所
 </div>
 
@@ -132,7 +133,7 @@ Farseerfcの居場所            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
 <section id="content">
 <div id="tipue_search_content"></div>
@@ -149,7 +150,7 @@ Farseerfcの居場所            </a>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -436,7 +437,7 @@ oldOnload();
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -540,14 +541,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

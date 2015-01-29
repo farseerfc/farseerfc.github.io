@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/zhs/discuss-cpp-template-downcast.html">
 
@@ -44,7 +45,7 @@
         <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/zhs/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">关于C++模板的类型转换的讨论 - Farseerfc的小窝</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -137,7 +138,7 @@ Farseerfc的小窝            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/zhs" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
@@ -181,10 +182,10 @@ Farseerfc的小窝            </a>
 
             <div class="entry-content jumbotron" id="article-content">
                     <div class="panel panel-default">
-                    <div class="panel-heading">
-目录                    </div>
-                    <div class="panel-boy">
-                    <html><body><div class="toc" id="">
+                        <div class="panel-heading">
+目录                        </div>
+                        <div class="panel-boy">
+                        <html><body><div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#id1" id="id4">讨论地址</a></li>
@@ -196,9 +197,9 @@ Farseerfc的小窝            </a>
 </li>
 </ul>
 </div></body></html>
+                        </div>
                     </div>
-                    </div>
-    
+ 
                 <html><body>
 <p>这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。</p>
 <div class="section" id="id1">
@@ -404,7 +405,7 @@ type</code>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                     <a href="//farseerfc.me/zhs/try-pelican.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
@@ -429,7 +430,7 @@ type</code>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'discuss-cpp-template-downcast';
-                var disqus_url = '//farseerfc.me/zhs/discuss-cpp-template-downcast.html';
+                var disqus_url = 'http://farseerfc.me/zhs/discuss-cpp-template-downcast.html';
 
             var disqus_config = function () {
 
@@ -466,7 +467,7 @@ type</code>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -862,13 +863,33 @@ oldOnload();
 </div>
     </div>
 </section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目录</h4>
+            </div>
+            <div class="panel-boy">
+            <html><body><div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id4">讨论地址</a></li>
+<li><a class="reference internal" href="#id2" id="id5">原问题</a></li>
+<li><a class="reference internal" href="#id3" id="id6">我的解答</a><ul>
+<li><a class="reference internal" href="#ff" id="id7">首先看ff的情况。</a></li>
+<li><a class="reference internal" href="#f" id="id8">再来看f的情况。</a></li>
+</ul>
+</li>
+</ul>
+</div></body></html>
+            </div>
+        </div>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -959,14 +980,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

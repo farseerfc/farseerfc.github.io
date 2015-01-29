@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html">
 
@@ -43,7 +44,7 @@
         <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/zhs/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments) - Farseerfc的小窝</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -136,7 +137,7 @@ Farseerfc的小窝            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/zhs" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
@@ -178,7 +179,7 @@ Farseerfc的小窝            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-    
+ 
                 <html><body><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
 <div class="section" id="i386c-variable-arguments">
 <h2>2.6 I386平台C函数的可变参数表(Variable Arguments)</h2>
@@ -273,7 +274,7 @@ Farseerfc的小窝            </a>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                     <a href="//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
@@ -298,7 +299,7 @@ Farseerfc的小窝            </a>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'c-tricks-2-6-i386-variable-arguments';
-                var disqus_url = '//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html';
+                var disqus_url = 'http://farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html';
 
             var disqus_config = function () {
 
@@ -335,7 +336,7 @@ Farseerfc的小窝            </a>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -731,13 +732,14 @@ oldOnload();
 </div>
     </div>
 </section>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -828,14 +830,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

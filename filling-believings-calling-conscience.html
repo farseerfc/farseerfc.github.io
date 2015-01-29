@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/filling-believings-calling-conscience.html">
 
@@ -41,7 +42,7 @@
         <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">填補信仰、喚醒良知 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -134,7 +135,7 @@ Farseerfc的小窩            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
@@ -173,7 +174,7 @@ Farseerfc的小窩            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-    
+ 
                 <html><body><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
 <p>填補信仰、喚醒良知</p>
 <p>我們聽盡了呼籲與號召，對於良知，我不必譴責喪失它的國人，不必盛讚良知的美好。我只想討論，喪失了良知的原因——空缺的信仰。</p>
@@ -201,7 +202,7 @@ Farseerfc的小窩            </a>
  
 
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                 </div>
                 <div class="col-xs-6">
@@ -221,7 +222,7 @@ Farseerfc的小窩            </a>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'filling-believings-calling-conscience';
-                var disqus_url = '//farseerfc.me/filling-believings-calling-conscience.html';
+                var disqus_url = 'http://farseerfc.me/filling-believings-calling-conscience.html';
 
             var disqus_config = function () {
 
@@ -258,7 +259,7 @@ Farseerfc的小窩            </a>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -654,13 +655,14 @@ oldOnload();
 </div>
     </div>
 </section>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -751,14 +753,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

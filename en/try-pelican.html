@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/en/try-pelican.html">
 
@@ -44,7 +45,7 @@
         <link href="//farseerfc.me/en/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/en/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">Give a try to Pelican - Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -137,7 +138,7 @@ Farseerfc's Blog            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/en" title="Farseerfc's Blog"><i class="fa fa-home fa-lg"></i></a></li>
@@ -180,7 +181,7 @@ Farseerfc's Blog            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-    
+ 
                 <html><body><p>It seems in one night
 <a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/">all</a>
 <a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/">geeks</a>
@@ -319,7 +320,7 @@ This is part 1 of the "pelican" series:                </h4>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                     <a href="//farseerfc.me/en/if-we-do-this-work.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
@@ -344,7 +345,7 @@ This is part 1 of the "pelican" series:                </h4>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'try-pelican';
-                var disqus_url = '//farseerfc.me/en/try-pelican.html';
+                var disqus_url = 'http://farseerfc.me/en/try-pelican.html';
 
             var disqus_config = function () {
 
@@ -381,7 +382,7 @@ This is part 1 of the "pelican" series:                </h4>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -682,13 +683,14 @@ oldOnload();
 </div>
     </div>
 </section>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -779,14 +781,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

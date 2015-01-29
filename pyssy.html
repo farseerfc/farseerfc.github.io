@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/pyssy.html">
 
@@ -45,7 +46,7 @@
         <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">Pyssy 項目 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -138,7 +139,7 @@ Farseerfc的小窩            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
@@ -182,7 +183,7 @@ Farseerfc的小窩            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-    
+ 
                 <html><body><div class="section" id="id1">
 <h2>簡介</h2>
 <p>Pyssy 是用於 <a class="reference external" href="https://bbs.sjtu.edu.cn">上海交通大學 飲水思源站</a> 的一系列 Python 腳本和工具。</p>
@@ -214,7 +215,7 @@ Farseerfc的小窩            </a>
  
 
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                     <a href="//farseerfc.me/mix-ruby.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
@@ -239,7 +240,7 @@ Farseerfc的小窩            </a>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'pyssy';
-                var disqus_url = '//farseerfc.me/pyssy.html';
+                var disqus_url = 'http://farseerfc.me/pyssy.html';
 
             var disqus_config = function () {
 
@@ -276,7 +277,7 @@ Farseerfc的小窩            </a>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -672,13 +673,14 @@ oldOnload();
 </div>
     </div>
 </section>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -769,14 +771,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 

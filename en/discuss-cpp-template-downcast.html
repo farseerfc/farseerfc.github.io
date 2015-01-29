@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
+    <meta name="theme-color" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/en/discuss-cpp-template-downcast.html">
 
@@ -44,7 +45,7 @@
         <link href="//farseerfc.me/en/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/en/../theme/css/ripples.min.css" rel="stylesheet">
 </head>
-<body>
+<body data-spy="scroll" data-target="#affix-toc">
 <div style="display:none" id="title">Discuss C++ Template Downcast - Farseerfc's Blog</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -137,7 +138,7 @@ Farseerfc's Blog            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9 col-sm-8">
+        <div class="col-xl-9 col-lg-10 col-md-9">
             <div id="loading-block">
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/en" title="Farseerfc's Blog"><i class="fa fa-home fa-lg"></i></a></li>
@@ -181,10 +182,10 @@ Farseerfc's Blog            </a>
 
             <div class="entry-content jumbotron" id="article-content">
                     <div class="panel panel-default">
-                    <div class="panel-heading">
-Table of Contents                    </div>
-                    <div class="panel-boy">
-                    <html><body><div class="toc" id="">
+                        <div class="panel-heading">
+Table of Contents                        </div>
+                        <div class="panel-boy">
+                        <html><body><div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#original-discuss" id="id1">Original Discuss</a></li>
@@ -196,9 +197,9 @@ Table of Contents                    </div>
 </li>
 </ul>
 </div></body></html>
+                        </div>
                     </div>
-                    </div>
-    
+ 
                 <html><body>
 <p>This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.</p>
 <div class="section" id="original-discuss">
@@ -400,7 +401,7 @@ This is part 1 of the "YSSY_C" series:                </h4>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="prevnext">
                 <div class="col-xs-6">
                     <a href="//farseerfc.me/en/try-pelican.html" class="btn btn-default btn-lg" style="float:right;clear:both">
                         <h4><i class="fa fa-arrow-left"></i>
@@ -425,7 +426,7 @@ This is part 1 of the "YSSY_C" series:                </h4>
             var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'discuss-cpp-template-downcast';
-                var disqus_url = '//farseerfc.me/en/discuss-cpp-template-downcast.html';
+                var disqus_url = 'http://farseerfc.me/en/discuss-cpp-template-downcast.html';
 
             var disqus_config = function () {
 
@@ -462,7 +463,7 @@ This is part 1 of the "YSSY_C" series:                </h4>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3 col-sm-4" id="sidebar">
+        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
             <aside>
 
 <section>
@@ -763,13 +764,33 @@ oldOnload();
 </div>
     </div>
 </section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+Table of Contents</h4>
+            </div>
+            <div class="panel-boy">
+            <html><body><div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#original-discuss" id="id1">Original Discuss</a></li>
+<li><a class="reference internal" href="#the-problem" id="id2">The problem</a></li>
+<li><a class="reference internal" href="#my-answer-to-the-problem" id="id3">My answer to the problem</a><ul>
+<li><a class="reference internal" href="#first-we-discuss-ff" id="id4">First we discuss ff</a></li>
+<li><a class="reference internal" href="#then-we-discuss-f" id="id5">Then we discuss f</a></li>
+</ul>
+</li>
+</ul>
+</div></body></html>
+            </div>
+        </div>
+  
             </aside>
         </div>
     </div>
 </div>
 
 
-<footer>
+<footer id="fcfooter">
    <div class="container">
       <hr>
       <div class="row">
@@ -860,14 +881,20 @@ oldOnload();
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
-        // $('#sidebar_toc').affix({
-        //   offset: {
-        //     top: 100,
-        //     bottom: function () {
-        //       return (this.bottom = $('#article-content').outerHeight(true))
-        //     }
-        //   }
-        // })
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $('#comments').outerHeight()+
+                    $('#fcfooter').outerHeight()+
+                    $('#prevnext').outerHeight()+75;
+            }
+          }
+        });
     });
 </script>
 
