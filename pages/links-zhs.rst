@@ -10,6 +10,8 @@ Links
 友情链接
 -----------------------------------------------------------------------
 
+以下列出我在网上认识的好 :ruby:`朋友|jī yǒu` 们，排名不分先后。欢迎申请友链。
+
 .. friend:: 
 	:nick: `lilydjwg 依云 百合仙子 <http://lilydjwg.is-programmer.com/>`_
 	:gravatar: lilydjwg@gmail.com
@@ -52,3 +54,9 @@ Links
 	:gravatar: acgtyrant@gmail.com
 
 	御宅暴君，维护着他个人的和Arch的两个博客。
+
+.. friend:: 
+	:nick: `przhu <https://przhu.github.io/>`_
+	:logo: https://avatars3.githubusercontent.com/u/1693228
+
+	OS X 骨灰用户，Haskell大牛，好像什么都知道。
