@@ -1,5 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-01-26T23:32:00+09:00</updated><entry><title>换到 farseerfc.me 域名</title><link href="//farseerfc.me/zhs/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:zhs/switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;上个月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上买了个自己的域名 &lt;code class="code"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-13T20:39:00+09:00</updated><entry><title>archlinux 上用 chrome 实现 透明计算 远程登录</title><link href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html" rel="alternate"></link><updated>2015-02-13T20:39:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-13:zhs/arch-chrome-remote-desktop.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm"&gt;透明计算&lt;/a&gt;
+具体是什么，因为他们没有公开技术细节所以我并不知道，只是看
+&lt;a class="reference external" href="http://v.qq.com/page/h/v/q/h0145ebh1vq.html"&gt;公开出来的演示视频&lt;/a&gt;
+，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
+如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。&lt;/p&gt;
+&lt;p&gt;Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在于，需要
+通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。&lt;/p&gt;
+&lt;p&gt;于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
+上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
+方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录，
+位于远端的登录的计算机必须一直开着 Chrome 。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Chrome Remote Desktop 插件&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-plugin.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="chrome-remote-desktop"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Chrome Remote Desktop 的客户端&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;虽然可能有很多人不知道，不过 Chrome 内包括远程桌面的功能很久了。只是这个功能的界面默认
+没有提供界面，要使用它需要安装 Google 官方出品的
+&lt;a class="reference external" href="https://chrome.google.com/webstore/detail/chrome-remote-desktop/gbchcmhmhahfdphkhkmpfmihenigjmpp"&gt;remote-desktop 插件&lt;/a&gt; 。
+装好之后远程桌面的客户端就准备好，可以用来远程访问别的计算机桌面了（无论是 Windows/OS X
+还是 Linux 都支持）。并且不光可以自己远程访问自己账户的桌面，还可以远程协助朋友的桌面。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="archlinux"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Archlinux 上设置远程登录的服务器&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;有了客户端之后还要设置一下才能让桌面作为远程登录的服务器。Windows 和 OS X 上 Chrome
+会自动下载需要的安装包，无脑下一步就能装好了。Linux上由于发行版众多，桌面配置各异，
+所以需要一点手动配置。官方的设置步骤记载在 &lt;a class="reference external" href="https://support.google.com/chrome/answer/1649523"&gt;这里&lt;/a&gt;
+其中给出了 debian 用的二进制包和 Ubuntu 12.10 上的设置方式，以下设置是参考官方步骤。&lt;/p&gt;
+&lt;p&gt;首先要安装 chrome-remote-desktop 这个包，这个包实际上对应了 Windows/OS X 上用安装程序
+安装的 Remote Desktop Host Controller。 archlinux 上开启了
+&lt;a class="reference external" href="https://github.com/archlinuxcn/repo"&gt;[archlinuxcn]&lt;/a&gt;
+仓库的话，可以直接安装打好的包。或者可以从
+&lt;a class="reference external" href="https://aur.archlinux.org/packages/chrome-remote-desktop/"&gt;AUR&lt;/a&gt; 装。&lt;/p&gt;
+&lt;pre&gt;$ pacman -Ss chrome-remote-desktop&lt;br/&gt;&lt;span style="color:purple;font-weight:bold;"&gt;archlinuxcn/&lt;/span&gt;&lt;span style="font-weight:bold;"&gt;chrome-remote-desktop &lt;/span&gt;&lt;span style="color:green;font-weight:bold;"&gt;40.0.2214.44-1&lt;/span&gt;&lt;br/&gt;Allows you to securely access your computer over the Internet through Chrome.&lt;/pre&gt;&lt;p&gt;装好之后从会说这么一段话：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;groupadd：无效的组 ID “chrome-remote-desktop”&lt;/p&gt;
+&lt;p&gt;Please create ~/.config/chrome-remote-desktop folder manually, if it doesn't exist, or else you can't use CRD.
+The needed files are created by the Chrome app, inside the chrome-remote-desktop folder, after Enabling Remote Connections.
+To {enable,start} the service use systemctl --user {enable,start} chrome-remote-desktop&lt;/p&gt;
+&lt;p&gt;You may need to create a ~/.chrome-remote-desktop-session file with commands to start your session&lt;/p&gt;
+&lt;p&gt;Go to &lt;a class="reference external" href="https://support.google.com/chrome/answer/1649523"&gt;https://support.google.com/chrome/answer/1649523&lt;/a&gt; for more information.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;那句报错是 AUR 里打的包还没跟上上游 Google 的更改导致的错误，
+首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
+新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;/opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后我们需要手动创建 &lt;code class="code"&gt;
+~/.config/chrome-remote-desktop&lt;/code&gt;
+ 这个文件夹，内容是空的
+就好了，随后 chrome 会往这里面放 &lt;code class="code"&gt;
+host#.json&lt;/code&gt;
+ 文件用于身份验证。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir ~/.config/chrome-remote-desktop
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后我们要创建一个 shell 脚本 &lt;code class="code"&gt;
+~/.chrome-remote-desktop-session&lt;/code&gt;
+ ，这是远程
+登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
+这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat ~/.chrome-remote-desktop-session
+&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+startxfce4
+&lt;span class="nv"&gt;$ &lt;/span&gt;chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
+应该可以看到一个「启用远程链接」的按钮。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-enable-button.png"/&gt;
+&lt;p class="caption"&gt;Chrome Remote Desktop 插件中「启用远程链接」的按钮&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="alert alert-warning compound"&gt;
+&lt;p&gt;在撰写本文的时候， Archlinux 官方源里的 chromium 的版本和 aur/google-chrome
+的版本尚且还是 40.0.2214.111 ，而 Chrome Web Store 中提供的 Chrome Remote
+Desktop 的插件的版本是 41.0.2272.41 。虽然通常并不要求两者版本一致，不过貌似最近
+Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你找不到
+「启用远程链接」的按钮，请尝试一下新版本的 Chrome 比如 google-chrome-dev 。
+在这一步启用之后，老版本的 chrome 应该也就能使用远程桌面了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="alert alert-warning compound"&gt;
+&lt;p&gt;在32位的 Linux 版本上，最近更新的 Chrome Remote Desktop 插件可能无法正确识别 Host
+的版本，具体 &lt;a class="alert-link reference external" href="https://code.google.com/p/chromium/issues/detail?id=332930"&gt;参考这个 bug&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-after-enabled.png"/&gt;
+&lt;p class="caption"&gt;启用远程链接之后的样子&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
+你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。同时，启用了
+远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop 文件夹中找到记录了验证
+信息的文件。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ls .config/chrome-remote-desktop
+chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 &lt;code class="code"&gt;
+systemctl --user enable&lt;/code&gt;
+ ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;systemctl --user start chrome-remote-desktop.service
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
+刚刚指定的桌面环境：&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-htop.png"/&gt;
+&lt;p class="caption"&gt;htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-xfce4.png"/&gt;
+&lt;p class="caption"&gt;「远程」登录到新的 XFCE4&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linux-chrome-windows-os-x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;通过上面的设置步骤也可以看出，Linux版本的远程桌面会在后台开一个独立的 X 会话，而不能
+复用现在已有的 X 会话。对远程登录的用法而言这还能接受，对远程协助的功能而言有点问题，
+因为正在使用的人不能观察协助者做了什么，协助者也不能继续请求协助的人的操作。&lt;/p&gt;
+&lt;p&gt;当然目前 Chrome 远程桌面的 Linux Host Controller 还只是 beta 版本，官方只测试支持
+Ubuntu 12.04 和 12.10 （14.04之后似乎有渲染Bug），所以不能要求太多。希望以后能改善吧。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bonus"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Bonus： 手机远程登录&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+手机上的 Chrome 远程桌面 App&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
+因为 Chrome 在三大桌面系统 Windows / OS X / Linux 上都有，所以应该能覆盖大多数桌面
+系统了。&lt;/p&gt;
+&lt;p&gt;除了桌面的 Chrome 之外还有一个客户端是 Android 上的
+&lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop"&gt;Chrome 远程桌面 App&lt;/a&gt; 经过上面的设置之后，从这个 App 也能看到并登录：&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="手机远程登录" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android-logined.png"/&gt;
+&lt;p class="caption"&gt;手机远程登录&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;好啦，开始享受国家自然科学一等奖的透明计算技术吧！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;</summary><category term="linux"></category><category term="archlinux"></category><category term="arch"></category><category term="chrome"></category><category term="remote"></category><category term="desktop"></category></entry><entry><title>换到 farseerfc.me 域名</title><link href="//farseerfc.me/zhs/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:zhs/switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;上个月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上买了个自己的域名 &lt;code class="code"&gt;
 farseerfc.me&lt;/code&gt;
  准备用在这个
 博客上，当时试着转到过这个域名，发现 &lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -250,7 +395,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="1" class=" table-striped docutils table-hover table"&gt;
+&lt;table border="1" class="table-hover table-striped docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="23%"&gt;&lt;/col&gt;
 &lt;col width="15%"&gt;&lt;/col&gt;
@@ -268,7 +413,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover first docutils last table-striped table"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"&gt;&lt;/col&gt;
 &lt;/colgroup&gt;
@@ -284,7 +429,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover first docutils last table-striped table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"&gt;&lt;/col&gt;
 &lt;col width="47%"&gt;&lt;/col&gt;
@@ -302,7 +447,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;td&gt;&lt;table border="1" class="table-hover first docutils last table-striped table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"&gt;&lt;/col&gt;
 &lt;col width="47%"&gt;&lt;/col&gt;
@@ -329,7 +474,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover first docutils last table-striped table"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"&gt;&lt;/col&gt;
 &lt;col width="35%"&gt;&lt;/col&gt;
@@ -351,7 +496,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover first docutils last table-striped table"&gt;
 &lt;colgroup&gt;
 &lt;col width="21%"&gt;&lt;/col&gt;
 &lt;col width="21%"&gt;&lt;/col&gt;
@@ -584,7 +729,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/973a8424.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;plantuml 是绘制UML的，除此之外还有一个类似的工具是绘制一般的 &lt;ruby&gt;&lt;rb&gt;流程图&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -772,7 +917,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table class="footnote docutils table-hover table-striped table" frame="void" id="id37" rules="none"&gt;
+&lt;table class="footnote table-hover table-striped docutils table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -1152,7 +1297,7 @@ TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="sae" rules="none"&gt;
+&lt;table class="footnote table-hover  table-striped docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -1438,13 +1583,13 @@ type&lt;/code&gt;
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id10" rules="none"&gt;
+&lt;table class="footnote table-hover  table-striped docutils table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id11" rules="none"&gt;
+&lt;table class="footnote table-hover  table-striped docutils table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
