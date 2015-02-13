@@ -167,7 +167,9 @@ Linux 版本的 Chrome遠程桌面 和 Windows/ OS X 上的區別
 因爲正在使用的人不能觀察協助者做了什麼，協助者也不能繼續請求協助的人的操作。
 
 當然目前 Chrome 遠程桌面的 Linux Host Controller 還只是 beta 版本，官方只測試支持 
-Ubuntu 12.04 和 12.10 （14.04之後似乎有渲染Bug），所以不能要求太多。希望以後能改善吧。
+Ubuntu 12.04 和 12.10 （14.04之後似乎有 
+`Bug <https://code.google.com/p/chromium/issues/detail?id=366432>`_
+），所以不能要求太多。希望以後能改善吧。
 
 
 Bonus： 手機遠程登錄
