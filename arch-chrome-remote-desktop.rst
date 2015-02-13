@@ -119,15 +119,17 @@ Archlinux 上設置遠程登錄的服務器
 	的版本，具體 `參考這個 bug <https://code.google.com/p/chromium/issues/detail?id=332930>`_ 。
 
 
+點擊「啓用遠程鏈接」，設定一個 PIN 密碼（不需要很複雜，這裏首先有 Google 帳號驗證保證只有
+你纔能訪問），然後就能看到這套電腦的 hostname 出現在「我的電腦」列表裏。
+
 .. figure:: {filename}/images/chrome-remote-desktop-after-enabled.png
   :alt: 啓用遠程鏈接之後的樣子
 
   啓用遠程鏈接之後的樣子
 
-點擊「啓用遠程鏈接」，設定一個 PIN 密碼（不需要很複雜，這裏首先有 Google 帳號驗證保證只有
-你纔能訪問），然後就能看到這套電腦的 hostname 出現在「我的電腦」列表裏。同時，啓用了
-遠程鏈接之後，可以在剛剛創建的 ~/.config/chrome-remote-desktop 文件夾中找到記錄了驗證
-信息的文件。
+
+同時，啓用了遠程鏈接之後，可以在剛剛創建的 ~/.config/chrome-remote-desktop 
+文件夾中找到記錄了驗證信息的文件。
 
 .. code-block:: bash
 

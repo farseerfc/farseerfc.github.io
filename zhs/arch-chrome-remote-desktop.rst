@@ -119,15 +119,17 @@ Archlinux 上设置远程登录的服务器
 	的版本，具体 `参考这个 bug <https://code.google.com/p/chromium/issues/detail?id=332930>`_ 。
 
 
+点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
+你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。
+
 .. figure:: {filename}/images/chrome-remote-desktop-after-enabled.png
   :alt: 启用远程链接之后的样子
 
   启用远程链接之后的样子
 
-点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
-你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。同时，启用了
-远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop 文件夹中找到记录了验证
-信息的文件。
+
+同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop 
+文件夹中找到记录了验证信息的文件。
 
 .. code-block:: bash
 
