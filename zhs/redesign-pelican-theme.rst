@@ -14,7 +14,7 @@
 
 .. label-warning::
     
-    **2015年2月3日更新**
+    **2015年2月14日更新**
 
 .. PELICAN_END_SUMMARY
 
@@ -577,6 +577,14 @@ twitter_bootstrap_rst_directives 这个插件则是增加了几个 reStructuredT
 今天又在 twitter_bootstrap_rst_directives 里增加了两个 :ruby:`行内角色|role` 。
 一个是 :code:`:twi:` 用来写 twitter 用户的链接，比如 :twi:`farseerfc` ，另一个是
 :code:`:irc:` 用来指向 freenode 的 channel ，比如 :irc:`yssyd3` 。
+
+.. label-warning::
+    
+    **2015年2月14日更新**
+
+今天增加了 :code:`.. friend::` 用来写好友链接，以及 :code:`fref` 用来引用好友，
+比如 :fref:`LQYMGT` 这样。
+
 
 extract_toc 和 summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
