@@ -50,7 +50,7 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 &lt;p&gt;那句報錯是 AUR 裏打的包還沒跟上上游 Google 的更改導致的錯誤，
 首先我們需要把遠程登錄的用戶添加入 chrome-remote-desktop 這個用戶組裏。
 新版本的 chrome remote desktop 提供了一個命令做這個事情，所以執行以下命令就可以了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;/opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後我們需要手動創建 &lt;code class="code"&gt;
 ~/.config/chrome-remote-desktop&lt;/code&gt;
@@ -58,17 +58,17 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 就好了，隨後 chrome 會往這裏面放 &lt;code class="code"&gt;
 host#.json&lt;/code&gt;
  文件用於身份驗證。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後我們要創建一個 shell 腳本 &lt;code class="code"&gt;
 ~/.chrome-remote-desktop-session&lt;/code&gt;
  ，這是遠程
 登錄時的 .xinitrc ，內容麼就是啓動你想在遠程登錄時用的桌面環境。
 這裏可以指定一個和你正在登錄的 WM/DE 不同的桌面，比如我啓動 xfce4：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat ~/.chrome-remote-desktop-session&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;startxfce4&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt;#&lt;/span&gt;!/bin/bash&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;startxfce4&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;接下來需要從 Chrome 的插件裏啓用遠程桌面。打開 Chrome 的 Remote Desktop 插件，這時
 應該可以看到一個「啓用遠程鏈接」的按鈕。&lt;/p&gt;
@@ -96,13 +96,13 @@ Chrome 內部的 Remoting 功能更改了 API 導致可能出問題。如果你�
 &lt;/div&gt;
 &lt;p&gt;同時，啓用了遠程鏈接之後，可以在剛剛創建的 ~/.config/chrome-remote-desktop
 文件夾中找到記錄了驗證信息的文件。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;ls .config/chrome-remote-desktop&lt;/span&gt;
-&lt;span class="code-line"&gt;chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後就可以啓動對應的 systemd 用戶服務了，如果想自動啓動服務要記得 &lt;code class="code"&gt;
 systemctl --user enable&lt;/code&gt;
  ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;如果上面的設置一切正常，就可以看到 chrome-remote-desktop 啓動了另外一個 Xorg 執行你
 剛剛指定的桌面環境：&lt;/p&gt;
@@ -934,7 +934,7 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;/body&gt;&lt;/html&gt;&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';

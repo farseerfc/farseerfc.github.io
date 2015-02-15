@@ -73,27 +73,27 @@ Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX�
 首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
 新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：
 
-<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-	<span class="nv">$ </span>/opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user
+	<span class="gp">$</span> /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user
 
 然后我们需要手动创建 <span class="na">:code:</span><span class="nv">`~/.config/chrome-remote-desktop`</span> 这个文件夹，内容是空的
 就好了，随后 chrome 会往这里面放 <span class="na">:code:</span><span class="nv">`host#.json`</span> 文件用于身份验证。
 
-<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-	<span class="nv">$ </span>mkdir ~/.config/chrome-remote-desktop
+	<span class="gp">$</span> mkdir ~/.config/chrome-remote-desktop
 
 然后我们要创建一个 shell 脚本 <span class="na">:code:</span><span class="nv">`~/.chrome-remote-desktop-session`</span> ，这是远程
 登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
 这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：
 
-<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-	<span class="nv">$ </span>cat ~/.chrome-remote-desktop-session
-	<span class="c">#!/bin/bash</span>
-	startxfce4
-	<span class="nv">$ </span>chmod <span class="m">755</span> .chrome-remote-desktop-session
+	<span class="gp">$</span> cat ~/.chrome-remote-desktop-session
+	<span class="gp">#</span>!/bin/bash
+	<span class="go">startxfce4</span>
+	<span class="gp">$</span> chmod <span class="m">755</span> .chrome-remote-desktop-session
 
 
 接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
@@ -131,16 +131,16 @@ Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX�
 同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop 
 文件夹中找到记录了验证信息的文件。
 
-<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-	<span class="nv">$ </span>ls .config/chrome-remote-desktop 
-	chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6
+	<span class="gp">$</span> ls .config/chrome-remote-desktop 
+	<span class="go">chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6</span>
 
 然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 <span class="na">:code:</span><span class="nv">`systemctl --user enable`</span> ：
 
-<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-	<span class="nv">$ </span>systemctl --user start chrome-remote-desktop.service
+	<span class="gp">$</span> systemctl --user start chrome-remote-desktop.service
 
 如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：
