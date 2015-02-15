@@ -229,55 +229,55 @@ From now on you should be able to write Ruby code within a regular Python module
 <p>最初に、これはもう一つのPyPyで実現したRubyだと思った。少なくとも、本当のRubyをPythonから呼び出すの何かの魔法も可能かもしれない。</p>
 <div class="section" id="ruby-py">
 <h2>それのソースコートはこうなっています。 ruby.py</h2>
-<div class="highlight"><pre><span class="c"># -*- coding: utf-8 -*-</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s">"""</span>
-
-<span class="s">                              `.-:/+ossyhhddmmmmNNNNNNNmmmmmdddddhhhyyyyhhhyo:`</span>
-<span class="s">                       .:+sydNNNmmdhhysso++/+++++++////::::::-.```......--/oymms.</span>
-<span class="s">                  `:ohmdys+//::/::--::::////:-.```......`````.://:-`         `/dNs.</span>
-<span class="s">               .+hNds:`-:-:///::------::///++///:--....--::///::-`.///.        `oMm/</span>
-<span class="s">             /hNmo.`   ``    `....```````````      ...------:::-:/+/-.:/:`       /NMs</span>
-<span class="s">            oMd/`      `::::--.---://+`           //`     `````-:::::+/-`::.`     :NM+</span>
-<span class="s">            yN`       -+.`         `/`           o.               ``::.-:. ``      :NN:</span>
-<span class="s">           :Nm        -             ./           :    `.-://///:-.   `-` ``         :NN-</span>
-<span class="s">          /NM/           .-:::-.`   `/            `:sdmdhyMMMMMMNNmy/`               :mNo`</span>
-<span class="s">        :hMd:          /dmddddNNmdy+-.          `smmy/-```hMMMMMMMhydm/ `-.``     `...:mMm+.</span>
-<span class="s">      -hNd/-/o/-..-::`.ydmmmmNMMMMMMNh:/+-      dMN-`-+hmmmmdhhhhdddmMN-`-/o:    .-::::/oydms-</span>
-<span class="s">     oNMo:+/::.         ``...--:/+ohNMNhs-      :hNmmdyo:..``yo-```.--. `-`-+shdddhs+-` `.//yms.</span>
-<span class="s">    .MMo:/`o:.:+sso+:-`             sM+           ./-`       /mNh+-....-/ymNNdo::--/shd+`  -`:mm:</span>
-<span class="s">    /MM-o ./ ohhsooohNmy::sh.      `yM/                       `:oyyyyyyhys+:.` hy    `/Nh`  : -NN.</span>
-<span class="s">    -MM// -: ``   y: odddhh+     -omNh-          `--.` ``          ````    .:ohMMs.    +Ms  /  yMo</span>
-<span class="s">     hMoo .+.    :Mh  ````    `/hNd/.`           ohdddy::...`..`      `-/sdmdyo+NMNh+- :Mh  /  sMs</span>
-<span class="s">     .mmh:..:.  :NMm       `-/dMNM+         ./+++/:`.hM:`.````.` `-/shmNmh+-`  /Mmooso.hM/ .: `mM/</span>
-<span class="s">      .mNs://: .NMNMs-   -:-.`/+-sms.   `  `shyyyhy`sNd`   `.:+sdmmmdMM-.    .oNM+    :m/ `s``yMh</span>
-<span class="s">       -mMo  . sMNdMNNh+-.        .ydyoyy`        ``+o::+shdddhs+:-.:MM.`.-+hNMMh-    `.`-/::dNs`</span>
-<span class="s">        -NM-   mMMMh:MMdNmhs+:-..```-ohs-`...-:/+syhddmMMs:-.`    `/mMMdmmddNMm+`      ..-/hNh-</span>
-<span class="s">         sMy   NMMM`:Mh`-/mMmmmdddddddddhhhdNNdhyo+:--.yMs  `..:+ymMMMMd+--yNh.        `+hNh:</span>
-<span class="s">         -Mm   NMMM/yMh  -NM-`..--:NMo:--.`+My         :MNoydmNMMNmhdMh` -dNs`        `yMd:</span>
-<span class="s">         `MN   mMMMMMMMyshMN+:---.-MN-.....+My...-:/oyhdMMMMNmdy+-` +Mh:sNm/          yMy`</span>
-<span class="s">          MN   yMMMMMMMMMMMMMMMMMNMMMMNNNNNMMMNNNMMMMMNmhMM/-.      `yMMNs.          /My</span>
-<span class="s">         `MN   :MMmMMMMMMMMMMMMMMMMMMMMMMMMMMMMNmmdy+:-``NM-      ./hNNy-           /Nd`</span>
-<span class="s">         -Mh    dMydMmsNMNdNNMMmmmNMMMdddhys+yMo``       /Nm:  `:yNNdo.           .sNd.</span>
-<span class="s">         +Ms    .mMsMN::NN:.:MN: `.+NM.      +Mo          +Mm+ymNdo-            .omm+`</span>
-<span class="s">         yM:     .hNMd+:sMN. oMm.   oMo      +Mh   ```.:+shMNmy+-``.-:-..-//-`:yNmo`</span>
-<span class="s">         mM.       :ohmNNMMdhyMMdo//+Mm//////sMNhyhhdmNNmhs/-``./+/:--+so/-:smNy/`</span>
-<span class="s">        .Mm        ``  .-:/+osyyhhddddddddddhhyysoo+/:-.  `./+//--+oo/--+ymmy/.</span>
-<span class="s">        :Mh   .:   `+:`        `.------------`      ```-////:/++/:../ydNdo:`</span>
-<span class="s">        +Ms   `/`    :+o+:-```              ``..-::///++///:-.`-+ydNdo:`</span>
-<span class="s">        oMs     :/:.``  `..---.``` ````````..-:/:::---.`  `-ohmmh+:`</span>
-<span class="s">        /Mh       .://///:::-----.-----.......`       `-+hmmy+-</span>
-<span class="s">         sMy`                                ``````-+ydmy+-</span>
-<span class="s">          /mNs-`                        `./ohmNMNNNmy+-</span>
-<span class="s">            /yNmho/:.``````````.-:/+syhdNmdyso+/-.`</span>
-<span class="s">              `:+ydmNMNNNNNNNNNmdhys+/:.`</span>
-<span class="s">                     ``.....`</span>
-
-<span class="s">    LOL U MAD?</span>
-<span class="s">"""</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight"><pre><span class="code-line"><span class="c"># -*- coding: utf-8 -*-</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">print</span><span class="p">(</span><span class="s">"""</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="s">                              `.-:/+ossyhhddmmmmNNNNNNNmmmmmdddddhhhyyyyhhhyo:`</span></span>
+<span class="code-line"><span class="s">                       .:+sydNNNmmdhhysso++/+++++++////::::::-.```......--/oymms.</span></span>
+<span class="code-line"><span class="s">                  `:ohmdys+//::/::--::::////:-.```......`````.://:-`         `/dNs.</span></span>
+<span class="code-line"><span class="s">               .+hNds:`-:-:///::------::///++///:--....--::///::-`.///.        `oMm/</span></span>
+<span class="code-line"><span class="s">             /hNmo.`   ``    `....```````````      ...------:::-:/+/-.:/:`       /NMs</span></span>
+<span class="code-line"><span class="s">            oMd/`      `::::--.---://+`           //`     `````-:::::+/-`::.`     :NM+</span></span>
+<span class="code-line"><span class="s">            yN`       -+.`         `/`           o.               ``::.-:. ``      :NN:</span></span>
+<span class="code-line"><span class="s">           :Nm        -             ./           :    `.-://///:-.   `-` ``         :NN-</span></span>
+<span class="code-line"><span class="s">          /NM/           .-:::-.`   `/            `:sdmdhyMMMMMMNNmy/`               :mNo`</span></span>
+<span class="code-line"><span class="s">        :hMd:          /dmddddNNmdy+-.          `smmy/-```hMMMMMMMhydm/ `-.``     `...:mMm+.</span></span>
+<span class="code-line"><span class="s">      -hNd/-/o/-..-::`.ydmmmmNMMMMMMNh:/+-      dMN-`-+hmmmmdhhhhdddmMN-`-/o:    .-::::/oydms-</span></span>
+<span class="code-line"><span class="s">     oNMo:+/::.         ``...--:/+ohNMNhs-      :hNmmdyo:..``yo-```.--. `-`-+shdddhs+-` `.//yms.</span></span>
+<span class="code-line"><span class="s">    .MMo:/`o:.:+sso+:-`             sM+           ./-`       /mNh+-....-/ymNNdo::--/shd+`  -`:mm:</span></span>
+<span class="code-line"><span class="s">    /MM-o ./ ohhsooohNmy::sh.      `yM/                       `:oyyyyyyhys+:.` hy    `/Nh`  : -NN.</span></span>
+<span class="code-line"><span class="s">    -MM// -: ``   y: odddhh+     -omNh-          `--.` ``          ````    .:ohMMs.    +Ms  /  yMo</span></span>
+<span class="code-line"><span class="s">     hMoo .+.    :Mh  ````    `/hNd/.`           ohdddy::...`..`      `-/sdmdyo+NMNh+- :Mh  /  sMs</span></span>
+<span class="code-line"><span class="s">     .mmh:..:.  :NMm       `-/dMNM+         ./+++/:`.hM:`.````.` `-/shmNmh+-`  /Mmooso.hM/ .: `mM/</span></span>
+<span class="code-line"><span class="s">      .mNs://: .NMNMs-   -:-.`/+-sms.   `  `shyyyhy`sNd`   `.:+sdmmmdMM-.    .oNM+    :m/ `s``yMh</span></span>
+<span class="code-line"><span class="s">       -mMo  . sMNdMNNh+-.        .ydyoyy`        ``+o::+shdddhs+:-.:MM.`.-+hNMMh-    `.`-/::dNs`</span></span>
+<span class="code-line"><span class="s">        -NM-   mMMMh:MMdNmhs+:-..```-ohs-`...-:/+syhddmMMs:-.`    `/mMMdmmddNMm+`      ..-/hNh-</span></span>
+<span class="code-line"><span class="s">         sMy   NMMM`:Mh`-/mMmmmdddddddddhhhdNNdhyo+:--.yMs  `..:+ymMMMMd+--yNh.        `+hNh:</span></span>
+<span class="code-line"><span class="s">         -Mm   NMMM/yMh  -NM-`..--:NMo:--.`+My         :MNoydmNMMNmhdMh` -dNs`        `yMd:</span></span>
+<span class="code-line"><span class="s">         `MN   mMMMMMMMyshMN+:---.-MN-.....+My...-:/oyhdMMMMNmdy+-` +Mh:sNm/          yMy`</span></span>
+<span class="code-line"><span class="s">          MN   yMMMMMMMMMMMMMMMMMNMMMMNNNNNMMMNNNMMMMMNmhMM/-.      `yMMNs.          /My</span></span>
+<span class="code-line"><span class="s">         `MN   :MMmMMMMMMMMMMMMMMMMMMMMMMMMMMMMNmmdy+:-``NM-      ./hNNy-           /Nd`</span></span>
+<span class="code-line"><span class="s">         -Mh    dMydMmsNMNdNNMMmmmNMMMdddhys+yMo``       /Nm:  `:yNNdo.           .sNd.</span></span>
+<span class="code-line"><span class="s">         +Ms    .mMsMN::NN:.:MN: `.+NM.      +Mo          +Mm+ymNdo-            .omm+`</span></span>
+<span class="code-line"><span class="s">         yM:     .hNMd+:sMN. oMm.   oMo      +Mh   ```.:+shMNmy+-``.-:-..-//-`:yNmo`</span></span>
+<span class="code-line"><span class="s">         mM.       :ohmNNMMdhyMMdo//+Mm//////sMNhyhhdmNNmhs/-``./+/:--+so/-:smNy/`</span></span>
+<span class="code-line"><span class="s">        .Mm        ``  .-:/+osyyhhddddddddddhhyysoo+/:-.  `./+//--+oo/--+ymmy/.</span></span>
+<span class="code-line"><span class="s">        :Mh   .:   `+:`        `.------------`      ```-////:/++/:../ydNdo:`</span></span>
+<span class="code-line"><span class="s">        +Ms   `/`    :+o+:-```              ``..-::///++///:-.`-+ydNdo:`</span></span>
+<span class="code-line"><span class="s">        oMs     :/:.``  `..---.``` ````````..-:/:::---.`  `-ohmmh+:`</span></span>
+<span class="code-line"><span class="s">        /Mh       .://///:::-----.-----.......`       `-+hmmy+-</span></span>
+<span class="code-line"><span class="s">         sMy`                                ``````-+ydmy+-</span></span>
+<span class="code-line"><span class="s">          /mNs-`                        `./ohmNMNNNmy+-</span></span>
+<span class="code-line"><span class="s">            /yNmho/:.``````````.-:/+syhdNmdyso+/-.`</span></span>
+<span class="code-line"><span class="s">              `:+ydmNMNNNNNNNNNmdhys+/:.`</span></span>
+<span class="code-line"><span class="s">                     ``.....`</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="s">    LOL U MAD?</span></span>
+<span class="code-line"><span class="s">"""</span><span class="p">)</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="kn">import</span> <span class="nn">sys</span></span>
+<span class="code-line"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></span>
 </pre></div>
 <p>本当だ、Pythonの中にRubyを呼び出すという考えはアホだ。</p>
 </div>

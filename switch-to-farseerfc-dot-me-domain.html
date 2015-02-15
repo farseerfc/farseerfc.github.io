@@ -277,24 +277,24 @@ CloudFlare 的，如下圖：</li>
 <p>等一切都反映到 DNS 服務器上就設置完成了，接下來給
 <a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/">farseerfc.github.io push 一個 CNAME 文件</a>
 寫上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做這個：</p>
-<div class="highlight"><pre><span class="nf">publish</span><span class="o">:</span> <span class="n">rmdrafts</span> <span class="n">cc</span> <span class="n">clean</span> <span class="n">theme</span>
-  <span class="o">[</span> ! -d <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">]</span> <span class="o">||</span> find <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -mindepth <span class="m">1</span> -not -wholename <span class="s2">"*/.git*"</span> -delete
-  rm -rf cache
-  <span class="nb">echo</span> <span class="k">$(</span>SITEURL<span class="k">)</span> &gt; content/static/CNAME
-  <span class="k">$(</span>PELICAN<span class="k">)</span> <span class="k">$(</span>INPUTDIR<span class="k">)</span> -o <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -s <span class="k">$(</span>PUBLISHCONF<span class="k">)</span> <span class="k">$(</span>PELICANOPTS<span class="k">)</span>
-  <span class="k">$(</span>MAKE<span class="k">)</span> rsthtml
-
-<span class="nf">github</span><span class="o">:</span>
-  <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git checkout master<span class="o">)</span>
-  env <span class="nv">SITEURL</span><span class="o">=</span><span class="s2">"farseerfc.me"</span> <span class="k">$(</span>MAKE<span class="k">)</span> publish
-  <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git add . <span class="o">&amp;&amp;</span> git commit -m <span class="s2">"update"</span> <span class="o">&amp;&amp;</span> git push<span class="o">)</span>
+<div class="highlight"><pre><span class="code-line"><span class="nf">publish</span><span class="o">:</span> <span class="n">rmdrafts</span> <span class="n">cc</span> <span class="n">clean</span> <span class="n">theme</span></span>
+<span class="code-line">  <span class="o">[</span> ! -d <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">]</span> <span class="o">||</span> find <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -mindepth <span class="m">1</span> -not -wholename <span class="s2">"*/.git*"</span> -delete</span>
+<span class="code-line">  rm -rf cache</span>
+<span class="code-line">  <span class="nb">echo</span> <span class="k">$(</span>SITEURL<span class="k">)</span> &gt; content/static/CNAME</span>
+<span class="code-line">  <span class="k">$(</span>PELICAN<span class="k">)</span> <span class="k">$(</span>INPUTDIR<span class="k">)</span> -o <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -s <span class="k">$(</span>PUBLISHCONF<span class="k">)</span> <span class="k">$(</span>PELICANOPTS<span class="k">)</span></span>
+<span class="code-line">  <span class="k">$(</span>MAKE<span class="k">)</span> rsthtml</span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nf">github</span><span class="o">:</span></span>
+<span class="code-line">  <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git checkout master<span class="o">)</span></span>
+<span class="code-line">  env <span class="nv">SITEURL</span><span class="o">=</span><span class="s2">"farseerfc.me"</span> <span class="k">$(</span>MAKE<span class="k">)</span> publish</span>
+<span class="code-line">  <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git add . <span class="o">&amp;&amp;</span> git commit -m <span class="s2">"update"</span> <span class="o">&amp;&amp;</span> git push<span class="o">)</span></span>
 </pre></div>
-<div class="highlight"><pre><span class="n">SITEURL</span> <span class="o">=</span> <span class="s">'//'</span> <span class="o">+</span> <span class="n">getenv</span><span class="p">(</span><span class="s">"SITEURL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">'localhost:8000'</span><span class="p">)</span>
-<span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'static'</span><span class="p">,</span> <span class="s">'images'</span><span class="p">,</span> <span class="s">'uml'</span><span class="p">,</span> <span class="s">'images/favicon.ico'</span><span class="p">,</span> <span class="s">'static/CNAME'</span><span class="p">]</span>
-<span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">'images/favicon.ico'</span><span class="p">:</span> <span class="p">{</span><span class="s">'path'</span><span class="p">:</span> <span class="s">'favicon.ico'</span><span class="p">},</span>
-    <span class="s">'static/CNAME'</span><span class="p">:</span> <span class="p">{</span><span class="s">'path'</span><span class="p">:</span> <span class="s">'CNAME'</span><span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight"><pre><span class="code-line"><span class="n">SITEURL</span> <span class="o">=</span> <span class="s">'//'</span> <span class="o">+</span> <span class="n">getenv</span><span class="p">(</span><span class="s">"SITEURL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">'localhost:8000'</span><span class="p">)</span></span>
+<span class="code-line"><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'static'</span><span class="p">,</span> <span class="s">'images'</span><span class="p">,</span> <span class="s">'uml'</span><span class="p">,</span> <span class="s">'images/favicon.ico'</span><span class="p">,</span> <span class="s">'static/CNAME'</span><span class="p">]</span></span>
+<span class="code-line"><span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span></span>
+<span class="code-line">    <span class="s">'images/favicon.ico'</span><span class="p">:</span> <span class="p">{</span><span class="s">'path'</span><span class="p">:</span> <span class="s">'favicon.ico'</span><span class="p">},</span></span>
+<span class="code-line">    <span class="s">'static/CNAME'</span><span class="p">:</span> <span class="p">{</span><span class="s">'path'</span><span class="p">:</span> <span class="s">'CNAME'</span><span class="p">}</span></span>
+<span class="code-line"><span class="p">}</span></span>
 </pre></div>
 <p>然後把生成的靜態網站 push 到 github 之後可以從項目設置裏看到域名的變化：</p>
 <div class="figure">

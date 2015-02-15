@@ -54,24 +54,24 @@ CloudFlare 的，如下圖：&lt;/li&gt;
 &lt;p&gt;等一切都反映到 DNS 服務器上就設置完成了，接下來給
 &lt;a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/"&gt;farseerfc.github.io push 一個 CNAME 文件&lt;/a&gt;
 寫上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做這個：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;
-  &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; find &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -mindepth &lt;span class="m"&gt;1&lt;/span&gt; -not -wholename &lt;span class="s2"&gt;"*/.git*"&lt;/span&gt; -delete
-  rm -rf cache
-  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;SITEURL&lt;span class="k"&gt;)&lt;/span&gt; &amp;gt; content/static/CNAME
-  &lt;span class="k"&gt;$(&lt;/span&gt;PELICAN&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;INPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -o &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -s &lt;span class="k"&gt;$(&lt;/span&gt;PUBLISHCONF&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;PELICANOPTS&lt;span class="k"&gt;)&lt;/span&gt;
-  &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; rsthtml
-
-&lt;span class="nf"&gt;github&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout master&lt;span class="o"&gt;)&lt;/span&gt;
-  env &lt;span class="nv"&gt;SITEURL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"farseerfc.me"&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; publish
-  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;"update"&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; find &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -mindepth &lt;span class="m"&gt;1&lt;/span&gt; -not -wholename &lt;span class="s2"&gt;"*/.git*"&lt;/span&gt; -delete&lt;/span&gt;
+&lt;span class="code-line"&gt;  rm -rf cache&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;SITEURL&lt;span class="k"&gt;)&lt;/span&gt; &amp;gt; content/static/CNAME&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;$(&lt;/span&gt;PELICAN&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;INPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -o &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -s &lt;span class="k"&gt;$(&lt;/span&gt;PUBLISHCONF&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;PELICANOPTS&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; rsthtml&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nf"&gt;github&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout master&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  env &lt;span class="nv"&gt;SITEURL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"farseerfc.me"&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; publish&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;"update"&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;STATIC_PATHS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;'static'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'uml'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;span class="n"&gt;EXTRA_PATH_METADATA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
-    &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'CNAME'&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;STATIC_PATHS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;'static'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'uml'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;EXTRA_PATH_METADATA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;'CNAME'&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後把生成的靜態網站 push 到 github 之後可以從項目設置裏看到域名的變化：&lt;/p&gt;
 &lt;div class="figure"&gt;
@@ -154,20 +154,20 @@ blog ，體驗一下這個頁面在不同顯示器大小中的效果。如果仍
 &lt;div class="panel-heading"&gt;
 Pelican 的新文件夾佈局&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;pre&gt;
-&lt;span style="color:blue;font-weight:bold;"&gt;.&lt;/span&gt;
-├── &lt;span style="color:blue;font-weight:bold;"&gt;cache&lt;/span&gt;             生成頁面的 pickle 緩存
-├── &lt;span style="color:blue;font-weight:bold;"&gt;content&lt;/span&gt;           讀取的全部內容
-│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;&amp;lt;categories&amp;gt;&lt;/span&gt;      按分類存放的文章
-│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;pages&lt;/span&gt;             像 About 這樣的固定頁面
-│   └── &lt;span style="color:blue;font-weight:bold;"&gt;static&lt;/span&gt;            文章內用到的靜態內容
-├── &lt;span style="color:blue;font-weight:bold;"&gt;drafts&lt;/span&gt;            文章的草稿箱
-├── &lt;span style="color:green;font-weight:bold;"&gt;Makefile&lt;/span&gt;          生成用的 makefile
-├── &lt;span style="color:green;font-weight:bold;"&gt;pelicanconf.py&lt;/span&gt;    測試時用的快速 Pelican 配置
-├── &lt;span style="color:green;font-weight:bold;"&gt;publishconf.py&lt;/span&gt;    部署時用的耗時 Pelican 配置
-├── &lt;span style="color:teal;font-weight:bold;"&gt;output&lt;/span&gt;          -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../farseerfc.github.io&lt;/span&gt;
-├── &lt;span style="color:teal;font-weight:bold;"&gt;plugins&lt;/span&gt;         -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-plugins&lt;/span&gt;
-└── &lt;span style="color:teal;font-weight:bold;"&gt;theme&lt;/span&gt;           -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-bootstrap3&lt;/span&gt;
+&lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span style="color:blue;font-weight:bold;"&gt;.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;cache&lt;/span&gt;             生成頁面的 pickle 緩存&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;content&lt;/span&gt;           讀取的全部內容&lt;/span&gt;
+&lt;span class="code-line"&gt;│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;&amp;lt;categories&amp;gt;&lt;/span&gt;      按分類存放的文章&lt;/span&gt;
+&lt;span class="code-line"&gt;│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;pages&lt;/span&gt;             像 About 這樣的固定頁面&lt;/span&gt;
+&lt;span class="code-line"&gt;│   └── &lt;span style="color:blue;font-weight:bold;"&gt;static&lt;/span&gt;            文章內用到的靜態內容&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;drafts&lt;/span&gt;            文章的草稿箱&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;Makefile&lt;/span&gt;          生成用的 makefile&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;pelicanconf.py&lt;/span&gt;    測試時用的快速 Pelican 配置&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;publishconf.py&lt;/span&gt;    部署時用的耗時 Pelican 配置&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:teal;font-weight:bold;"&gt;output&lt;/span&gt;          -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../farseerfc.github.io&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:teal;font-weight:bold;"&gt;plugins&lt;/span&gt;         -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;└── &lt;span style="color:teal;font-weight:bold;"&gt;theme&lt;/span&gt;           -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-bootstrap3&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.com"&gt;之前的博客&lt;/a&gt; 仍然留在
@@ -211,15 +211,15 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 &lt;div class="panel-heading"&gt;
 修改了 Bootstrap 3 響應式設備的大小&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;@screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;@screen-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;598px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  768px; */&lt;/span&gt;
-&lt;span class="k"&gt;@screen-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;952px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  992px; */&lt;/span&gt;
-&lt;span class="k"&gt;@screen-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;1350px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1200px; */&lt;/span&gt;
-&lt;span class="k"&gt;@screen-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;2030px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;@container-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;582px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  750px; */&lt;/span&gt;
-&lt;span class="k"&gt;@container-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;930px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  970px; */&lt;/span&gt;
-&lt;span class="k"&gt;@container-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1170px; */&lt;/span&gt;
-&lt;span class="k"&gt;@container-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1990px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;598px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  768px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;952px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  992px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;1350px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1200px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;2030px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@container-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;582px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  750px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@container-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;930px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  970px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@container-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1170px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;@container-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1990px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -444,14 +444,14 @@ Pelican 實現顯示源代碼按鈕&lt;/div&gt;
 &lt;p&gt;顯示源代碼按鈕借用了 Pelican 配置中自帶的 &lt;code class="code"&gt;
 OUTPUT_SOURCES&lt;/code&gt;
  選項將源文件複製到輸出文件夾：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
-&lt;span class="n"&gt;OUTPUT_SOURCES_EXTENSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'.rst'&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_SOURCES_EXTENSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'.rst'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後在 Makefile 裏用 pygmentize 把所有源代碼文件着色：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;最後在按鈕按下的時候用 jQuery 載入源代碼：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;onclick=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;onclick=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;雖然難看的 hack 比較多，但是能用！&lt;/p&gt;
 &lt;/div&gt;
@@ -480,18 +480,18 @@ modal&lt;/code&gt;
 &lt;div class="section" id="pelican-restructuredtext"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id50"&gt;插件: 發揮 Pelican 和 reStructuredText 的優勢&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;先列舉一下我目前用到的所有插件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;"plantuml"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;"youku"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;"youtube"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'tipue_search'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'neighbors'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'series'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'bootstrapify'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'twitter_bootstrap_rst_directives'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;"render_math"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'extract_toc'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-           &lt;span class="s"&gt;'summary'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;"plantuml"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;"youku"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;"youtube"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'tipue_search'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'neighbors'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'series'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'bootstrapify'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'twitter_bootstrap_rst_directives'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;"render_math"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'extract_toc'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s"&gt;'summary'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;嗯其實不算多。接下來逐一介紹一下這些各具特色的插件。&lt;/p&gt;
 &lt;div class="section" id="i18n-subsites"&gt;
@@ -566,13 +566,13 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 ，把嵌入的內容提取出來調用 plantuml 命令處理
 成圖像然後再插入到文章中。&lt;/p&gt;
 &lt;p&gt;比如示例裏的這個 UML 圖就是用這樣一段簡單的文字描述生成的：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;
-
-    Object &amp;lt;|-- ArrayList
-
-    Object : equals()
-    ArrayList : Object[] elementData
-    ArrayList : size()
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    Object &amp;lt;|-- ArrayList&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    Object : equals()&lt;/span&gt;
+&lt;span class="code-line"&gt;    ArrayList : Object[] elementData&lt;/span&gt;
+&lt;span class="code-line"&gt;    ArrayList : size()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;實際用起來這個插件實現上稍微有點小問題：首先它只支持 python2，所以我把它改寫成了 python
 2 和 3 都通用的語法；其次它原本輸出的文件夾似乎會被 pelican 刪掉，所以把它改了個位置；
@@ -591,24 +591,24 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 的，叫 &lt;a class="reference external" href="http://ditaa.sourceforge.net/"&gt;ditaa&lt;/a&gt; ，和 plantuml 非常像，也比較像
 reStructuredText 的表格。
 於是我也照貓畫虎實現了一個 ditaa 的 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，用起來類似這樣：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;ditaa&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;
-
-                       +-------------+
-                       &lt;span class="o"&gt;|&lt;/span&gt;   ditaa     |-------+
-                       &lt;span class="o"&gt;|&lt;/span&gt;  Diagram    |       |
-                       +-------------+       | PNG out
-                           ^                 |
-                           &lt;span class="o"&gt;|&lt;/span&gt; ditaa in        |
-                           &lt;span class="o"&gt;|&lt;/span&gt;                 v
-     +--------+   +--------+----+    /----------------\
-     &lt;span class="o"&gt;|&lt;/span&gt;        | --+   Pelican   +--&amp;gt; |                |
-     &lt;span class="o"&gt;|&lt;/span&gt;  Text  |   +-------------+    | Beautiful Blog |
-     |Document|   |   !magic!   |    |                |
-     &lt;span class="o"&gt;|&lt;/span&gt;     {d}|   |             |    |                |
-     +---+----+   +-------------+    \----------------/
-         :                                   ^
-         &lt;span class="o"&gt;|&lt;/span&gt;          Lots of work             |
-         +-----------------------------------+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;ditaa&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;                       +-------------+&lt;/span&gt;
+&lt;span class="code-line"&gt;                       &lt;span class="o"&gt;|&lt;/span&gt;   ditaa     |-------+&lt;/span&gt;
+&lt;span class="code-line"&gt;                       &lt;span class="o"&gt;|&lt;/span&gt;  Diagram    |       |&lt;/span&gt;
+&lt;span class="code-line"&gt;                       +-------------+       | PNG out&lt;/span&gt;
+&lt;span class="code-line"&gt;                           ^                 |&lt;/span&gt;
+&lt;span class="code-line"&gt;                           &lt;span class="o"&gt;|&lt;/span&gt; ditaa in        |&lt;/span&gt;
+&lt;span class="code-line"&gt;                           &lt;span class="o"&gt;|&lt;/span&gt;                 v&lt;/span&gt;
+&lt;span class="code-line"&gt;     +--------+   +--------+----+    /----------------\&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;        | --+   Pelican   +--&amp;gt; |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;  Text  |   +-------------+    | Beautiful Blog |&lt;/span&gt;
+&lt;span class="code-line"&gt;     |Document|   |   !magic!   |    |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;     {d}|   |             |    |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     +---+----+   +-------------+    \----------------/&lt;/span&gt;
+&lt;span class="code-line"&gt;         :                                   ^&lt;/span&gt;
+&lt;span class="code-line"&gt;         &lt;span class="o"&gt;|&lt;/span&gt;          Lots of work             |&lt;/span&gt;
+&lt;span class="code-line"&gt;         +-----------------------------------+&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="render-math"&gt;
@@ -787,7 +787,7 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;/body&gt;&lt;/html&gt;&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
@@ -868,54 +868,54 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;div class="section" id="settings-py"&gt;
 &lt;h2&gt;我的設置 settings.py&lt;/h2&gt;
 &lt;p&gt;安裝 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 很容易，一句話就夠了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後把文章寫成ReST的格式，放在`pages`文件夾裏面。(重新)生成只要：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;上傳到 Github:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;
-&lt;span class="gp"&gt;$&lt;/span&gt; git push
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git push&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;就這麼簡單。附上我的配置文件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
-
-&lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Asia/Tokyo'&lt;/span&gt;
-
-&lt;span class="n"&gt;DATE_FORMATS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="s"&gt;'en'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%a, &lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt; %b %Y'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-    &lt;span class="s"&gt;'zh'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt;, %a'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-    &lt;span class="s"&gt;'jp'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%Y/%m/&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt; (%a)'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="c"&gt;# windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx&lt;/span&gt;
-&lt;span class="n"&gt;LOCALE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;        &lt;span class="c"&gt;# windows&lt;/span&gt;
-          &lt;span class="s"&gt;'en_US'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'zh_CN'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'ja_JP'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  &lt;span class="c"&gt;# Unix/Linux&lt;/span&gt;
-&lt;span class="n"&gt;DEFAULT_LANG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'zh'&lt;/span&gt;
-
-&lt;span class="n"&gt;SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Farseerfc Blog'&lt;/span&gt;
-&lt;span class="n"&gt;AUTHOR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Jiachen Yang'&lt;/span&gt;
-
-&lt;span class="n"&gt;DISQUS_SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'farseerfcgithub'&lt;/span&gt;
-&lt;span class="n"&gt;GITHUB_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'https://github.com/farseerfc'&lt;/span&gt;
-&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'http://farseerfc.github.com'&lt;/span&gt;
-&lt;span class="n"&gt;TAG_FEED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'feeds/&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;.atom.xml'&lt;/span&gt;
-
-&lt;span class="n"&gt;SOCIAL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s"&gt;'twitter'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://twitter.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'github'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'facebook'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://www.facebook.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'weibo'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://weibo.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'renren'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://www.renren.com/farseer'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-          &lt;span class="p"&gt;)&lt;/span&gt;
-
-
-&lt;span class="n"&gt;TWITTER_USERNAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'farseerfc'&lt;/span&gt;
-
-&lt;span class="n"&gt;THEME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'notmyidea'&lt;/span&gt;
-&lt;span class="n"&gt;CSS_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;"wide.css"&lt;/span&gt;
-
-&lt;span class="n"&gt;DEFAULT_CATEGORY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'Others'&lt;/span&gt;
-&lt;span class="n"&gt;OUTPUT_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'.'&lt;/span&gt;
-&lt;span class="n"&gt;PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'posts'&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="c"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Asia/Tokyo'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DATE_FORMATS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s"&gt;'en'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%a, &lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt; %b %Y'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s"&gt;'zh'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt;, %a'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s"&gt;'jp'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;'%Y/%m/&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s"&gt; (%a)'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="c"&gt;# windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;LOCALE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;        &lt;span class="c"&gt;# windows&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="s"&gt;'en_US'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'zh_CN'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'ja_JP'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  &lt;span class="c"&gt;# Unix/Linux&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_LANG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'zh'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Farseerfc Blog'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;AUTHOR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'Jiachen Yang'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DISQUS_SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'farseerfcgithub'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;GITHUB_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'http://farseerfc.github.com'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TAG_FEED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'feeds/&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;.atom.xml'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SOCIAL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s"&gt;'twitter'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://twitter.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'github'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'facebook'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://www.facebook.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'weibo'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://weibo.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;'renren'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;'http://www.renren.com/farseer'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TWITTER_USERNAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;THEME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'notmyidea'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;CSS_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;"wide.css"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_CATEGORY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;'Others'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'.'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'posts'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="pelican"></category></entry></feed>

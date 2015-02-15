@@ -280,7 +280,7 @@ Chrome Remote Desktop 插件</div>
 <a class="reference external" href="https://github.com/archlinuxcn/repo">[archlinuxcn]</a>
 仓库的话，可以直接安装打好的包。或者可以从
 <a class="reference external" href="https://aur.archlinux.org/packages/chrome-remote-desktop/">AUR</a> 装。</p>
-<pre>$ pacman -Ss chrome-remote-desktop<br/><span style="color:purple;font-weight:bold;">archlinuxcn/</span><span style="font-weight:bold;">chrome-remote-desktop </span><span style="color:green;font-weight:bold;">40.0.2214.44-1</span><br/>Allows you to securely access your computer over the Internet through Chrome.</pre><p>装好之后从会说这么一段话：</p>
+<pre><span class="code-line">$ pacman -Ss chrome-remote-desktop<br/><span style="color:purple;font-weight:bold;">archlinuxcn/</span><span style="font-weight:bold;">chrome-remote-desktop </span><span style="color:green;font-weight:bold;">40.0.2214.44-1</span><br/>Allows you to securely access your computer over the Internet through Chrome.</span></pre><p>装好之后从会说这么一段话：</p>
 <blockquote>
 <p>groupadd：无效的组 ID “chrome-remote-desktop”</p>
 <p>Please create ~/.config/chrome-remote-desktop folder manually, if it doesn't exist, or else you can't use CRD.
@@ -292,7 +292,7 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 <p>那句报错是 AUR 里打的包还没跟上上游 Google 的更改导致的错误，
 首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
 新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：</p>
-<div class="highlight"><pre><span class="nv">$ </span>/opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user
+<div class="highlight"><pre><span class="code-line"><span class="nv">$ </span>/opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user</span>
 </pre></div>
 <p>然后我们需要手动创建 <code class="code">
 ~/.config/chrome-remote-desktop</code>
@@ -300,17 +300,17 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 就好了，随后 chrome 会往这里面放 <code class="code">
 host#.json</code>
  文件用于身份验证。</p>
-<div class="highlight"><pre><span class="nv">$ </span>mkdir ~/.config/chrome-remote-desktop
+<div class="highlight"><pre><span class="code-line"><span class="nv">$ </span>mkdir ~/.config/chrome-remote-desktop</span>
 </pre></div>
 <p>然后我们要创建一个 shell 脚本 <code class="code">
 ~/.chrome-remote-desktop-session</code>
  ，这是远程
 登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
 这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：</p>
-<div class="highlight"><pre><span class="nv">$ </span>cat ~/.chrome-remote-desktop-session
-<span class="c">#!/bin/bash</span>
-startxfce4
-<span class="nv">$ </span>chmod <span class="m">755</span> .chrome-remote-desktop-session
+<div class="highlight"><pre><span class="code-line"><span class="nv">$ </span>cat ~/.chrome-remote-desktop-session</span>
+<span class="code-line"><span class="c">#!/bin/bash</span></span>
+<span class="code-line">startxfce4</span>
+<span class="code-line"><span class="nv">$ </span>chmod <span class="m">755</span> .chrome-remote-desktop-session</span>
 </pre></div>
 <p>接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
 应该可以看到一个「启用远程链接」的按钮。</p>
@@ -338,13 +338,13 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 </div>
 <p>同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
 文件夹中找到记录了验证信息的文件。</p>
-<div class="highlight"><pre><span class="nv">$ </span>ls .config/chrome-remote-desktop
-chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6
+<div class="highlight"><pre><span class="code-line"><span class="nv">$ </span>ls .config/chrome-remote-desktop</span>
+<span class="code-line">chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6</span>
 </pre></div>
 <p>然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 <code class="code">
 systemctl --user enable</code>
  ：</p>
-<div class="highlight"><pre><span class="nv">$ </span>systemctl --user start chrome-remote-desktop.service
+<div class="highlight"><pre><span class="code-line"><span class="nv">$ </span>systemctl --user start chrome-remote-desktop.service</span>
 </pre></div>
 <p>如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：</p>
