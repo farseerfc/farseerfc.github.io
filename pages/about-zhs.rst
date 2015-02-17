@@ -65,3 +65,14 @@ facebook: http://www.facebook.com/farseerfc
 renren（人人）: http://renren.com/farseer
 
 
+关于现在用的头像
+------------------------------------------
+
+.. figure:: /images/sakuya.jpg
+	:alt: 我的头像 十六夜 咲夜
+
+	这个头像来自 `HUG 大大 <http://weibo.com/PetroleummonsterHUG>`_
+	绘制的 :ruby:`十六夜|いざよい` :ruby:`咲夜|さくや` ，
+	`pixiv id=41143207 <http://www.pixiv.net/member_illust.php?mode=medium&illust_id=41143207>`_
+	因为实在太喜欢了所以就擅自拿来作为头像了。十六夜是东方系列正传 :ruby:`妖々梦|ようようむ` 、 
+	:ruby:`永夜抄|えいやしょう` 和格斗类 :ruby:`绯想天|ひそうてん`、:ruby:`非想天则|ひそうてんそく` 等作里用得最顺手的角色。
