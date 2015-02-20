@@ -108,6 +108,11 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
 每个 push 调用测试了。
 
+.. figure:: {filename}/images/travis-repo-enable.png
+	:alt: 在 Travis-CI 中开启对 Github Repo 的持续整合
+
+	在 Travis-CI 中开启对 Github Repo 的持续整合
+
 然后在 repo 的根目录放一个 :code:`.travis.yml` 文件描述编译的步骤。
 **暂时** 测试的目的下我写的 :code:`.travis.yml` 大概是侧边那样。
 
