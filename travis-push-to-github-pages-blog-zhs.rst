@@ -196,3 +196,14 @@ build 的状态就会变成 passed ，比如
 在我的 :code:`make github` 中 
 `调用了 <https://github.com/farseerfc/farseerfc/blob/master/Makefile#L102>`_
 :code:`git push` 命令，从而执行了 :code:`make github` 之后就会自动部署到 github 上。
+
+用 Web 编辑并发布静态博客 
+--------------------------------------------------------
+
+经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
+拉来更新然后编译并发布了。可以放置这样的图标 |travisIcon| 在项目的 :code:`Readme.md`
+中显示编译状态。
+
+.. |travisIcon| image:: https://travis-ci.org/farseerfc/farseerfc.svg?branch=master
+
+这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。
