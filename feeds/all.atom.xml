@@ -91,8 +91,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 所以 python 是 2.7 的最新版並且有 pip 可以直接用。
 配置中的 before_install 和 install 的區別其實不大，其中任何一個失敗的話算作
 build errored 而不是 build fail ，而如果在 script 裏失敗的話算作 build fail 。&lt;/p&gt;
-&lt;p&gt;爲了編譯我的模板，還需要比較新的 less.js ，所以添加了 ppa 裝了個最新的 nodejs 。
-還從源碼編譯安裝上了最新版的 opencc ，因爲 Ubuntu 源裏的 opencc 的版本比較老，
+&lt;p&gt;爲了編譯我的模板，還需要比較新的 less.js ，所以添加了 ppa 裝了個最新的 nodejs
+並用它裝上了 less 。
+還從源碼編譯安裝上了最新版的 opencc 1.0.2 ，因爲 Ubuntu 源裏的 opencc 的版本比較老(0.4)，
 然後 doxygen 作爲 opencc 的編譯依賴也裝上了。
 其它安裝的東西麼，除了 pelican 之外都是插件們需要的。以及我還需要生成 4 個語言的 locale
 所以調用了 4 次 locale-gen 。由於是比較標準的 Ubuntu 環境，所以基本上編譯的步驟和在本地
@@ -106,10 +107,10 @@ build 的狀態就會變成 passing ，比如
 &lt;/div&gt;
 &lt;div class="section" id="travis-ci-github"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;從 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;上面的測試編譯通過了之後，下一步自然就是讓 travis-ci 編譯的結果自動推到 Github
-發佈出來。要推往 Github 自然需要設置 github 用戶的身份，在本地設置的時候是把
-本地的 ssh key 添加到 github 賬戶就可以了，在一切細節都公開了的 travis 上
-當然不能放私有 key ，所以我們需要另外一種方案傳遞密碼。&lt;/p&gt;
+&lt;p&gt;上面的測試編譯通過了之後，下一步就是讓 travis-ci 編譯的結果自動推到 Github Pages
+並發佈出來。要推往 Github 自然需要設置 Github 用戶的身份，在本地設置的時候是把
+ssh key 添加到 github 賬戶就可以了，在編譯細節都通過 github repo 公開了的 travis 上
+當然不能放推送用的私有 key ，所以我們需要另外一種方案傳遞密碼。&lt;/p&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Github 上創建 Personal Access Token&lt;/div&gt;
@@ -119,7 +120,7 @@ Github 上創建 Personal Access Token&lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;好在 Github 支持通過 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 的方式驗證，這個和 App Token 一樣可以隨時吊銷，同時完全是個人創建的。另一方面 Travis-CI
-支持加密一些私密數據，通過環境變量的方式傳遞給編譯腳本，避免公開關鍵數據。&lt;/p&gt;
+支持加密一些私密數據，通過環境變量的方式傳遞給編譯腳本，避免公開密碼這樣的關鍵數據。&lt;/p&gt;
 &lt;p&gt;首先創建一個 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 ，這裏需要勾選一些給這個 Token 的權限，我只給予了最小的 public_repo 權限，如側邊裏的圖。
 生成之後會得到一長串 Token 的散列碼。&lt;/p&gt;
@@ -276,8 +277,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 所以 python 是 2.7 的最新版并且有 pip 可以直接用。
 配置中的 before_install 和 install 的区别其实不大，其中任何一个失败的话算作
 build errored 而不是 build fail ，而如果在 script 里失败的话算作 build fail 。&lt;/p&gt;
-&lt;p&gt;为了编译我的模板，还需要比较新的 less.js ，所以添加了 ppa 装了个最新的 nodejs 。
-还从源码编译安装上了最新版的 opencc ，因为 Ubuntu 源里的 opencc 的版本比较老，
+&lt;p&gt;为了编译我的模板，还需要比较新的 less.js ，所以添加了 ppa 装了个最新的 nodejs
+并用它装上了 less 。
+还从源码编译安装上了最新版的 opencc 1.0.2 ，因为 Ubuntu 源里的 opencc 的版本比较老(0.4)，
 然后 doxygen 作为 opencc 的编译依赖也装上了。
 其它安装的东西么，除了 pelican 之外都是插件们需要的。以及我还需要生成 4 个语言的 locale
 所以调用了 4 次 locale-gen 。由于是比较标准的 Ubuntu 环境，所以基本上编译的步骤和在本地
@@ -291,10 +293,10 @@ build 的状态就会变成 passing ，比如
 &lt;/div&gt;
 &lt;div class="section" id="travis-ci-github"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;从 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;上面的测试编译通过了之后，下一步自然就是让 travis-ci 编译的结果自动推到 Github
-发布出来。要推往 Github 自然需要设置 github 用户的身份，在本地设置的时候是把
-本地的 ssh key 添加到 github 账户就可以了，在一切细节都公开了的 travis 上
-当然不能放私有 key ，所以我们需要另外一种方案传递密码。&lt;/p&gt;
+&lt;p&gt;上面的测试编译通过了之后，下一步就是让 travis-ci 编译的结果自动推到 Github Pages
+并发布出来。要推往 Github 自然需要设置 Github 用户的身份，在本地设置的时候是把
+ssh key 添加到 github 账户就可以了，在编译细节都通过 github repo 公开了的 travis 上
+当然不能放推送用的私有 key ，所以我们需要另外一种方案传递密码。&lt;/p&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Github 上创建 Personal Access Token&lt;/div&gt;
@@ -304,7 +306,7 @@ Github 上创建 Personal Access Token&lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;好在 Github 支持通过 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 的方式验证，这个和 App Token 一样可以随时吊销，同时完全是个人创建的。另一方面 Travis-CI
-支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开关键数据。&lt;/p&gt;
+支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开密码这样的关键数据。&lt;/p&gt;
 &lt;p&gt;首先创建一个 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 ，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
 生成之后会得到一长串 Token 的散列码。&lt;/p&gt;
