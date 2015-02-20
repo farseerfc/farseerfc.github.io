@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
-&lt;div class="section" id="id1"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;前言&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;上次介绍 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;过这个博客改换了主题&lt;/a&gt; ，
-本以为这个话题可以告一段落了，没想到还要继续呢。&lt;/p&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
 生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
-还是有一点点复杂的，所以不能随便找台电脑就开始写博客。再比如 pelican 本身虽然是 python
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
 写的所以跨平台，但是具体到博客的配置方面， Windows 环境和 Linux/OSX/Unix-like
 环境下还是有
 &lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/settings.html#date-format-and-locale"&gt;些许出入&lt;/a&gt;
@@ -21,9 +20,8 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;当然并不是因此就束手无策了，感谢 &lt;a class="reference external" href="https://travis-ci.org/"&gt;Travis-CI&lt;/a&gt; 提供了免费的
 &lt;ruby&gt;&lt;rb&gt;持续整合&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Continuous integration&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 虚拟机环境，
 通过它全自动生成静态博客成为了可能。&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="id5"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;关于 Travis-CI&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;关于 Travis-CI&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷开发&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;极限编程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是说在开发的过程中，
@@ -35,8 +33,8 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
 为博客生成静态网站。&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="id7"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;启用 Travis-CI 自动编译&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;启用 Travis-CI 自动编译&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;这一步很简单，访问 &lt;a class="reference external" href="https://travis-ci.org/"&gt;https://travis-ci.org/&lt;/a&gt; 并用你的 Github 账户登录，
 授权它访问你的账户信息就可以了。然后在 &lt;a class="reference external" href="https://travis-ci.org/repositories"&gt;https://travis-ci.org/repositories&lt;/a&gt; 里开启
 需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
@@ -106,7 +104,7 @@ build 的状态就会变成 passed ，比如
 &lt;a class="reference external" href="https://travis-ci.org/farseerfc/farseerfc/builds/51344614"&gt;我的这次的build&lt;/a&gt; 。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="travis-ci-github"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;从 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;从 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;上面的测试编译通过了之后，下一步自然就是让 travis-ci 编译的结果自动推到 Github
 发布出来。要推往 Github 自然需要设置 github 用户的身份，在本地设置的时候是把
 本地的 ssh key 添加到 github 账户就可以了，在一切细节都公开了的 travis 上
@@ -169,7 +167,7 @@ make github&lt;/code&gt;
  之后就会自动部署到 github 上。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="web"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
 拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
@@ -186,17 +184,16 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
 &lt;p&gt;That is all, happy blogging ~&lt;/p&gt;
 &lt;/div&gt;
 </summary><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/../travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/../travis-push-to-github-pages-blog.html</id><summary type="html">
-&lt;div class="section" id="id1"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;前言&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;上次介紹 &lt;a class="reference external" href="//farseerfc.me/zhs/../redesign-pelican-theme.html"&gt;過這個博客改換了主題&lt;/a&gt; ，
-本以爲這個話題可以告一段落了，沒想到還要繼續呢。&lt;/p&gt;
+&lt;p&gt;上次介紹過 &lt;a class="reference external" href="//farseerfc.me/zhs/../redesign-pelican-theme.html"&gt;這個博客改換了主題&lt;/a&gt; ，
+本以爲這個話題可以告一段落了，沒想到還能繼續寫呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的靜態博客通常有兩種方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰寫，這可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
 生成靜態網站。另一種是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的電腦上生成好，然後把生成的 HTML 網站 push
 到 Github Pages ，這種情況下 Github Pages 就完全只是一個靜態頁面宿主環境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，當然就只能選擇後一種方式了。這帶來一些不便，比如本地配置 pelican
-還是有一點點複雜的，所以不能隨便找臺電腦就開始寫博客。再比如 pelican 本身雖然是 python
+還是有一點點複雜的，所以不能隨便找臺電腦就開始寫博客。有的時候只是想修正一兩個錯別字，
+這時候必須打開某臺特定的電腦纔能編輯博客就顯得不太方便了。再比如 pelican 本身雖然是 python
 寫的所以跨平臺，但是具體到博客的配置方面， Windows 環境和 Linux/OSX/Unix-like
 環境下還是有
 &lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/settings.html#date-format-and-locale"&gt;些許出入&lt;/a&gt;
@@ -207,9 +204,8 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;當然並不是因此就束手無策了，感謝 &lt;a class="reference external" href="https://travis-ci.org/"&gt;Travis-CI&lt;/a&gt; 提供了免費的
 &lt;ruby&gt;&lt;rb&gt;持续整合&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Continuous integration&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 虛擬機環境，
 通過它全自動生成靜態博客成爲了可能。&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="id5"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;關於 Travis-CI&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;關於 Travis-CI&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷開發&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;極限編程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是說在開發的過程中，
@@ -221,8 +217,8 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 提供了免費的整合服務器虛擬機服務，和 github 的整合非常自然。所以我們就可以用它提供的虛擬機
 爲博客生成靜態網站。&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="id7"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;啓用 Travis-CI 自動編譯&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;啓用 Travis-CI 自動編譯&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;這一步很簡單，訪問 &lt;a class="reference external" href="https://travis-ci.org/"&gt;https://travis-ci.org/&lt;/a&gt; 並用你的 Github 賬戶登錄，
 授權它訪問你的賬戶信息就可以了。然後在 &lt;a class="reference external" href="https://travis-ci.org/repositories"&gt;https://travis-ci.org/repositories&lt;/a&gt; 裏開啓
 需要編譯的 repo ，這樣 Travis-CI 就會監視對這個 repo 的所有 push 操作，並且對
@@ -292,7 +288,7 @@ build 的狀態就會變成 passed ，比如
 &lt;a class="reference external" href="https://travis-ci.org/farseerfc/farseerfc/builds/51344614"&gt;我的這次的build&lt;/a&gt; 。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="travis-ci-github"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;從 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;從 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;上面的測試編譯通過了之後，下一步自然就是讓 travis-ci 編譯的結果自動推到 Github
 發佈出來。要推往 Github 自然需要設置 github 用戶的身份，在本地設置的時候是把
 本地的 ssh key 添加到 github 賬戶就可以了，在一切細節都公開了的 travis 上
@@ -355,7 +351,7 @@ make github&lt;/code&gt;
  之後就會自動部署到 github 上。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="web"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;經過以上設置之後，一切正常的話，每次對主 repo 推送更新的同時， Travis-CI 就會自動
 拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
@@ -1677,7 +1673,7 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
@@ -2403,7 +2399,7 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
