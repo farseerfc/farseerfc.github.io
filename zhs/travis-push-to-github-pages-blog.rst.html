@@ -1,0 +1,194 @@
+<div class="highlight"><pre><span class="gh">用 Travis-CI 生成 Github Pages 博客</span>
+<span class="gh">====================================================</span>
+
+<span class="nc">:slug:</span> <span class="nf">travis-push-to-github-pages-blog</span>
+<span class="nc">:lang:</span> <span class="nf">zhs</span>
+<span class="nc">:date:</span> <span class="nf">2015-02-20 11:10</span>
+<span class="nc">:tags:</span> <span class="nf">pelican, github, pages, travis, travis-ci, ubuntu</span>
+<span class="nc">:series:</span> <span class="nf">pelican</span>
+
+<span class="p">..</span> <span class="ow">contents</span><span class="p">::</span>
+
+<span class="gh">前言</span>
+<span class="gh">----------------------------</span>
+
+上次介绍 <span class="s">`过这个博客改换了主题 </span><span class="si">&lt;{filename}/tech/redesign-pelican-theme.zhs.rst&gt;</span><span class="s">`_</span> ，
+本以为这个话题可以告一段落了，没想到还要继续呢。
+
+寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 Jekyll_ 方式撰写，这可以利用
+Github Pages 原本就有的 
+<span class="s">`Jekyll支持 </span><span class="si">&lt;https://help.github.com/articles/using-jekyll-with-pages/&gt;</span><span class="s">`_</span>
+生成静态网站。另一种是在 <span class="gs">**本地**</span> 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。
+
+<span class="p">..</span> <span class="nt">_Jekyll:</span> http://jekyllrb.com/
+
+我用 Pelican_ 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows 环境和 Linux/OSX/Unix-like
+环境下还是有
+<span class="s">`些许出入 </span><span class="si">&lt;http://pelican.readthedocs.org/en/latest/settings.html#date-format-and-locale&gt;</span><span class="s">`_</span>
+的。还有就是没有像 wordpress 那样的基于 web
+的编辑环境，在手机上就不能随便写一篇博客发表出来（不知道有没有勇士尝试过在
+Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
+<span class="s">`Android 上的 git 客户端 </span><span class="si">&lt;https://play.google.com/store/apps/details?id=com.romanenco.gitt&gt;</span><span class="s">`_</span> ）。
+
+<span class="p">..</span> <span class="nt">_Pelican:</span> http://getpelican.com/
+<span class="p">..</span> <span class="nt">_SL4A:</span> https://code.google.com/p/android-scripting/
+<span class="p">..</span> <span class="nt">_Agit:</span> https://play.google.com/store/apps/details?id=com.madgag.agit
+
+当然并不是因此就束手无策了，感谢 Travis-CI_ 提供了免费的 
+<span class="na">:ruby:</span><span class="nv">`持续整合|Continuous integration`</span> 虚拟机环境，
+通过它全自动生成静态博客成为了可能。
+
+<span class="p">..</span> <span class="nt">_Travis-CI:</span> https://travis-ci.org/
+
+<span class="gh">关于 Travis-CI</span>
+<span class="gh">----------------------------</span>
+
+<span class="s">`持续整合 </span><span class="si">&lt;http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88&gt;</span><span class="s">`_</span>
+原本是 <span class="na">:ruby:</span><span class="nv">`敏捷开发|Agile Development`</span>
+或者 <span class="na">:ruby:</span><span class="nv">`极限编程|Extreme Programming`</span> 中提到的概念，大意就是说在开发的过程中，
+一旦有微小的变更，就全自动地 <span class="gs">**持续**</span> 合并到主线中， <span class="gs">**整合**</span> 变更的内容到发布版本里。
+这里的 <span class="gs">**整合**</span> 实际上可以理解为 <span class="gs">**全自动测试**</span> 加上 <span class="gs">**生成最终产品**</span> 。
+可以看到 <span class="gs">**持续整合**</span> 实际强调 <span class="gs">**全自动**</span> ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。
+
+于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
+提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
+为博客生成静态网站。
+
+<span class="gh">启用 Travis-CI 自动编译 </span>
+<span class="gh">--------------------------------------------------------</span>
+
+<span class="p">..</span> <span class="ow">panel-default</span><span class="p">::</span>
+  <span class="nc">:title:</span> <span class="nf">**暂时** 测试的目的下的 :code:`.travis.yml` </span>
+
+	.. code-block:: yaml
+
+		language: python
+
+		python:
+		    <span class="m">-</span> &quot;2.7&quot;
+
+		before_install:
+		    <span class="m">-</span> sudo apt-add-repository ppa:chris-lea/node.js -y
+		    <span class="m">-</span> sudo apt-get update
+		    <span class="m">-</span> sudo apt-get install nodejs ditaa doxygen parallel
+
+		install:
+		    <span class="m">-</span> sudo pip install pelican 
+		    <span class="m">-</span> sudo pip install jinja2
+		    <span class="m">-</span> sudo pip install babel
+		    <span class="m">-</span> sudo pip install beautifulsoup4
+		    <span class="m">-</span> sudo pip install markdown
+		    <span class="m">-</span> sudo npm install -g less
+		    <span class="m">-</span> wget &quot;http://downloads.sourceforge.net/project/plantuml/plantuml.jar?r=&amp;ts=1424308684&amp;use_mirror=jaist&quot; -O plantuml.jar
+		    <span class="m">-</span> sudo mkdir -p /opt/plantuml
+		    <span class="m">-</span> sudo cp plantuml.jar /opt/plantuml
+		    <span class="m">-</span> echo &quot;#! /bin/sh&quot; &gt; plantuml
+		    <span class="m">-</span> echo &#39;exec java -jar /opt/plantuml/plantuml.jar &quot;$@&quot;&#39; &gt;&gt; plantuml
+		    <span class="m">-</span> sudo install -m 755 -D plantuml /usr/bin/plantuml
+		    <span class="m">-</span> wget https://bintray.com/artifact/download/byvoid/opencc/opencc-1.0.2.tar.gz
+		    <span class="m">-</span> tar xf opencc-1.0.2.tar.gz
+		    <span class="m">-</span> cd opencc-1.0.2 &amp;&amp; make &amp;&amp; sudo make install &amp;&amp; cd ..
+		    <span class="m">-</span> sudo locale-gen zh_CN.UTF-8
+		    <span class="m">-</span> sudo locale-gen zh_HK.UTF-8
+		    <span class="m">-</span> sudo locale-gen en_US.UTF-8
+		    <span class="m">-</span> sudo locale-gen ja_JP.UTF-8
+
+		script:
+		    <span class="m">-</span> git clone https://github.com/farseerfc/pelican-plugins plugins
+		    <span class="m">-</span> git clone https://github.com/farseerfc/pelican-bootstrap3 theme
+		    <span class="m">-</span> mkdir output
+		    <span class="m">-</span> env SITEURL=&quot;farseerfc.me&quot; make publish
+
+这一步很简单，访问 https://travis-ci.org/ 并用你的 Github 账户登录，
+授权它访问你的账户信息就可以了。然后在 https://travis-ci.org/repositories 里开启
+需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
+每个 push 调用测试了。
+
+然后在 repo 的根目录放一个 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 文件描述编译的步骤。
+<span class="gs">**暂时**</span> 测试的目的下我写的 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 大概是侧边那样。
+
+Travis-CI 提供的虚拟机是比较标准的 Ubuntu 12.04 LTS ，打上了最新的补丁，并且根据你指定的
+语言选项会把响应的解释器和编译器升级到最新版（或者指定的版本）。这里用 python 语言的配置。
+配置中的 before_install 和 install 的区别其实不大，其中任何一个失败的话算作
+build errored 而不是 build fail ，而如果在 script 里失败的话算作 build fail 。
+
+为了编译我的模板，还需要比较新的 less.js ，所以添加了 ppa 装了个最新的 nodejs 。
+还从源码编译安装上了最新版的 opencc ，因为 Ubuntu 源里的 opencc 的版本比较老，
+然后 doxygen 作为 opencc 的编译依赖也装上了。
+其它安装的东西么，除了 pelican 之外都是插件们需要的。以及我还需要生成 4 个语言的 locale
+所以调用了 4 次 locale-gen 。由于是比较标准的 Ubuntu 环境，所以基本上编译的步骤和在本地
+Linux 环境中是一样的，同样的这套配置应该可以直接用于本地 Ubuntu 下编译我的博客。
+
+写好 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 之后把它 push 到 github ，然后 travis 这边就会自动 clone
+下来开始编译。 travis 上能看到编译的完整过程和输出，一切正常的话编译结束之后
+build 的状态就会变成 passed ，比如
+<span class="s">`我的这次的build </span><span class="si">&lt;https://travis-ci.org/farseerfc/farseerfc/builds/51344614&gt;</span><span class="s">`_</span> 。
+
+<span class="gh">从 Travis-CI 推往 Github </span>
+<span class="gh">--------------------------------------------------------</span>
+
+上面的测试编译通过了之后，下一步自然就是让 travis-ci 编译的结果自动推到 Github
+发布出来。要推往 Github 自然需要设置 github 用户的身份，在本地设置的时候是把
+本地的 ssh key 添加到 github 账户就可以了，在一切细节都公开了的 travis 上
+当然不能放私有 key ，所以我们需要另外一种方案传递密码。
+
+<span class="p">..</span> <span class="ow">panel-default</span><span class="p">::</span> 
+	:title: Github 上创建 Personal Access Token
+
+	.. image:: {filename}/images/travis-blog-push.png
+	  :alt: Github 上创建 Personal Access Token
+
+好在 Github 支持通过 <span class="s">`Personal Access Token </span><span class="si">&lt;https://github.com/settings/applications&gt;</span><span class="s">`_</span>
+的方式验证，这个和 App Token 一样可以随时吊销，同时完全是个人创建的。另一方面 Travis-CI
+支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开关键数据。
+
+首先创建一个 <span class="s">`Personal Access Token </span><span class="si">&lt;https://github.com/settings/applications&gt;</span><span class="s">`_</span>
+需要勾选一些权限，我只给予了最小的 public_repo 权限，如侧边里的图。生成之后会得到一长串
+散列码。
+
+然后我们需要 <span class="na">:code:</span><span class="nv">`travis`</span> 命令来加密这个 token ， archlinux 用户可以安装
+<span class="na">:code:</span><span class="nv">`aur/ruby-travis`</span> ，其它用户可以用 gems 安装：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+	<span class="gp">$</span> gem install travis
+
+装好之后，在设定了 Travis-CI 的 repo 的目录中执行一下 <span class="na">:code:</span><span class="nv">`travis status`</span> ，
+命令会指导你登录 Travis-CI 并验证 repo 。正常的话会显示最新的 build 状态。
+然后同样在这个 repo 目录下执行：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+	<span class="gp">$</span> travis encrypt <span class="s1">&#39;GIT_NAME=&quot;Jiachen Yang&quot; GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;&#39;</span>
+
+当然上面一行里的相应信息替换为个人的信息，作为这个命令的执行结果会得到另一长串散列码，
+把这串散列写入刚才的 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 文件：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
+
+	<span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">&quot;long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">hash</span><span class="nv"> </span><span class="s">string&quot;</span>
+
+有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
+然后在编译脚本中利用这些环境变量来生成博客：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
+
+	<span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$GIT_EMAIL&quot;</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$GIT_NAME&quot;</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-plugins plugins</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-bootstrap3 theme</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">make github</span>
+
+具体我用的配置见
+<span class="s">`这里的最新版 </span><span class="si">&lt;https://github.com/farseerfc/farseerfc/blob/master/.travis.yml&gt;</span><span class="s">`_</span>
+在我的 <span class="na">:code:</span><span class="nv">`make github`</span> 中 
+<span class="s">`调用了 </span><span class="si">&lt;https://github.com/farseerfc/farseerfc/blob/master/Makefile#L102&gt;</span><span class="s">`_</span>
+<span class="na">:code:</span><span class="nv">`git push`</span> 命令，从而执行了 <span class="na">:code:</span><span class="nv">`make github`</span> 之后就会自动部署到 github 上。
+</pre></div>
