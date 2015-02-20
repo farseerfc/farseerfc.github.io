@@ -127,7 +127,7 @@ Linux 环境中是一样的，同样的这套配置应该可以直接用于本�
 
 写好 :code:`.travis.yml` 之后把它 push 到 github ，然后 travis 这边就会自动 clone
 下来开始编译。 travis 上能看到编译的完整过程和输出，一切正常的话编译结束之后
-build 的状态就会变成 passed ，比如
+build 的状态就会变成 passing ，比如
 `我的这次的build <https://travis-ci.org/farseerfc/farseerfc/builds/51344614>`_ 。
 
 从 Travis-CI 推往 Github 
