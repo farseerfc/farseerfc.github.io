@@ -280,13 +280,20 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 </div>
 <div class="section" id="id7">
 <h2><a class="toc-backref" href="#id13">啓用 Travis-CI 自動編譯</a></h2>
-<div class="panel panel-default">
-<div class="panel-heading">
-<strong>暫時</strong> 測試的目的下的 <code class="code">
-.travis.yml</code>
+<p>這一步很簡單，訪問 <a class="reference external" href="https://travis-ci.org/">https://travis-ci.org/</a> 並用你的 Github 賬戶登錄，
+授權它訪問你的賬戶信息就可以了。然後在 <a class="reference external" href="https://travis-ci.org/repositories">https://travis-ci.org/repositories</a> 裏開啓
+需要編譯的 repo ，這樣 Travis-CI 就會監視對這個 repo 的所有 push 操作，並且對
+每個 push 調用測試了。</p>
+<div class="figure">
+<img alt="在 Travis-CI 中開啓對 Github Repo 的持續整合" class="img-responsive" src="//farseerfc.me/images/travis-repo-enable.png"/>
+<p class="caption">在 Travis-CI 中開啓對 Github Repo 的持續整合</p>
 </div>
-<div class="panel-body">
-<blockquote>
+<p>然後在 repo 的根目錄放一個 <code class="code">
+.travis.yml</code>
+ 文件描述編譯的步驟。
+<strong>暫時</strong> 測試的目的下我寫的 <code class="code">
+.travis.yml</code>
+ 大概是下面這樣。</p>
 <div class="highlight"><pre><span class="code-line"><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">python</span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="l-Scalar-Plain">python</span><span class="p-Indicator">:</span></span>
@@ -324,23 +331,6 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 <span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mkdir output</span></span>
 <span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">env SITEURL="farseerfc.me" make publish</span></span>
 </pre></div>
-</blockquote>
-</div>
-</div>
-<p>這一步很簡單，訪問 <a class="reference external" href="https://travis-ci.org/">https://travis-ci.org/</a> 並用你的 Github 賬戶登錄，
-授權它訪問你的賬戶信息就可以了。然後在 <a class="reference external" href="https://travis-ci.org/repositories">https://travis-ci.org/repositories</a> 裏開啓
-需要編譯的 repo ，這樣 Travis-CI 就會監視對這個 repo 的所有 push 操作，並且對
-每個 push 調用測試了。</p>
-<div class="figure">
-<img alt="在 Travis-CI 中開啓對 Github Repo 的持續整合" class="img-responsive" src="//farseerfc.me/images/travis-repo-enable.png"/>
-<p class="caption">在 Travis-CI 中開啓對 Github Repo 的持續整合</p>
-</div>
-<p>然後在 repo 的根目錄放一個 <code class="code">
-.travis.yml</code>
- 文件描述編譯的步驟。
-<strong>暫時</strong> 測試的目的下我寫的 <code class="code">
-.travis.yml</code>
- 大概是側邊那樣。</p>
 <p>Travis-CI 提供的虛擬機是比較標準的 Ubuntu 12.04 LTS ，打上了最新的補丁，並且根據你指定的
 語言選項會把響應的解釋器和編譯器升級到最新版（或者指定的版本）。這裏用 python 語言的配置。
 配置中的 before_install 和 install 的區別其實不大，其中任何一個失敗的話算作

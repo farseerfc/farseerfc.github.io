@@ -61,48 +61,6 @@ Android 的 SL4A_ 環境下的 python 中跑 pelican ，還要配合一個
 <span class="gh">啓用 Travis-CI 自動編譯 </span>
 <span class="gh">--------------------------------------------------------</span>
 
-<span class="p">..</span> <span class="ow">panel-default</span><span class="p">::</span>
-  <span class="nc">:title:</span> <span class="nf">**暫時** 測試的目的下的 :code:`.travis.yml` </span>
-
-	.. code-block:: yaml
-
-		language: python
-
-		python:
-		    <span class="m">-</span> &quot;2.7&quot;
-
-		before_install:
-		    <span class="m">-</span> sudo apt-add-repository ppa:chris-lea/node.js -y
-		    <span class="m">-</span> sudo apt-get update
-		    <span class="m">-</span> sudo apt-get install nodejs ditaa doxygen parallel
-
-		install:
-		    <span class="m">-</span> sudo pip install pelican 
-		    <span class="m">-</span> sudo pip install jinja2
-		    <span class="m">-</span> sudo pip install babel
-		    <span class="m">-</span> sudo pip install beautifulsoup4
-		    <span class="m">-</span> sudo pip install markdown
-		    <span class="m">-</span> sudo npm install -g less
-		    <span class="m">-</span> wget &quot;http://downloads.sourceforge.net/project/plantuml/plantuml.jar?r=&amp;ts=1424308684&amp;use_mirror=jaist&quot; -O plantuml.jar
-		    <span class="m">-</span> sudo mkdir -p /opt/plantuml
-		    <span class="m">-</span> sudo cp plantuml.jar /opt/plantuml
-		    <span class="m">-</span> echo &quot;#! /bin/sh&quot; &gt; plantuml
-		    <span class="m">-</span> echo &#39;exec java -jar /opt/plantuml/plantuml.jar &quot;$@&quot;&#39; &gt;&gt; plantuml
-		    <span class="m">-</span> sudo install -m 755 -D plantuml /usr/bin/plantuml
-		    <span class="m">-</span> wget https://bintray.com/artifact/download/byvoid/opencc/opencc-1.0.2.tar.gz
-		    <span class="m">-</span> tar xf opencc-1.0.2.tar.gz
-		    <span class="m">-</span> cd opencc-1.0.2 &amp;&amp; make &amp;&amp; sudo make install &amp;&amp; cd ..
-		    <span class="m">-</span> sudo locale-gen zh_CN.UTF-8
-		    <span class="m">-</span> sudo locale-gen zh_HK.UTF-8
-		    <span class="m">-</span> sudo locale-gen en_US.UTF-8
-		    <span class="m">-</span> sudo locale-gen ja_JP.UTF-8
-
-		script:
-		    <span class="m">-</span> git clone https://github.com/farseerfc/pelican-plugins plugins
-		    <span class="m">-</span> git clone https://github.com/farseerfc/pelican-bootstrap3 theme
-		    <span class="m">-</span> mkdir output
-		    <span class="m">-</span> env SITEURL=&quot;farseerfc.me&quot; make publish
-
 這一步很簡單，訪問 https://travis-ci.org/ 並用你的 Github 賬戶登錄，
 授權它訪問你的賬戶信息就可以了。然後在 https://travis-ci.org/repositories 裏開啓
 需要編譯的 repo ，這樣 Travis-CI 就會監視對這個 repo 的所有 push 操作，並且對
@@ -114,7 +72,46 @@ Android 的 SL4A_ 環境下的 python 中跑 pelican ，還要配合一個
 	在 Travis-CI 中開啓對 Github Repo 的持續整合
 
 然後在 repo 的根目錄放一個 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 文件描述編譯的步驟。
-<span class="gs">**暫時**</span> 測試的目的下我寫的 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 大概是側邊那樣。
+<span class="gs">**暫時**</span> 測試的目的下我寫的 <span class="na">:code:</span><span class="nv">`.travis.yml`</span> 大概是下面這樣。
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
+
+	<span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">python</span>
+
+	<span class="l-Scalar-Plain">python</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="s">&quot;2.7&quot;</span>
+
+	<span class="l-Scalar-Plain">before_install</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo apt-add-repository ppa:chris-lea/node.js -y</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo apt-get update</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo apt-get install nodejs ditaa doxygen parallel</span>
+
+	<span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo pip install pelican</span> 
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo pip install jinja2</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo pip install babel</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo pip install beautifulsoup4</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo pip install markdown</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo npm install -g less</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">wget &quot;http://downloads.sourceforge.net/project/plantuml/plantuml.jar?r=&amp;ts=1424308684&amp;use_mirror=jaist&quot; -O plantuml.jar</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo mkdir -p /opt/plantuml</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo cp plantuml.jar /opt/plantuml</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;#! /bin/sh&quot; &gt; plantuml</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &#39;exec java -jar /opt/plantuml/plantuml.jar &quot;$@&quot;&#39; &gt;&gt; plantuml</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo install -m 755 -D plantuml /usr/bin/plantuml</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">wget https://bintray.com/artifact/download/byvoid/opencc/opencc-1.0.2.tar.gz</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">tar xf opencc-1.0.2.tar.gz</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cd opencc-1.0.2 &amp;&amp; make &amp;&amp; sudo make install &amp;&amp; cd ..</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo locale-gen zh_CN.UTF-8</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo locale-gen zh_HK.UTF-8</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo locale-gen en_US.UTF-8</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">sudo locale-gen ja_JP.UTF-8</span>
+
+	<span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-plugins plugins</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-bootstrap3 theme</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mkdir output</span>
+	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">env SITEURL=&quot;farseerfc.me&quot; make publish</span>
 
 Travis-CI 提供的虛擬機是比較標準的 Ubuntu 12.04 LTS ，打上了最新的補丁，並且根據你指定的
 語言選項會把響應的解釋器和編譯器升級到最新版（或者指定的版本）。這裏用 python 語言的配置。
