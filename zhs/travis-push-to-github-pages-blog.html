@@ -427,13 +427,33 @@ travis status</code>
 然后在编译脚本中利用这些环境变量来生成博客：</p>
 <div class="highlight"><pre><span class="code-line"><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span></span>
 <span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email "$GIT_EMAIL"</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email "$GIT_NAME"</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-plugins plugins</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-bootstrap3 theme</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">make github</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.name "$GIT_NAME"</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global push.default simple</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">env SITEURL="farseerfc.me" $(MAKE) publish</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="l-Scalar-Plain">after_success</span><span class="p-Indicator">:</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cd output</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git add -A .</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git commit -m "update from travis"</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git push --quiet</span></span>
 </pre></div>
-<p>具体我用的配置见
+<div class="alert alert-warning compound">
+<p>这里要注意最后 <code class="code">
+git push</code>
+ 的时候一定要加上 <code class="code">
+--quiet</code>
+，因为默认不加的时候会把
+代入了 <code class="code">
+$GH_TOKEN</code>
+ 的 URL 显示出来，从而上面的加密工作就前功尽弃了……</p>
+</div>
+<p>根据 <a class="reference external" href="http://docs.travis-ci.com/user/build-lifecycle/">travis 的文档</a>
+， after_success 里写的步骤只有在 script 里的全都完全无错执行完之后才会执行，这正是我们
+push 的条件。目前 after_success 的成功与否不会影响到 build 的状态。
+具体我用的配置见
 <a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/.travis.yml">这里的最新版</a> 。
 在我的 <code class="code">
 make github</code>

@@ -219,14 +219,29 @@ ssh key 添加到 github 賬戶就可以了，在編譯細節都通過 github re
 
 .. code-block:: yaml
 
-	script:
-	    - git config --global user.email "$GIT_EMAIL"
-	    - git config --global user.email "$GIT_NAME"
-	    - git clone https://github.com/farseerfc/pelican-plugins plugins
-	    - git clone https://github.com/farseerfc/pelican-bootstrap3 theme
-	    - git clone https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output
-	    - make github
+  script:
+      - git config --global user.email "$GIT_EMAIL"
+      - git config --global user.name "$GIT_NAME"
+      - git config --global push.default simple
+      - git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins
+      - git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme
+      - git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output
+      - env SITEURL="farseerfc.me" $(MAKE) publish
 
+  after_success:
+      - cd output
+      - git add -A .
+      - git commit -m "update from travis"
+      - git push --quiet
+
+.. alert-warning::
+
+  這裏要注意最後 :code:`git push` 的時候一定要加上 :code:`--quiet`，因爲默認不加的時候會把
+  代入了 :code:`$GH_TOKEN` 的 URL 顯示出來，從而上面的加密工作就前功盡棄了……
+
+根據 `travis 的文檔 <http://docs.travis-ci.com/user/build-lifecycle/>`_
+， after_success 裏寫的步驟只有在 script 裏的全都完全無錯執行完之後纔會執行，這正是我們
+push 的條件。目前 after_success 的成功與否不會影響到 build 的狀態。
 具體我用的配置見
 `這裏的最新版 <https://github.com/farseerfc/farseerfc/blob/master/.travis.yml>`_ 。
 在我的 :code:`make github` 中

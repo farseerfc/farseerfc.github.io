@@ -219,14 +219,29 @@ ssh key 添加到 github 賬戶就可以了，在編譯細節都通過 github re
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
 
-	<span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$GIT_EMAIL&quot;</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$GIT_NAME&quot;</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-plugins plugins</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://github.com/farseerfc/pelican-bootstrap3 theme</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span>
-	    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">make github</span>
+  <span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$GIT_EMAIL&quot;</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.name &quot;$GIT_NAME&quot;</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global push.default simple</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">env SITEURL=&quot;farseerfc.me&quot; $(MAKE) publish</span>
 
+  <span class="l-Scalar-Plain">after_success</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cd output</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git add -A .</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git commit -m &quot;update from travis&quot;</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git push --quiet</span>
+
+<span class="p">..</span> <span class="ow">alert-warning</span><span class="p">::</span>
+
+  這裏要注意最後 <span class="na">:code:</span><span class="nv">`git push`</span> 的時候一定要加上 <span class="na">:code:</span><span class="nv">`--quiet`</span>，因爲默認不加的時候會把
+  代入了 <span class="na">:code:</span><span class="nv">`$GH_TOKEN`</span> 的 URL 顯示出來，從而上面的加密工作就前功盡棄了……
+
+根據 <span class="s">`travis 的文檔 </span><span class="si">&lt;http://docs.travis-ci.com/user/build-lifecycle/&gt;</span><span class="s">`_</span>
+， after_success 裏寫的步驟只有在 script 裏的全都完全無錯執行完之後纔會執行，這正是我們
+push 的條件。目前 after_success 的成功與否不會影響到 build 的狀態。
 具體我用的配置見
 <span class="s">`這裏的最新版 </span><span class="si">&lt;https://github.com/farseerfc/farseerfc/blob/master/.travis.yml&gt;</span><span class="s">`_</span> 。
 在我的 <span class="na">:code:</span><span class="nv">`make github`</span> 中

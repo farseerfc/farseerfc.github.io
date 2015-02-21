@@ -185,13 +185,33 @@ travis status&lt;/code&gt;
 然后在编译脚本中利用这些环境变量来生成博客：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git config --global user.email "$GIT_EMAIL"&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git config --global user.email "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;make github&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git config --global user.name "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git config --global push.default simple&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;env SITEURL="farseerfc.me" $(MAKE) publish&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;after_success&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;cd output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git add -A .&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git commit -m "update from travis"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;git push --quiet&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;具体我用的配置见
+&lt;div class="alert alert-warning compound"&gt;
+&lt;p&gt;这里要注意最后 &lt;code class="code"&gt;
+git push&lt;/code&gt;
+ 的时候一定要加上 &lt;code class="code"&gt;
+--quiet&lt;/code&gt;
+，因为默认不加的时候会把
+代入了 &lt;code class="code"&gt;
+$GH_TOKEN&lt;/code&gt;
+ 的 URL 显示出来，从而上面的加密工作就前功尽弃了……&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;根据 &lt;a class="reference external" href="http://docs.travis-ci.com/user/build-lifecycle/"&gt;travis 的文档&lt;/a&gt;
+， after_success 里写的步骤只有在 script 里的全都完全无错执行完之后才会执行，这正是我们
+push 的条件。目前 after_success 的成功与否不会影响到 build 的状态。
+具体我用的配置见
 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/.travis.yml"&gt;这里的最新版&lt;/a&gt; 。
 在我的 &lt;code class="code"&gt;
 make github&lt;/code&gt;
@@ -1008,7 +1028,7 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
