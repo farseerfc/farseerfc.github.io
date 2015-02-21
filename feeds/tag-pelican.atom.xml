@@ -149,14 +149,14 @@ grep&lt;/code&gt;
 &lt;code class="code"&gt;
 sed&lt;/code&gt;
  匹配出 key 的字符串本身，然後 &lt;code class="code"&gt;
-xargs -0 echo -e&lt;/code&gt;
+xargs -0 echo -en&lt;/code&gt;
 
 解釋掉轉義字符，然後刪掉其中的 "&amp;lt;空格&amp;gt;RSA" 幾個字（否則 openssl 不能讀），
 最後保存在名爲 travis.pem 的文件裏。&lt;/p&gt;
-&lt;p&gt;有了 pubkey 之後用 openssl 加密我們需要加密的東西：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;p&gt;有了 pubkey 之後用 openssl 加密我們需要加密的東西並用 base64 編碼：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;得到的結果就是 secure 裏要寫的加密過的內容。&lt;/p&gt;
+&lt;p&gt;替換了相應的身份信息和token之後，這行得到的結果就是 secure 裏要寫的加密過的內容。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;然後我們需要 &lt;code class="code"&gt;
@@ -179,7 +179,7 @@ travis status&lt;/code&gt;
 .travis.yml&lt;/code&gt;
  文件：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;hash&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;base64&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;有了這段聲明之後， Travis-CI 就會在每次編譯之前，設置上面加密的環境變量。
 然後在編譯腳本中利用這些環境變量來生成博客：&lt;/p&gt;

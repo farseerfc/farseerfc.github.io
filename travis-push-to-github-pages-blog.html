@@ -391,14 +391,14 @@ grep</code>
 <code class="code">
 sed</code>
  匹配出 key 的字符串本身，然後 <code class="code">
-xargs -0 echo -e</code>
+xargs -0 echo -en</code>
 
 解釋掉轉義字符，然後刪掉其中的 "&lt;空格&gt;RSA" 幾個字（否則 openssl 不能讀），
 最後保存在名爲 travis.pem 的文件裏。</p>
-<p>有了 pubkey 之後用 openssl 加密我們需要加密的東西：</p>
-<div class="highlight"><pre><span class="code-line"><span class="go">echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0</span></span>
+<p>有了 pubkey 之後用 openssl 加密我們需要加密的東西並用 base64 編碼：</p>
+<div class="highlight"><pre><span class="code-line"><span class="go">echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0</span></span>
 </pre></div>
-<p>得到的結果就是 secure 裏要寫的加密過的內容。</p>
+<p>替換了相應的身份信息和token之後，這行得到的結果就是 secure 裏要寫的加密過的內容。</p>
 </div>
 </div>
 <p>然後我們需要 <code class="code">
@@ -421,7 +421,7 @@ travis status</code>
 .travis.yml</code>
  文件：</p>
 <div class="highlight"><pre><span class="code-line"><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span></span>
-<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">"long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">hash</span><span class="nv"> </span><span class="s">string"</span></span>
+<span class="code-line">    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">"long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string"</span></span>
 </pre></div>
 <p>有了這段聲明之後， Travis-CI 就會在每次編譯之前，設置上面加密的環境變量。
 然後在編譯腳本中利用這些環境變量來生成博客：</p>
