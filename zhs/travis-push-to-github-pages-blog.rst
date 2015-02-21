@@ -9,6 +9,9 @@
 
 .. contents::
 
+.. label-warning::
+    
+    **2015年2月21日更新**
 
 上次介绍过 `这个博客改换了主题 <{filename}/tech/redesign-pelican-theme.zhs.rst>`_ ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。
