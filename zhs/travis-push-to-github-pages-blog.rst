@@ -10,14 +10,14 @@
 .. contents::
 
 .. label-warning::
-    
+
     **2015年2月21日更新**
 
 上次介绍过 `这个博客改换了主题 <{filename}/tech/redesign-pelican-theme.zhs.rst>`_ ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。
 
 寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 Jekyll_ 方式撰写，这可以利用
-Github Pages 原本就有的 
+Github Pages 原本就有的
 `Jekyll支持 <https://help.github.com/articles/using-jekyll-with-pages/>`_
 生成静态网站。另一种是在 **本地** 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。
@@ -39,7 +39,7 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 .. _SL4A: https://code.google.com/p/android-scripting/
 .. _Agit: https://play.google.com/store/apps/details?id=com.madgag.agit
 
-当然并不是因此就束手无策了，感谢 Travis-CI_ 提供了免费的 
+当然并不是因此就束手无策了，感谢 Travis-CI_ 提供了免费的
 :ruby:`持续整合|Continuous integration` 虚拟机环境，
 通过它全自动生成静态博客成为了可能。
 
@@ -60,7 +60,7 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
 为博客生成静态网站。
 
-启用 Travis-CI 自动编译 
+启用 Travis-CI 自动编译
 --------------------------------------------------------
 
 这一步很简单，访问 https://travis-ci.org/ 并用你的 Github 账户登录，
@@ -89,7 +89,7 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 	    - sudo apt-get install nodejs ditaa doxygen parallel
 
 	install:
-	    - sudo pip install pelican 
+	    - sudo pip install pelican
 	    - sudo pip install jinja2
 	    - sudo pip install babel
 	    - sudo pip install beautifulsoup4
@@ -134,7 +134,7 @@ Linux 环境中是一样的，同样的这套配置应该可以直接用于本�
 build 的状态就会变成 passing ，比如
 `我的这次的build <https://travis-ci.org/farseerfc/farseerfc/builds/51344614>`_ 。
 
-从 Travis-CI 推往 Github 
+从 Travis-CI 推往 Github
 --------------------------------------------------------
 
 上面的测试编译通过了之后，下一步就是让 travis-ci 编译的结果自动推到 Github Pages
@@ -142,7 +142,7 @@ build 的状态就会变成 passing ，比如
 ssh key 添加到 github 账户就可以了，在编译细节都通过 github repo 公开了的 travis 上
 当然不能放推送用的私有 key ，所以我们需要另外一种方案传递密码。
 
-.. panel-default:: 
+.. panel-default::
 	:title: Github 上创建 Personal Access Token
 
 	.. image:: {filename}/images/travis-blog-push.png
@@ -152,15 +152,15 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 的方式验证，这个和 App Token 一样可以随时吊销，同时完全是个人创建的。另一方面 Travis-CI
 支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开密码这样的关键数据。
 
-首先创建一个 `Personal Access Token <https://github.com/settings/applications>`_ 
+首先创建一个 `Personal Access Token <https://github.com/settings/applications>`_
 ，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
 生成之后会得到一长串 Token 的散列码。
 
-.. panel-default:: 
+.. panel-default::
 	:title: 如果你不能使用 travis 命令
 
 	.. label-warning::
-	    
+
 	    **2015年2月21日更新**
 
 	使用 :code:`travis encrypt` 命令来加密重要数据最方便，不过如果有任何原因，
@@ -175,8 +175,8 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 		curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/<github-id/repo>/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' > travis.pem
 
 	其中的 <github-id/repo> 替换成 github 上的 用户名/repo名， 比如我的是
-	farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的 
-	json 模块处理了一下，然后把其中包含 key 的行用 :code:`grep` 提取出来，用 
+	farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
+	json 模块处理了一下，然后把其中包含 key 的行用 :code:`grep` 提取出来，用
 	:code:`sed` 匹配出 key 的字符串本身，然后 :code:`xargs -0 echo -en`
 	解释掉转义字符，然后删掉其中的 "<空格>RSA" 几个字（否则 openssl 不能读），
 	最后保存在名为 travis.pem 的文件里。
@@ -229,11 +229,11 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 
 具体我用的配置见
 `这里的最新版 <https://github.com/farseerfc/farseerfc/blob/master/.travis.yml>`_ 。
-在我的 :code:`make github` 中 
+在我的 :code:`make github` 中
 `调用了 <https://github.com/farseerfc/farseerfc/blob/master/Makefile#L102>`_
 :code:`git push` 命令，从而执行了 :code:`make github` 之后就会自动部署到 github 上。
 
-用 Web 编辑并发布静态博客 
+用 Web 编辑并发布静态博客
 --------------------------------------------------------
 
 经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
@@ -241,6 +241,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 中显示编译状态。
 
 .. |travisIcon| image:: https://travis-ci.org/farseerfc/farseerfc.svg?branch=master
+  :class: no-responsive
 
 这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
 编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。
@@ -253,4 +254,4 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录
 github 并编辑文章的可用性也还不错，所以同样的方式也可以直接在手机上发布博文了。
 
-That is all, happy blogging ~ 
+That is all, happy blogging ~
