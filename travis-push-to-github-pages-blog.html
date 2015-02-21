@@ -380,8 +380,7 @@ travis encrypt</code>
 比如 ruby 版本太低或者安裝不方便之類的，那麼不用擔心，我們直接通過
 <a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys">travis api</a>
 也能加密數據。</p>
-<p>第一步登錄 travis ，進入這個頁面 <a class="reference external" href="https://travis-ci.org/profile/info">https://travis-ci.org/profile/info</a> 找到自己的
-Token ，然後用這個命令得到你的repo的 pubkey ：</p>
+<p>第一步用這個命令得到你的repo的 pubkey ：</p>
 <div class="highlight"><pre><span class="code-line"><span class="go">curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&lt;github-id/repo&gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &gt; travis.pem</span></span>
 </pre></div>
 <p>其中的 &lt;github-id/repo&gt; 替換成 github 上的 用戶名/repo名， 比如我的是
