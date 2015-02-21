@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:travis-push-to-github-pages-blog.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;p&gt;上次介紹過 &lt;a class="reference external" href="//farseerfc.me/redesign-pelican-theme.html"&gt;這個博客改換了主題&lt;/a&gt; ，
 本以爲這個話題可以告一段落了，沒想到還能繼續寫呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的靜態博客通常有兩種方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰寫，這可以利用
@@ -124,6 +124,40 @@ Github 上創建 Personal Access Token&lt;/div&gt;
 &lt;p&gt;首先創建一個 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 ，這裏需要勾選一些給這個 Token 的權限，我只給予了最小的 public_repo 權限，如側邊裏的圖。
 生成之後會得到一長串 Token 的散列碼。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+如果你不能使用 travis 命令&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;使用 &lt;code class="code"&gt;
+travis encrypt&lt;/code&gt;
+ 命令來加密重要數據最方便，不過如果有任何原因，
+比如 ruby 版本太低或者安裝不方便之類的，那麼不用擔心，我們直接通過
+&lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
+也能加密數據。&lt;/p&gt;
+&lt;p&gt;第一步登錄 travis ，進入這個頁面 &lt;a class="reference external" href="https://travis-ci.org/profile/info"&gt;https://travis-ci.org/profile/info&lt;/a&gt; 找到自己的
+Token ，然後用這個命令得到你的repo的 pubkey ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替換成 github 上的 用戶名/repo名， 比如我的是
+farseerfc/farseer 。travis api 獲得的結果是一個 json ，所以還用 python 的
+json 模塊處理了一下，然後把其中包含 key 的行用 &lt;code class="code"&gt;
+grep&lt;/code&gt;
+ 提取出來，用
+&lt;code class="code"&gt;
+sed&lt;/code&gt;
+ 匹配出 key 的字符串本身，然後 &lt;code class="code"&gt;
+xargs -0 echo -e&lt;/code&gt;
+
+解釋掉轉義字符，然後刪掉其中的 "&amp;lt;空格&amp;gt;RSA" 幾個字（否則 openssl 不能讀），
+最後保存在名爲 travis.pem 的文件裏。&lt;/p&gt;
+&lt;p&gt;有了 pubkey 之後用 openssl 加密我們需要加密的東西：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;得到的結果就是 secure 裏要寫的加密過的內容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;p&gt;然後我們需要 &lt;code class="code"&gt;
 travis&lt;/code&gt;
  命令來加密這個 token ， archlinux 用戶可以安裝
@@ -185,7 +219,7 @@ Readme.md&lt;/code&gt;
 github 並編輯文章的可用性也還不錯，所以同樣的方式也可以直接在手機上發佈博文了。&lt;/p&gt;
 &lt;p&gt;That is all, happy blogging ~&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry><entry><title>archlinux 上用 chrome 實現 透明計算 遠程登錄</title><link href="//farseerfc.me/arch-chrome-remote-desktop.html" rel="alternate"></link><updated>2015-02-13T20:39:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-13:arch-chrome-remote-desktop.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+</summary><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry><entry><title>archlinux 上用 chrome 實現 透明計算 遠程登錄</title><link href="//farseerfc.me/arch-chrome-remote-desktop.html" rel="alternate"></link><updated>2015-02-13T20:39:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-13:arch-chrome-remote-desktop.html</id><summary type="html">
 &lt;p&gt;&lt;a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm"&gt;透明計算&lt;/a&gt;
 具體是什麼，因爲他們沒有公開技術細節所以我並不知道，只是看
 &lt;a class="reference external" href="http://v.qq.com/page/h/v/q/h0145ebh1vq.html"&gt;公開出來的演示視頻&lt;/a&gt;
@@ -332,7 +366,7 @@ Ubuntu 12.04 和 12.10 （14.04之後似乎有
 &lt;/div&gt;
 &lt;p&gt;好啦，開始享受國家自然科學一等獎的透明計算技術吧！&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="linux"></category><category term="archlinux"></category><category term="arch"></category><category term="chrome"></category><category term="remote"></category><category term="desktop"></category></entry><entry><title>換到 farseerfc.me 域名</title><link href="//farseerfc.me/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;上個月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上買了個自己的域名 &lt;code class="code"&gt;
+</summary><category term="linux"></category><category term="archlinux"></category><category term="arch"></category><category term="chrome"></category><category term="remote"></category><category term="desktop"></category></entry><entry><title>換到 farseerfc.me 域名</title><link href="//farseerfc.me/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;p&gt;上個月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上買了個自己的域名 &lt;code class="code"&gt;
 farseerfc.me&lt;/code&gt;
  準備用在這個
 博客上，當時試着轉到過這個域名，發現 &lt;ruby&gt;&lt;rb&gt;自定義域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -420,13 +454,13 @@ CloudFlare 的，如下圖：&lt;/li&gt;
 &lt;em&gt;Jonathan J Hunt&lt;/em&gt; ， 感謝 CloudFlare 提供免費 SSL CDN 服務，感謝 Github 提供
 方便免費的 Pages 託管。&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:redesign-pelican-theme.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+</summary><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:redesign-pelican-theme.html</id><summary type="html">
 
 &lt;div class="label label-warning"&gt;
 &lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
 
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;/a&gt;&lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
 &lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;不知不覺間放任這邊長草很久了，從上次
 &lt;a class="reference external" href="//farseerfc.me/try-pelican.html"&gt;折騰主題&lt;/a&gt; 到現在都快三年了，
@@ -583,7 +617,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="1" class="docutils table-striped table table-hover"&gt;
+&lt;table border="1" class=" table-striped docutils table-hover table"&gt;
 &lt;colgroup&gt;
 &lt;col width="23%"&gt;&lt;/col&gt;
 &lt;col width="15%"&gt;&lt;/col&gt;
@@ -601,7 +635,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="first table docutils table-striped table-hover last"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"&gt;&lt;/col&gt;
 &lt;/colgroup&gt;
@@ -617,7 +651,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="1" class="first table docutils table-striped table-hover last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"&gt;&lt;/col&gt;
 &lt;col width="47%"&gt;&lt;/col&gt;
@@ -635,7 +669,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="1" class="first table docutils table-striped table-hover last"&gt;
+&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"&gt;&lt;/col&gt;
 &lt;col width="47%"&gt;&lt;/col&gt;
@@ -662,7 +696,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="1" class="first table docutils table-striped table-hover last"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"&gt;&lt;/col&gt;
 &lt;col width="35%"&gt;&lt;/col&gt;
@@ -684,7 +718,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="1" class="first table docutils table-striped table-hover last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
 &lt;colgroup&gt;
 &lt;col width="21%"&gt;&lt;/col&gt;
 &lt;col width="21%"&gt;&lt;/col&gt;
@@ -917,7 +951,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;plantuml 是繪製UML的，除此之外還有一個類似的工具是繪製一般的 &lt;ruby&gt;&lt;rb&gt;流程圖&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -1113,14 +1147,14 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table class="docutils table-striped table table-hover footnote" frame="void" id="id37" rules="none"&gt;
+&lt;table class="footnote docutils table-hover table-striped table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
@@ -1146,7 +1180,8 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
         "}); ";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>總結一下 Material Design 的 CSS 框架</title><link href="//farseerfc.me/summarize-material-design-css-framework.html" rel="alternate"></link><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-16:summarize-material-design-css-framework.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
+&lt;/script&gt;</summary><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>總結一下 Material Design 的 CSS 框架</title><link href="//farseerfc.me/summarize-material-design-css-framework.html" rel="alternate"></link><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-16:summarize-material-design-css-framework.html</id><summary type="html">
+&lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
 上公佈Android L 也即 後來的 Lollipop 說起。 他們在談論界面設計的時候公佈了他們的
 設計準則： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻譯&lt;/a&gt; )。
 當然這只是一些準則，總結並描述了之前在 Web 設計和移動端 App 界面設計方面的一些規範，
@@ -1233,7 +1268,7 @@ bootstrap-material-design 是在 Bootstrap 3 的基礎上套用 Material Design 
 ，需要的可以自取。&lt;/p&gt;
 &lt;p&gt;至於細節上我定製了哪些地方，敬請聽下回分解……&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="css"></category><category term="material"></category><category term="paper"></category></entry><entry><title>從非緩衝輸入流到 Linux 控制檯的歷史</title><link href="//farseerfc.me/from-unbuffered-stdin-to-history-of-linux-tty.html" rel="alternate"></link><updated>2014-12-12T17:06:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-12:from-unbuffered-stdin-to-history-of-linux-tty.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+</summary><category term="css"></category><category term="material"></category><category term="paper"></category></entry><entry><title>從非緩衝輸入流到 Linux 控制檯的歷史</title><link href="//farseerfc.me/from-unbuffered-stdin-to-history-of-linux-tty.html" rel="alternate"></link><updated>2014-12-12T17:06:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-12:from-unbuffered-stdin-to-history-of-linux-tty.html</id><summary type="html">
 &lt;p&gt;這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。
 &lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"&gt;原帖在這裏&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="section" id="id2"&gt;
@@ -1476,7 +1511,8 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 裏的相關歷史評論和吐槽，那一段非常有意思。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link href="//farseerfc.me/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:jumping-kde5-plasma-activities-button.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;今天嘗試 KDE5 Plasma 的活動的時候無意間發現這個現象。
+</summary><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link href="//farseerfc.me/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:jumping-kde5-plasma-activities-button.html</id><summary type="html">
+&lt;p&gt;今天嘗試 KDE5 Plasma 的活動的時候無意間發現這個現象。
 只要把活動按鈕拖出桌面，它就會在桌面邊緣來回跳動。
 視頻如下：&lt;/p&gt;
 
@@ -1487,13 +1523,13 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 &lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;順便，今天還看到一個賣萌的 KDE5 Plasma 靜音圖標的翻譯：&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
-&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;&lt;/body&gt;&lt;/html&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>Pyssy 項目</title><link href="//farseerfc.me/pyssy.html" rel="alternate"></link><updated>2012-04-02T12:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-04-02:pyssy.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;div class="section" id="id1"&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>Pyssy 項目</title><link href="//farseerfc.me/pyssy.html" rel="alternate"></link><updated>2012-04-02T12:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-04-02:pyssy.html</id><summary type="html">&lt;div class="section" id="id1"&gt;
 &lt;h2&gt;簡介&lt;/h2&gt;
 &lt;p&gt;Pyssy 是用於 &lt;a class="reference external" href="https://bbs.sjtu.edu.cn"&gt;上海交通大學 飲水思源站&lt;/a&gt; 的一系列 Python 腳本和工具。&lt;/p&gt;
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table class="docutils  table-striped table table-hover footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -1507,7 +1543,7 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 &lt;p&gt;SAE Python 環境下請開啓 Memcached 支持。&lt;/p&gt;
 &lt;p&gt;本地環境下請安裝 Redis-py 並運行 redis-server 服務器程序。&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="sjtu"></category><category term="yssy"></category></entry><entry><title>PyRuby</title><link href="//farseerfc.me/mix-ruby.html" rel="alternate"></link><updated>2012-03-02T23:09:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-03-02:mix-ruby.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;今天在GitHub上閒逛的時候看到一個叫做 &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; 的項目。項目的Readme說得很好：&lt;/p&gt;
+</summary><category term="python"></category><category term="sjtu"></category><category term="yssy"></category></entry><entry><title>PyRuby</title><link href="//farseerfc.me/mix-ruby.html" rel="alternate"></link><updated>2012-03-02T23:09:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-03-02:mix-ruby.html</id><summary type="html">&lt;p&gt;今天在GitHub上閒逛的時候看到一個叫做 &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; 的項目。項目的Readme說得很好：&lt;/p&gt;
 &lt;pre class="literal-block"&gt;
 PyRuby - Some Ruby for your Python!
 PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.
@@ -1577,7 +1613,7 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;是的……的確……這種嘗試把Python和Ruby放在一起的想法絕對是瘋了……&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="ruby"></category></entry><entry><title>關於C++模板的類型轉換的討論</title><link href="//farseerfc.me/discuss-cpp-template-downcast.html" rel="alternate"></link><updated>2012-02-26T05:54:57+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-26:discuss-cpp-template-downcast.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+</summary><category term="python"></category><category term="ruby"></category></entry><entry><title>關於C++模板的類型轉換的討論</title><link href="//farseerfc.me/discuss-cpp-template-downcast.html" rel="alternate"></link><updated>2012-02-26T05:54:57+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-26:discuss-cpp-template-downcast.html</id><summary type="html">
 &lt;p&gt;這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;討論地址&lt;/a&gt;&lt;/h2&gt;
@@ -1761,7 +1797,7 @@ type&lt;/code&gt;
 &lt;p&gt;唯一的模板匹配出錯，重載函數集合爲空，SFINAE原則不能找到合適的匹配，於是報錯。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="template"></category><category term="C"></category></entry><entry><title>嘗試一下 Pelican</title><link href="//farseerfc.me/try-pelican.html" rel="alternate"></link><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-24:try-pelican.html</id><summary type="html">&lt;html&gt;&lt;body&gt;&lt;p&gt;似乎一夜之間所有的
+</summary><category term="template"></category><category term="C"></category></entry><entry><title>嘗試一下 Pelican</title><link href="//farseerfc.me/try-pelican.html" rel="alternate"></link><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-24:try-pelican.html</id><summary type="html">&lt;p&gt;似乎一夜之間所有的
 &lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;極客們&lt;/a&gt;
 &lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;都&lt;/a&gt;
 &lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;有了&lt;/a&gt;
@@ -1779,13 +1815,13 @@ type&lt;/code&gt;
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table class="docutils  table-striped table table-hover footnote" frame="void" id="id10" rules="none"&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table class="docutils  table-striped table table-hover footnote" frame="void" id="id11" rules="none"&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"&gt;&lt;/col&gt;&lt;col&gt;&lt;/col&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -1866,4 +1902,4 @@ type&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="n"&gt;PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;'posts'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="python"></category><category term="pelican"></category></entry></feed>
+</summary><category term="python"></category><category term="pelican"></category></entry></feed>

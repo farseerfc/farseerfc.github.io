@@ -153,6 +153,42 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 ，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
 生成之后会得到一长串 Token 的散列码。
 
+.. panel-default:: 
+	:title: 如果你不能使用 travis 命令
+
+	.. label-warning::
+	    
+	    **2015年2月21日更新**
+
+	使用 :code:`travis encrypt` 命令来加密重要数据最方便，不过如果有任何原因，
+	比如 ruby 版本太低或者安装不方便之类的，那么不用担心，我们直接通过
+	`travis api <http://docs.travis-ci.com/api/#repository-keys>`_
+	也能加密数据。
+
+	第一步登录 travis ，进入这个页面 https://travis-ci.org/profile/info 找到自己的
+	Token ，然后用这个命令得到你的repo的 pubkey ：
+
+	.. code-block:: console
+
+		curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/<github-id/repo>/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' > travis.pem
+
+	其中的 <github-id/repo> 替换成 github 上的 用户名/repo名， 比如我的是
+	farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的 
+	json 模块处理了一下，然后把其中包含 key 的行用 :code:`grep` 提取出来，用 
+	:code:`sed` 匹配出 key 的字符串本身，然后 :code:`xargs -0 echo -e`
+	解释掉转义字符，然后删掉其中的 "<空格>RSA" 几个字（否则 openssl 不能读），
+	最后保存在名为 travis.pem 的文件里。
+
+	有了 pubkey 之后用 openssl 加密我们需要加密的东西：
+
+	.. code-block:: console
+
+		echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0
+
+	得到的结果就是 secure 里要写的加密过的内容。
+
+
+
 然后我们需要 :code:`travis` 命令来加密这个 token ， archlinux 用户可以安装
 :code:`aur/ruby-travis` ，其它用户可以用 gems 安装：
 

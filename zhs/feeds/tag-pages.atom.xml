@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pages.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/travis-push-to-github-pages-blog.html</id><summary type="html">&lt;html&gt;&lt;body&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pages.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
@@ -124,6 +124,40 @@ Github 上创建 Personal Access Token&lt;/div&gt;
 &lt;p&gt;首先创建一个 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
 ，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
 生成之后会得到一长串 Token 的散列码。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+如果你不能使用 travis 命令&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;使用 &lt;code class="code"&gt;
+travis encrypt&lt;/code&gt;
+ 命令来加密重要数据最方便，不过如果有任何原因，
+比如 ruby 版本太低或者安装不方便之类的，那么不用担心，我们直接通过
+&lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
+也能加密数据。&lt;/p&gt;
+&lt;p&gt;第一步登录 travis ，进入这个页面 &lt;a class="reference external" href="https://travis-ci.org/profile/info"&gt;https://travis-ci.org/profile/info&lt;/a&gt; 找到自己的
+Token ，然后用这个命令得到你的repo的 pubkey ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替换成 github 上的 用户名/repo名， 比如我的是
+farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
+json 模块处理了一下，然后把其中包含 key 的行用 &lt;code class="code"&gt;
+grep&lt;/code&gt;
+ 提取出来，用
+&lt;code class="code"&gt;
+sed&lt;/code&gt;
+ 匹配出 key 的字符串本身，然后 &lt;code class="code"&gt;
+xargs -0 echo -e&lt;/code&gt;
+
+解释掉转义字符，然后删掉其中的 "&amp;lt;空格&amp;gt;RSA" 几个字（否则 openssl 不能读），
+最后保存在名为 travis.pem 的文件里。&lt;/p&gt;
+&lt;p&gt;有了 pubkey 之后用 openssl 加密我们需要加密的东西：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;得到的结果就是 secure 里要写的加密过的内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;p&gt;然后我们需要 &lt;code class="code"&gt;
 travis&lt;/code&gt;
  命令来加密这个 token ， archlinux 用户可以安装
@@ -185,4 +219,4 @@ Readme.md&lt;/code&gt;
 github 并编辑文章的可用性也还不错，所以同样的方式也可以直接在手机上发布博文了。&lt;/p&gt;
 &lt;p&gt;That is all, happy blogging ~&lt;/p&gt;
 &lt;/div&gt;
-&lt;/body&gt;&lt;/html&gt;</summary><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry></feed>
+</summary><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry></feed>

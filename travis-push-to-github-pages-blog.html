@@ -73,17 +73,17 @@ Farseerfc的小窩            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="active"><a href="//farseerfc.me/">繁體</a></li>
-                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
                             <li><a href="//farseerfc.me/zhs/">简体</a></li>
                             <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
                         <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
-                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                         <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
                         <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                     </ul>
 
                     <li class="dropdown hidden-md hidden-lg hidden-xl">
@@ -229,7 +229,7 @@ Farseerfc的小窩            </a>
                         <div class="panel-heading">
 目錄                        </div>
                         <div class="panel-boy">
-                        <html><body><div class="toc" id="">
+                        <div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#id4" id="id10">關於 Travis-CI</a></li>
@@ -237,11 +237,11 @@ Farseerfc的小窩            </a>
 <li><a class="reference internal" href="#travis-ci-github" id="id12">從 Travis-CI 推往 Github</a></li>
 <li><a class="reference internal" href="#web" id="id13">用 Web 編輯並發佈靜態博客</a></li>
 </ul>
-</div></body></html>
+</div>
                         </div>
                     </div>
  
-                <html><body>
+                
 <p>上次介紹過 <a class="reference external" href="//farseerfc.me/redesign-pelican-theme.html">這個博客改換了主題</a> ，
 本以爲這個話題可以告一段落了，沒想到還能繼續寫呢。</p>
 <p>寄宿在 Github Pages 上的靜態博客通常有兩種方案，其一是使用 <a class="reference external" href="http://jekyllrb.com/">Jekyll</a> 方式撰寫，這可以利用
@@ -366,6 +366,40 @@ Github 上創建 Personal Access Token</div>
 <p>首先創建一個 <a class="reference external" href="https://github.com/settings/applications">Personal Access Token</a>
 ，這裏需要勾選一些給這個 Token 的權限，我只給予了最小的 public_repo 權限，如側邊裏的圖。
 生成之後會得到一長串 Token 的散列碼。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+如果你不能使用 travis 命令</div>
+<div class="panel-body">
+<div class="label label-warning">
+<strong>2015年2月21日更新</strong></div>
+<p>使用 <code class="code">
+travis encrypt</code>
+ 命令來加密重要數據最方便，不過如果有任何原因，
+比如 ruby 版本太低或者安裝不方便之類的，那麼不用擔心，我們直接通過
+<a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys">travis api</a>
+也能加密數據。</p>
+<p>第一步登錄 travis ，進入這個頁面 <a class="reference external" href="https://travis-ci.org/profile/info">https://travis-ci.org/profile/info</a> 找到自己的
+Token ，然後用這個命令得到你的repo的 pubkey ：</p>
+<div class="highlight"><pre><span class="code-line"><span class="go">curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&lt;github-id/repo&gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &gt; travis.pem</span></span>
+</pre></div>
+<p>其中的 &lt;github-id/repo&gt; 替換成 github 上的 用戶名/repo名， 比如我的是
+farseerfc/farseer 。travis api 獲得的結果是一個 json ，所以還用 python 的
+json 模塊處理了一下，然後把其中包含 key 的行用 <code class="code">
+grep</code>
+ 提取出來，用
+<code class="code">
+sed</code>
+ 匹配出 key 的字符串本身，然後 <code class="code">
+xargs -0 echo -e</code>
+
+解釋掉轉義字符，然後刪掉其中的 "&lt;空格&gt;RSA" 幾個字（否則 openssl 不能讀），
+最後保存在名爲 travis.pem 的文件裏。</p>
+<p>有了 pubkey 之後用 openssl 加密我們需要加密的東西：</p>
+<div class="highlight"><pre><span class="code-line"><span class="go">echo -n "Hello=world" | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0</span></span>
+</pre></div>
+<p>得到的結果就是 secure 裏要寫的加密過的內容。</p>
+</div>
+</div>
 <p>然後我們需要 <code class="code">
 travis</code>
  命令來加密這個 token ， archlinux 用戶可以安裝
@@ -427,7 +461,7 @@ Readme.md</code>
 github 並編輯文章的可用性也還不錯，所以同樣的方式也可以直接在手機上發佈博文了。</p>
 <p>That is all, happy blogging ~</p>
 </div>
-</body></html>
+
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -556,34 +590,9 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/python.html">
-                    python <sup> 4</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/yssy.html">
-                    yssy <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/travis-ci.html">
-                    travis-ci <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/stdio.html">
-                    stdio <sup> 1</sup>
+                <a href="//farseerfc.me/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -591,24 +600,29 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                     tty <sup> 1</sup>
                 </a>
             </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/material.html">
-                    material <sup> 2</sup>
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/me.html">
-                    me <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ubuntu.html">
-                    ubuntu <sup> 1</sup>
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -617,8 +631,8 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/japan.html">
-                    japan <sup> 1</sup>
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -627,53 +641,18 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/plasma.html">
-                    plasma <sup> 1</sup>
+                <a href="//farseerfc.me/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/linux.html">
+                    linux <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/paper.html">
-                    paper <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/archlinux.html">
-                    archlinux <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/icse.html">
-                    icse <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/mining.html">
-                    mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/pages.html">
-                    pages <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -686,14 +665,44 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                     creationism <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/linux.html">
-                    linux <sup> 4</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    Java <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/you.html">
-                    you <sup> 1</sup>
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -702,13 +711,93 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/subsite.html">
-                    subsite <sup> 1</sup>
+                <a href="//farseerfc.me/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/css.html">
                     css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C++ <sup> 14</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -722,8 +811,8 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
+                <a href="//farseerfc.me/tag/stdio.html">
+                    stdio <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -732,13 +821,13 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/desktop.html">
-                    desktop <sup> 1</sup>
+                <a href="//farseerfc.me/tag/will.html">
+                    will <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/academic.html">
-                    academic <sup> 1</sup>
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -747,73 +836,18 @@ github 並編輯文章的可用性也還不錯，所以同樣的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/domain.html">
-                    domain <sup> 1</sup>
+                <a href="//farseerfc.me/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/tag/software.html">
                     software <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/arch.html">
-                    arch <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/java.html">
-                    Java <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/oop.html">
-                    oop <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/pelican.html">
-                    pelican <sup> 4</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/chrome.html">
-                    chrome <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.me/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/cloudflare.html">
-                    cloudflare <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/travis.html">
-                    travis <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/zz.html">
-                    zz <sup> 1</sup>
                 </a>
             </li>
     </ul>
@@ -870,7 +904,7 @@ oldOnload();
 目錄</h4>
             </div>
             <div class="panel-boy">
-            <html><body><div class="toc" id="">
+            <div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#id4" id="id10">關於 Travis-CI</a></li>
@@ -878,7 +912,7 @@ oldOnload();
 <li><a class="reference internal" href="#travis-ci-github" id="id12">從 Travis-CI 推往 Github</a></li>
 <li><a class="reference internal" href="#web" id="id13">用 Web 編輯並發佈靜態博客</a></li>
 </ul>
-</div></body></html>
+</div>
             </div>
         </div>
   
