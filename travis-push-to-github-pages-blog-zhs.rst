@@ -226,7 +226,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
       - git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins
       - git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme
       - git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output
-      - env SITEURL="farseerfc.me" $(MAKE) publish
+      - env SITEURL="farseerfc.me" make publish
 
   after_success:
       - cd output
