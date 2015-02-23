@@ -25,7 +25,7 @@
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <link href="//farseerfc.me/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
 
     <link href="//farseerfc.me/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
@@ -99,7 +99,7 @@ Farseerfc的小窝            </a>
                       </a></li>
                   </ul>
             </ul>
-            
+
                 <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
                     <li class="dropdown hidden-md hidden-lg hidden-xl">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
@@ -131,8 +131,8 @@ Farseerfc的小窝            </a>
                         </li>
                     </ul>
 
-            
-            
+
+
             <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
                 <li class="dropdown hidden-md hidden-lg hidden-xl">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
@@ -141,7 +141,7 @@ Farseerfc的小窝            </a>
                     <ul class="dropdown-menu">
                       <li><span>
                         <form class="navbar-search" action="/search.html">
-                          <input type="text" class="search-query form-control col-lg-8" placeholder="搜索" name="q" id="tipue_search_input" required>
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
                         </form></span>
                       </li>
                     </ul>
@@ -151,11 +151,11 @@ Farseerfc的小窝            </a>
             <ul class="nav navbar-right navbar-form hidden-xs">
               <li><span>
                 <form class="navbar-search" action="/search.html">
-                  <input type="text" class="search-query form-control col-lg-8" placeholder="搜索" name="q" id="tipue_search_input" required>
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
             </ul>
-            
+
             <ul class="nav navbar-nav navbar-right hidden-xs">
               <li><a href="//farseerfc.me/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
               <li><a href="//farseerfc.me/zhs/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
@@ -168,7 +168,7 @@ Farseerfc的小窝            </a>
 <!-- End Banner -->
 <div class="container">
     <div class="row">
-        <div class="col-xl-9 col-lg-10 col-md-9">
+        <div class="col-xl-21 col-lg-20 col-md-18">
             <div id="loading-block">
     <ol class="breadcrumb">
         <li><a href="//farseerfc.me/zhs/" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
@@ -181,86 +181,15 @@ Farseerfc的小窝            </a>
             <article class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
-                            <a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.3 I386平台C函数内部的栈分配
-                            </h2></a>
-                        </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="translate">繁體</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-3-i386-stack-allocation-in-c-functions" data-disqus-url="http://farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
-<div class="section" id="i386c">
-<h2>2.3 I386平台C函数内部的栈分配</h2>
-<p>函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。</p>
-<p>为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例：</p>
-<p>void f()</p>
-<p>{</p>
-<p>int a=0; //a的地址被分配为ebp-4</p>
-<p>char c=1; //c的地址被分配为ebp-8</p>
-<p>}</p>
-<p>产生的汇编代码为：</p>
-<p>push ebp ;将ebp压栈</p>
-<p>mov ebp,esp ;ebp=esp 用栈底备份栈顶指针</p>
-<p>sub ...</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
-                            <a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.4 I386平台C函数调用边界的栈分配
-                            </h2></a>
-                        </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="translate">繁體</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-4-i386-stack-allocation-accross-function-invocation" data-disqus-url="http://farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
-<div class="section" id="i386c">
-<h2>2.4 I386平台C函数调用边界的栈分配</h2>
-<p>当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。</p>
-<p>函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。</p>
-<p>同样以最简单的函数为例：</p>
-<p>void f(){</p>
-<p>int i ...</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
                             <a href="//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.5 I386平台的边界对齐(Align)
                             </h2></a>
                         </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
                             <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-5-address-alignment.html" class="translate">繁體</a></li></ul>
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-2-5-address-alignment.html" class="translate">繁體</a></li></ul>
 </div>
 
                             <div>
@@ -285,14 +214,15 @@ Farseerfc的小窝            </a>
             <article class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
                             <a href="//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments)
                             </h2></a>
                         </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
                             <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-6-i386-variable-arguments.html" class="translate">繁體</a></li></ul>
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-2-6-i386-variable-arguments.html" class="translate">繁體</a></li></ul>
 </div>
 
                             <div>
@@ -318,14 +248,15 @@ Farseerfc的小窝            </a>
             <article class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
                             <a href="//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.7 I386平台的其它函数调用模型
                             </h2></a>
                         </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
                             <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-7-i386-calling-conventions.html" class="translate">繁體</a></li></ul>
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-2-7-i386-calling-conventions.html" class="translate">繁體</a></li></ul>
 </div>
 
                             <div>
@@ -363,14 +294,15 @@ Farseerfc的小窝            </a>
             <article class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-lg-8 col-md-9 col-sm-9 col-xs-12">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
                             <a href="//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.1 X86概述
                             </h2></a>
                         </div>
-                        <div class="col-lg-4 col-md-3 col-sm-3 hidden-xs">
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
                             <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i>简体<span class="caret"></a>
-<ul class="dropdown-menu"><li><a href="//farseerfc.me/zhs/../c-tricks-2-1-x86-architecture.html" class="translate">繁體</a></li></ul>
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-2-1-x86-architecture.html" class="translate">繁體</a></li></ul>
 </div>
 
                             <div>
@@ -392,6 +324,76 @@ Farseerfc的小窝            </a>
                 </div>
             </article>
         </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-1-2-trap-in-comma-logical-operator.html" class="translate">繁體</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operator" data-disqus-url="http://farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="id1">
+<h2>1.2   逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</h2>
+<p>很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如：</p>
+<p><strong>for</strong>(<strong>int</strong>i=0,j=9;i&lt;10;++i<strong>,</strong>--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”;</p>
+<p>在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求 ...</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.1  条件运算符(?:)
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-1-1-conditional-operator.html" class="translate">繁體</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-1-conditional-operator" data-disqus-url="http://farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="id1">
+<h2>1.1   条件运算符(?:)</h2>
+<p>条件运算符(?:)是C++中唯一的三目运算符(trinary
+operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual
+Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下：</p>
+<p><em>condition</em> ? <em>true_value</em> : <em>false_value</em></p>
+<p>其中<em>condition
+*条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*</em>、<strong>int</strong>、指针。与<strong>if</strong>和<strong>while</strong>的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。</p>
+<p>另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如：</p>
+<p><strong>int</strong> *pi=getInt();</p>
+<p><strong>int</strong> i=pi ...</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
     </div>
 
         <ul class="pagination">
@@ -401,10 +403,7 @@ Farseerfc的小窝            </a>
                             href="//farseerfc.me/zhs/tag/c.html">1</a></li>
                     <li class="active"><a
                             href="//farseerfc.me/zhs/tag/c2.html">2</a></li>
-                    <li class=""><a
-                            href="//farseerfc.me/zhs/tag/c3.html">3</a></li>
-                <li class="next"><a
-                        href="//farseerfc.me/zhs/tag/c3.html">&raquo;</a></li>
+                <li class="next disabled"><a href="#">&raquo;</a></li>
         </ul>
             </div>
 <!-- Modal -->
@@ -418,7 +417,7 @@ Farseerfc的小窝            </a>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
         </div>
-        <div class="col-xl-3 col-lg-2 col-md-3" id="sidebar">
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
             <aside>
 
 <section>
@@ -785,7 +784,7 @@ oldOnload();
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-md-10 col-sm-9">&copy; 2014 farseerfc
+         <div class="col-md-20 col-sm-18">&copy; 2014 farseerfc
             &middot; 这些开源技术驱动：            <a href="http://fezvrasta.github.io/bootstrap-material-design/" target="_blank">bootstrap-material-design</a>,
             <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>,
@@ -794,7 +793,7 @@ oldOnload();
   licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
 </small></p>
          </div>
-         <div class="col-md-2 col-sm-3"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>
+         <div class="col-md-4 col-sm-6"><p class="pull-right"><a href="#" class="btn btn-default"><i class="fa fa-arrow-up"></i>回页首</a></p></div>
       </div>
    </div>
 </footer>
@@ -868,7 +867,7 @@ oldOnload();
         $.material.init();
         $("div.navbar").autoHidingNavbar();
         $(".img-responsive").css("cursor","pointer").on('click',function(){
-            var sr=$(this).attr('src'); 
+            var sr=$(this).attr('src');
             $('#mimg').attr('src',sr);
             $('#myModal').modal('show');
         });
@@ -880,8 +879,8 @@ oldOnload();
                 return $('#sidebar').height() - $('#affix-toc').height();
             },
             bottom: function (){
-                return $("#fcfooter").offset().top - 
-                    $("#article-content").offset().top - 
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
                     $("#article-content").height() + 60;
             }
           }
