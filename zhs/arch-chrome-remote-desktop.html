@@ -31,7 +31,11 @@
             <meta property="article:tag" content="remote" />
             <meta property="article:tag" content="desktop" />
             <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/zhs/arch-chrome-remote-desktop.png"/>
 
+    
+    <meta property="wb:webmaster" content="a699edf35652cd85" />
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
@@ -214,8 +218,8 @@ Farseerfc的小窝            </a>
 </div>
 
     <a onclick="$.get('//farseerfc.me/zhs/arch-chrome-remote-desktop.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
-    <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" download="arch-chrome-remote-desktop"><i class="fa fa-file-pdf-o"></i></a>
-    <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" download="arch-chrome-remote-desktop"><i class="fa fa-file-photo-o"></i></a>
+    <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
 
 <small><span><a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="arch-chrome-remote-desktop" data-disqus-url="http://farseerfc.me/zhs/arch-chrome-remote-desktop.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
 	<a href="//farseerfc.me/zhs/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
@@ -227,7 +231,7 @@ Farseerfc的小窝            </a>
 </span>
 
 
-    <wb:like appkey="3Lgf94" type="number" skin="silver" language="zh_tw"></wb:like>
+    <wb:share-button appkey="3Lgf94" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「archlinux 上用 chrome 实现 <del>透明计算</del> 远程登录」透明计算 具体是什么，因为他们没有公开技术细节所以我并不知道，只是看 公开出来的演示视频 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。 Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到， 直接 ssh X forwarding 效果也不错。只是这些方案的一个 不太易用 的地方在于，需要 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。 于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手） 方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录， 位于远端的登录的计算机必须一直开着 ..."  pic="http%3A//farseerfc.me/zhs%2Farch-chrome-remote-desktop.png"></wb:share-button>
 
 </div><!-- /.post-info -->                </div>
             </header>
@@ -237,7 +241,7 @@ Farseerfc的小窝            </a>
                         <div class="panel-heading">
 目录                        </div>
                         <div class="panel-boy">
-                        <html><body><div class="toc" id="">
+                        <div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#chrome-remote-desktop" id="id5">Chrome Remote Desktop 的客户端</a></li>
@@ -245,10 +249,10 @@ Farseerfc的小窝            </a>
 <li><a class="reference internal" href="#linux-chrome-windows-os-x" id="id7">Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别</a></li>
 <li><a class="reference internal" href="#bonus" id="id8">Bonus： 手机远程登录</a></li>
 </ul>
-</div></body></html>
+</div>
                         </div>
                     </div>
-                <html><body>
+                
 <p><a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm">透明计算</a>
 具体是什么，因为他们没有公开技术细节所以我并不知道，只是看
 <a class="reference external" href="http://v.qq.com/page/h/v/q/h0145ebh1vq.html">公开出来的演示视频</a>
@@ -395,7 +399,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 </div>
 <p>好啦，开始享受国家自然科学一等奖的透明计算技术吧！</p>
 </div>
-</body></html>
+
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -449,6 +453,8 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
             Disqus.</a></noscript>
         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
+        <hr/>
+        <wb:comments url="auto" width="auto" language="zh_tw" appkey="2333871470" ></wb:comments>
     </section>
         </article>
     </section>
@@ -837,7 +843,7 @@ oldOnload();
 目录</h4>
             </div>
             <div class="panel-boy">
-            <html><body><div class="toc" id="">
+            <div class="toc" id="">
 
 <ul class="simple">
 <li><a class="reference internal" href="#chrome-remote-desktop" id="id5">Chrome Remote Desktop 的客户端</a></li>
@@ -845,7 +851,7 @@ oldOnload();
 <li><a class="reference internal" href="#linux-chrome-windows-os-x" id="id7">Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别</a></li>
 <li><a class="reference internal" href="#bonus" id="id8">Bonus： 手机远程登录</a></li>
 </ul>
-</div></body></html>
+</div>
             </div>
         </div>
             </aside>

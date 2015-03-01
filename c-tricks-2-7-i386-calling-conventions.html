@@ -26,7 +26,11 @@
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
             <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.png"/>
 
+    
+    <meta property="wb:webmaster" content="a699edf35652cd85" />
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
@@ -209,21 +213,21 @@ Farseerfc的小窩            </a>
 </div>
 
     <a onclick="$.get('//farseerfc.me/c-tricks-2-7-i386-calling-conventions.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
-    <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" download="c-tricks-2-7-i386-calling-conventions"><i class="fa fa-file-pdf-o"></i></a>
-    <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" download="c-tricks-2-7-i386-calling-conventions"><i class="fa fa-file-photo-o"></i></a>
+    <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
 
 <small><span><a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-7-i386-calling-conventions" data-disqus-url="http://farseerfc.me/c-tricks-2-7-i386-calling-conventions.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
 	<a href="//farseerfc.me/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
 </span>
 
 
-    <wb:like appkey="3Lgf94" type="number" skin="silver" language="zh_tw"></wb:like>
+    <wb:share-button appkey="3Lgf94" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「C++ Tricks 2.7 I386平臺的其它函數調用模型」從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 ..."  pic="http%3A//farseerfc.me%2Fc-tricks-2-7-i386-calling-conventions.png"></wb:share-button>
 
 </div><!-- /.post-info -->                </div>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <html><body><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+                <p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
 <div class="section" id="i386">
 <h2>2.7 I386平臺的其它函數調用模型</h2>
 <div class="line-block">
@@ -286,7 +290,7 @@ Farseerfc的小窩            </a>
 <p>int (CALLBACK * pf)()=GetVersion;</p>
 </div>
 </div>
-</body></html>
+
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -360,6 +364,8 @@ Farseerfc的小窩            </a>
             Disqus.</a></noscript>
         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
+        <hr/>
+        <wb:comments url="auto" width="auto" language="zh_tw" appkey="2333871470" ></wb:comments>
     </section>
         </article>
     </section>
