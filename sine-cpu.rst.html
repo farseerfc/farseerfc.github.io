@@ -1,0 +1,68 @@
+<div class="highlight"><pre><span class="gh">寫程序讓CPU佔用率保持正弦函數</span>
+<span class="gh">==========================================</span>
+
+<span class="nc">:slug:</span> <span class="nf">sine-cpu</span>
+<span class="nc">:lang:</span> <span class="nf">zh</span>
+<span class="nc">:date:</span> <span class="nf">2008-06-02 23:27</span>
+<span class="nc">:tags:</span> <span class="nf">java, microsoft</span>
+
+導入自
+<span class="s">`renren </span><span class="si">&lt;http://blog.renren.com/blog/230263946/298871889&gt;</span><span class="s">`_</span>
+
+據說是一道微軟的面試題。如題，寫程序，讓Windows的任務管理器中的性能監視器呈現正弦曲線。
+
+<span class="p">..</span> <span class="ow">image</span><span class="p">::</span> http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg
+   <span class="nc">:align:</span> <span class="nf">center</span>
+   <span class="nc">:alt:</span> <span class="nf">正弦曲線</span>
+
+<span class="p">..</span> <span class="ow">image</span><span class="p">::</span> http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg
+   <span class="nc">:align:</span> <span class="nf">center</span>
+   <span class="nc">:alt:</span> <span class="nf">正弦曲線</span>
+
+<span class="cp">.. PELICAN_END_SUMMARY</span>
+
+
+潛心鑽研良久，得代碼：（java）
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">java</span>
+
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">sincpu</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">cycle</span><span class="o">=</span><span class="mi">1024</span><span class="o">,</span><span class="n">tick</span> <span class="o">=</span> <span class="mi">256</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span> <span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+            <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;;</span><span class="n">i</span><span class="o">++){</span>
+                <span class="n">work</span><span class="o">(</span><span class="n">calcNextSleep</span><span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">cycle</span><span class="o">));</span>
+                <span class="n">sleep</span><span class="o">(</span><span class="n">tick</span> <span class="o">-</span> <span class="n">calcNextSleep</span><span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">cycle</span><span class="o">));</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        
+        <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">calcNextSleep</span><span class="o">(</span><span class="kt">long</span> <span class="n">i</span><span class="o">){</span>
+            <span class="k">return</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">((</span><span class="kt">double</span><span class="o">)</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Math</span><span class="o">.</span><span class="na">PI</span> <span class="o">/</span> <span class="n">cycle</span><span class="o">)</span> <span class="o">*</span> <span class="n">tick</span> <span class="o">+</span> <span class="n">tick</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span>
+        <span class="o">}</span>
+        
+        <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sleep</span> <span class="o">(</span><span class="kt">long</span> <span class="n">sleepTime</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InterruptedException</span>
+        <span class="o">{</span>
+            <span class="k">if</span><span class="o">(</span><span class="n">sleepTime</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span>
+                <span class="n">Thread</span><span class="o">.</span><span class="na">yield</span><span class="o">();</span>
+            <span class="k">else</span>
+                <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">sleepTime</span><span class="o">);</span>
+        <span class="o">}</span>
+        
+        <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">work</span> <span class="o">(</span><span class="kt">long</span> <span class="n">period</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+            <span class="k">for</span><span class="o">(;;){</span>
+                <span class="n">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+                <span class="k">if</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">period</span><span class="o">)</span>
+                    <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+
+多核CPU上測試時要注意關掉一個CPU：
+
+
+
+<span class="p">..</span> <span class="ow">image</span><span class="p">::</span> http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg
+   <span class="nc">:align:</span> <span class="nf">center</span>
+   <span class="nc">:alt:</span> <span class="nf">多核CPU上測試</span>
+</pre></div>
