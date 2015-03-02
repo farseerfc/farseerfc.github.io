@@ -72,16 +72,16 @@ Farseerfc的小窩            </a>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="active"><a href="//farseerfc.me/">繁體</a></li>
-                            <li><a href="//farseerfc.me/en/">English</a></li>
                             <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
                             <li><a href="//farseerfc.me/jp/">日本語</a></li>
                         </ul>
                     </li>
 
                     <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
                         <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
-                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
                         <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
                         <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
                     </ul>
 
@@ -227,7 +227,7 @@ Farseerfc的小窩            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <html><body><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+                <p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
 <div class="section" id="i386c">
 <h2>2.4 I386平臺C函數調用邊界的棧分配</h2>
 <p>當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。</p>
@@ -279,7 +279,7 @@ Farseerfc的小窩            </a>
 <p>注意在函數g的彙編代碼中，訪問函數的局部變量和訪問函數參數的區別。局部變量總是通過將ebp減去偏移量來訪問，函數參數總是通過將ebp加上偏移量來訪問。對於32位變量而言，第一個局部變量位於ebp-4，第二個位於ebp-8，以此類推，32位局部變量在棧中形成一個逆序數組；第一個函數參數位於ebp+8，第二個位於ebp+12，以此類推，32位函數參數在棧中形成一個正序數組。</p>
 <p>由於函數返回值通過寄存器返回，不需要空間分配等操作，所以返回值的代價很低。基於這個原因，舊的C語法約定，不寫明返回值類型的函數，返回值類型爲int。這一規則與現行的C++語法相違背，因爲C++中，不寫明返回值類型的函數返回值類型爲void，表示不返回值。這種語法不兼容性是爲了加強C++的類型安全，但同時也帶來了一些問題。</p>
 </div>
-</body></html>
+
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -326,65 +326,92 @@ Farseerfc的小窩            </a>
                 </ul>
             </div>
 
-
-<section class="comments well" id="comments">
-    <ul class="nav nav-tabs" style="margin-bottom: 15px;">
-        <li class="active"><a href="#disqus-comments" data-toggle="tab">Disqus</a></li>
-
-        <li><a href="#weibo-comments" data-toggle="tab">Weibo</a></li>
-
-        <li><a href="#gplus-comments" data-toggle="tab">Google+</a></li>
-    </ul>
-    <div id="myTabContent" class="tab-content">
-        <div class="tab-pane fade active in" id="disqus-comments">
-            
-            <div id="disqus_thread"></div>
-            <script type="text/javascript">
-                /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-                var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
-
-                        var disqus_identifier = 'c-tricks-2-4-i386-stack-allocation-accross-function-invocation';
-                    var disqus_url = 'http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html';
-
-                var disqus_config = function () {
-
-                    this.language = "zh";
-                };
-
-                /* * * DON'T EDIT BELOW THIS LINE * * */
-                (function () {
-                    var dsq = document.createElement('script');
-                    dsq.type = 'text/javascript';
-                    dsq.async = true;
-                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
-                Disqus.</a></noscript>
-            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
         </div>
+        <div id="disqus-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
 
-        <div class="tab-pane fade" id="weibo-comments">
+                            var disqus_identifier = 'c-tricks-2-4-i386-stack-allocation-accross-function-invocation';
+                        var disqus_url = 'http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html';
 
-            <wb:comments url="auto" width="auto" language="zh_tw" appkey="WEIBO_APPKEYN" ></wb:comments>
-        </div>
+                    var disqus_config = function () {
 
-        <div class="tab-pane fade" id="gplus-comments">
-                    
-            <div style="margin-right: 40px">
-                <script src="https://apis.google.com/js/plusone.js">
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
                 </script>
-                <div class="g-comments"
-                    data-href="http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"
-                    data-width="642"
-                    data-first_party_property="BLOGGER"
-                    data-view_type="FILTERED_POSTMOD">
-                </div>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
             </div>
+          </div>
         </div>
-
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="weibo-heading">
+          <h4 class="panel-title">
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#weibo-comments" aria-expanded="false" aria-controls="weibo-comments">
+              <i class="fa fa-weibo"></i> Weibo 留言            </a>
+          </h4>
+        </div>
+        <div id="weibo-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="weibo-heading">
+          <div class="panel-body">
+                <wb:comments url="auto" width="auto" language="zh_tw" appkey="WEIBO_APPKEYN" ></wb:comments>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="ds-heading">
+          <h4 class="panel-title">
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#ds-comments" aria-expanded="false" aria-controls="ds-comments">
+              <i class="fa fa-comments-o"></i> Duoshuo 留言            </a>
+          </h4>
+        </div>
+        <div id="ds-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="ds-heading">
+          <div class="panel-body">
+                <!-- 多说评论框 start -->
+                    <div class="ds-thread" 
+                        data-thread-key="c-tricks-2-4-i386-stack-allocation-accross-function-invocation" 
+                        data-title="C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配" 
+                        data-url="http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"
+                    ></div>
+                <!-- 多说评论框 end -->
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                var duoshuoQuery = {short_name:"farseerfc"};
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                    </script>
+                <!-- 多说公共JS代码 end -->
+          </div>
+        </div>
+      </div>
     </div>
 </section>        </article>
     </section>
@@ -450,104 +477,9 @@ Farseerfc的小窩            </a>
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/software.html">
-                    software <sup> 2</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/termcap.html">
                     termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/travis-ci.html">
-                    travis-ci <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ruby.html">
-                    ruby <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/zz.html">
-                    zz <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/will.html">
-                    will <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/stdio.html">
-                    stdio <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-1">
-                <a href="//farseerfc.me/tag/c.html">
-                    C++ <sup> 14</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/python.html">
-                    python <sup> 4</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/plasma.html">
-                    plasma <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/japan.html">
-                    japan <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/paper.html">
-                    paper <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/unix.html">
-                    unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/css.html">
-                    css <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/gnome3.html">
-                    gnome3 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ubuntu.html">
-                    ubuntu <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/repository.html">
-                    repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/chrome.html">
-                    chrome <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/msr.html">
-                    msr <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/oop.html">
-                    oop <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -556,13 +488,13 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/cloudflare.html">
-                    cloudflare <sup> 1</sup>
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/travis.html">
-                    travis <sup> 1</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -571,18 +503,33 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/marry.html">
-                    marry <sup> 1</sup>
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/material.html">
-                    material <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zz.html">
+                    zz <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -591,48 +538,18 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/template.html">
-                    template <sup> 1</sup>
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/desktop.html">
-                    desktop <sup> 1</sup>
+                <a href="//farseerfc.me/tag/kde5.html">
+                    kde5 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/remote.html">
-                    remote <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/pages.html">
-                    pages <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/acpi.html">
-                    acpi <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/github.html">
-                    github <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/mining.html">
-                    mining <sup> 1</sup>
+                <a href="//farseerfc.me/tag/creationism.html">
+                    creationism <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -646,23 +563,28 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/pelican.html">
-                    pelican <sup> 4</sup>
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ugh.html">
-                    ugh <sup> 1</sup>
+                <a href="//farseerfc.me/tag/ruby.html">
+                    ruby <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/tag/icse.html">
-                    icse <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -671,28 +593,43 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/you.html">
                     you <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/me.html">
-                    me <sup> 1</sup>
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/bootstrap.html">
-                    bootstrap <sup> 1</sup>
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/creationism.html">
-                    creationism <sup> 1</sup>
+                <a href="//farseerfc.me/tag/acpi.html">
+                    acpi <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/arch.html">
-                    arch <sup> 1</sup>
+                <a href="//farseerfc.me/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mining.html">
+                    mining <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -701,13 +638,103 @@ Farseerfc的小窩            </a>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/yssy.html">
                     yssy <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C++ <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/subsite.html">
                     subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
                 </a>
             </li>
     </ul>
