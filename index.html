@@ -38,7 +38,7 @@
               title="Farseerfc的小窩 ATOM Feed"/>
 
         <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
-        <link href="//farseerfc.me/theme/css/ripples.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
 </head>
 <body>
 <div style="display:none" id="title">Farseerfc的小窩</div>
@@ -177,6 +177,93 @@ Farseerfc的小窩            </a>
         <li><a href="//farseerfc.me/feeds/atom.xml" title="訂閱全部文章"><i class="fa fa-rss"></i></a></li>
     </ol>
     <div class="articles-container">
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/compositor-in-X-and-compositext.html" class="btn btn-primary btn-lg"><h2>X 中的混成器與 Composite 擴展
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/compositor-in-X-and-compositext.html">繁體</a></li><li><a href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" class="translate">简体</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/compositor-in-X-and-compositext.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="compositor-in-X-and-compositext" data-disqus-url="http://farseerfc.me/compositor-in-X-and-compositext.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary">
+<p>在上篇文章 <a class="reference external" href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html">「桌面系統的混成器簡史」</a>
+中我介紹了其它桌面系統中的混成器的發展史和工作原理，
+話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。
+這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 <a class="reference external" href="#id6">結論</a> 。</p>
+<div class="section" id="x">
+<h2><a class="toc-backref" href="#id8">原始的 X 的繪圖模型</a></h2>
+<p>首先，沒有混成器的時候 X 是這樣畫圖的：</p>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/>
+<p>X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 <a class="reference external" href="http://cairographics.org/">Cairo</a> 繪圖，
+而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
+其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 ...</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html" class="btn btn-primary btn-lg"><h2>桌面系統的混成器簡史
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html">繁體</a></li><li><a href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" class="translate">简体</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="brief-history-of-compositors-in-desktop-os" data-disqus-url="http://farseerfc.me/brief-history-of-compositors-in-desktop-os.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary">
+<p>Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
+是一個混成器，替代 X 作爲顯示服務器。
+那麼 <strong>混成器</strong> 是個什麼東西，桌面系統爲什麼需要它呢？
+要理解爲什麼桌面系統需要 <strong>混成器</strong> （或者它的另一個叫法，
+<ruby><rb>混成窗口管理器</rb><rp>(</rp><rt>Compositing Window Manager</rt><rp>)</rp></ruby>
+），在這篇文章中我想回顧一下歷史，
+瞭解一下混成器出現的前因後果。</p>
+<p>首先介紹一下混成器出現前主要的一類窗口管理器，也就是
+<ruby><rb>棧式窗口管理器</rb><rp>(</rp><rt>Stacking Window Manager</rt><rp>)</rp></ruby> 的實現方式。</p>
+
+<p>我們知道最初圖形界面的應用程序是全屏的，獨佔整個顯示器（現在很多遊戲機和手持設備的實現仍舊如此）。
+所有程序都全屏並且任何時刻只能看到一個程序的輸出，這個限制顯然不能滿足人們使用計算機的需求，
+於是就有了 <a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)">窗口</a>
+的概念，有了 <a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_metaphor">桌面隱喻</a> 。</p>
+<p>在 <ruby><rb>桌面隱喻</rb><rp>(</rp><rt>Desktop Metaphor</rt><rp>)</rp></ruby> 中每個窗口只佔用顯示面積的一小部分，
+有其顯示的位置和大小，可以互相遮蓋。於是棧式窗口管理器就是在圖形界面中實現桌面隱喻的核心功能，
+其實現方式大體就是：給每個窗口一個相對的“高度”或者說“遠近”，比較高的窗口顯得距離用戶比較近，
+會覆蓋其下比較低的窗口。繪圖的時候窗口管理器會從把窗口按高低排序，按照從低到高的順序使用
+<a class="reference external" href="http://zh.wikipedia.org/wiki/%E7%94%BB%E5%AE%B6%E7%AE%97%E6%B3%95">畫家算法</a>
+繪製整個屏幕。</p>
+
+                    </div>
+                </div>
+            </article>
+        </div>
         <div class="article-item">
             <article class="panel panel-primary">
                 <div class="panel-heading">
@@ -574,83 +661,6 @@ Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，�
                 </div>
             </article>
         </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/icse2012.html" class="btn btn-primary btn-lg"><h2>ICSE 2012
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/icse2012.html">繁體</a></li><li><a href="//farseerfc.me/zhs/icse2012.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/icse2012.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="icse2012" data-disqus-url="http://farseerfc.me/icse2012.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary">
-<div class="section" id="keynote-1">
-<h3><a class="toc-backref" href="#id2">Keynote 1</a></h3>
-<p>沒怎麼聽懂，只記得講到了finance is not money但是沒聽懂這個和軟件有什麼關係。</p>
-</div>
-<div class="section" id="cost-estimation-for-distributed-software-project">
-<h3><a class="toc-backref" href="#id3">Cost Estimation for Distributed Software Project</a></h3>
-<p>講到他們試圖改善現有的模型去更精確地評估軟件開發的開銷。</p>
-<p>他們會給PM建議之前的項目的歷史數據，然後對於新項目，他們建議歷史上已有
-的項目的數據，從而幫助PM得到更精確的評估。他們試圖儘量減少項目評估對PM
-的經驗的需求，從而幫助即使經驗很少的PM也能準確評估項目的開銷。</p>
-
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/msr2012.html" class="btn btn-primary btn-lg"><h2>MSR 2012 &#64; ICSE
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/msr2012.html">繁體</a></li><li><a href="//farseerfc.me/en/msr2012.html" class="translate">English</a></li><li><a href="//farseerfc.me/jp/msr2012.html" class="translate">日本語</a></li><li><a href="//farseerfc.me/zhs/msr2012.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/msr2012.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="msr2012" data-disqus-url="http://farseerfc.me/msr2012.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary">
-<div class="section" id="mining-software-repository-2012-icse">
-<h2><a class="toc-backref" href="#id3">Mining Software Repository 2012 @ ICSE</a></h2>
-<p>參加了今年的MSR，會場在University of Zurich。一大早來到大學，註冊有點
-小插曲，顯然瑞士人搞不清楚中國人的名字，3個楊（Yang）姓的中國人的名牌
-被搞錯了。然後堀田學長的所屬被寫作了“Japan, Japan”，成爲了全日本的代表。</p>
-<div class="section" id="msr-microsoft-research-talk-msr-mining-software-repositories">
-<h3><a class="toc-backref" href="#id4">MSR(MicroSoft Research) talk @ MSR(Mining Software Repositories)</a></h3>
-<p>首先是來自微軟亞洲研究院（MicroSoft Research @ Asia, MSR Asia）的Keynots，
-於是就變成了MSR在MSR的演講。MSR的張冬梅（Dongmei Zhang）女士的演講
-分爲關於Software Analysis和XIAO的兩部分。XIAO是MSRA開發的Code Clone
-Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的細節，不過張女士
-演講結束的時候的鼓掌導致了話筒的小故障 ...</p></div></div>
-                    </div>
-                </div>
-            </article>
-        </div>
     </div>
 
         <ul class="pagination">
@@ -661,6 +671,8 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                             href="//farseerfc.me/index2.html">2</a></li>
                     <li class=""><a
                             href="//farseerfc.me/index3.html">3</a></li>
+                    <li class=""><a
+                            href="//farseerfc.me/index4.html">4</a></li>
                 <li class="next"><a
                         href="//farseerfc.me/index2.html">&raquo;</a></li>
         </ul>
@@ -750,8 +762,18 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/domain.html">
                     domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -786,7 +808,7 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
             </li>
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/tag/linux.html">
-                    linux <sup> 4</sup>
+                    linux <sup> 5</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -829,9 +851,9 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                     msr <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
+            <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/tag/desktop.html">
-                    desktop <sup> 1</sup>
+                    desktop <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -839,9 +861,14 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                     blog <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/python.html">
-                    python <sup> 4</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -920,8 +947,18 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/ubuntu.html">
                     ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -955,6 +992,11 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/stdio.html">
                     stdio <sup> 1</sup>
                 </a>
@@ -962,6 +1004,11 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/bootstrap.html">
                     bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">

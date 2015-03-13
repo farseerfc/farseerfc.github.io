@@ -1,5 +1,449 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-11T22:00:00+09:00</updated><entry><title>避免在博文中写「简单地」</title><link href="//farseerfc.me/zhs/stop-write-simply.html" rel="alternate"></link><updated>2015-03-11T22:00:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-11:zhs/stop-write-simply.html</id><summary type="html">&lt;p&gt;我的 RSS 订阅着一个博客叫 &lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/"&gt;The Old New Thing&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-19T17:45:00+09:00</updated><entry><title>X 中的混成器与 Composite 扩展</title><link href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" rel="alternate"></link><updated>2015-03-19T17:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/compositor-in-X-and-compositext.html</id><summary type="html">
+&lt;p&gt;在上篇文章 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"&gt;「桌面系统的混成器简史」&lt;/a&gt;
+中我介绍了其它桌面系统中的混成器的发展史和工作原理，
+话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。
+这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 &lt;a class="reference external" href="#id6"&gt;结论&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
+而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
+其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图。
+QT 的情况也是类似，基本上用 QPaint 子系统绘制成位图然后交给 X 的显示服务器。
+显示服务器拿到这些绘制请求之后，再在屏幕上的相应位置绘制整个屏幕。
+当然还有很多老旧的不用 GTK 或者 QT 的程序，他们则直接调用 X 核心协议提供的绘图原语。&lt;/p&gt;
+&lt;p&gt;值得注意一点是 X 上除了没有统一的绘图模型，也没有统一的矢量图格式。
+X 核心协议的绘图原语提供的是像素单位的绘图操作，没有类似 GDI+ 或者 Quartz
+提供的 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Device Independence&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的「点」的抽象。所以只用 X
+的绘图原语的话，我们可以把 (1,1) 这个像素点涂黑，但是不能把 (0.5, 0.5)
+这个点涂黑，这一设计缺陷在
+&lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix Hater's Handbook&lt;/a&gt;
+中已经被吐槽过了。因为这个缺陷，所以直接用 X 绘图原语绘制的图像不能像
+矢量图那样进行无损缩放。同样的缺陷导致 X 绘图原语绘制的字符不能做到
+&lt;ruby&gt;&lt;rb&gt;子像素级&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;抗锯齿&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;anti-aliasing&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+（这解释了默认配置下的 xterm 和
+&lt;a class="reference external" href="http://arch.acgtyrant.com/2015/01/05/I-do-not-recommend-urxvt-again-now/"&gt;urxvt 中的字体渲染为什么难看&lt;/a&gt;
+）。相比之下 GDI 有对应的 WMF 矢量图格式， Quartz 有对应的 PDF 矢量图格式，
+而 X 中没有这样的格式对应。因为没有统一的矢量图格式，所以无论是 Cairo 、QPaint
+还是没有用这些绘图库但是同样在意字体和曲线渲染效果的程序（比如 Firefox 和
+Chromium）都需要首先渲染到内部的 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/X_PixMap"&gt;XPixMap&lt;/a&gt;
+位图格式，做好子像素渲染和矢量缩放，然后再把渲染好的位图转交给 X 图形服务器。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="composite"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;通过 Composite 扩展重定向窗口输出&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;2004年发布的 X11R6.8 版本的 Xorg 引入了
+&lt;a class="reference external" href="http://freedesktop.org/wiki/Software/CompositeExt/"&gt;Composite 扩展&lt;/a&gt;
+。这个扩展背后的动机以及前因后果在一篇文章
+&lt;a class="reference external" href="http://keithp.com/~keithp/talks/xarch_ols2004/xarch-ols2004-html/"&gt;The (Re)Architecture of the X Window System&lt;/a&gt;
+中有详细的表述。Composite 扩展允许某个 X 程序做这几件事情：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+RedirectSubwindows&lt;/code&gt;
+ 调用将一个窗口树中的所有窗口渲染重定向到
+&lt;ruby&gt;&lt;rb&gt;内部存储&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;off-screen storage&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。重定向的时候可以指定让 X
+自动更新窗口的内容到屏幕上或者由混成器手动更新。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+NameWindowPixmap&lt;/code&gt;
+ 取得某个窗口的内部存储。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+GetOverlayWindow&lt;/code&gt;
+ 获得一个特殊的用于绘图的窗口，
+在这个窗口上绘制的图像将覆盖在屏幕的最上面。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+CreateRegionFromBorderClip&lt;/code&gt;
+ 取得某个窗口的边界剪裁区域（不一定是矩形）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;有了 Composite 扩展，一个 X 程序就可以调用这些 API 实现混成器。
+这里有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教学解释如何使用 Composite 扩展&lt;/a&gt; 。开启了混成的 X 是这样绘图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
+&lt;p&gt;整个 X 的混成器模型与 Mac OS X 的混成器模型相比，有如下几点显著的区别：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
+出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
+OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;strong&gt;在不同的三个程序之间来回传递&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+RedirectSubwindows&lt;/code&gt;
+ 调用针对的是一个窗口树，换句话说是一个窗口
+及其全部子窗口，不同于 Mac OS X 中混成器会拿到全部窗口的输出。
+这个特点其实并不算是限制，因为 X 中每个虚拟桌面都有一个根窗口，只要指定这个根窗口
+就可以拿到整个虚拟桌面上的全部可见窗口输出了。
+反而这个设计提供了一定的自由度，比如我们可以用这个调用实现一个截图程序，
+拿到某个特定窗口的输出，而不用在意别的窗口。&lt;/li&gt;
+&lt;li&gt;为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
+状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+的状态。因此直接用上述方法 &lt;strong&gt;不能得到没有显示的窗口的输出&lt;/strong&gt; ，比如不能对最小化的窗口
+直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
+比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+不过要实现这一点需要混成器和窗口管理器相互配合。&lt;/li&gt;
+&lt;li&gt;不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device independent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+的，这里 X 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备相关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device dependent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的。
+这既是优点也是缺点。从缺点方面而言，显示到 X 的位图输出因为设备相关性，
+所以严格对应显示器的点阵，并不适合作为文档格式打印出来。当然无论是 Cairo
+还是 QPaint 都提供了到 PostScript 或者 PDF 后端的输出，所以实用层面这个并不构成问题。
+设备相关这一点的优点在于，绘制到 XPM 位图的时候，程序和绘图库是能拿到输出设备（显示器）
+的特殊属性的，从而绘图库能考虑不同的色彩、分辨率、 DPI 或者
+&lt;ruby&gt;&lt;rb&gt;子像素布局&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel layout&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 这些属性以提供最好的渲染效果。
+Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
+10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
+上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;输入事件的重定向，这可能做到么？&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;strong&gt;输出&lt;/strong&gt; 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;strong&gt;没有重定向输入&lt;/strong&gt; 。
+考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
+上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。&lt;/p&gt;
+&lt;p&gt;需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
+由于 Composite 扩展并没有直接提供这方面的重定向 API ，这使得输入事件处理起来都比较麻烦，&lt;/p&gt;
+&lt;p&gt;假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
+那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
+看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
+于是 &lt;strong&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/strong&gt;
+。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
+因为不像重定向窗口输出那样只需要考虑 &lt;ruby&gt;&lt;rb&gt;顶层&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
+重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
+以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
+中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。&lt;/p&gt;
+&lt;p&gt;由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
+&lt;strong&gt;不重定向输入事件&lt;/strong&gt; 而把它交给 X 处理。具体的实现方式就是通过
+&lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
+扩展提供的 &lt;code class="code"&gt;
+SetWindowShapeRegion&lt;/code&gt;
+ API 将 OverlayWindow 的 &lt;strong&gt;输入区域&lt;/strong&gt;
+&lt;code class="code"&gt;
+ShapeInput&lt;/code&gt;
+ 设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
+这样一来对 OverlayWindow 的点击会透过 OverlayWindow 直接作用到底下的窗口上。&lt;/p&gt;
+&lt;p&gt;因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
+（并不是移动窗口的位置）， &lt;strong&gt;但是不能让用户与窗口的内容交互&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;正常状态下可以让用户与窗口的内容交互，但是
+&lt;strong&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/strong&gt;
+。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
+变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 &lt;ruby&gt;&lt;rb&gt;活动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
+的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
+&lt;strong&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/strong&gt; 。&lt;/p&gt;
+&lt;p&gt;Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
+效果，而不能实现 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那样直接在 3D 空间中操纵窗口内容。&lt;/p&gt;
+&lt;p&gt;解决重定向问题曾经的一缕曙光是 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在开发 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的过程中同时提议过另一个 X
+扩展叫做 Event Interception 或者简称 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/XEvIE/"&gt;XEvIE&lt;/a&gt; ，这个扩展的设计目的就是提供 API
+让某个程序接收并操纵全部的键盘和鼠标事件。可惜这个扩展随着升阳公司本身的陨落而
+处于无人维护的状态，这一点也在它的官方网页上说明了：&lt;/p&gt;
+&lt;blockquote&gt;
+It has been suggested that this extension should not be used
+because it is broken and maintainerless.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;Composite 扩展的不足&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;通过上面的介绍，我们就已经可以看到 Composite 扩展的不足之处了。
+总结起来说，主要有两大不足：&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;绘图效率低。因为同样的位图从应用程序传到 Xorg ，再从 Xorg 传到混成器，
+最后从混成器再绘制到屏幕上，绕了一个大弯。这就是为什么 Wayland 的开发者在他的slide
+&lt;a class="reference external" href="http://people.freedesktop.org/~daniels/lca2013-wayland-x11.pdf"&gt;the real story behind Wayland and X&lt;/a&gt;
+里这么说：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;and what's the X server? really bad IPC&lt;/p&gt;
+&lt;p&gt;那么 X 服务器到底做了什么呢？ 非常糟糕的进程间通讯&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;没有重定向输入事件。如果我们要在 X 的混成器里做这个事情，
+基本上我们要全部重写一遍 X 已经写好的窗口事件分发逻辑。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;既然同样要重写，为什么不直接重写一遍 X 呢，扔掉那些历史负担，扔掉那些无用的 API
+，重新设计可扩展的 API ，做好快速安全的 IPC —— 嗯，重写 X 就是 Wayland 的目的。&lt;/p&gt;
+&lt;p&gt;不过这么重写了的 Wayland 还是我们熟悉可爱的 X 么？它有哪些地方变样了？
+这将是我下一篇文章的内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;附录：扩展阅读&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;我自己没有写过窗口管理器，没有写过混成器，没有写过 Wayland
+程序，以上说的都是我从互联网上看到的整理出来的内容。写下本文的过程中我参考了这些文章：&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://keithp.com/~keithp/talks/xarch_ols2004/xarch-ols2004-html/"&gt;The (Re)Architecture of the X Window System&lt;/a&gt; 这篇2004年写的文章描述了 Composite
+扩展出现的动机和历史，介绍了绘图库的实现情况，涉及了上面所说的那些 X 扩展被用到的情况和可能。
+同时这篇文章还展望了很多现在的 X 已然实现了的功能，比如 OpenGL 和 X 的结合方面我们有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/GLX"&gt;GLX&lt;/a&gt; 和 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/AIGLX"&gt;AIGLX&lt;/a&gt;
+，比如内核的显卡支持方面我们有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Direct_Rendering_Infrastructure"&gt;DRI&lt;/a&gt; 和 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Mode_setting"&gt;KMS&lt;/a&gt; 。总之这是一篇描述 Linux
+桌面未来的发展轨迹的非常有阅读价值的历史文献。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://wingolog.org/archives/2008/07/26/so-you-want-to-build-a-compositor"&gt;so you want to build a compositor&lt;/a&gt; 这是一篇 2008 年写的博文，介绍如何用 Clutter
+实现一个最简单的混成器。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;Composite tutorial&lt;/a&gt; 这是另一篇介绍如何实现一个简单的混成器的博文，用 Qt 实现，但是同样很底层。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://projects.mini-dweeb.org/projects/unagi"&gt;unagi&lt;/a&gt; 这是一个可用的（但是已经长期没有开发的）类似 xcompmgr 的混成器。这个项目貌似
+是一位研究生的硕士毕业设计，同时他公开了硕士学位的毕业论文
+&lt;a class="reference external" href="http://projects.mini-dweeb.org/attachments/download/3/report.pdf"&gt;Master thesis: Writing an X compositing manager&lt;/a&gt;
+其中也对实现一个简单的混成器做了详尽描述，包括介绍了相关的 X 扩展和调用。&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="linux"></category><category term="wayland"></category><category term="xorg"></category><category term="compositor"></category></entry><entry><title>桌面系统的混成器简史</title><link href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">
+&lt;p&gt;（原本是想写篇关于 Wayland 的文章，后来越写越长感觉能形成一个系列，
+于是就先把这篇背景介绍性质的部分发出来了。）&lt;/p&gt;
+
+&lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
+是一个混成器，替代 X 作为显示服务器。
+那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
+&lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+），在这篇文章中我想回顾一下历史，
+了解一下混成器出现的前因后果。&lt;/p&gt;
+&lt;p&gt;首先介绍一下混成器出现前主要的一类窗口管理器，也就是
+&lt;ruby&gt;&lt;rb&gt;栈式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的实现方式。&lt;/p&gt;
+
+&lt;div class="label label-warning"&gt;
+本文中所有桌面截图来自维基百科，不具有著作权保护。&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;早期的栈式窗口管理器&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+栈式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="栈式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/zhs/../images/Windows_3.11_workspace.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;我们知道最初图形界面的应用程序是全屏的，独占整个显示器（现在很多游戏机和手持设备的实现仍旧如此）。
+所有程序都全屏并且任何时刻只能看到一个程序的输出，这个限制显然不能满足人们使用计算机的需求，
+于是就有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)"&gt;窗口&lt;/a&gt;
+的概念，有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_metaphor"&gt;桌面隐喻&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;在 &lt;ruby&gt;&lt;rb&gt;桌面隐喻&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Desktop Metaphor&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中每个窗口只占用显示面积的一小部分，
+有其显示的位置和大小，可以互相遮盖。于是栈式窗口管理器就是在图形界面中实现桌面隐喻的核心功能，
+其实现方式大体就是：给每个窗口一个相对的“高度”或者说“远近”，比较高的窗口显得距离用户比较近，
+会覆盖其下比较低的窗口。绘图的时候窗口管理器会从把窗口按高低排序，按照从低到高的顺序使用
+&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E7%94%BB%E5%AE%B6%E7%AE%97%E6%B3%95"&gt;画家算法&lt;/a&gt;
+绘制整个屏幕。&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;p&gt;这里还要补充一点说明，在当时图形界面的概念刚刚普及的时候，绘图操作是非常“昂贵”的。
+可以想象一下 800x600 像素的显示器输出下，每帧
+&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E7%9C%9F%E5%BD%A9%E8%89%B2"&gt;真彩色&lt;/a&gt;
+位图就要占掉 &lt;span class="math"&gt;\(800 \times 600 \times 3 \approx 1.4 \text{MiB}\)&lt;/span&gt; 的内存大小，30Hz
+的刷新率（也就是30FPS）下每秒从 CPU 传往绘图设备的数据单单位图就需要
+&lt;span class="math"&gt;\(1.4 \times 30 = 41 \text{MiB}\)&lt;/span&gt; 的带宽。对比一下当时的
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/VESA_Local_Bus"&gt;VESA 接口&lt;/a&gt; 总的数据传输能力也就是
+&lt;span class="math"&gt;\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)&lt;/span&gt; 左右，
+而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
+这无疑都是一个庞大的负担。&lt;/p&gt;
+&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;strong&gt;优势&lt;/strong&gt; ：如果正确地采用画家算法，
+并且合理地控制重绘时 &lt;strong&gt;只绘制没有被别的窗口覆盖的部分&lt;/strong&gt; ，那么无论有多少窗口互相
+遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
+同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;strong&gt;限制&lt;/strong&gt; ：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;窗口必须是矩形的，不能支持不规则形状的窗口。&lt;/li&gt;
+&lt;li&gt;不支持透明或者半透明的颜色。&lt;/li&gt;
+&lt;li&gt;为了优化效率，在缩放窗口和移动窗口的过程中，窗口的内容不会得到重绘请求，
+必须等到缩放或者移动命令结束之后窗口才会重绘。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上这些限制在早期的 X11 窗口管理器比如 twm 以及 XP 之前经典主题的 Windows
+或者经典的 Mac OS 上都能看到。
+在这些早期的窗口环境中，如果你拖动或者缩放一个窗口，那么将显示变化后的窗口边界，
+这些用来预览的边界用快速的位图反转方式绘制。当你放开鼠标的时候才会触发窗口的
+重绘事件。
+虽然有很多方法或者说技巧能绕过这些限制，比如 Windows XP 上就支持了实时的
+重绘事件和不规则形状的窗口剪裁，不过这些技巧都是一连串的 hack ，难以扩展。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="nextstep-mac-os-x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;NeXTSTEP 与 Mac OS X 中混成器的发展&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+NeXTSTEP 桌面&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="NeXTSTEP 桌面" class="img-responsive" src="//farseerfc.me/zhs/../images/NeXTSTEP_desktop.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;转眼进入了千禧年， Windows 称霸了 PC 产业，苹果为重振 Macintosh 请回了 Jobs 基于 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP"&gt;NeXTSTEP&lt;/a&gt;
+开发 Mac OSX 。&lt;/p&gt;
+&lt;p&gt;NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
+拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;strong&gt;实时更新&lt;/strong&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
+而实现这个特性的基础是在 NeXTSTEP 中运用了
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
+技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
+格式交给窗口管理器，然后窗口管理器再在需要的时候把 PostScript 用软件解释器解释成位图显示在屏幕上。&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/&gt;
+&lt;p&gt;比起让窗口直接绘制，这种方案在滚动和移动窗口的时候不需要重新渲染保存好的 DPS ，
+所以能实现实时渲染。到了实现 Mac OS X 的时候，为了同时兼容老的 Mac 程序 API (carbon)
+以及更快的渲染速度，以及考虑到 Adobe 对苹果收取的高昂的 Display PostScript 授权费，
+Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间又插入了一层抽象：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Mission Control&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Mission Control" class="img-responsive" src="//farseerfc.me/zhs/../images/Mac_OS_X_Lion_Preview_-_Mission_Control.jpg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;也就是说在 Mac OS X 中无论窗口用何种方式绘图，都会绘制输出成一副内存中的位图交给混成器，
+而后者再在需要的时候将位图混成在屏幕上。这种设计使得 2001年3月发布的 Mac OS X v10.0
+成为了第一个广泛使用的具有软件混成器的操作系统。&lt;/p&gt;
+&lt;p&gt;到了 Mac OS X v10.2 的时候，苹果又引入了 Quartz Extreme 让最后的混成渲染这一步发生在
+显卡上。然后在 2003年1月公开亮相的 Mac OS X v10.3 中，他们公布了 Exposé (后来改名为
+Mission Control) 功能，把窗口的缩略图（而不是事先绘制的图标）并排显示在桌面上，
+方便用户挑选打开的窗口。&lt;/p&gt;
+&lt;p&gt;由于有了混成器的这种实现方式，使得可能把窗口渲染的图像做进一步加工，添加阴影、三维和动画效果。
+这使得 Mac OS X 有了美轮美奂的动画效果和 Exposé 这样的方便易用的功能。
+或许对于乔布斯而言，更重要的是因为有了混成器，窗口的形状终于能显示为他
+&lt;a class="reference external" href="http://www.folklore.org/StoryView.py?story=Round_Rects_Are_Everywhere.txt"&gt;梦寐以求&lt;/a&gt;
+的 &lt;a class="reference external" href="http://www.uiandus.com/blog/2009/7/26/realizations-of-rounded-rectangles.html"&gt;圆角矩形&lt;/a&gt;
+了！&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="project-looking-glass-3d"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;插曲：昙花一现的 Project Looking Glass 3D&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;在苹果那边刚刚开始使用混成器渲染窗口的 2003 年，昔日的 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+则在 Linux 上用 Java3D 作出了另一个炫酷到没有朋友的东西，被他们命名为
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Project_Looking_Glass"&gt;Project Looking Glass 3D&lt;/a&gt;
+（缩写LG3D，别和 Google 的 Project Glass 混淆呀）。这个项目的炫酷实在难以用言语描述，
+好在还能找到两段视频展示它的效果。&lt;/p&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_JXv8VlpoK_g"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/JXv8VlpoK_g"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XOTEzMzM3MTY0"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XOTEzMzM3MTY0/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_JXv8VlpoK_g"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XOTEzMzM3MTY0"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_zcPIEMvyPy4"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/zcPIEMvyPy4"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XOTEzMzQwMjky"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XOTEzMzQwMjky/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_zcPIEMvyPy4"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XOTEzMzQwMjky"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+LG3D&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="LG3D" class="img-responsive" src="//farseerfc.me/zhs/../images/LG3D.jpg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;如视频中展示的那样， LG3D 完全突破了传统的栈式窗口管理方式，
+在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
+还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
+Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
+下的窗口是 &lt;strong&gt;可以接受输入事件&lt;/strong&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
+LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。&lt;/p&gt;
+&lt;p&gt;LG3D 虽然没有放出实现的源代码，不过官方曾经放出过一个
+&lt;a class="reference external" href="http://sourceforge.net/projects/lg3d-livecd/"&gt;预览版的 LiveCD&lt;/a&gt;
+。只可惜时隔久远（12年前了）在我的 VirtualBox 上已经不能跑起来这个 LiveCD 了……&lt;/p&gt;
+&lt;p&gt;更为可惜的是，就在这个项目刚刚公开展示出来的时候，乔布斯就致电升阳，
+说如果继续商业化这个产品，升阳公司将涉嫌侵犯苹果的知识产权
+（时间顺序上来看，苹果最初展示 Exposé 是在 2003年6月23日的
+Apple Worldwide Developers Conference ，而升阳最初展示
+LG3D 是在 2003年8月5日的 LinuxWorld Expo）。
+虽然和乔布斯的指控无关，升阳公司本身的业务也着重于服务器端的业务，
+后来随着升阳的财政困难，这个项目也就停止开发并不了了之了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="windows"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Windows 中的混成器&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Longhorn 中的 Wobbly 效果&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_X0idaN0MY1U"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/X0idaN0MY1U"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XOTEzMzY5NjQ0"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XOTEzMzY5NjQ0/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_X0idaN0MY1U"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XOTEzMzY5NjQ0"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;上面说到， Windows 系列中到 XP 为止都还没有使用混成器绘制窗口。
+看着 Mac OS X 上有了美轮美奂的动画效果， Windows 这边自然不甘示弱。
+于是同样在 2003 年展示的 Project Longhorn 中就演示了 wobbly 效果的窗口，
+并且跳票推迟多年之后的 Windows Vista 中实现了完整的混成器
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager"&gt;Desktop Window Manager (DWM)&lt;/a&gt;
+。整个 DWM 的架构和 Mac OS X 上看到的很像：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/&gt;
+&lt;p&gt;和 Mac OS X 的情况类似， Windows Vista 之后的应用程序有两套主要的绘图库，一套是从早期
+Win32API 就沿用至今的 GDI（以及GDI+），另一套是随着 Longhorn 计划开发出的 WPF 。
+WPF 的所有用户界面控件都绘制在 DirectX 贴图上，所以使用了 WPF 的程序也可以看作是
+DirectX 程序。而对老旧的 GDI 程序而言，它们并不是直接绘制到 DirectX 贴图的。首先每一个
+GDI 的绘图操作都对应一条
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Windows_Metafile"&gt;Windows Metafile (WMF)&lt;/a&gt;
+记录，所以 WMF 就可以看作是 Mac OS X 的 Quartz 内部用的 PDF 或者 NeXTSTEP 内部用的
+DPS，它们都是矢量图描述。随后，这些 WMF 绘图操作被通过一个
+Canonical Display Driver (cdd.dll) 的内部组建转换到 DirectX 平面，并且保存起来交给
+DWM。最后， DWM 拿到来自 CDD 或者 DirectX 的平面，把它们混合起来绘制在屏幕上。&lt;/p&gt;
+&lt;p&gt;值得注意的细节是，WPF 底层的绘图库几乎肯定有 C/C++ 绑定对应， Windows 自带的不少应用程序
+和 Office 2007 用了 Ribbon 之后的版本都采用这套绘图引擎，不过微软没有公开这套绘图库的
+C/C++ 实现的底层细节，而只能通过 .Net 框架的 WPF 访问它。这一点和 OS X 上只能通过
+Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。&lt;/p&gt;
+&lt;p&gt;另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
+基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
+在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
+&lt;strong&gt;直接绘制&lt;/strong&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
+而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
+DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，
+只有 DWM 处于 DirectX 的直接渲染模式下，而别的窗口都输出到 DirectX 平面里（可能通过了硬件加速）。&lt;/p&gt;
+&lt;p&gt;由 DWM 的这种实现方式，可以解释为什么
+&lt;a class="reference external" href="http://gaming.stackexchange.com/questions/13066/why-is-windowed-mode-always-slower-in-games"&gt;窗口模式下的游戏总是显得比较慢&lt;/a&gt;
+，原因是整个桌面有很多不同的窗口都需要 DWM 最后混成，而如果在全屏模式下，只有游戏
+处于 DirectX 的直接渲染方式，从而不会浪费对游戏而言宝贵的 GPU 资源。&lt;/p&gt;
+&lt;p&gt;由于 DWM 实现了混成器，使得 Vista 和随后的 Windows 7 有了
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Windows_Aero"&gt;Aero Glass&lt;/a&gt; 的界面风格，
+有了 Flip 3D 、Aero Peek 等等的这些辅助功能和动画效果。
+这套渲染方式延续到 Windows 8 之后，虽然 Windows 8 还提出了 Modern UI
+不过传统桌面上的渲染仍旧是依靠混成器来做的。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linux"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;这就结束了？ Linux 桌面呢？&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;别急，我写这些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下现有的混成器和 Wayland
+，这篇文章只是个背景介绍。关于 X 中混成器的实现方式和限制，且听我下回分解。&lt;/p&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="desktop"></category><category term="compositor"></category><category term="macosx"></category><category term="windows"></category><category term="window"></category><category term="manager"></category></entry><entry><title>避免在博文中写「简单地」</title><link href="//farseerfc.me/zhs/stop-write-simply.html" rel="alternate"></link><updated>2015-03-11T22:00:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-11:zhs/stop-write-simply.html</id><summary type="html">&lt;p&gt;我的 RSS 订阅着一个博客叫 &lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/"&gt;The Old New Thing&lt;/a&gt;
 ，作者是Windows开发者之一的 Raymond Chen ，记录 Windows 中的很多有趣的技术细节。
 这个博客中的一些精彩内容还被他写成了一本书，中文名叫《Windows编程启示录》
 (ISBN: &lt;a class="reference external" href="http://www.amazon.cn/dp/B0011C1ZEG/"&gt;978-7-111-21919-4&lt;/a&gt;) 而英文书名就叫
@@ -1252,11 +1696,11 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
@@ -1614,11 +2058,39 @@ TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
 只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。
 视频如下：&lt;/p&gt;
 
-&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。&lt;/p&gt;
 &lt;p&gt;比比之前 Gnome3 那个跳动的界面真是好太多了：&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
-&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;div align="left" class="embed-responsive embed-responsive-16by9"&gt;&lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt;&lt;/div&gt;&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_TRQJdRHYwrw"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XNjc4MjQ5NjE2"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_TRQJdRHYwrw"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XNjc4MjQ5NjE2"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译：&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国语翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</summary><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>嫁给我好么</title><link href="//farseerfc.me/zhs/marry-me.html" rel="alternate"></link><updated>2013-02-20T20:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2013-02-20:zhs/marry-me.html</id><summary type="html">&lt;div class="panel panel-default"&gt;

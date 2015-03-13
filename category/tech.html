@@ -39,7 +39,7 @@
               title="Farseerfc的小窩 ATOM Feed"/>
 
         <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
-        <link href="//farseerfc.me/theme/css/ripples.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
 </head>
 <body>
 <div style="display:none" id="title">tech - Farseerfc的小窩</div>
@@ -179,6 +179,93 @@ Farseerfc的小窩            </a>
         <li><a href="//farseerfc.me/feeds/tech.atom.xml" title="訂閱分類 "><i class="fa fa-rss fa-lg"></i></a></li>
     </ol>
     <div class="articles-container">
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/compositor-in-X-and-compositext.html" class="btn btn-primary btn-lg"><h2>X 中的混成器與 Composite 擴展
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/compositor-in-X-and-compositext.html">繁體</a></li><li><a href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" class="translate">简体</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/compositor-in-X-and-compositext.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="compositor-in-X-and-compositext" data-disqus-url="http://farseerfc.me/compositor-in-X-and-compositext.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary">
+<p>在上篇文章 <a class="reference external" href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html">「桌面系統的混成器簡史」</a>
+中我介紹了其它桌面系統中的混成器的發展史和工作原理，
+話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。
+這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 <a class="reference external" href="#id6">結論</a> 。</p>
+<div class="section" id="x">
+<h2><a class="toc-backref" href="#id8">原始的 X 的繪圖模型</a></h2>
+<p>首先，沒有混成器的時候 X 是這樣畫圖的：</p>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/>
+<p>X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 <a class="reference external" href="http://cairographics.org/">Cairo</a> 繪圖，
+而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
+其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 ...</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html" class="btn btn-primary btn-lg"><h2>桌面系統的混成器簡史
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html">繁體</a></li><li><a href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" class="translate">简体</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="brief-history-of-compositors-in-desktop-os" data-disqus-url="http://farseerfc.me/brief-history-of-compositors-in-desktop-os.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary">
+<p>Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
+是一個混成器，替代 X 作爲顯示服務器。
+那麼 <strong>混成器</strong> 是個什麼東西，桌面系統爲什麼需要它呢？
+要理解爲什麼桌面系統需要 <strong>混成器</strong> （或者它的另一個叫法，
+<ruby><rb>混成窗口管理器</rb><rp>(</rp><rt>Compositing Window Manager</rt><rp>)</rp></ruby>
+），在這篇文章中我想回顧一下歷史，
+瞭解一下混成器出現的前因後果。</p>
+<p>首先介紹一下混成器出現前主要的一類窗口管理器，也就是
+<ruby><rb>棧式窗口管理器</rb><rp>(</rp><rt>Stacking Window Manager</rt><rp>)</rp></ruby> 的實現方式。</p>
+
+<p>我們知道最初圖形界面的應用程序是全屏的，獨佔整個顯示器（現在很多遊戲機和手持設備的實現仍舊如此）。
+所有程序都全屏並且任何時刻只能看到一個程序的輸出，這個限制顯然不能滿足人們使用計算機的需求，
+於是就有了 <a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)">窗口</a>
+的概念，有了 <a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_metaphor">桌面隱喻</a> 。</p>
+<p>在 <ruby><rb>桌面隱喻</rb><rp>(</rp><rt>Desktop Metaphor</rt><rp>)</rp></ruby> 中每個窗口只佔用顯示面積的一小部分，
+有其顯示的位置和大小，可以互相遮蓋。於是棧式窗口管理器就是在圖形界面中實現桌面隱喻的核心功能，
+其實現方式大體就是：給每個窗口一個相對的“高度”或者說“遠近”，比較高的窗口顯得距離用戶比較近，
+會覆蓋其下比較低的窗口。繪圖的時候窗口管理器會從把窗口按高低排序，按照從低到高的順序使用
+<a class="reference external" href="http://zh.wikipedia.org/wiki/%E7%94%BB%E5%AE%B6%E7%AE%97%E6%B3%95">畫家算法</a>
+繪製整個屏幕。</p>
+
+                    </div>
+                </div>
+            </article>
+        </div>
         <div class="article-item">
             <article class="panel panel-primary">
                 <div class="panel-heading">
@@ -588,48 +675,17 @@ From now on you should be able ...</pre>
                 </div>
             </article>
         </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/try-pelican.html" class="btn btn-primary btn-lg"><h2>嘗試一下 Pelican
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/try-pelican.html">繁體</a></li><li><a href="//farseerfc.me/en/try-pelican.html" class="translate">English</a></li><li><a href="//farseerfc.me/jp/try-pelican.html" class="translate">日本語</a></li><li><a href="//farseerfc.me/zhs/try-pelican.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/try-pelican.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="try-pelican" data-disqus-url="http://farseerfc.me/try-pelican.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>似乎一夜之間所有的
-<a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/">極客們</a>
-<a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/">都</a>
-<a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/">有了</a>
-<a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html">自己</a>
-的 <a class="reference external" href="http://pages.github.com/#user__organization_pages">Github主頁</a>
-和 <a class="reference external" href="http://octopress.org/">Octopress</a> 博客。就像所有人在他們的博客中指出的，靜態博客的確比傳統的WordPress方式具有更多優勢。 自從看到這些
-我就一直在想着自己搭一個 <a class="reference external" href="http://octopress.org/">Octopress</a> 。</p>
-<div class="section" id="id6">
-<h2>但是似乎 <a class="reference external" href="http://octopress.org/">Octopress</a> 不適合我</h2>
-<p>一上手就被 <a class="reference external" href="http://octopress.org/docs/setup/">Octopress的搭建步驟</a> 煩到了。 <a class="reference external" href="http://beginrescueend.com/">RVM</a> 是什麼？ <a class="reference external" href="https://github.com/sstephenson/rbenv">rbenv</a> 又是什麼？
-看來 Ruby 社區的快節奏發展已經超過了我的想象，他們似乎需要一套發行版管理器來調和不同版本之間的 Ruby 的兼容性問題。
-雖然同樣的兼容性問題在 Python 社區也有 <a class="footnote-reference" href="#id10" id="id8">[1]</a> ，不過總覺得 Python 至少還沒到需要一個發行版管理器的程度 <a class="footnote-reference" href="#id11" id="id9">[2]</a> 。</p>
-<p>真正的問題是我手上還沒有一個可以讓我隨便玩的 Linux 環境（真的想要……）。 而無論是 <a class="reference external" href="http://beginrescueend.com/">RVM</a> 還是 <a class="reference external" href="https://github.com/sstephenson/rbenv">rbenv</a> 似乎都只支持 Unix/Linux ...</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
     </div>
 
+        <ul class="pagination">
+                <li class="prev disabled"><a href="#">&laquo;</a></li>
+                    <li class="active"><a
+                            href="//farseerfc.me/category/tech.html">1</a></li>
+                    <li class=""><a
+                            href="//farseerfc.me/category/tech2.html">2</a></li>
+                <li class="next"><a
+                        href="//farseerfc.me/category/tech2.html">&raquo;</a></li>
+        </ul>
             </div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -716,8 +772,18 @@ From now on you should be able ...</pre>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/domain.html">
                     domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -752,7 +818,7 @@ From now on you should be able ...</pre>
             </li>
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/tag/linux.html">
-                    linux <sup> 4</sup>
+                    linux <sup> 5</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -795,9 +861,9 @@ From now on you should be able ...</pre>
                     msr <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
+            <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/tag/desktop.html">
-                    desktop <sup> 1</sup>
+                    desktop <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -805,9 +871,14 @@ From now on you should be able ...</pre>
                     blog <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/tag/python.html">
-                    python <sup> 4</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -886,8 +957,18 @@ From now on you should be able ...</pre>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/ubuntu.html">
                     ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -921,6 +1002,11 @@ From now on you should be able ...</pre>
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/stdio.html">
                     stdio <sup> 1</sup>
                 </a>
@@ -928,6 +1014,11 @@ From now on you should be able ...</pre>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/bootstrap.html">
                     bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
