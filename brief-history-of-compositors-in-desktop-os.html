@@ -231,7 +231,7 @@ Farseerfc的小窩            </a>
 </span>
 
 
-    <wb:share-button appkey="NANnN" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「桌面系統的混成器簡史」Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland 是一個混成器，替代 X 作爲顯示服務器。 那麼 混成器 是個什麼東西，桌面系統爲什麼需要它呢？ 要理解爲什麼桌面系統需要 混成器 （或者它的另一個叫法， 混成窗口管理器(Compositing Window Manager) ），在這篇文章中我想回顧一下歷史， 瞭解一下混成器出現的前因後果。 首先介紹一下混成器出現前主要的一類窗口管理器，也就是 棧式窗口管理器(Stacking Window Manager) 的實現方式。 我們知道最初圖形界面的應用程序是全屏的，獨佔整個顯示器（現在很多遊戲機和手持設備的實現仍舊如此）。 所有程序都全屏並且任何時刻只能看到一個程序的輸出，這個限制顯然不能滿足人們使用計算機的需求， 於是就有了 窗口 的概念，有了 桌面隱喻 。 在 桌面隱喻(Desktop Metaphor) 中每個窗口只佔用顯示面積的一小部分， 有其顯示的位置和大小，可以互相遮蓋。於是棧式窗口管理器就是在圖形界面中實現桌面隱喻的核心功能， 其實現方式大體就是：給每個窗口一個相對的“高度”或者說“遠近”，比較高的窗口顯得距離用戶比較近， 會覆蓋其下比較低的窗口。繪圖的時候窗口管理器會從把窗口按高低排序，按照從低到高的順序使用 畫家算法 繪製整個屏幕。"  pic="http%3A//farseerfc.me%2Fbrief-history-of-compositors-in-desktop-os.png"></wb:share-button>
+    <wb:share-button appkey="NANnN" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「桌面系統的混成器簡史」Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland 是一個混成器，替代 X 作爲顯示服務器。 那麼 混成器 是個什麼東西，桌面系統爲什麼需要它呢？ 要理解爲什麼桌面系統需要 混成器 （或者它的另一個叫法， 混成窗口管理器(Compositin..."  pic="http%3A//farseerfc.me%2Fbrief-history-of-compositors-in-desktop-os.png"></wb:share-button>
 
 </div><!-- /.post-info -->                </div>
             </header>
@@ -455,13 +455,17 @@ Objective-C 下的 Cocoa API 調用 Quartz 的情況類似。</p>
 而在 WDDM 規範的 Vista 中，所有窗口最終都繪製到 DirectX 平面上，換句話說每個窗口都是
 DirectX 窗口。又或者我們可以認爲，整個界面上只有一個真正的窗口也就是 DWM 繪製的全屏窗口，
 只有 DWM 處於 DirectX 的直接渲染模式下，而別的窗口都輸出到 DirectX 平面裏（可能通過了硬件加速）。</p>
+<p>由 DWM 的這種實現方式，可以解釋爲什麼
+<a class="reference external" href="http://gaming.stackexchange.com/questions/13066/why-is-windowed-mode-always-slower-in-games">窗口模式下的遊戲總是顯得比較慢</a>
+，原因是整個桌面有很多不同的窗口都需要 DWM 最後混成，而如果在全屏模式下，只有遊戲
+處於 DirectX 的直接渲染方式，從而不會浪費對遊戲而言寶貴的 GPU 資源。</p>
 <p>由於 DWM 實現了混成器，使得 Vista 和隨後的 Windows 7 有了
 <a class="reference external" href="http://en.wikipedia.org/wiki/Windows_Aero">Aero Glass</a> 的界面風格，
 有了 Flip 3D 、Aero Peek 等等的這些輔助功能和動畫效果。
 這套渲染方式延續到 Windows 8 之後，雖然 Windows 8 還提出了 Modern UI
 不過傳統桌面上的渲染仍舊是依靠混成器來做的。</p>
 </div>
-<div class="section" id="id10">
+<div class="section" id="id11">
 <h2>這就結束了？</h2>
 <p>別急，我寫這些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下現有的混成器和 Wayland
 ，這篇文章只是個背景介紹。關於 X 中混成器的實現方式和限制，且聽我下回分解。</p>
