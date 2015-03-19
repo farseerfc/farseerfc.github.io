@@ -119,7 +119,7 @@ NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windo
 比起让窗口直接绘制，这种方案在滚动和移动窗口的时候不需要重新渲染保存好的 DPS ，
 所以能实现实时渲染。到了实现 Mac OS X 的时候，为了同时兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考虑到 Adobe 对苹果收取的高昂的 Display PostScript 授权费，
-Mac OS X 的 Quartz 技术在矢量图的 PDF 格式和最终渲染之间又插入了一层抽象：
+Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间又插入了一层抽象：
 
 .. ditaa::
 
