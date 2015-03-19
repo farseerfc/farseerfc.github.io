@@ -1,5 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/all-zhs.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-19T13:45:00+09:00</updated><entry><title>桌面系统的混成器简史</title><link href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">&lt;p&gt;（原本是想写篇关于 Wayland 的文章，后来越写越长感觉能形成一个系列，
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/all-zhs.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-19T17:45:00+09:00</updated><entry><title>X 中的混成器与 Composite 扩展</title><link href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" rel="alternate"></link><updated>2015-03-19T17:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/compositor-in-X-and-compositext.html</id><summary type="html">
+&lt;p&gt;在上篇文章 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"&gt;「桌面系统的混成器简史」&lt;/a&gt;
+中我介绍了其它桌面系统中的混成器的发展史和工作原理，
+话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。
+这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 &lt;a class="reference external" href="#id6"&gt;结论&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
+而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
+其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图。
+QT 的情况也是类似，基本上用 QPaint 子系统绘制成位图然后交给 X 的显示服务器。
+显示服务器拿到这些绘制请求之后，再在屏幕上的相应位置绘制整个屏幕。
+当然还有很多老旧的不用 GTK 或者 QT 的程序，他们则直接调用 X 核心协议提供的绘图原语。&lt;/p&gt;
+&lt;p&gt;值得注意一点是 X 上除了没有统一的绘图模型，也没有统一的矢量图格式。
+X 核心协议的绘图原语提供的是像素单位的绘图操作，没有类似 GDI+ 或者 Quartz
+提供的 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Device Independence&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的「点」的抽象。所以只用 X
+的绘图原语的话，我们可以把 (1,1) 这个像素点涂黑，但是不能把 (0.5, 0.5)
+这个点涂黑，这一设计缺陷在
+&lt;a class="reference external" href="http://web.mit.edu/~simsong/www/ugh.pdf"&gt;Unix Hater's Handbook&lt;/a&gt;
+中已经被吐槽过了。因为这个缺陷，所以直接用 X 绘图原语绘制的图像不能像
+矢量图那样进行无损缩放。同样的缺陷导致 X 绘图原语绘制的字符不能做到
+&lt;ruby&gt;&lt;rb&gt;子像素级&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;抗锯齿&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;anti-aliasing&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+（这解释了默认配置下的 xterm 和
+&lt;a class="reference external" href="http://arch.acgtyrant.com/2015/01/05/I-do-not-recommend-urxvt-again-now/"&gt;urxvt 中的字体渲染为什么难看&lt;/a&gt;
+）。相比之下 GDI 有对应的 WMF 矢量图格式， Quartz 有对应的 PDF 矢量图格式，
+而 X 中没有这样的格式对应。因为没有统一的矢量图格式，所以无论是 Cairo 、QPaint
+还是没有用这些绘图库但是同样在意字体和曲线渲染效果的程序（比如 Firefox 和
+Chromium）都需要首先渲染到内部的 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/X_PixMap"&gt;XPixMap&lt;/a&gt;
+位图格式，做好子像素渲染和矢量缩放，然后再把渲染好的位图转交给 X 图形服务器。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="composite"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;通过 Composite 扩展重定向窗口输出&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;2004年发布的 X11R6.8 版本的 Xorg 引入了
+&lt;a class="reference external" href="http://freedesktop.org/wiki/Software/CompositeExt/"&gt;Composite 扩展&lt;/a&gt;
+。这个扩展背后的动机以及前因后果在一篇文章
+&lt;a class="reference external" href="http://keithp.com/~keithp/talks/xarch_ols2004/xarch-ols2004-html/"&gt;The (Re)Architecture of the X Window System&lt;/a&gt;
+中有详细的表述。Composite 扩展允许某个 X 程序做这几件事情：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+RedirectSubwindows&lt;/code&gt;
+ 调用将一个窗口树中的所有窗口渲染重定向到
+&lt;ruby&gt;&lt;rb&gt;内部存储&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;off-screen storage&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。重定向的时候可以指定让 X
+自动更新窗口的内容到屏幕上或者由混成器手动更新。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+NameWindowPixmap&lt;/code&gt;
+ 取得某个窗口的内部存储。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+GetOverlayWindow&lt;/code&gt;
+ 获得一个特殊的用于绘图的窗口，
+在这个窗口上绘制的图像将覆盖在屏幕的最上面。&lt;/li&gt;
+&lt;li&gt;通过 &lt;code class="code"&gt;
+CreateRegionFromBorderClip&lt;/code&gt;
+ 取得某个窗口的边界剪裁区域（不一定是矩形）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;有了 Composite 扩展，一个 X 程序就可以调用这些 API 实现混成器。
+这里有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教学解释如何使用 Composite 扩展&lt;/a&gt; 。开启了混成的 X 是这样绘图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
+&lt;p&gt;整个 X 的混成器模型与 Mac OS X 的混成器模型相比，有如下几点显著的区别：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
+出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
+OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;strong&gt;在不同的三个程序之间来回传递&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+RedirectSubwindows&lt;/code&gt;
+ 调用针对的是一个窗口树，换句话说是一个窗口
+及其全部子窗口，不同于 Mac OS X 中混成器会拿到全部窗口的输出。
+这个特点其实并不算是限制，因为 X 中每个虚拟桌面都有一个根窗口，只要指定这个根窗口
+就可以拿到整个虚拟桌面上的全部可见窗口输出了。
+反而这个设计提供了一定的自由度，比如我们可以用这个调用实现一个截图程序，
+拿到某个特定窗口的输出，而不用在意别的窗口。&lt;/li&gt;
+&lt;li&gt;为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
+状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+的状态。因此直接用上述方法 &lt;strong&gt;不能得到没有显示的窗口的输出&lt;/strong&gt; ，比如不能对最小化的窗口
+直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
+比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+不过要实现这一点需要混成器和窗口管理器相互配合。&lt;/li&gt;
+&lt;li&gt;不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device independent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+的，这里 X 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备相关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device dependent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的。
+这既是优点也是缺点。从缺点方面而言，显示到 X 的位图输出因为设备相关性，
+所以严格对应显示器的点阵，并不适合作为文档格式打印出来。当然无论是 Cairo
+还是 QPaint 都提供了到 PostScript 或者 PDF 后端的输出，所以实用层面这个并不构成问题。
+设备相关这一点的优点在于，绘制到 XPM 位图的时候，程序和绘图库是能拿到输出设备（显示器）
+的特殊属性的，从而绘图库能考虑不同的色彩、分辨率、 DPI 或者
+&lt;ruby&gt;&lt;rb&gt;子像素布局&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel layout&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 这些属性以提供最好的渲染效果。
+Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
+10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
+上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;输入事件的重定向，这可能做到么？&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;strong&gt;输出&lt;/strong&gt; 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;strong&gt;没有重定向输入&lt;/strong&gt; 。
+考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
+上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。&lt;/p&gt;
+&lt;p&gt;需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
+由于 Composite 扩展并没有直接提供这方面的重定向 API ，这使得输入事件处理起来都比较麻烦，&lt;/p&gt;
+&lt;p&gt;假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
+那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
+看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
+于是 &lt;strong&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/strong&gt;
+。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
+因为不像重定向窗口输出那样只需要考虑 &lt;ruby&gt;&lt;rb&gt;顶层&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
+重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
+以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
+中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。&lt;/p&gt;
+&lt;p&gt;由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
+&lt;strong&gt;不重定向输入事件&lt;/strong&gt; 而把它交给 X 处理。具体的实现方式就是通过
+&lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
+扩展提供的 &lt;code class="code"&gt;
+SetWindowShapeRegion&lt;/code&gt;
+ API 将 OverlayWindow 的 &lt;strong&gt;输入区域&lt;/strong&gt;
+&lt;code class="code"&gt;
+ShapeInput&lt;/code&gt;
+ 设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
+这样一来对 OverlayWindow 的点击会透过 OverlayWindow 直接作用到底下的窗口上。&lt;/p&gt;
+&lt;p&gt;因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
+（并不是移动窗口的位置）， &lt;strong&gt;但是不能让用户与窗口的内容交互&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;正常状态下可以让用户与窗口的内容交互，但是
+&lt;strong&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/strong&gt;
+。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
+变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 &lt;ruby&gt;&lt;rb&gt;活动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
+的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
+&lt;strong&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/strong&gt; 。&lt;/p&gt;
+&lt;p&gt;Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
+效果，而不能实现 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那样直接在 3D 空间中操纵窗口内容。&lt;/p&gt;
+&lt;p&gt;解决重定向问题曾经的一缕曙光是 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在开发 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的过程中同时提议过另一个 X
+扩展叫做 Event Interception 或者简称 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/XEvIE/"&gt;XEvIE&lt;/a&gt; ，这个扩展的设计目的就是提供 API
+让某个程序接收并操纵全部的键盘和鼠标事件。可惜这个扩展随着升阳公司本身的陨落而
+处于无人维护的状态，这一点也在它的官方网页上说明了：&lt;/p&gt;
+&lt;blockquote&gt;
+It has been suggested that this extension should not be used
+because it is broken and maintainerless.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;Composite 扩展的不足&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;通过上面的介绍，我们就已经可以看到 Composite 扩展的不足之处了。
+总结起来说，主要有两大不足：&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;绘图效率低。因为同样的位图从应用程序传到 Xorg ，再从 Xorg 传到混成器，
+最后从混成器再绘制到屏幕上，绕了一个大弯。这就是为什么 Wayland 的开发者在他的slide
+&lt;a class="reference external" href="http://people.freedesktop.org/~daniels/lca2013-wayland-x11.pdf"&gt;the real story behind Wayland and X&lt;/a&gt;
+里这么说：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;and what's the X server? really bad IPC&lt;/p&gt;
+&lt;p&gt;那么 X 服务器到底做了什么呢？ 非常糟糕的进程间通讯&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;没有重定向输入事件。如果我们要在 X 的混成器里做这个事情，
+基本上我们要全部重写一遍 X 已经写好的窗口事件分发逻辑。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;既然同样要重写，为什么不直接重写一遍 X 呢，扔掉那些历史负担，扔掉那些无用的 API
+，重新设计可扩展的 API ，做好快速安全的 IPC —— 嗯，重写 X 就是 Wayland 的目的。&lt;/p&gt;
+&lt;p&gt;不过这么重写了的 Wayland 还是我们熟悉可爱的 X 么？它有哪些地方变样了？
+这将是我下一篇文章的内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;附录：扩展阅读&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;我自己没有写过窗口管理器，没有写过混成器，没有写过 Wayland
+程序，以上说的都是我从互联网上看到的整理出来的内容。写下本文的过程中我参考了这些文章：&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://keithp.com/~keithp/talks/xarch_ols2004/xarch-ols2004-html/"&gt;The (Re)Architecture of the X Window System&lt;/a&gt; 这篇2004年写的文章描述了 Composite
+扩展出现的动机和历史，介绍了绘图库的实现情况，涉及了上面所说的那些 X 扩展被用到的情况和可能。
+同时这篇文章还展望了很多现在的 X 已然实现了的功能，比如 OpenGL 和 X 的结合方面我们有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/GLX"&gt;GLX&lt;/a&gt; 和 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/AIGLX"&gt;AIGLX&lt;/a&gt;
+，比如内核的显卡支持方面我们有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Direct_Rendering_Infrastructure"&gt;DRI&lt;/a&gt; 和 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Mode_setting"&gt;KMS&lt;/a&gt; 。总之这是一篇描述 Linux
+桌面未来的发展轨迹的非常有阅读价值的历史文献。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://wingolog.org/archives/2008/07/26/so-you-want-to-build-a-compositor"&gt;so you want to build a compositor&lt;/a&gt; 这是一篇 2008 年写的博文，介绍如何用 Clutter
+实现一个最简单的混成器。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;Composite tutorial&lt;/a&gt; 这是另一篇介绍如何实现一个简单的混成器的博文，用 Qt 实现，但是同样很底层。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://projects.mini-dweeb.org/projects/unagi"&gt;unagi&lt;/a&gt; 这是一个可用的（但是已经长期没有开发的）类似 xcompmgr 的混成器。这个项目貌似
+是一位研究生的硕士毕业设计，同时他公开了硕士学位的毕业论文
+&lt;a class="reference external" href="http://projects.mini-dweeb.org/attachments/download/3/report.pdf"&gt;Master thesis: Writing an X compositing manager&lt;/a&gt;
+其中也对实现一个简单的混成器做了详尽描述，包括介绍了相关的 X 扩展和调用。&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="linux"></category><category term="wayland"></category><category term="xorg"></category><category term="compositor"></category></entry><entry><title>桌面系统的混成器简史</title><link href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">
+&lt;p&gt;（原本是想写篇关于 Wayland 的文章，后来越写越长感觉能形成一个系列，
 于是就先把这篇背景介绍性质的部分发出来了。）&lt;/p&gt;
 
 &lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
@@ -15,7 +200,7 @@
 &lt;div class="label label-warning"&gt;
 本文中所有桌面截图来自维基百科，不具有著作权保护。&lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt;早期的栈式窗口管理器&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;早期的栈式窗口管理器&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 栈式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
@@ -64,7 +249,7 @@
 重绘事件和不规则形状的窗口剪裁，不过这些技巧都是一连串的 hack ，难以扩展。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="nextstep-mac-os-x"&gt;
-&lt;h2&gt;NeXTSTEP 与 Mac OS X 中混成器的发展&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;NeXTSTEP 与 Mac OS X 中混成器的发展&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 NeXTSTEP 桌面&lt;/div&gt;
@@ -108,7 +293,7 @@ Mission Control) 功能，把窗口的缩略图（而不是事先绘制的图标
 了！&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="project-looking-glass-3d"&gt;
-&lt;h2&gt;插曲：昙花一现的 Project Looking Glass 3D&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;插曲：昙花一现的 Project Looking Glass 3D&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;在苹果那边刚刚开始使用混成器渲染窗口的 2003 年，昔日的 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 则在 Linux 上用 Java3D 作出了另一个炫酷到没有朋友的东西，被他们命名为
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Project_Looking_Glass"&gt;Project Looking Glass 3D&lt;/a&gt;
@@ -167,7 +352,7 @@ LG3D 是在 2003年8月5日的 LinuxWorld Expo）。
 后来随着升阳的财政困难，这个项目也就停止开发并不了了之了。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="windows"&gt;
-&lt;h2&gt;Windows 中的混成器&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Windows 中的混成器&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Longhorn 中的 Wobbly 效果&lt;/div&gt;
@@ -228,11 +413,11 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 不过传统桌面上的渲染仍旧是依靠混成器来做的。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="linux"&gt;
-&lt;h2&gt;这就结束了？ Linux 桌面呢？&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;这就结束了？ Linux 桌面呢？&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;别急，我写这些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下现有的混成器和 Wayland
 ，这篇文章只是个背景介绍。关于 X 中混成器的实现方式和限制，且听我下回分解。&lt;/p&gt;
 &lt;/div&gt;
-&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
@@ -1511,7 +1696,7 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
