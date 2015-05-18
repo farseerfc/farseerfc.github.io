@@ -64,7 +64,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
 出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
 OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
-比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;strong&gt;在不同的三个程序之间来回传递&lt;/strong&gt; 。&lt;/li&gt;
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;em&gt;在不同的三个程序之间来回传递&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;&lt;code class="code"&gt;
 RedirectSubwindows&lt;/code&gt;
  调用针对的是一个窗口树，换句话说是一个窗口
@@ -75,9 +75,9 @@ RedirectSubwindows&lt;/code&gt;
 拿到某个特定窗口的输出，而不用在意别的窗口。&lt;/li&gt;
 &lt;li&gt;为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
 状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
-的状态。因此直接用上述方法 &lt;strong&gt;不能得到没有显示的窗口的输出&lt;/strong&gt; ，比如不能对最小化的窗口
+的状态。因此直接用上述方法 &lt;em&gt;不能得到没有显示的窗口的输出&lt;/em&gt; ，比如不能对最小化的窗口
 直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
-比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+比如在需要窗口输出的时候临时把窗口映射到桌面上，拿到输出之后再隐藏起来，
 不过要实现这一点需要混成器和窗口管理器相互配合。&lt;/li&gt;
 &lt;li&gt;不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device independent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 的，这里 X 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备相关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device dependent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的。
@@ -89,14 +89,14 @@ RedirectSubwindows&lt;/code&gt;
 &lt;ruby&gt;&lt;rb&gt;子像素布局&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel layout&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 这些属性以提供最好的渲染效果。
 Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
 10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
-上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器采用的
 OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;输入事件的重定向，这可能做到么？&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;strong&gt;输出&lt;/strong&gt; 重定向到自己的窗口上。
-但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;strong&gt;没有重定向输入&lt;/strong&gt; 。
+&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;em&gt;输出&lt;/em&gt; 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;em&gt;没有重定向输入&lt;/em&gt; 。
 考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
 上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。&lt;/p&gt;
 &lt;p&gt;需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
@@ -104,18 +104,18 @@ OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;p&gt;假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
 那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
 看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
-于是 &lt;strong&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/strong&gt;
+于是 &lt;em&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/em&gt;
 。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
 因为不像重定向窗口输出那样只需要考虑 &lt;ruby&gt;&lt;rb&gt;顶层&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
 重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
 以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
 中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。&lt;/p&gt;
 &lt;p&gt;由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
-&lt;strong&gt;不重定向输入事件&lt;/strong&gt; 而把它交给 X 处理。具体的实现方式就是通过
+&lt;em&gt;不重定向输入事件&lt;/em&gt; 而把它交给 X 处理。具体的实现方式就是通过
 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
 扩展提供的 &lt;code class="code"&gt;
 SetWindowShapeRegion&lt;/code&gt;
- API 将 OverlayWindow 的 &lt;strong&gt;输入区域&lt;/strong&gt;
+ API 将 OverlayWindow 的 &lt;em&gt;输入区域&lt;/em&gt;
 &lt;code class="code"&gt;
 ShapeInput&lt;/code&gt;
  设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
@@ -123,16 +123,16 @@ ShapeInput&lt;/code&gt;
 &lt;p&gt;因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
-（并不是移动窗口的位置）， &lt;strong&gt;但是不能让用户与窗口的内容交互&lt;/strong&gt; 。&lt;/li&gt;
+（并不是移动窗口的位置）， &lt;em&gt;但是不能让用户与窗口的内容交互&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;正常状态下可以让用户与窗口的内容交互，但是
-&lt;strong&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/strong&gt;
+&lt;em&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/em&gt;
 。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
 变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 &lt;ruby&gt;&lt;rb&gt;活动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
 的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
-&lt;strong&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/strong&gt; 。&lt;/p&gt;
+&lt;em&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/em&gt; 。&lt;/p&gt;
 &lt;p&gt;Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
 效果，而不能实现 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那样直接在 3D 空间中操纵窗口内容。&lt;/p&gt;
 &lt;p&gt;解决重定向问题曾经的一缕曙光是 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在开发 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的过程中同时提议过另一个 X
@@ -189,8 +189,8 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 
 &lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
 是一个混成器，替代 X 作为显示服务器。
-那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
-要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
+那么 &lt;em&gt;混成器&lt;/em&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;em&gt;混成器&lt;/em&gt; （或者它的另一个叫法，
 &lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 ），在这篇文章中我想回顾一下历史，
 了解一下混成器出现的前因后果。&lt;/p&gt;
@@ -230,10 +230,10 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 &lt;span class="math"&gt;\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)&lt;/span&gt; 左右，
 而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
 这无疑都是一个庞大的负担。&lt;/p&gt;
-&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;strong&gt;优势&lt;/strong&gt; ：如果正确地采用画家算法，
-并且合理地控制重绘时 &lt;strong&gt;只绘制没有被别的窗口覆盖的部分&lt;/strong&gt; ，那么无论有多少窗口互相
+&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;em&gt;优势&lt;/em&gt; ：如果正确地采用画家算法，
+并且合理地控制重绘时 &lt;em&gt;只绘制没有被别的窗口覆盖的部分&lt;/em&gt; ，那么无论有多少窗口互相
 遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
-同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;strong&gt;限制&lt;/strong&gt; ：&lt;/p&gt;
+同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;em&gt;限制&lt;/em&gt; ：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;窗口必须是矩形的，不能支持不规则形状的窗口。&lt;/li&gt;
 &lt;li&gt;不支持透明或者半透明的颜色。&lt;/li&gt;
@@ -260,7 +260,7 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;p&gt;转眼进入了千禧年， Windows 称霸了 PC 产业，苹果为重振 Macintosh 请回了 Jobs 基于 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP"&gt;NeXTSTEP&lt;/a&gt;
 开发 Mac OSX 。&lt;/p&gt;
 &lt;p&gt;NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
-拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;strong&gt;实时更新&lt;/strong&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
+拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;em&gt;实时更新&lt;/em&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
 而实现这个特性的基础是在 NeXTSTEP 中运用了
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
@@ -338,7 +338,7 @@ LG3D&lt;/div&gt;
 在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
 还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
 Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
-下的窗口是 &lt;strong&gt;可以接受输入事件&lt;/strong&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
+下的窗口是 &lt;em&gt;可以接受输入事件&lt;/em&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
 LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。&lt;/p&gt;
 &lt;p&gt;LG3D 虽然以 GPL 放出了实现的源代码，不过整个项目已经停滞开发许久了。
 官方曾经放出过一个
@@ -398,7 +398,7 @@ Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。&lt;/p&gt;
 &lt;p&gt;另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
 基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
 在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
-&lt;strong&gt;直接绘制&lt;/strong&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+&lt;em&gt;直接绘制&lt;/em&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
 这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
 而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
 DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，
@@ -418,19 +418,31 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 &lt;p&gt;别急，我写这些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下现有的混成器和 Wayland
 ，这篇文章只是个背景介绍。关于 X 中混成器的实现方式和限制，且听我下回分解。&lt;/p&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
     var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
         "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: 'center'," +
-        "    displayIndent: '0em'," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
@@ -439,9 +451,26 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-        "    } " +
-        "}); ";
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</summary><category term="desktop"></category><category term="compositor"></category><category term="macosx"></category><category term="windows"></category><category term="window"></category><category term="manager"></category></entry></feed>

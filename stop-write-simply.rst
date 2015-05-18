@@ -6,11 +6,11 @@
 :date: 2015-03-11 22:00
 :tags: blog, writing
 
-我的 RSS 訂閱着一個博客叫 `The Old New Thing <http://blogs.msdn.com/b/oldnewthing/>`_ 
+我的 RSS 訂閱着一個博客叫 `The Old New Thing <http://blogs.msdn.com/b/oldnewthing/>`_
 ，作者是Windows開發者之一的 Raymond Chen ，記錄 Windows 中的很多有趣的技術細節。
 這個博客中的一些精彩內容還被他寫成了一本書，中文名叫《Windows編程啓示錄》
 (ISBN: `978-7-111-21919-4 <http://www.amazon.cn/dp/B0011C1ZEG/>`_) 而英文書名就叫
-*The Old New Thing — Practical Development Throughout the Evolution of Windows* 
+:cite:`The Old New Thing — Practical Development Throughout the Evolution of Windows`
 (ISBN: `978-0-321-44030-3 <http://www.amazon.com/gp/product/0321440307>`_)。
 
 今天看到這個博客的一篇文章說

@@ -120,7 +120,7 @@ Chromium）都需要首先渲染到内部的 <span class="s">`XPixMap </span><sp
 <span class="m">#.</span> 混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
    出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
    OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
-   比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） <span class="gs">**在不同的三个程序之间来回传递**</span> 。
+   比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） <span class="ge">*在不同的三个程序之间来回传递*</span> 。
 <span class="m">#.</span> <span class="na">:code:</span><span class="nv">`RedirectSubwindows`</span> 调用针对的是一个窗口树，换句话说是一个窗口
    及其全部子窗口，不同于 Mac OS X 中混成器会拿到全部窗口的输出。
    这个特点其实并不算是限制，因为 X 中每个虚拟桌面都有一个根窗口，只要指定这个根窗口
@@ -129,9 +129,9 @@ Chromium）都需要首先渲染到内部的 <span class="s">`XPixMap </span><sp
    拿到某个特定窗口的输出，而不用在意别的窗口。
 <span class="m">#.</span> 为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
    状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 <span class="na">:ruby:</span><span class="nv">`被映射|mapped`</span>
-   的状态。因此直接用上述方法 <span class="gs">**不能得到没有显示的窗口的输出**</span> ，比如不能对最小化的窗口
+   的状态。因此直接用上述方法 <span class="ge">*不能得到没有显示的窗口的输出*</span> ，比如不能对最小化的窗口
    直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
-   比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+   比如在需要窗口输出的时候临时把窗口映射到桌面上，拿到输出之后再隐藏起来，
    不过要实现这一点需要混成器和窗口管理器相互配合。
 <span class="m">#.</span> 不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 <span class="na">:ruby:</span><span class="nv">`设备无关|device independent`</span>
    的，这里 X 的绘图模型是 <span class="na">:ruby:</span><span class="nv">`设备相关|device dependent`</span> 的。
@@ -143,15 +143,15 @@ Chromium）都需要首先渲染到内部的 <span class="s">`XPixMap </span><sp
    <span class="na">:ruby:</span><span class="nv">`子像素布局|subpixel layout`</span> 这些属性以提供最好的渲染效果。
    Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
    10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
-   上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+   上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器采用的
    OpenGL Surface 则无视了这些设备相关的属性。
 
 
 <span class="gh">输入事件的重定向，这可能做到么？</span>
 <span class="gh">++++++++++++++++++++++++++++++++++++++++++</span>
 
-通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 <span class="gs">**输出**</span> 重定向到自己的窗口上。
-但是仅仅重定向输出，整个 X 还不处于可用状态，因为 <span class="gs">**没有重定向输入**</span> 。
+通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 <span class="ge">*输出*</span> 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 <span class="ge">*没有重定向输入*</span> 。
 考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
 上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。
 
@@ -161,7 +161,7 @@ Chromium）都需要首先渲染到内部的 <span class="s">`XPixMap </span><sp
 假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
 那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
 看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
-于是 <span class="gs">**大部分 X 的混成器都不处理键盘事件重定向**</span> 
+于是 <span class="ge">*大部分 X 的混成器都不处理键盘事件重定向*</span> 
 。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
 因为不像重定向窗口输出那样只需要考虑 <span class="na">:ruby:</span><span class="nv">`顶层|top-level`</span> 窗口，
 重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
@@ -169,25 +169,25 @@ Chromium）都需要首先渲染到内部的 <span class="s">`XPixMap </span><sp
 中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。
 
 由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
-<span class="gs">**不重定向输入事件**</span> 而把它交给 X 处理。具体的实现方式就是通过
+<span class="ge">*不重定向输入事件*</span> 而把它交给 X 处理。具体的实现方式就是通过
 <span class="s">`XFixes </span><span class="si">&lt;http://freedesktop.org/wiki/Software/FixesExt/&gt;</span><span class="s">`_</span>
-扩展提供的 <span class="na">:code:</span><span class="nv">`SetWindowShapeRegion`</span> API 将 OverlayWindow 的 <span class="gs">**输入区域**</span>
+扩展提供的 <span class="na">:code:</span><span class="nv">`SetWindowShapeRegion`</span> API 将 OverlayWindow 的 <span class="ge">*输入区域*</span>
 <span class="na">:code:</span><span class="nv">`ShapeInput`</span> 设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
 这样一来对 OverlayWindow 的点击会透过 OverlayWindow 直接作用到底下的窗口上。
 
 因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：
 
 <span class="m">#.</span> 选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
-   （并不是移动窗口的位置）， <span class="gs">**但是不能让用户与窗口的内容交互**</span> 。
+   （并不是移动窗口的位置）， <span class="ge">*但是不能让用户与窗口的内容交互*</span> 。
 <span class="m">#.</span> 正常状态下可以让用户与窗口的内容交互，但是
-   <span class="gs">**绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致**</span>
+   <span class="ge">*绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致*</span>
    。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
    变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。
 
 可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 <span class="na">:ruby:</span><span class="nv">`活动|Activity`</span>
 或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
 的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
-<span class="gs">**因为处于缩略状态下的窗口只是一张画而不能点**</span> 。
+<span class="ge">*因为处于缩略状态下的窗口只是一张画而不能点*</span> 。
 
 Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
 效果，而不能实现 LG3D_ 那样直接在 3D 空间中操纵窗口内容。

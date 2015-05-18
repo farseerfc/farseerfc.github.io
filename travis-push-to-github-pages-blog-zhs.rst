@@ -11,7 +11,7 @@
 
 .. label-warning::
 
-    **2015年2月21日更新**
+    *2015年2月21日更新*
 
 上次介绍过 `这个博客改换了主题 <{filename}/tech/redesign-pelican-theme.zhs.rst>`_ ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。
@@ -19,7 +19,7 @@
 寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 Jekyll_ 方式撰写，这可以利用
 Github Pages 原本就有的
 `Jekyll支持 <https://help.github.com/articles/using-jekyll-with-pages/>`_
-生成静态网站。另一种是在 **本地** 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+生成静态网站。另一种是在 *本地* 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。
 
 .. _Jekyll: http://jekyllrb.com/
@@ -51,9 +51,9 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 `持续整合 <http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88>`_
 原本是 :ruby:`敏捷开发|Agile Development`
 或者 :ruby:`极限编程|Extreme Programming` 中提到的概念，大意就是说在开发的过程中，
-一旦有微小的变更，就全自动地 **持续** 合并到主线中， **整合** 变更的内容到发布版本里。
-这里的 **整合** 实际上可以理解为 **全自动测试** 加上 **生成最终产品** 。
-可以看到 **持续整合** 实际强调 **全自动** ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有微小的变更，就全自动地 *持续* 合并到主线中， *整合* 变更的内容到发布版本里。
+这里的 *整合* 实际上可以理解为 *全自动测试* 加上 *生成最终产品* 。
+可以看到 *持续整合* 实际强调 *全自动* ，于是需要有一个服务器不断地监听主线开发的变更内容，
 一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。
 
 于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
@@ -74,7 +74,7 @@ Android 的 SL4A_ 环境下的 python 中跑 pelican ，还要配合一个
 	在 Travis-CI 中开启对 Github Repo 的持续整合
 
 然后在 repo 的根目录放一个 :code:`.travis.yml` 文件描述编译的步骤。
-**暂时** 测试的目的下我写的 :code:`.travis.yml` 大概是下面这样。
+*暂时* 测试的目的下我写的 :code:`.travis.yml` 大概是下面这样。
 
 .. code-block:: yaml
 
@@ -161,7 +161,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 
 	.. label-warning::
 
-	    **2015年2月21日更新**
+	    *2015年2月21日更新*
 
 	使用 :code:`travis encrypt` 命令来加密重要数据最方便，不过如果有任何原因，
 	比如 ruby 版本太低或者安装不方便之类的，那么不用担心，我们直接通过

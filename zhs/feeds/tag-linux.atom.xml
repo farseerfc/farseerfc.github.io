@@ -64,7 +64,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
 出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
 OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
-比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;strong&gt;在不同的三个程序之间来回传递&lt;/strong&gt; 。&lt;/li&gt;
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;em&gt;在不同的三个程序之间来回传递&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;&lt;code class="code"&gt;
 RedirectSubwindows&lt;/code&gt;
  调用针对的是一个窗口树，换句话说是一个窗口
@@ -75,9 +75,9 @@ RedirectSubwindows&lt;/code&gt;
 拿到某个特定窗口的输出，而不用在意别的窗口。&lt;/li&gt;
 &lt;li&gt;为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
 状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
-的状态。因此直接用上述方法 &lt;strong&gt;不能得到没有显示的窗口的输出&lt;/strong&gt; ，比如不能对最小化的窗口
+的状态。因此直接用上述方法 &lt;em&gt;不能得到没有显示的窗口的输出&lt;/em&gt; ，比如不能对最小化的窗口
 直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
-比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+比如在需要窗口输出的时候临时把窗口映射到桌面上，拿到输出之后再隐藏起来，
 不过要实现这一点需要混成器和窗口管理器相互配合。&lt;/li&gt;
 &lt;li&gt;不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device independent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 的，这里 X 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备相关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device dependent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的。
@@ -89,14 +89,14 @@ RedirectSubwindows&lt;/code&gt;
 &lt;ruby&gt;&lt;rb&gt;子像素布局&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel layout&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 这些属性以提供最好的渲染效果。
 Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
 10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
-上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器采用的
 OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;输入事件的重定向，这可能做到么？&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;strong&gt;输出&lt;/strong&gt; 重定向到自己的窗口上。
-但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;strong&gt;没有重定向输入&lt;/strong&gt; 。
+&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;em&gt;输出&lt;/em&gt; 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;em&gt;没有重定向输入&lt;/em&gt; 。
 考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
 上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。&lt;/p&gt;
 &lt;p&gt;需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
@@ -104,18 +104,18 @@ OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;p&gt;假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
 那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
 看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
-于是 &lt;strong&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/strong&gt;
+于是 &lt;em&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/em&gt;
 。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
 因为不像重定向窗口输出那样只需要考虑 &lt;ruby&gt;&lt;rb&gt;顶层&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
 重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
 以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
 中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。&lt;/p&gt;
 &lt;p&gt;由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
-&lt;strong&gt;不重定向输入事件&lt;/strong&gt; 而把它交给 X 处理。具体的实现方式就是通过
+&lt;em&gt;不重定向输入事件&lt;/em&gt; 而把它交给 X 处理。具体的实现方式就是通过
 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
 扩展提供的 &lt;code class="code"&gt;
 SetWindowShapeRegion&lt;/code&gt;
- API 将 OverlayWindow 的 &lt;strong&gt;输入区域&lt;/strong&gt;
+ API 将 OverlayWindow 的 &lt;em&gt;输入区域&lt;/em&gt;
 &lt;code class="code"&gt;
 ShapeInput&lt;/code&gt;
  设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
@@ -123,16 +123,16 @@ ShapeInput&lt;/code&gt;
 &lt;p&gt;因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
-（并不是移动窗口的位置）， &lt;strong&gt;但是不能让用户与窗口的内容交互&lt;/strong&gt; 。&lt;/li&gt;
+（并不是移动窗口的位置）， &lt;em&gt;但是不能让用户与窗口的内容交互&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;正常状态下可以让用户与窗口的内容交互，但是
-&lt;strong&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/strong&gt;
+&lt;em&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/em&gt;
 。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
 变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 &lt;ruby&gt;&lt;rb&gt;活动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
 的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
-&lt;strong&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/strong&gt; 。&lt;/p&gt;
+&lt;em&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/em&gt; 。&lt;/p&gt;
 &lt;p&gt;Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
 效果，而不能实现 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那样直接在 3D 空间中操纵窗口内容。&lt;/p&gt;
 &lt;p&gt;解决重定向问题曾经的一缕曙光是 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在开发 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的过程中同时提议过另一个 X
@@ -190,7 +190,7 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。&lt;/p&gt;
 &lt;p&gt;Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
-直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在于，需要
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;em&gt;不太易用&lt;/em&gt; 的地方在于，需要
 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。&lt;/p&gt;
 &lt;p&gt;于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
@@ -200,7 +200,7 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 &lt;div class="panel-heading"&gt;
 Chrome Remote Desktop 插件&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-plugin.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="{filename}/images/chrome-remote-desktop-plugin.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chrome-remote-desktop"&gt;
@@ -257,7 +257,7 @@ host#.json&lt;/code&gt;
 &lt;p&gt;接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
 应该可以看到一个「启用远程链接」的按钮。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-enable-button.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="{filename}/images/chrome-remote-desktop-enable-button.png"/&gt;
 &lt;p class="caption"&gt;Chrome Remote Desktop 插件中「启用远程链接」的按钮&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="alert alert-warning compound"&gt;
@@ -275,7 +275,7 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 &lt;p&gt;点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
 你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-after-enabled.png"/&gt;
+&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="{filename}/images/chrome-remote-desktop-after-enabled.png"/&gt;
 &lt;p class="caption"&gt;启用远程链接之后的样子&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
@@ -291,12 +291,12 @@ systemctl --user enable&lt;/code&gt;
 &lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-htop.png"/&gt;
+&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="{filename}/images/chrome-remote-desktop-htop.png"/&gt;
 &lt;p class="caption"&gt;htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-xfce4.png"/&gt;
+&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="{filename}/images/chrome-remote-desktop-xfce4.png"/&gt;
 &lt;p class="caption"&gt;「远程」登录到新的 XFCE4&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -316,7 +316,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;div class="panel-heading"&gt;
 手机上的 Chrome 远程桌面 App&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android.png"/&gt;
+&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
@@ -325,7 +325,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;p&gt;除了桌面的 Chrome 之外还有一个客户端是 Android 上的
 &lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop"&gt;Chrome 远程桌面 App&lt;/a&gt; 经过上面的设置之后，从这个 App 也能看到并登录：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="手机远程登录" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android-logined.png"/&gt;
+&lt;img alt="手机远程登录" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android-logined.png"/&gt;
 &lt;p class="caption"&gt;手机远程登录&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;好啦，开始享受国家自然科学一等奖的透明计算技术吧！&lt;/p&gt;

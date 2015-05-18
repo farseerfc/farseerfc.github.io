@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zhs"
+<html lang="zh-Hans"
 >
 <head>
     <title>用 Travis-CI 生成 Github Pages 博客 - Farseerfc的小窝</title>
@@ -34,8 +34,7 @@
         <meta property="og:image"
                   content="//farseerfc.me/zhs/travis-push-to-github-pages-blog.png"/>
 
-    
-    <meta property="wb:webmaster" content="a699edf35652cd85" />
+
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
@@ -52,6 +51,9 @@
 
         <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/han.min.css">
+
 </head>
 <body>
 <div style="display:none" id="title">用 Travis-CI 生成 Github Pages 博客 - Farseerfc的小窝</div>
@@ -231,7 +233,6 @@ Farseerfc的小窝            </a>
 </span>
 
 
-    <wb:share-button appkey="NANnN" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「用 Travis-CI 生成 Github Pages 博客」2015年2月21日更新 上次介绍过 这个博客改换了主题 ， 本以为这个话题可以告一段落了，没想到还能继续写呢。 寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 Jekyll 方式撰写，这可以利用 Github Pages 原本就有的 Jekyll支持 ..."  pic="http%3A//farseerfc.me/zhs%2Ftravis-push-to-github-pages-blog.png"></wb:share-button>
 
 </div><!-- /.post-info -->                </div>
             </header>
@@ -254,13 +255,13 @@ Farseerfc的小窝            </a>
                     </div>
                 
 <div class="label label-warning">
-<strong>2015年2月21日更新</strong></div>
+<em>2015年2月21日更新</em></div>
 <p>上次介绍过 <a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html">这个博客改换了主题</a> ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。</p>
 <p>寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 <a class="reference external" href="http://jekyllrb.com/">Jekyll</a> 方式撰写，这可以利用
 Github Pages 原本就有的
 <a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/">Jekyll支持</a>
-生成静态网站。另一种是在 <strong>本地</strong> 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+生成静态网站。另一种是在 <em>本地</em> 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。</p>
 <p>我用 <a class="reference external" href="http://getpelican.com/">Pelican</a> 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
 还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
@@ -280,9 +281,9 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 <p><a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88">持续整合</a>
 原本是 <ruby><rb>敏捷开发</rb><rp>(</rp><rt>Agile Development</rt><rp>)</rp></ruby>
 或者 <ruby><rb>极限编程</rb><rp>(</rp><rt>Extreme Programming</rt><rp>)</rp></ruby> 中提到的概念，大意就是说在开发的过程中，
-一旦有微小的变更，就全自动地 <strong>持续</strong> 合并到主线中， <strong>整合</strong> 变更的内容到发布版本里。
-这里的 <strong>整合</strong> 实际上可以理解为 <strong>全自动测试</strong> 加上 <strong>生成最终产品</strong> 。
-可以看到 <strong>持续整合</strong> 实际强调 <strong>全自动</strong> ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有微小的变更，就全自动地 <em>持续</em> 合并到主线中， <em>整合</em> 变更的内容到发布版本里。
+这里的 <em>整合</em> 实际上可以理解为 <em>全自动测试</em> 加上 <em>生成最终产品</em> 。
+可以看到 <em>持续整合</em> 实际强调 <em>全自动</em> ，于是需要有一个服务器不断地监听主线开发的变更内容，
 一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。</p>
 <p>于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
 提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
@@ -295,13 +296,13 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
 每个 push 调用测试了。</p>
 <div class="figure">
-<img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-repo-enable.png"/>
+<img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="{filename}/images/travis-repo-enable.png"/>
 <p class="caption">在 Travis-CI 中开启对 Github Repo 的持续整合</p>
 </div>
 <p>然后在 repo 的根目录放一个 <code class="code">
 .travis.yml</code>
  文件描述编译的步骤。
-<strong>暂时</strong> 测试的目的下我写的 <code class="code">
+<em>暂时</em> 测试的目的下我写的 <code class="code">
 .travis.yml</code>
  大概是下面这样。</p>
 <div class="highlight"><pre><span class="code-line"><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">python</span></span>
@@ -370,7 +371,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 <div class="panel-heading">
 Github 上创建 Personal Access Token</div>
 <div class="panel-body">
-<img alt="Github 上创建 Personal Access Token" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-blog-push.png"/>
+<img alt="Github 上创建 Personal Access Token" class="img-responsive" src="{filename}/images/travis-blog-push.png"/>
 </div>
 </div>
 <p>好在 Github 支持通过 <a class="reference external" href="https://github.com/settings/applications">Personal Access Token</a>
@@ -384,7 +385,7 @@ Github 上创建 Personal Access Token</div>
 如果你不能使用 travis 命令</div>
 <div class="panel-body">
 <div class="label label-warning">
-<strong>2015年2月21日更新</strong></div>
+<em>2015年2月21日更新</em></div>
 <p>使用 <code class="code">
 travis encrypt</code>
  命令来加密重要数据最方便，不过如果有任何原因，
@@ -486,7 +487,7 @@ Readme.md</code>
 <p>这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
 编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。</p>
 <div class="figure">
-<img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-edit-github-web.png"/>
+<img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="{filename}/images/travis-edit-github-web.png"/>
 <p class="caption">在 Github 的 Web 界面中直接编辑文章内容</p>
 </div>
 <p>以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录
@@ -571,19 +572,6 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                     Disqus.</a></noscript>
                 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-primary">
-        <div class="panel-heading" role="tab" id="weibo-heading">
-          <h4 class="panel-title">
-            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#weibo-comments" aria-expanded="false" aria-controls="weibo-comments">
-              <i class="fa fa-weibo"></i> Weibo 留言            </a>
-          </h4>
-        </div>
-        <div id="weibo-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="weibo-heading">
-          <div class="panel-body">
-                <wb:comments url="auto" width="auto" language="zh_tw" appkey="WEIBO_APPKEYN" ></wb:comments>
           </div>
         </div>
       </div>
@@ -684,14 +672,14 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/tty.html">
-                    tty <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -700,13 +688,8 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/japan.html">
-                    japan <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/zhs/tag/pelican.html">
-                    pelican <sup> 4</sup>
+                <a href="//farseerfc.me/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -715,13 +698,8 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/domain.html">
-                    domain <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/zhs/tag/python.html">
-                    python <sup> 4</sup>
+                <a href="//farseerfc.me/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -735,8 +713,8 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -760,13 +738,13 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/writing.html">
-                    writing <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -774,14 +752,19 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                     creationism <sup> 1</sup>
                 </a>
             </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/zhs/tag/java.html">
-                    Java <sup> 2</sup>
+                    java <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/academic.html">
-                    academic <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -792,6 +775,11 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/ruby.html">
                     ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -822,11 +810,6 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/archlinux.html">
                     archlinux <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -874,9 +857,9 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                     repository <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -926,7 +909,7 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
             </li>
             <li class="list-group-item tag-1">
                 <a href="//farseerfc.me/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
+                    c <sup> 14</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -955,8 +938,13 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/manager.html">
-                    manager <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -965,8 +953,8 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
-                    travis-ci <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -979,9 +967,9 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
                     subsite <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -1009,16 +997,7 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
     </div>
 </div>
 </div>
-<div class="sidebar-item hidden-xs">
-<div class="panel panel-default">
-	<div class="panel-heading">
-        <h4>
-<i class="fa fa-weibo fa-lg"></i><span class="icon-label">最新微博</span>
-        </h4>
-    </div>
-<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
-</div>
-</div>
+
 <div class="sidebar-item hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -1163,8 +1142,8 @@ $.ajax( {
         })();
     </script>
     <!-- End Google Analytics Code -->
-<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="//farseerfc.me/zhs/../theme/js/han.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
@@ -1187,10 +1166,22 @@ $.ajax( {
             bottom: function (){
                 return $("#fcfooter").offset().top -
                     $("#article-content").offset().top -
-                    $("#article-content").height() + 60;
+                    $("#article-content").height() + 20;
             }
           }
         });
+        $('#affix-toc').width($('#sidebar').width());
+        Han()
+          .initCond()
+          .renderElem()
+          // .renderHanging()
+          // .renderJiya()
+          .renderHWS()
+          .correctBasicBD()
+          .substCombLigaWithPUA();
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
     });
 </script>
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zhs"
+<html lang="zh-Hans"
 >
 <head>
     <title>桌面系统的混成器简史 - Farseerfc的小窝</title>
@@ -34,8 +34,7 @@
         <meta property="og:image"
                   content="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.png"/>
 
-    
-    <meta property="wb:webmaster" content="a699edf35652cd85" />
+
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
@@ -52,6 +51,9 @@
 
         <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/han.min.css">
+
 </head>
 <body>
 <div style="display:none" id="title">桌面系统的混成器简史 - Farseerfc的小窝</div>
@@ -231,7 +233,6 @@ Farseerfc的小窝            </a>
 </span>
 
 
-    <wb:share-button appkey="NANnN" addition="number" type="button" language="zh_tw" picture_search="false" ralateUid="1862842353" default_text="「桌面系统的混成器简史」Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland 是一个混成器，替代 X 作为显示服务器。 那么 混成器 是个什么东西，桌面系统为什么需要它呢？ 要理解为什么桌面系统需要 混成器 （或者它的另一个叫法， 混成窗口管理器(Compositin..."  pic="http%3A//farseerfc.me/zhs%2Fbrief-history-of-compositors-in-desktop-os.png"></wb:share-button>
 
 </div><!-- /.post-info -->                </div>
             </header>
@@ -259,8 +260,8 @@ Farseerfc的小窝            </a>
 
 <p>Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
 是一个混成器，替代 X 作为显示服务器。
-那么 <strong>混成器</strong> 是个什么东西，桌面系统为什么需要它呢？
-要理解为什么桌面系统需要 <strong>混成器</strong> （或者它的另一个叫法，
+那么 <em>混成器</em> 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 <em>混成器</em> （或者它的另一个叫法，
 <ruby><rb>混成窗口管理器</rb><rp>(</rp><rt>Compositing Window Manager</rt><rp>)</rp></ruby>
 ），在这篇文章中我想回顾一下历史，
 了解一下混成器出现的前因后果。</p>
@@ -300,10 +301,10 @@ Farseerfc的小窝            </a>
 <span class="math">\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)</span> 左右，
 而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
 这无疑都是一个庞大的负担。</p>
-<p>于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 <strong>优势</strong> ：如果正确地采用画家算法，
-并且合理地控制重绘时 <strong>只绘制没有被别的窗口覆盖的部分</strong> ，那么无论有多少窗口互相
+<p>于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 <em>优势</em> ：如果正确地采用画家算法，
+并且合理地控制重绘时 <em>只绘制没有被别的窗口覆盖的部分</em> ，那么无论有多少窗口互相
 遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
-同样因为实现方式栈式窗口管理器也有一些难以回避的 <strong>限制</strong> ：</p>
+同样因为实现方式栈式窗口管理器也有一些难以回避的 <em>限制</em> ：</p>
 <ol class="arabic simple">
 <li>窗口必须是矩形的，不能支持不规则形状的窗口。</li>
 <li>不支持透明或者半透明的颜色。</li>
@@ -330,7 +331,7 @@ NeXTSTEP 桌面</div>
 <p>转眼进入了千禧年， Windows 称霸了 PC 产业，苹果为重振 Macintosh 请回了 Jobs 基于 <a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP">NeXTSTEP</a>
 开发 Mac OSX 。</p>
 <p>NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
-拖动滚动条或者移动窗口的时候，窗口的内容是 <strong>实时更新</strong> 的，这比只显示一个缩放大小的框框来说被认为更直观。
+拖动滚动条或者移动窗口的时候，窗口的内容是 <em>实时更新</em> 的，这比只显示一个缩放大小的框框来说被认为更直观。
 而实现这个特性的基础是在 NeXTSTEP 中运用了
 <a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript">Display PostScript (DPS)</a>
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
@@ -408,7 +409,7 @@ LG3D</div>
 在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
 还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
 Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
-下的窗口是 <strong>可以接受输入事件</strong> 的。这一重要区别在后面 Wayland 的说明中还会提到。
+下的窗口是 <em>可以接受输入事件</em> 的。这一重要区别在后面 Wayland 的说明中还会提到。
 LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。</p>
 <p>LG3D 虽然以 GPL 放出了实现的源代码，不过整个项目已经停滞开发许久了。
 官方曾经放出过一个
@@ -468,7 +469,7 @@ Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。</p>
 <p>另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
 基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
 在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
-<strong>直接绘制</strong> 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+<em>直接绘制</em> 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
 这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
 而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
 DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，
@@ -488,19 +489,31 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 <p>别急，我写这些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下现有的混成器和 Wayland
 ，这篇文章只是个背景介绍。关于 X 中混成器的实现方式和限制，且听我下回分解。</p>
 </div>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
     var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
         "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: 'center'," +
-        "    displayIndent: '0em'," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
@@ -509,9 +522,26 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-        "    } " +
-        "}); ";
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
@@ -589,19 +619,6 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                     Disqus.</a></noscript>
                 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-primary">
-        <div class="panel-heading" role="tab" id="weibo-heading">
-          <h4 class="panel-title">
-            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#weibo-comments" aria-expanded="false" aria-controls="weibo-comments">
-              <i class="fa fa-weibo"></i> Weibo 留言            </a>
-          </h4>
-        </div>
-        <div id="weibo-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="weibo-heading">
-          <div class="panel-body">
-                <wb:comments url="auto" width="auto" language="zh_tw" appkey="WEIBO_APPKEYN" ></wb:comments>
           </div>
         </div>
       </div>
@@ -702,14 +719,14 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/termcap.html">
-                    termcap <sup> 1</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/tty.html">
-                    tty <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -718,13 +735,8 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/japan.html">
-                    japan <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/zhs/tag/pelican.html">
-                    pelican <sup> 4</sup>
+                <a href="//farseerfc.me/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -733,13 +745,8 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/domain.html">
-                    domain <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-2">
-                <a href="//farseerfc.me/zhs/tag/python.html">
-                    python <sup> 4</sup>
+                <a href="//farseerfc.me/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -753,8 +760,8 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/unix.html">
-                    unix <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -778,13 +785,13 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/writing.html">
-                    writing <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/kde5.html">
-                    kde5 <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -792,14 +799,19 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                     creationism <sup> 1</sup>
                 </a>
             </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/zhs/tag/java.html">
-                    Java <sup> 2</sup>
+                    java <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/academic.html">
-                    academic <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -810,6 +822,11 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/ruby.html">
                     ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -840,11 +857,6 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/archlinux.html">
                     archlinux <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/marry.html">
-                    marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -892,9 +904,9 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                     repository <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -944,7 +956,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
             </li>
             <li class="list-group-item tag-1">
                 <a href="//farseerfc.me/zhs/tag/c.html">
-                    C++ <sup> 14</sup>
+                    c <sup> 14</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -973,8 +985,13 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/manager.html">
-                    manager <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -983,8 +1000,8 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
-                    travis-ci <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -997,9 +1014,9 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
                     subsite <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/zhs/tag/microsoft.html">
-                    microsoft <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
@@ -1027,16 +1044,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
     </div>
 </div>
 </div>
-<div class="sidebar-item hidden-xs">
-<div class="panel panel-default">
-	<div class="panel-heading">
-        <h4>
-<i class="fa fa-weibo fa-lg"></i><span class="icon-label">最新微博</span>
-        </h4>
-    </div>
-<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
-</div>
-</div>
+
 <div class="sidebar-item hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -1182,8 +1190,8 @@ $.ajax( {
         })();
     </script>
     <!-- End Google Analytics Code -->
-<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="//farseerfc.me/zhs/../theme/js/han.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
@@ -1206,10 +1214,22 @@ $.ajax( {
             bottom: function (){
                 return $("#fcfooter").offset().top -
                     $("#article-content").offset().top -
-                    $("#article-content").height() + 60;
+                    $("#article-content").height() + 20;
             }
           }
         });
+        $('#affix-toc').width($('#sidebar').width());
+        Han()
+          .initCond()
+          .renderElem()
+          // .renderHanging()
+          // .renderJiya()
+          .renderHWS()
+          .correctBasicBD()
+          .substCombLigaWithPUA();
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
     });
 </script>
 

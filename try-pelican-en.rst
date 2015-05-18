@@ -87,14 +87,14 @@ Let it be Pelican_
 
 For my own use, Pelican_ offers me some advantages over Octopress_:
 
- #. Implemented in **pure Python**. This means that I can use different implementation of Python other than CPython easily. I use PyPy_ myself.
+ #. Implemented in *pure Python*. This means that I can use different implementation of Python other than CPython easily. I use PyPy_ myself.
  #. Translation of multi-languages. The original author of Pelican_ is a France. This is unnecessory for most people, but I will post my blog mainly in three languages: English, Japanese and Chinese.
  #. ReST_ . So that I can use the @auto-rst feature of Leo_ . And also I don't need to switch between my blog and documentation of my projects.
 
 But it seems that Pelican_ was less contributed than Octopress_ . Some minor issues remains in latest version:
 
  #. Support of pelican-import from WordPress for Chinese and Japanese articles are buggy.
- #. Datetime format, timezone, and locale support for multi-language blogs are not so natural. **I will work on this in these days**
+ #. Datetime format, timezone, and locale support for multi-language blogs are not so natural. *I will work on this in these days*
  #. There are not so many templates compared to Octopress_ .
  #. And less plugins .
 

@@ -64,7 +64,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
 出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
 OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
-比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;strong&gt;在不同的三个程序之间来回传递&lt;/strong&gt; 。&lt;/li&gt;
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） &lt;em&gt;在不同的三个程序之间来回传递&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;&lt;code class="code"&gt;
 RedirectSubwindows&lt;/code&gt;
  调用针对的是一个窗口树，换句话说是一个窗口
@@ -75,9 +75,9 @@ RedirectSubwindows&lt;/code&gt;
 拿到某个特定窗口的输出，而不用在意别的窗口。&lt;/li&gt;
 &lt;li&gt;为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
 状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
-的状态。因此直接用上述方法 &lt;strong&gt;不能得到没有显示的窗口的输出&lt;/strong&gt; ，比如不能对最小化的窗口
+的状态。因此直接用上述方法 &lt;em&gt;不能得到没有显示的窗口的输出&lt;/em&gt; ，比如不能对最小化的窗口
 直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
-比如在需要窗口输出的时候临时把窗口隐射到桌面上，拿到输出之后再隐藏起来，
+比如在需要窗口输出的时候临时把窗口映射到桌面上，拿到输出之后再隐藏起来，
 不过要实现这一点需要混成器和窗口管理器相互配合。&lt;/li&gt;
 &lt;li&gt;不像 Mac OS X 的基于 OpenGL Surface 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备无关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device independent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 的，这里 X 的绘图模型是 &lt;ruby&gt;&lt;rb&gt;设备相关&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;device dependent&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的。
@@ -89,14 +89,14 @@ RedirectSubwindows&lt;/code&gt;
 &lt;ruby&gt;&lt;rb&gt;子像素布局&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subpixel layout&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 这些属性以提供最好的渲染效果。
 Mac OS X 10.4 在设计的时候也曾考虑过提供无极缩放的支持，而这种支持到了 Mac OS X
 10.5 中就缩水变成了 Retina 的固定 2 倍缩放。这种局面在 X
-上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器才用的
+上没有发生正是因为 X 的绘图模型的这种设备相关性，而 Mac OS X 的混成器采用的
 OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;输入事件的重定向，这可能做到么？&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;strong&gt;输出&lt;/strong&gt; 重定向到自己的窗口上。
-但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;strong&gt;没有重定向输入&lt;/strong&gt; 。
+&lt;p&gt;通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 &lt;em&gt;输出&lt;/em&gt; 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 &lt;em&gt;没有重定向输入&lt;/em&gt; 。
 考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
 上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。&lt;/p&gt;
 &lt;p&gt;需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
@@ -104,18 +104,18 @@ OpenGL Surface 则无视了这些设备相关的属性。&lt;/li&gt;
 &lt;p&gt;假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
 那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
 看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
-于是 &lt;strong&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/strong&gt;
+于是 &lt;em&gt;大部分 X 的混成器都不处理键盘事件重定向&lt;/em&gt;
 。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
 因为不像重定向窗口输出那样只需要考虑 &lt;ruby&gt;&lt;rb&gt;顶层&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
 重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
 以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
 中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。&lt;/p&gt;
 &lt;p&gt;由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
-&lt;strong&gt;不重定向输入事件&lt;/strong&gt; 而把它交给 X 处理。具体的实现方式就是通过
+&lt;em&gt;不重定向输入事件&lt;/em&gt; 而把它交给 X 处理。具体的实现方式就是通过
 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
 扩展提供的 &lt;code class="code"&gt;
 SetWindowShapeRegion&lt;/code&gt;
- API 将 OverlayWindow 的 &lt;strong&gt;输入区域&lt;/strong&gt;
+ API 将 OverlayWindow 的 &lt;em&gt;输入区域&lt;/em&gt;
 &lt;code class="code"&gt;
 ShapeInput&lt;/code&gt;
  设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
@@ -123,16 +123,16 @@ ShapeInput&lt;/code&gt;
 &lt;p&gt;因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
-（并不是移动窗口的位置）， &lt;strong&gt;但是不能让用户与窗口的内容交互&lt;/strong&gt; 。&lt;/li&gt;
+（并不是移动窗口的位置）， &lt;em&gt;但是不能让用户与窗口的内容交互&lt;/em&gt; 。&lt;/li&gt;
 &lt;li&gt;正常状态下可以让用户与窗口的内容交互，但是
-&lt;strong&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/strong&gt;
+&lt;em&gt;绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致&lt;/em&gt;
 。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
 变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 &lt;ruby&gt;&lt;rb&gt;活动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
 的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
-&lt;strong&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/strong&gt; 。&lt;/p&gt;
+&lt;em&gt;因为处于缩略状态下的窗口只是一张画而不能点&lt;/em&gt; 。&lt;/p&gt;
 &lt;p&gt;Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
 效果，而不能实现 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那样直接在 3D 空间中操纵窗口内容。&lt;/p&gt;
 &lt;p&gt;解决重定向问题曾经的一缕曙光是 &lt;ruby&gt;&lt;rb&gt;升阳公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在开发 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的过程中同时提议过另一个 X
@@ -189,8 +189,8 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 
 &lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
 是一个混成器，替代 X 作为显示服务器。
-那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
-要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
+那么 &lt;em&gt;混成器&lt;/em&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;em&gt;混成器&lt;/em&gt; （或者它的另一个叫法，
 &lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 ），在这篇文章中我想回顾一下历史，
 了解一下混成器出现的前因后果。&lt;/p&gt;
@@ -230,10 +230,10 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 &lt;span class="math"&gt;\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)&lt;/span&gt; 左右，
 而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
 这无疑都是一个庞大的负担。&lt;/p&gt;
-&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;strong&gt;优势&lt;/strong&gt; ：如果正确地采用画家算法，
-并且合理地控制重绘时 &lt;strong&gt;只绘制没有被别的窗口覆盖的部分&lt;/strong&gt; ，那么无论有多少窗口互相
+&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;em&gt;优势&lt;/em&gt; ：如果正确地采用画家算法，
+并且合理地控制重绘时 &lt;em&gt;只绘制没有被别的窗口覆盖的部分&lt;/em&gt; ，那么无论有多少窗口互相
 遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
-同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;strong&gt;限制&lt;/strong&gt; ：&lt;/p&gt;
+同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;em&gt;限制&lt;/em&gt; ：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;窗口必须是矩形的，不能支持不规则形状的窗口。&lt;/li&gt;
 &lt;li&gt;不支持透明或者半透明的颜色。&lt;/li&gt;
@@ -260,7 +260,7 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;p&gt;转眼进入了千禧年， Windows 称霸了 PC 产业，苹果为重振 Macintosh 请回了 Jobs 基于 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP"&gt;NeXTSTEP&lt;/a&gt;
 开发 Mac OSX 。&lt;/p&gt;
 &lt;p&gt;NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
-拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;strong&gt;实时更新&lt;/strong&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
+拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;em&gt;实时更新&lt;/em&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
 而实现这个特性的基础是在 NeXTSTEP 中运用了
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
@@ -338,7 +338,7 @@ LG3D&lt;/div&gt;
 在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
 还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
 Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
-下的窗口是 &lt;strong&gt;可以接受输入事件&lt;/strong&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
+下的窗口是 &lt;em&gt;可以接受输入事件&lt;/em&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
 LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。&lt;/p&gt;
 &lt;p&gt;LG3D 虽然以 GPL 放出了实现的源代码，不过整个项目已经停滞开发许久了。
 官方曾经放出过一个
@@ -398,7 +398,7 @@ Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。&lt;/p&gt;
 &lt;p&gt;另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
 基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
 在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
-&lt;strong&gt;直接绘制&lt;/strong&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+&lt;em&gt;直接绘制&lt;/em&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
 这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
 而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
 DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，
@@ -418,19 +418,31 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 &lt;p&gt;别急，我写这些文章的目的是想聊聊 Linux 中的混成器，尤其是 X 下现有的混成器和 Wayland
 ，这篇文章只是个背景介绍。关于 X 中混成器的实现方式和限制，且听我下回分解。&lt;/p&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
     var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
         "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: 'center'," +
-        "    displayIndent: '0em'," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
@@ -439,20 +451,37 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-        "    } " +
-        "}); ";
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</summary><category term="desktop"></category><category term="compositor"></category><category term="macosx"></category><category term="windows"></category><category term="window"></category><category term="manager"></category></entry><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
-生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+生成静态网站。另一种是在 &lt;em&gt;本地&lt;/em&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
 还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
@@ -472,9 +501,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷开发&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;极限编程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是说在开发的过程中，
-一旦有微小的变更，就全自动地 &lt;strong&gt;持续&lt;/strong&gt; 合并到主线中， &lt;strong&gt;整合&lt;/strong&gt; 变更的内容到发布版本里。
-这里的 &lt;strong&gt;整合&lt;/strong&gt; 实际上可以理解为 &lt;strong&gt;全自动测试&lt;/strong&gt; 加上 &lt;strong&gt;生成最终产品&lt;/strong&gt; 。
-可以看到 &lt;strong&gt;持续整合&lt;/strong&gt; 实际强调 &lt;strong&gt;全自动&lt;/strong&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有微小的变更，就全自动地 &lt;em&gt;持续&lt;/em&gt; 合并到主线中， &lt;em&gt;整合&lt;/em&gt; 变更的内容到发布版本里。
+这里的 &lt;em&gt;整合&lt;/em&gt; 实际上可以理解为 &lt;em&gt;全自动测试&lt;/em&gt; 加上 &lt;em&gt;生成最终产品&lt;/em&gt; 。
+可以看到 &lt;em&gt;持续整合&lt;/em&gt; 实际强调 &lt;em&gt;全自动&lt;/em&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
 一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。&lt;/p&gt;
 &lt;p&gt;于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
 提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
@@ -487,13 +516,13 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
 每个 push 调用测试了。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-repo-enable.png"/&gt;
+&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="{filename}/images/travis-repo-enable.png"/&gt;
 &lt;p class="caption"&gt;在 Travis-CI 中开启对 Github Repo 的持续整合&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;然后在 repo 的根目录放一个 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件描述编译的步骤。
-&lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
+&lt;em&gt;暂时&lt;/em&gt; 测试的目的下我写的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面这样。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
@@ -562,7 +591,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 &lt;div class="panel-heading"&gt;
 Github 上创建 Personal Access Token&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-blog-push.png"/&gt;
+&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="{filename}/images/travis-blog-push.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;好在 Github 支持通过 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
@@ -576,7 +605,7 @@ Github 上创建 Personal Access Token&lt;/div&gt;
 如果你不能使用 travis 命令&lt;/div&gt;
 &lt;div class="panel-body"&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;使用 &lt;code class="code"&gt;
 travis encrypt&lt;/code&gt;
  命令来加密重要数据最方便，不过如果有任何原因，
@@ -678,7 +707,7 @@ Readme.md&lt;/code&gt;
 &lt;p&gt;这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
 编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="//farseerfc.me/zhs/../images/travis-edit-github-web.png"/&gt;
+&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="{filename}/images/travis-edit-github-web.png"/&gt;
 &lt;p class="caption"&gt;在 Github 的 Web 界面中直接编辑文章内容&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录
@@ -692,7 +721,7 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。&lt;/p&gt;
 &lt;p&gt;Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
-直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在于，需要
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;em&gt;不太易用&lt;/em&gt; 的地方在于，需要
 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。&lt;/p&gt;
 &lt;p&gt;于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
@@ -702,7 +731,7 @@ github 并编辑文章的可用性也还不错，所以同样的方式也可以�
 &lt;div class="panel-heading"&gt;
 Chrome Remote Desktop 插件&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-plugin.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="{filename}/images/chrome-remote-desktop-plugin.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chrome-remote-desktop"&gt;
@@ -759,7 +788,7 @@ host#.json&lt;/code&gt;
 &lt;p&gt;接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
 应该可以看到一个「启用远程链接」的按钮。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-enable-button.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="{filename}/images/chrome-remote-desktop-enable-button.png"/&gt;
 &lt;p class="caption"&gt;Chrome Remote Desktop 插件中「启用远程链接」的按钮&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="alert alert-warning compound"&gt;
@@ -777,7 +806,7 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 &lt;p&gt;点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
 你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-after-enabled.png"/&gt;
+&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="{filename}/images/chrome-remote-desktop-after-enabled.png"/&gt;
 &lt;p class="caption"&gt;启用远程链接之后的样子&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
@@ -793,12 +822,12 @@ systemctl --user enable&lt;/code&gt;
 &lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-htop.png"/&gt;
+&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="{filename}/images/chrome-remote-desktop-htop.png"/&gt;
 &lt;p class="caption"&gt;htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-xfce4.png"/&gt;
+&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="{filename}/images/chrome-remote-desktop-xfce4.png"/&gt;
 &lt;p class="caption"&gt;「远程」登录到新的 XFCE4&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -818,7 +847,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;div class="panel-heading"&gt;
 手机上的 Chrome 远程桌面 App&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android.png"/&gt;
+&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
@@ -827,7 +856,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;p&gt;除了桌面的 Chrome 之外还有一个客户端是 Android 上的
 &lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop"&gt;Chrome 远程桌面 App&lt;/a&gt; 经过上面的设置之后，从这个 App 也能看到并登录：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="手机远程登录" class="img-responsive" src="//farseerfc.me/zhs/../images/chrome-remote-desktop-android-logined.png"/&gt;
+&lt;img alt="手机远程登录" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android-logined.png"/&gt;
 &lt;p class="caption"&gt;手机远程登录&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;好啦，开始享受国家自然科学一等奖的透明计算技术吧！&lt;/p&gt;
@@ -850,7 +879,7 @@ farseerfc.me&lt;/code&gt;
 &lt;li&gt;支持 SPDY 协议&lt;/li&gt;
 &lt;li&gt;支持 IPv6&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;然后 &lt;strong&gt;免费账户&lt;/strong&gt; 的一些缺点有：&lt;/p&gt;
+&lt;p&gt;然后 &lt;em&gt;免费账户&lt;/em&gt; 的一些缺点有：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;CloudFlare 和 github.io 之间的数据不是加密的，因为 github
 &lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 还不支持使用自己的证书。这也是一开始我没用
@@ -875,13 +904,13 @@ github.io 是不加密的。&lt;/li&gt;
 CloudFlare 的，如下图：&lt;/li&gt;
 &lt;/ol&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="更改狗爹的域名服务器" class="img-responsive" src="//farseerfc.me/zhs/../images/godaddy.png"/&gt;
+&lt;img alt="更改狗爹的域名服务器" class="img-responsive" src="{filename}/images/godaddy.png"/&gt;
 &lt;p class="caption"&gt;更改狗爹的域名服务器&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;申请好之后就由 CloudFlare 接管域名解析了，接下来在 CloudFlare 的 DNS 设置添加一条
 &lt;a class="reference external" href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/"&gt;A 类规则指向 github pages 的 IP&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="更改CloudFlare的DNS规则" class="img-responsive" src="//farseerfc.me/zhs/../images/cloudflaredns.png"/&gt;
+&lt;img alt="更改CloudFlare的DNS规则" class="img-responsive" src="{filename}/images/cloudflaredns.png"/&gt;
 &lt;p class="caption"&gt;更改CloudFlare的DNS规则&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;等一切都反映到 DNS 服务器上就设置完成了，接下来给
@@ -908,7 +937,7 @@ CloudFlare 的，如下图：&lt;/li&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后把生成的静态网站 push 到 github 之后可以从项目设置里看到域名的变化：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="Github 配置好自定义域名之后的变化" class="img-responsive" src="//farseerfc.me/zhs/../images/githubdomain.png"/&gt;
+&lt;img alt="Github 配置好自定义域名之后的变化" class="img-responsive" src="{filename}/images/githubdomain.png"/&gt;
 &lt;p class="caption"&gt;Github 配置好自定义域名之后的变化&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;最后把Disqus的评论也迁移到新的域名，disqus有方便的迁移向导，一直下一步就可以了。&lt;/p&gt;
@@ -923,7 +952,7 @@ CloudFlare 的，如下图：&lt;/li&gt;
 </summary><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新设计了 Pelican 的主题与插件</title><link href="//farseerfc.me/zhs/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:zhs/redesign-pelican-theme.html</id><summary type="html">
 
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月14日更新&lt;/em&gt;&lt;/div&gt;
 
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，将一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
@@ -936,7 +965,7 @@ CloudFlare 的，如下图：&lt;/li&gt;
 &lt;p&gt;洞中一日世上千载，两年里 Bootstrap 已经升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
 而 Pelican 则已经升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
 早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。&lt;/p&gt;
-&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;strong&gt;两个月&lt;/strong&gt; 的时间重新设计了一遍
+&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;em&gt;两个月&lt;/em&gt; 的时间重新设计了一遍
 Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
 （以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧。）&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
@@ -1021,7 +1050,7 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 最后 output 指向
 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.io"&gt;farseerfc.github.io&lt;/a&gt;
 也就是发布的静态网站啦。&lt;/p&gt;
-&lt;p&gt;接下来从 &lt;strong&gt;主题&lt;/strong&gt; 和 &lt;strong&gt;插件&lt;/strong&gt; 两个方面介绍一下改版的细节。&lt;/p&gt;
+&lt;p&gt;接下来从 &lt;em&gt;主题&lt;/em&gt; 和 &lt;em&gt;插件&lt;/em&gt; 两个方面介绍一下改版的细节。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="material-design-bootstrap-3"&gt;
@@ -1061,8 +1090,8 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 xs&lt;/code&gt;
  和 &lt;code class="code"&gt;
 sm&lt;/code&gt;
- 的大小分别按照我的手机屏幕 &lt;strong&gt;竖屏&lt;/strong&gt; 和
-&lt;strong&gt;横屏&lt;/strong&gt; 时候的浏览器页面宽度来算， &lt;code class="code"&gt;
+ 的大小分别按照我的手机屏幕 &lt;em&gt;竖屏&lt;/em&gt; 和
+&lt;em&gt;横屏&lt;/em&gt; 时候的浏览器页面宽度来算， &lt;code class="code"&gt;
 md&lt;/code&gt;
  是想兼容 Nexus 7 横屏 960 的宽度以及
 一个常见上网本 1024 的宽度。 &lt;code class="code"&gt;
@@ -1243,7 +1272,7 @@ white-space: nowrap;&lt;/code&gt;
  让按钮的文字可以换行，
 这也只是一行修改。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月29日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;另外我也不太喜欢 Bootstrap 3 默认在手机上的 &lt;ruby&gt;&lt;rb&gt;折叠导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;collapsed navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，
 折叠之后的操作不够直观方便而且依赖 javascript 所以有 bug …… 于是我把它关掉了，
 具体方式是在 variables.less 把 &lt;code class="code"&gt;
@@ -1302,7 +1331,7 @@ modal&lt;/code&gt;
  实现。&lt;/li&gt;
 &lt;li&gt;上面提到的用 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;这个bootstrap插件&lt;/a&gt;
 让导航栏自动隐藏。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;显示源代码按钮&lt;/strong&gt; ，也就是每篇文章信息栏中的
+&lt;li&gt;&lt;em&gt;显示源代码按钮&lt;/em&gt; ，也就是每篇文章信息栏中的
 &lt;button class="btn btn-primary"&gt;&lt;i class="fa fa-code"&gt;&lt;/i&gt;&lt;/button&gt; 按钮。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
@@ -1340,10 +1369,10 @@ slug&lt;/code&gt;
  和不同的 &lt;code class="code"&gt;
 lang&lt;/code&gt;
 。然后原本 Pelican 里对多语言的
-实现方式是，首先有一个 &lt;strong&gt;主语言&lt;/strong&gt; 是模板和大部分文章采用的语言，文章列表中会优先列出
-用 &lt;strong&gt;主语言&lt;/strong&gt; 撰写的文章，然后从 &lt;strong&gt;主语言&lt;/strong&gt; 的文章链接到别的翻译版本。
-很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 &lt;strong&gt;主语言&lt;/strong&gt;
-的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 &lt;strong&gt;主语言&lt;/strong&gt; 都是英语。&lt;/p&gt;
+实现方式是，首先有一个 &lt;em&gt;主语言&lt;/em&gt; 是模板和大部分文章采用的语言，文章列表中会优先列出
+用 &lt;em&gt;主语言&lt;/em&gt; 撰写的文章，然后从 &lt;em&gt;主语言&lt;/em&gt; 的文章链接到别的翻译版本。
+很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 &lt;em&gt;主语言&lt;/em&gt;
+的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 &lt;em&gt;主语言&lt;/em&gt; 都是英语。&lt;/p&gt;
 &lt;p&gt;而这个插件做的事情描述起来很简单：将文章按语言属性分到多个子站，每个子站独立放在各自的文件夹。
 比如主站是 &lt;a class="reference external" href="https://farseerfc.github.io/"&gt;https://farseerfc.github.io/&lt;/a&gt; 的话，那么英语的子站就可以是
 &lt;a class="reference external" href="https://farseerfc.github.io/en/"&gt;https://farseerfc.github.io/en/&lt;/a&gt; 。
@@ -1409,7 +1438,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 然后它输出的 URL 也和 i18n-subsites 插件间有不兼容的问题，也顺带修掉了。
 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/tree/master/plantuml"&gt;修改之后的代码在这里&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月30日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月30日更新&lt;/em&gt;&lt;/div&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
@@ -1464,7 +1493,7 @@ reStructuredText 的表格。
 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
 实际工作的渲染库当然是大名鼎鼎的 &lt;a class="reference external" href="http://www.mathjax.org/"&gt;MathJax&lt;/a&gt; ，这个插件
 会用 MathJax 的 CDN 载入，所以也没有额外的依赖文件。（只是不知道是否会被国内墙掉，
-如果公式显示不正常请 &lt;strong&gt;务必&lt;/strong&gt; 告诉我。）&lt;/p&gt;
+如果公式显示不正常请 &lt;em&gt;务必&lt;/em&gt; 告诉我。）&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="youtube-youku"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id54"&gt;youtube 和 youku&lt;/a&gt;&lt;/h3&gt;
@@ -1478,7 +1507,7 @@ youku 是我照猫画虎抄的。
 &lt;h3&gt;&lt;a class="toc-backref" href="#id55"&gt;tipue_search&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://www.tipue.com/search/"&gt;Tipue search&lt;/a&gt; 是一个非常有意思也很强大的搜索工具，
 通过 jQuery 实现静态博客的站内搜索功能。实现方式是，它需要你写一个 json 文件，包含
-整个网站的 &lt;strong&gt;全部&lt;/strong&gt; 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
+整个网站的 &lt;em&gt;全部&lt;/em&gt; 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
 虽然听起来会有性能问题，但是应用在小型的静态博客上效果意外很不错，比如本站的所有文章内容
 放在一起的 json 也只有 300KiB 左右。&lt;/p&gt;
 &lt;p&gt;这个插件就是自动在 pelican 输出完全部静态网页之后，调用 beautifulsoup4 从所有网页中抽取出
@@ -1487,13 +1516,13 @@ youku 是我照猫画虎抄的。
 &lt;div class="section" id="neighbors-series"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id56"&gt;neighbors 和 series&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;这两个插件比较类似也都比较简单， neighbors 提供一篇文章的前后文章信息，
-在主题模板里可以用来制作 &lt;strong&gt;上一篇&lt;/strong&gt; 和 &lt;strong&gt;下一篇&lt;/strong&gt; 按钮。
-series 提供将多篇文章归类为一个 &lt;strong&gt;系列&lt;/strong&gt; 的支持，当然也需要在
+在主题模板里可以用来制作 &lt;em&gt;上一篇&lt;/em&gt; 和 &lt;em&gt;下一篇&lt;/em&gt; 按钮。
+series 提供将多篇文章归类为一个 &lt;em&gt;系列&lt;/em&gt; 的支持，当然也需要在
 主题模板中定义显示「文章系列」的列表。这两个插件的效果都能在本文末尾，评论区上方的部分看到。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bootstrapify-twitter-bootstrap-rst-directives"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id57"&gt;bootstrapify 和 twitter_bootstrap_rst_directives&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;这两个插件让文章的 &lt;strong&gt;正文&lt;/strong&gt; 套用上 Bootstrap 的样式。&lt;/p&gt;
+&lt;p&gt;这两个插件让文章的 &lt;em&gt;正文&lt;/em&gt; 套用上 Bootstrap 的样式。&lt;/p&gt;
 &lt;p&gt;bootstrapify 这个插件实现得比较简单，用 beautifulsoup4 在静态网页的结果里面过滤元素，
 对 &lt;code class="code"&gt;
 table&lt;/code&gt;
@@ -1553,7 +1582,7 @@ xl&lt;/code&gt;
 这边由于要考虑多种输出格式于是就比较麻烦了）。这两个 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的
 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/twitter_bootstrap_rst_directives/bootstrap_rst_directives.py#L140"&gt;实现代码在这里&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月3日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月3日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天又在 twitter_bootstrap_rst_directives 里增加了两个 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
 一个是 &lt;code class="code"&gt;
 :twi:&lt;/code&gt;
@@ -1562,7 +1591,7 @@ xl&lt;/code&gt;
 :irc:&lt;/code&gt;
  用来指向 freenode 的 channel ，比如 &lt;a class="reference external" href="//webchat.freenode.net/?channels=yssyd3"&gt;#yssyd3&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月14日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天增加了 &lt;code class="code"&gt;
 .. friend::&lt;/code&gt;
  用来写好友链接，以及 &lt;code class="code"&gt;
@@ -1589,7 +1618,7 @@ Pelican 原始的实现似乎是按照文字数抽取前半段，不总是适合
 summary 这个插件原本的实现只允许抽取一段文字，我又对它的实现做了少许扩充，允许标注多段
 文字合并起来作为总结。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月29日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天在 extract_toc 插件的帮助下，在侧边栏里放了一个 Bootstrap affix 的目录，
 它保持在页面的右侧位置不变，方便导航到文章的各个地方。具体实现方法除了 Bootstrap 3 的
 &lt;a class="reference external" href="http://getbootstrap.com/javascript/#affix"&gt;Affix 文档&lt;/a&gt; ，还参考了
@@ -1617,19 +1646,31 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
     var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
         "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: 'center'," +
-        "    displayIndent: '0em'," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
@@ -1638,9 +1679,26 @@ bootstrap-material-design 样式。自己草草修改的东西被别人用到果
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-        "    } " +
-        "}); ";
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</summary><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>总结一下 Material Design 的 CSS 框架</title><link href="//farseerfc.me/zhs/summarize-material-design-css-framework.html" rel="alternate"></link><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-16:zhs/summarize-material-design-css-framework.html</id><summary type="html">
@@ -1668,11 +1726,11 @@ Polymer logo&lt;/object&gt;
 &lt;p&gt;Google 官方提供的参考实现应该是 &lt;a class="reference external" href="https://www.polymer-project.org/"&gt;Polymer&lt;/a&gt; 中的
 &lt;a class="reference external" href="https://www.polymer-project.org/docs/elements/paper-elements.html"&gt;Paper Elements&lt;/a&gt; 。&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
-&lt;p&gt;由于是 &lt;strong&gt;官方参考实现&lt;/strong&gt; ，这个框架的确非常忠实地实现了 Material Design 的设计，但是同时
+&lt;p&gt;由于是 &lt;em&gt;官方参考实现&lt;/em&gt; ，这个框架的确非常忠实地实现了 Material Design 的设计，但是同时
 由于它基于 &lt;a class="reference external" href="http://webcomponents.org/"&gt;HTML5 Web Components&lt;/a&gt; 构建，相关技术我还
 不太懂，浏览器兼容性和其余 HTML 技术的兼容性也还不太完善的样子……&lt;/p&gt;
 &lt;p&gt;并且对于我这个 Web 开发的半吊子来说，Polymer 只是提供了一组设计组建，没有完善的
-&lt;strong&gt;响应式&lt;/strong&gt; (responsive) 布局支持，也没有 Navbar 这种常见的框架组建，真的要用起来的话还
+&lt;em&gt;响应式&lt;/em&gt; (responsive) 布局支持，也没有 Navbar 这种常见的框架组建，真的要用起来的话还
 需要手工实现不少东西。于是口水了半天之后只好放弃……以后可能真的会换用这个，只是目前需要学
 的东西太多了。&lt;/p&gt;
 &lt;/div&gt;
@@ -1690,7 +1748,7 @@ AngularJS&lt;/div&gt;
 就是基于 AngularJS 构建的Material Design 库啦，同样是 Google 出品所以应该算得上半个
 官方实现吧。 相比于 Polymer, AngularJS 算是实用了很多，提供了基于
 &lt;a class="reference external" href="http://www.w3.org/TR/css3-flexbox/"&gt;CSS Flexbox&lt;/a&gt; 的布局。有人对这两者的评价是，
-如果说 Polymer 代表了 &lt;strong&gt;未来趋势&lt;/strong&gt; ，那么 AngularJS 就是 &lt;strong&gt;眼下可用&lt;/strong&gt; 的 Web
+如果说 Polymer 代表了 &lt;em&gt;未来趋势&lt;/em&gt; ，那么 AngularJS 就是 &lt;em&gt;眼下可用&lt;/em&gt; 的 Web
 Components 实现了。&lt;/p&gt;
 &lt;p&gt;只不过同样是因为它是 Components 的框架，对 WebApp 的支持很丰富，大量采用 Ajax 等
 JavaScript 技术， 对于我这个静态博客来说仍然稍显高级了……非常担心还不支持 HTML5 的浏览器
@@ -2333,7 +2391,7 @@ type&lt;/code&gt;
 &lt;blockquote&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;pelican-import 从 WordPress 导入的时候对中文、日文的支持似乎很成问题。&lt;/li&gt;
-&lt;li&gt;日期格式、时区、字符集、和多语言功能的结合度还不够。  &lt;strong&gt;我在尝试改善它。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;日期格式、时区、字符集、和多语言功能的结合度还不够。  &lt;em&gt;我在尝试改善它。&lt;/em&gt;&lt;/li&gt;
 &lt;li&gt;模板还不够丰富。&lt;/li&gt;
 &lt;li&gt;插件也不够多……&lt;/li&gt;
 &lt;/ol&gt;

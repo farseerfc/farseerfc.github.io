@@ -16,8 +16,8 @@
 
 Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
 是一个混成器，替代 X 作为显示服务器。
-那么 <span class="gs">**混成器**</span> 是个什么东西，桌面系统为什么需要它呢？
-要理解为什么桌面系统需要 <span class="gs">**混成器**</span> （或者它的另一个叫法，
+那么 <span class="ge">*混成器*</span> 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 <span class="ge">*混成器*</span> （或者它的另一个叫法，
 <span class="na">:ruby:</span><span class="nv">`混成窗口管理器|Compositing Window Manager`</span>
 ），在这篇文章中我想回顾一下历史，
 了解一下混成器出现的前因后果。
@@ -67,10 +67,10 @@ Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 W
 而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
 这无疑都是一个庞大的负担。
 
-于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 <span class="gs">**优势**</span> ：如果正确地采用画家算法，
-并且合理地控制重绘时 <span class="gs">**只绘制没有被别的窗口覆盖的部分**</span> ，那么无论有多少窗口互相
+于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 <span class="ge">*优势*</span> ：如果正确地采用画家算法，
+并且合理地控制重绘时 <span class="ge">*只绘制没有被别的窗口覆盖的部分*</span> ，那么无论有多少窗口互相
 遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
-同样因为实现方式栈式窗口管理器也有一些难以回避的 <span class="gs">**限制**</span> ：
+同样因为实现方式栈式窗口管理器也有一些难以回避的 <span class="ge">*限制*</span> ：
 
 <span class="m">#.</span> 窗口必须是矩形的，不能支持不规则形状的窗口。
 <span class="m">#.</span> 不支持透明或者半透明的颜色。
@@ -100,7 +100,7 @@ Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 W
 开发 Mac OSX 。 
 
 NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
-拖动滚动条或者移动窗口的时候，窗口的内容是 <span class="gs">**实时更新**</span> 的，这比只显示一个缩放大小的框框来说被认为更直观。
+拖动滚动条或者移动窗口的时候，窗口的内容是 <span class="ge">*实时更新*</span> 的，这比只显示一个缩放大小的框框来说被认为更直观。
 而实现这个特性的基础是在 NeXTSTEP 中运用了
 <span class="s">`Display PostScript (DPS) </span><span class="si">&lt;http://en.wikipedia.org/wiki/Display_PostScript&gt;</span><span class="s">`_</span>
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript 
@@ -191,7 +191,7 @@ Mission Control) 功能，把窗口的缩略图（而不是事先绘制的图标
 在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
 还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
 Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
-下的窗口是 <span class="gs">**可以接受输入事件**</span> 的。这一重要区别在后面 Wayland 的说明中还会提到。
+下的窗口是 <span class="ge">*可以接受输入事件*</span> 的。这一重要区别在后面 Wayland 的说明中还会提到。
 LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。
 
 LG3D 虽然以 GPL 放出了实现的源代码，不过整个项目已经停滞开发许久了。
@@ -263,7 +263,7 @@ Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。
 另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
 基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
 在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
-<span class="gs">**直接绘制**</span> 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+<span class="ge">*直接绘制*</span> 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
 这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
 而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
 DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，

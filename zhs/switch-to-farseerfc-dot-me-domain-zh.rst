@@ -24,7 +24,7 @@
 #. 支持 SPDY 協議
 #. 支持 IPv6 
 
-然後 **免費賬戶** 的一些缺點有：
+然後 *免費賬戶* 的一些缺點有：
 
 #. CloudFlare 和 github.io 之間的數據不是加密的，因爲 github
    :ruby:`自定義域名|custom domain` 還不支持使用自己的證書。這也是一開始我沒用

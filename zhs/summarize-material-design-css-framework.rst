@@ -39,12 +39,12 @@ Google 官方提供的参考实现应该是 `Polymer <https://www.polymer-projec
 
 .. PELICAN_END_SUMMARY
 
-由于是 **官方参考实现** ，这个框架的确非常忠实地实现了 Material Design 的设计，但是同时
+由于是 *官方参考实现* ，这个框架的确非常忠实地实现了 Material Design 的设计，但是同时
 由于它基于 `HTML5 Web Components <http://webcomponents.org/>`_ 构建，相关技术我还
 不太懂，浏览器兼容性和其余 HTML 技术的兼容性也还不太完善的样子……
 
 并且对于我这个 Web 开发的半吊子来说，Polymer 只是提供了一组设计组建，没有完善的 
-**响应式** (responsive) 布局支持，也没有 Navbar 这种常见的框架组建，真的要用起来的话还
+*响应式* (responsive) 布局支持，也没有 Navbar 这种常见的框架组建，真的要用起来的话还
 需要手工实现不少东西。于是口水了半天之后只好放弃……以后可能真的会换用这个，只是目前需要学
 的东西太多了。
 
@@ -64,7 +64,7 @@ Angular Material Design
 就是基于 AngularJS 构建的Material Design 库啦，同样是 Google 出品所以应该算得上半个
 官方实现吧。 相比于 Polymer, AngularJS 算是实用了很多，提供了基于 
 `CSS Flexbox <http://www.w3.org/TR/css3-flexbox/>`_ 的布局。有人对这两者的评价是，
-如果说 Polymer 代表了 **未来趋势** ，那么 AngularJS 就是 **眼下可用** 的 Web
+如果说 Polymer 代表了 *未来趋势* ，那么 AngularJS 就是 *眼下可用* 的 Web
 Components 实现了。
 
 只不过同样是因为它是 Components 的框架，对 WebApp 的支持很丰富，大量采用 Ajax 等

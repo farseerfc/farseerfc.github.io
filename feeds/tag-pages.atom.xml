@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pages.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;上次介紹過 &lt;a class="reference external" href="//farseerfc.me/redesign-pelican-theme.html"&gt;這個博客改換了主題&lt;/a&gt; ，
 本以爲這個話題可以告一段落了，沒想到還能繼續寫呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的靜態博客通常有兩種方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰寫，這可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
-生成靜態網站。另一種是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的電腦上生成好，然後把生成的 HTML 網站 push
+生成靜態網站。另一種是在 &lt;em&gt;本地&lt;/em&gt; 也就是自己的電腦上生成好，然後把生成的 HTML 網站 push
 到 Github Pages ，這種情況下 Github Pages 就完全只是一個靜態頁面宿主環境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，當然就只能選擇後一種方式了。這帶來一些不便，比如本地配置 pelican
 還是有一點點複雜的，所以不能隨便找臺電腦就開始寫博客。有的時候只是想修正一兩個錯別字，
@@ -27,9 +27,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷開發&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;極限編程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是說在開發的過程中，
-一旦有微小的變更，就全自動地 &lt;strong&gt;持續&lt;/strong&gt; 合併到主線中， &lt;strong&gt;整合&lt;/strong&gt; 變更的內容到發佈版本裏。
-這裏的 &lt;strong&gt;整合&lt;/strong&gt; 實際上可以理解爲 &lt;strong&gt;全自動測試&lt;/strong&gt; 加上 &lt;strong&gt;生成最終產品&lt;/strong&gt; 。
-可以看到 &lt;strong&gt;持續整合&lt;/strong&gt; 實際強調 &lt;strong&gt;全自動&lt;/strong&gt; ，於是需要有一個服務器不斷地監聽主線開發的變更內容，
+一旦有微小的變更，就全自動地 &lt;em&gt;持續&lt;/em&gt; 合併到主線中， &lt;em&gt;整合&lt;/em&gt; 變更的內容到發佈版本裏。
+這裏的 &lt;em&gt;整合&lt;/em&gt; 實際上可以理解爲 &lt;em&gt;全自動測試&lt;/em&gt; 加上 &lt;em&gt;生成最終產品&lt;/em&gt; 。
+可以看到 &lt;em&gt;持續整合&lt;/em&gt; 實際強調 &lt;em&gt;全自動&lt;/em&gt; ，於是需要有一個服務器不斷地監聽主線開發的變更內容，
 一旦有任何變更（可以理解爲 git commit ）就自動調用測試和部署腳本。&lt;/p&gt;
 &lt;p&gt;於是要用持續整合就需要一個整合服務器，幸而 Travis-CI 對 github 上的公開 repo
 提供了免費的整合服務器虛擬機服務，和 github 的整合非常自然。所以我們就可以用它提供的虛擬機
@@ -48,7 +48,7 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;然後在 repo 的根目錄放一個 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件描述編譯的步驟。
-&lt;strong&gt;暫時&lt;/strong&gt; 測試的目的下我寫的 &lt;code class="code"&gt;
+&lt;em&gt;暫時&lt;/em&gt; 測試的目的下我寫的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面這樣。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
@@ -131,7 +131,7 @@ Github 上創建 Personal Access Token&lt;/div&gt;
 如果你不能使用 travis 命令&lt;/div&gt;
 &lt;div class="panel-body"&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;使用 &lt;code class="code"&gt;
 travis encrypt&lt;/code&gt;
  命令來加密重要數據最方便，不過如果有任何原因，

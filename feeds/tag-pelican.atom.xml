@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pelican.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;上次介紹過 &lt;a class="reference external" href="//farseerfc.me/redesign-pelican-theme.html"&gt;這個博客改換了主題&lt;/a&gt; ，
 本以爲這個話題可以告一段落了，沒想到還能繼續寫呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的靜態博客通常有兩種方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰寫，這可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
-生成靜態網站。另一種是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的電腦上生成好，然後把生成的 HTML 網站 push
+生成靜態網站。另一種是在 &lt;em&gt;本地&lt;/em&gt; 也就是自己的電腦上生成好，然後把生成的 HTML 網站 push
 到 Github Pages ，這種情況下 Github Pages 就完全只是一個靜態頁面宿主環境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，當然就只能選擇後一種方式了。這帶來一些不便，比如本地配置 pelican
 還是有一點點複雜的，所以不能隨便找臺電腦就開始寫博客。有的時候只是想修正一兩個錯別字，
@@ -27,9 +27,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷開發&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;極限編程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是說在開發的過程中，
-一旦有微小的變更，就全自動地 &lt;strong&gt;持續&lt;/strong&gt; 合併到主線中， &lt;strong&gt;整合&lt;/strong&gt; 變更的內容到發佈版本裏。
-這裏的 &lt;strong&gt;整合&lt;/strong&gt; 實際上可以理解爲 &lt;strong&gt;全自動測試&lt;/strong&gt; 加上 &lt;strong&gt;生成最終產品&lt;/strong&gt; 。
-可以看到 &lt;strong&gt;持續整合&lt;/strong&gt; 實際強調 &lt;strong&gt;全自動&lt;/strong&gt; ，於是需要有一個服務器不斷地監聽主線開發的變更內容，
+一旦有微小的變更，就全自動地 &lt;em&gt;持續&lt;/em&gt; 合併到主線中， &lt;em&gt;整合&lt;/em&gt; 變更的內容到發佈版本裏。
+這裏的 &lt;em&gt;整合&lt;/em&gt; 實際上可以理解爲 &lt;em&gt;全自動測試&lt;/em&gt; 加上 &lt;em&gt;生成最終產品&lt;/em&gt; 。
+可以看到 &lt;em&gt;持續整合&lt;/em&gt; 實際強調 &lt;em&gt;全自動&lt;/em&gt; ，於是需要有一個服務器不斷地監聽主線開發的變更內容，
 一旦有任何變更（可以理解爲 git commit ）就自動調用測試和部署腳本。&lt;/p&gt;
 &lt;p&gt;於是要用持續整合就需要一個整合服務器，幸而 Travis-CI 對 github 上的公開 repo
 提供了免費的整合服務器虛擬機服務，和 github 的整合非常自然。所以我們就可以用它提供的虛擬機
@@ -48,7 +48,7 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;然後在 repo 的根目錄放一個 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件描述編譯的步驟。
-&lt;strong&gt;暫時&lt;/strong&gt; 測試的目的下我寫的 &lt;code class="code"&gt;
+&lt;em&gt;暫時&lt;/em&gt; 測試的目的下我寫的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面這樣。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
@@ -131,7 +131,7 @@ Github 上創建 Personal Access Token&lt;/div&gt;
 如果你不能使用 travis 命令&lt;/div&gt;
 &lt;div class="panel-body"&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;使用 &lt;code class="code"&gt;
 travis encrypt&lt;/code&gt;
  命令來加密重要數據最方便，不過如果有任何原因，
@@ -258,7 +258,7 @@ farseerfc.me&lt;/code&gt;
 &lt;li&gt;支持 SPDY 協議&lt;/li&gt;
 &lt;li&gt;支持 IPv6&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;然後 &lt;strong&gt;免費賬戶&lt;/strong&gt; 的一些缺點有：&lt;/p&gt;
+&lt;p&gt;然後 &lt;em&gt;免費賬戶&lt;/em&gt; 的一些缺點有：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;CloudFlare 和 github.io 之間的數據不是加密的，因爲 github
 &lt;ruby&gt;&lt;rb&gt;自定義域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 還不支持使用自己的證書。這也是一開始我沒用
@@ -331,7 +331,7 @@ CloudFlare 的，如下圖：&lt;/li&gt;
 </summary><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:redesign-pelican-theme.html</id><summary type="html">
 
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月14日更新&lt;/em&gt;&lt;/div&gt;
 
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
@@ -344,7 +344,7 @@ CloudFlare 的，如下圖：&lt;/li&gt;
 &lt;p&gt;洞中一日世上千載，兩年裏 Bootstrap 已經升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
 而 Pelican 則已經升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
 早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。&lt;/p&gt;
-&lt;p&gt;近日想寫的東西越積越多，終於下定決心花了前前後後 &lt;strong&gt;兩個月&lt;/strong&gt; 的時間重新設計了一遍
+&lt;p&gt;近日想寫的東西越積越多，終於下定決心花了前前後後 &lt;em&gt;兩個月&lt;/em&gt; 的時間重新設計了一遍
 Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。
 （以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧。）&lt;/p&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
@@ -429,7 +429,7 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 最後 output 指向
 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.io"&gt;farseerfc.github.io&lt;/a&gt;
 也就是發佈的靜態網站啦。&lt;/p&gt;
-&lt;p&gt;接下來從 &lt;strong&gt;主題&lt;/strong&gt; 和 &lt;strong&gt;插件&lt;/strong&gt; 兩個方面介紹一下改版的細節。&lt;/p&gt;
+&lt;p&gt;接下來從 &lt;em&gt;主題&lt;/em&gt; 和 &lt;em&gt;插件&lt;/em&gt; 兩個方面介紹一下改版的細節。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="material-design-bootstrap-3"&gt;
@@ -469,8 +469,8 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 xs&lt;/code&gt;
  和 &lt;code class="code"&gt;
 sm&lt;/code&gt;
- 的大小分別按照我的手機屏幕 &lt;strong&gt;豎屏&lt;/strong&gt; 和
-&lt;strong&gt;橫屏&lt;/strong&gt; 時候的瀏覽器頁面寬度來算， &lt;code class="code"&gt;
+ 的大小分別按照我的手機屏幕 &lt;em&gt;豎屏&lt;/em&gt; 和
+&lt;em&gt;橫屏&lt;/em&gt; 時候的瀏覽器頁面寬度來算， &lt;code class="code"&gt;
 md&lt;/code&gt;
  是想兼容 Nexus 7 橫屏 960 的寬度以及
 一個常見上網本 1024 的寬度。 &lt;code class="code"&gt;
@@ -651,7 +651,7 @@ white-space: nowrap;&lt;/code&gt;
  讓按鈕的文字可以換行，
 這也只是一行修改。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月29日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;另外我也不太喜歡 Bootstrap 3 默認在手機上的 &lt;ruby&gt;&lt;rb&gt;摺疊導航欄&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;collapsed navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，
 摺疊之後的操作不夠直觀方便而且依賴 javascript 所以有 bug …… 於是我把它關掉了，
 具體方式是在 variables.less 把 &lt;code class="code"&gt;
@@ -710,7 +710,7 @@ modal&lt;/code&gt;
  實現。&lt;/li&gt;
 &lt;li&gt;上面提到的用 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;這個bootstrap插件&lt;/a&gt;
 讓導航欄自動隱藏。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;顯示源代碼按鈕&lt;/strong&gt; ，也就是每篇文章信息欄中的
+&lt;li&gt;&lt;em&gt;顯示源代碼按鈕&lt;/em&gt; ，也就是每篇文章信息欄中的
 &lt;button class="btn btn-primary"&gt;&lt;i class="fa fa-code"&gt;&lt;/i&gt;&lt;/button&gt; 按鈕。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
@@ -748,10 +748,10 @@ slug&lt;/code&gt;
  和不同的 &lt;code class="code"&gt;
 lang&lt;/code&gt;
 。然後原本 Pelican 裏對多語言的
-實現方式是，首先有一個 &lt;strong&gt;主語言&lt;/strong&gt; 是模板和大部分文章採用的語言，文章列表中會優先列出
-用 &lt;strong&gt;主語言&lt;/strong&gt; 撰寫的文章，然後從 &lt;strong&gt;主語言&lt;/strong&gt; 的文章鏈接到別的翻譯版本。
-很多博客系統和CMS對多語言的支持都是這樣的，這種處理方式的缺點也顯而易見：作爲 &lt;strong&gt;主語言&lt;/strong&gt;
-的語言必須足夠通用，纔能讓進來的人找到合適的翻譯版本，所以通常 &lt;strong&gt;主語言&lt;/strong&gt; 都是英語。&lt;/p&gt;
+實現方式是，首先有一個 &lt;em&gt;主語言&lt;/em&gt; 是模板和大部分文章採用的語言，文章列表中會優先列出
+用 &lt;em&gt;主語言&lt;/em&gt; 撰寫的文章，然後從 &lt;em&gt;主語言&lt;/em&gt; 的文章鏈接到別的翻譯版本。
+很多博客系統和CMS對多語言的支持都是這樣的，這種處理方式的缺點也顯而易見：作爲 &lt;em&gt;主語言&lt;/em&gt;
+的語言必須足夠通用，纔能讓進來的人找到合適的翻譯版本，所以通常 &lt;em&gt;主語言&lt;/em&gt; 都是英語。&lt;/p&gt;
 &lt;p&gt;而這個插件做的事情描述起來很簡單：將文章按語言屬性分到多個子站，每個子站獨立放在各自的文件夾。
 比如主站是 &lt;a class="reference external" href="https://farseerfc.github.io/"&gt;https://farseerfc.github.io/&lt;/a&gt; 的話，那麼英語的子站就可以是
 &lt;a class="reference external" href="https://farseerfc.github.io/en/"&gt;https://farseerfc.github.io/en/&lt;/a&gt; 。
@@ -817,7 +817,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 然後它輸出的 URL 也和 i18n-subsites 插件間有不兼容的問題，也順帶修掉了。
 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/tree/master/plantuml"&gt;修改之後的代碼在這裏&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月30日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月30日更新&lt;/em&gt;&lt;/div&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
@@ -872,7 +872,7 @@ reStructuredText 的表格。
 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
 實際工作的渲染庫當然是大名鼎鼎的 &lt;a class="reference external" href="http://www.mathjax.org/"&gt;MathJax&lt;/a&gt; ，這個插件
 會用 MathJax 的 CDN 載入，所以也沒有額外的依賴文件。（只是不知道是否會被國內牆掉，
-如果公式顯示不正常請 &lt;strong&gt;務必&lt;/strong&gt; 告訴我。）&lt;/p&gt;
+如果公式顯示不正常請 &lt;em&gt;務必&lt;/em&gt; 告訴我。）&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="youtube-youku"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id54"&gt;youtube 和 youku&lt;/a&gt;&lt;/h3&gt;
@@ -886,7 +886,7 @@ youku 是我照貓畫虎抄的。
 &lt;h3&gt;&lt;a class="toc-backref" href="#id55"&gt;tipue_search&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://www.tipue.com/search/"&gt;Tipue search&lt;/a&gt; 是一個非常有意思也很強大的搜索工具，
 通過 jQuery 實現靜態博客的站內搜索功能。實現方式是，它需要你寫一個 json 文件，包含
-整個網站的 &lt;strong&gt;全部&lt;/strong&gt; 文章的標題和文字內容，然後在搜索的時候讀入這個 json 做搜索（是不是有點耍賴）。
+整個網站的 &lt;em&gt;全部&lt;/em&gt; 文章的標題和文字內容，然後在搜索的時候讀入這個 json 做搜索（是不是有點耍賴）。
 雖然聽起來會有性能問題，但是應用在小型的靜態博客上效果意外很不錯，比如本站的所有文章內容
 放在一起的 json 也只有 300KiB 左右。&lt;/p&gt;
 &lt;p&gt;這個插件就是自動在 pelican 輸出完全部靜態網頁之後，調用 beautifulsoup4 從所有網頁中抽取出
@@ -895,13 +895,13 @@ youku 是我照貓畫虎抄的。
 &lt;div class="section" id="neighbors-series"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id56"&gt;neighbors 和 series&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;這兩個插件比較類似也都比較簡單， neighbors 提供一篇文章的前後文章信息，
-在主題模板裏可以用來製作 &lt;strong&gt;上一篇&lt;/strong&gt; 和 &lt;strong&gt;下一篇&lt;/strong&gt; 按鈕。
-series 提供將多篇文章歸類爲一個 &lt;strong&gt;系列&lt;/strong&gt; 的支持，當然也需要在
+在主題模板裏可以用來製作 &lt;em&gt;上一篇&lt;/em&gt; 和 &lt;em&gt;下一篇&lt;/em&gt; 按鈕。
+series 提供將多篇文章歸類爲一個 &lt;em&gt;系列&lt;/em&gt; 的支持，當然也需要在
 主題模板中定義顯示「文章系列」的列表。這兩個插件的效果都能在本文末尾，評論區上方的部分看到。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bootstrapify-twitter-bootstrap-rst-directives"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id57"&gt;bootstrapify 和 twitter_bootstrap_rst_directives&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;這兩個插件讓文章的 &lt;strong&gt;正文&lt;/strong&gt; 套用上 Bootstrap 的樣式。&lt;/p&gt;
+&lt;p&gt;這兩個插件讓文章的 &lt;em&gt;正文&lt;/em&gt; 套用上 Bootstrap 的樣式。&lt;/p&gt;
 &lt;p&gt;bootstrapify 這個插件實現得比較簡單，用 beautifulsoup4 在靜態網頁的結果裏面過濾元素，
 對 &lt;code class="code"&gt;
 table&lt;/code&gt;
@@ -961,7 +961,7 @@ xl&lt;/code&gt;
 這邊由於要考慮多種輸出格式於是就比較麻煩了）。這兩個 &lt;ruby&gt;&lt;rb&gt;行內角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的
 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/twitter_bootstrap_rst_directives/bootstrap_rst_directives.py#L140"&gt;實現代碼在這裏&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月3日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月3日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天又在 twitter_bootstrap_rst_directives 裏增加了兩個 &lt;ruby&gt;&lt;rb&gt;行內角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
 一個是 &lt;code class="code"&gt;
 :twi:&lt;/code&gt;
@@ -970,7 +970,7 @@ xl&lt;/code&gt;
 :irc:&lt;/code&gt;
  用來指向 freenode 的 channel ，比如 &lt;a class="reference external" href="//webchat.freenode.net/?channels=yssyd3"&gt;#yssyd3&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年2月14日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天增加了 &lt;code class="code"&gt;
 .. friend::&lt;/code&gt;
  用來寫好友鏈接，以及 &lt;code class="code"&gt;
@@ -997,7 +997,7 @@ Pelican 原始的實現似乎是按照文字數抽取前半段，不總是適合
 summary 這個插件原本的實現只允許抽取一段文字，我又對它的實現做了少許擴充，允許標註多段
 文字合併起來作爲總結。&lt;/p&gt;
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;em&gt;2015年1月29日更新&lt;/em&gt;&lt;/div&gt;
 &lt;p&gt;今天在 extract_toc 插件的幫助下，在側邊欄裏放了一個 Bootstrap affix 的目錄，
 它保持在頁面的右側位置不變，方便導航到文章的各個地方。具體實現方法除了 Bootstrap 3 的
 &lt;a class="reference external" href="http://getbootstrap.com/javascript/#affix"&gt;Affix 文檔&lt;/a&gt; ，還參考了
@@ -1025,19 +1025,31 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
     var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
         "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: 'center'," +
-        "    displayIndent: '0em'," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
@@ -1046,9 +1058,26 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-        "    } " +
-        "}); ";
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 &lt;/script&gt;</summary><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>嘗試一下 Pelican</title><link href="//farseerfc.me/try-pelican.html" rel="alternate"></link><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-24:try-pelican.html</id><summary type="html">&lt;p&gt;似乎一夜之間所有的
@@ -1096,7 +1125,7 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
 &lt;blockquote&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;pelican-import 從 WordPress 導入的時候對中文、日文的支持似乎很成問題。&lt;/li&gt;
-&lt;li&gt;日期格式、時區、字符集、和多語言功能的結合度還不夠。  &lt;strong&gt;我在嘗試改善它。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;日期格式、時區、字符集、和多語言功能的結合度還不夠。  &lt;em&gt;我在嘗試改善它。&lt;/em&gt;&lt;/li&gt;
 &lt;li&gt;模板還不夠豐富。&lt;/li&gt;
 &lt;li&gt;插件也不夠多……&lt;/li&gt;
 &lt;/ol&gt;

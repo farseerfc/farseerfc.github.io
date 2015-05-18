@@ -22,8 +22,7 @@
     <meta property="og:url" content="//farseerfc.me/en/pages/404-zh.html"/>
     <meta property="og:description" content="頁面沒找到呢 你能聽到麼 硬盤旋轉的聲音 答案未找到 [1] [1]編程之禪 The ZEN of Programming 您訪問了一個不存在的頁面噢。 如果你是通過點本博客內的鏈接進來的，請在下面留言讓我修復鏈接。 如果你是直接輸入 URL 進來的，是希望我針對一個新話題寫點什麼？也請留言吧。 Page Not Found Page you are seeking From your path they are fleeing Their winter has come. [2] [2]Haiku Error Messages You are trying to access a page not found ..." />
 
-    
-    <meta property="wb:webmaster" content="a699edf35652cd85" />
+
 
     <!-- Bootstrap -->
         <link href="//farseerfc.me/en/../theme/css/bootstrap.min.css" rel="stylesheet">
@@ -40,6 +39,9 @@
 
         <link href="//farseerfc.me/en/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/en/../theme/css/ripples.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="//farseerfc.me/en/../theme/css/han.min.css">
+
 </head>
 <body>
 <div style="display:none" id="title">404 Page Not Found - Farseerfc's Nest</div>
@@ -289,19 +291,6 @@ about some new topic? Please leave a comment as well.</p>
         </div>
       </div>
       <div class="panel panel-primary">
-        <div class="panel-heading" role="tab" id="weibo-heading">
-          <h4 class="panel-title">
-            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#weibo-comments" aria-expanded="false" aria-controls="weibo-comments">
-              <i class="fa fa-weibo"></i> Weibo comments            </a>
-          </h4>
-        </div>
-        <div id="weibo-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="weibo-heading">
-          <div class="panel-body">
-                <wb:comments url="auto" width="auto" language="zh_tw" appkey="WEIBO_APPKEYN" ></wb:comments>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-primary">
         <div class="panel-heading" role="tab" id="ds-heading">
           <h4 class="panel-title">
             <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#ds-comments" aria-expanded="false" aria-controls="ds-comments">
@@ -525,16 +514,7 @@ About farseerfc</a>
     </div>
 </div>
 </div>
-<div class="sidebar-item hidden-xs">
-<div class="panel panel-default">
-	<div class="panel-heading">
-        <h4>
-<i class="fa fa-weibo fa-lg"></i><span class="icon-label">Latest Weibo</span>
-        </h4>
-    </div>
-<div id="weibo_timeline"><iframe width="100%" height="400" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=600&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1862842353&verifier=b193b9de&dpc=1"></iframe></div>
-</div>
-</div>
+
 <div class="sidebar-item hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -663,8 +643,8 @@ $.ajax( {
         })();
     </script>
     <!-- End Google Analytics Code -->
-<script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="//farseerfc.me/en/../theme/js/han.min.js"></script>
 <script src="//farseerfc.me/en/../theme/js/ripples.min.js"></script>
 <script src="//farseerfc.me/en/../theme/js/material.min.js"></script>
 <script src="//farseerfc.me/en/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
@@ -687,10 +667,22 @@ $.ajax( {
             bottom: function (){
                 return $("#fcfooter").offset().top -
                     $("#article-content").offset().top -
-                    $("#article-content").height() + 60;
+                    $("#article-content").height() + 20;
             }
           }
         });
+        $('#affix-toc').width($('#sidebar').width());
+        Han()
+          .initCond()
+          .renderElem()
+          // .renderHanging()
+          // .renderJiya()
+          .renderHWS()
+          .correctBasicBD()
+          .substCombLigaWithPUA();
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
     });
 </script>
 

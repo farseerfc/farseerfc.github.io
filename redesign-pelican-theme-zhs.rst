@@ -14,7 +14,7 @@
 
 .. label-warning::
 
-    **2015年2月14日更新**
+    *2015年2月14日更新*
 
 .. PELICAN_END_SUMMARY
 
@@ -34,7 +34,7 @@
 而 Pelican 则已经升到 `3.5 <https://github.com/getpelican/pelican/releases/tag/3.5.0>`_ 了。
 早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。
 
-近日想写的东西越积越多，终于下定决心花了前前后后 **两个月** 的时间重新设计了一遍
+近日想写的东西越积越多，终于下定决心花了前前后后 *两个月* 的时间重新设计了一遍
 Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
 （以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧。）
 
@@ -129,7 +129,7 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 `farseerfc.github.io <https://github.com/farseerfc/farseerfc.github.io>`_
 也就是发布的静态网站啦。
 
-接下来从 **主题** 和 **插件** 两个方面介绍一下改版的细节。
+接下来从 *主题* 和 *插件* 两个方面介绍一下改版的细节。
 
 主题： Material Design 风格的 Bootstrap 3
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -169,8 +169,8 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
         @container-xl: 1990px;
 
 首先把 Bootstrap 3 默认适配的几个 `响应式设备的大小 <http://getbootstrap.com/css/#grid>`_
-改成了我需要的大小。 :code:`xs` 和 :code:`sm` 的大小分别按照我的手机屏幕 **竖屏** 和
-**横屏** 时候的浏览器页面宽度来算， :code:`md` 是想兼容 Nexus 7 横屏 960 的宽度以及
+改成了我需要的大小。 :code:`xs` 和 :code:`sm` 的大小分别按照我的手机屏幕 *竖屏* 和
+*横屏* 时候的浏览器页面宽度来算， :code:`md` 是想兼容 Nexus 7 横屏 960 的宽度以及
 一个常见上网本 1024 的宽度。 :code:`lg` 的大小则按照常见的笔记本 1366 宽的屏幕来适配。
 
 这里 Bootstrap 3 支持的设备大小的一个问题是，它最多考虑到 1200 像素宽的显示器，而更宽的
@@ -258,7 +258,7 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 
 .. label-warning::
 
-    **2015年1月29日更新**
+    *2015年1月29日更新*
 
 另外我也不太喜欢 Bootstrap 3 默认在手机上的 :ruby:`折叠导航栏|collapsed navbar` ，
 折叠之后的操作不够直观方便而且依赖 javascript 所以有 bug …… 于是我把它关掉了，
@@ -318,7 +318,7 @@ plugins 指向 `pelican-plugins <https://github.com/farseerfc/pelican-plugins>`_
 #. 对正文中出现的插图，添加点击放大的功能，通过 Bootstrap 的 :code:`modal` 实现。
 #. 上面提到的用 `这个bootstrap插件 <http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/>`_
    让导航栏自动隐藏。
-#. **显示源代码按钮** ，也就是每篇文章信息栏中的
+#. *显示源代码按钮* ，也就是每篇文章信息栏中的
    :html:`<button class="btn btn-primary"><i class="fa fa-code"></i></button>` 按钮。
 
 
@@ -355,10 +355,10 @@ i18n-subsites
 原本的 Pelican 就支持一篇文章用多种语言书写，有 :code:`lang` 属性注明这篇文章使用的
 语言，以及 :code:`slug` 属性注明多语言的翻译之间的关联，换句话说同一篇文章的多个语言
 版本应该有相同的 :code:`slug` 和不同的 :code:`lang`。然后原本 Pelican 里对多语言的
-实现方式是，首先有一个 **主语言** 是模板和大部分文章采用的语言，文章列表中会优先列出
-用 **主语言** 撰写的文章，然后从 **主语言** 的文章链接到别的翻译版本。
-很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 **主语言**
-的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 **主语言** 都是英语。
+实现方式是，首先有一个 *主语言* 是模板和大部分文章采用的语言，文章列表中会优先列出
+用 *主语言* 撰写的文章，然后从 *主语言* 的文章链接到别的翻译版本。
+很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 *主语言*
+的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 *主语言* 都是英语。
 
 而这个插件做的事情描述起来很简单：将文章按语言属性分到多个子站，每个子站独立放在各自的文件夹。
 比如主站是 https://farseerfc.github.io/ 的话，那么英语的子站就可以是
@@ -432,7 +432,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 
 .. label-warning::
 
-    **2015年1月30日更新**
+    *2015年1月30日更新*
 
 .. panel-default::
     :title: 嵌入 Ditaa 的示例
@@ -502,7 +502,7 @@ render-math
 :code:`:math:` :ruby:`行内角色|role` 和 :code:`.. math::` :ruby:`指示符|directive` 。
 实际工作的渲染库当然是大名鼎鼎的 `MathJax <http://www.mathjax.org/>`_ ，这个插件
 会用 MathJax 的 CDN 载入，所以也没有额外的依赖文件。（只是不知道是否会被国内墙掉，
-如果公式显示不正常请 **务必** 告诉我。）
+如果公式显示不正常请 *务必* 告诉我。）
 
 
 youtube 和 youku
@@ -519,7 +519,7 @@ tipue_search
 
 `Tipue search <http://www.tipue.com/search/>`_ 是一个非常有意思也很强大的搜索工具，
 通过 jQuery 实现静态博客的站内搜索功能。实现方式是，它需要你写一个 json 文件，包含
-整个网站的 **全部** 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
+整个网站的 *全部* 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
 虽然听起来会有性能问题，但是应用在小型的静态博客上效果意外很不错，比如本站的所有文章内容
 放在一起的 json 也只有 300KiB 左右。
 
@@ -530,15 +530,15 @@ neighbors 和 series
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 这两个插件比较类似也都比较简单， neighbors 提供一篇文章的前后文章信息，
-在主题模板里可以用来制作 **上一篇** 和 **下一篇** 按钮。
-series 提供将多篇文章归类为一个 **系列** 的支持，当然也需要在
+在主题模板里可以用来制作 *上一篇* 和 *下一篇* 按钮。
+series 提供将多篇文章归类为一个 *系列* 的支持，当然也需要在
 主题模板中定义显示「文章系列」的列表。这两个插件的效果都能在本文末尾，评论区上方的部分看到。
 
 
 bootstrapify 和 twitter_bootstrap_rst_directives
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-这两个插件让文章的 **正文** 套用上 Bootstrap 的样式。
+这两个插件让文章的 *正文* 套用上 Bootstrap 的样式。
 
 bootstrapify 这个插件实现得比较简单，用 beautifulsoup4 在静态网页的结果里面过滤元素，
 对 :code:`table` , :code:`img` , :code:`embed` , :code:`iframe` ,
@@ -572,7 +572,7 @@ twitter_bootstrap_rst_directives 这个插件则是增加了几个 reStructuredT
 
 .. label-warning::
 
-    **2015年2月3日更新**
+    *2015年2月3日更新*
 
 今天又在 twitter_bootstrap_rst_directives 里增加了两个 :ruby:`行内角色|role` 。
 一个是 :code:`:twi:` 用来写 twitter 用户的链接，比如 :twi:`farseerfc` ，另一个是
@@ -580,7 +580,7 @@ twitter_bootstrap_rst_directives 这个插件则是增加了几个 reStructuredT
 
 .. label-warning::
 
-    **2015年2月14日更新**
+    *2015年2月14日更新*
 
 今天增加了 :code:`.. friend::` 用来写好友链接，以及 :code:`fref` 用来引用好友，
 比如 :fref:`LQYMGT` 这样。
@@ -607,7 +607,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 
 .. label-warning::
 
-    **2015年1月29日更新**
+    *2015年1月29日更新*
 
 今天在 extract_toc 插件的帮助下，在侧边栏里放了一个 Bootstrap affix 的目录，
 它保持在页面的右侧位置不变，方便导航到文章的各个地方。具体实现方法除了 Bootstrap 3 的
