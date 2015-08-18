@@ -5,8 +5,8 @@
 
 &lt;p&gt;Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
 是一個混成器，替代 X 作爲顯示服務器。
-那麼 &lt;em&gt;混成器&lt;/em&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
-要理解爲什麼桌面系統需要 &lt;em&gt;混成器&lt;/em&gt; （或者它的另一個叫法，
+那麼 &lt;strong&gt;混成器&lt;/strong&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
+要理解爲什麼桌面系統需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一個叫法，
 &lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 ），在這篇文章中我想回顧一下歷史，
 瞭解一下混成器出現的前因後果。&lt;/p&gt;
@@ -46,10 +46,10 @@
 &lt;span class="math"&gt;\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)&lt;/span&gt; 左右，
 而 Windows 3.1 的最低內存需求是 1MB，對當時的硬件而言無論是顯示設備、內存或是CPU，
 這無疑都是一個龐大的負擔。&lt;/p&gt;
-&lt;p&gt;於是在當時的硬件條件下採用棧式窗口管理器有一個巨大 &lt;em&gt;優勢&lt;/em&gt; ：如果正確地採用畫家算法，
-並且合理地控制重繪時 &lt;em&gt;只繪製沒有被別的窗口覆蓋的部分&lt;/em&gt; ，那麼無論有多少窗口互相
+&lt;p&gt;於是在當時的硬件條件下採用棧式窗口管理器有一個巨大 &lt;strong&gt;優勢&lt;/strong&gt; ：如果正確地採用畫家算法，
+並且合理地控制重繪時 &lt;strong&gt;只繪製沒有被別的窗口覆蓋的部分&lt;/strong&gt; ，那麼無論有多少窗口互相
 遮蓋，都可以保證每次繪製屏幕的最大面積不會超過整個顯示器的面積。
-同樣因爲實現方式棧式窗口管理器也有一些難以迴避的 &lt;em&gt;限制&lt;/em&gt; ：&lt;/p&gt;
+同樣因爲實現方式棧式窗口管理器也有一些難以迴避的 &lt;strong&gt;限制&lt;/strong&gt; ：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;窗口必須是矩形的，不能支持不規則形狀的窗口。&lt;/li&gt;
 &lt;li&gt;不支持透明或者半透明的顏色。&lt;/li&gt;
@@ -76,7 +76,7 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;p&gt;轉眼進入了千禧年， Windows 稱霸了 PC 產業，蘋果爲重振 Macintosh 請回了 Jobs 基於 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP"&gt;NeXTSTEP&lt;/a&gt;
 開發 Mac OSX 。&lt;/p&gt;
 &lt;p&gt;NeXTSTEP 在當時提供的 GUI 界面技術相比較於同年代的 X 和 Windows 有一個很特別的地方：
-拖動滾動條或者移動窗口的時候，窗口的內容是 &lt;em&gt;實時更新&lt;/em&gt; 的，這比只顯示一個縮放大小的框框來說被認爲更直觀。
+拖動滾動條或者移動窗口的時候，窗口的內容是 &lt;strong&gt;實時更新&lt;/strong&gt; 的，這比只顯示一個縮放大小的框框來說被認爲更直觀。
 而實現這個特性的基礎是在 NeXTSTEP 中運用了
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技術，簡單地說，就是每個窗口並非直接輸出到顯示設備，而是把內容輸出到 (Display) PostScript
@@ -154,7 +154,7 @@ LG3D&lt;/div&gt;
 在三維空間中操縱二維的窗口平面，不僅像傳統的窗口管理器那樣可以縮放和移動窗口，
 還能夠旋轉角度甚至翻轉到背面去。從視頻中難以體會到的一點是， LG3D 在實現方式上與
 Mac OS X 中的混成器有一個本質上的不同，那就是處於（靜止或動畫中）縮放或旋轉狀態
-下的窗口是 &lt;em&gt;可以接受輸入事件&lt;/em&gt; 的。這一重要區別在後面 Wayland 的說明中還會提到。
+下的窗口是 &lt;strong&gt;可以接受輸入事件&lt;/strong&gt; 的。這一重要區別在後面 Wayland 的說明中還會提到。
 LG3D 項目展示了窗口管理器將如何突破傳統的棧式管理的框架，可以說代表了窗口管理器的未來發展趨勢。&lt;/p&gt;
 &lt;p&gt;LG3D 雖然以 GPL 放出了實現的源代碼，不過整個項目已經停滯開發許久了。
 官方曾經放出過一個
@@ -214,7 +214,7 @@ Objective-C 下的 Cocoa API 調用 Quartz 的情況類似。&lt;/p&gt;
 &lt;p&gt;另外需要注意的細節是 DirectX 的單窗口限制在 Windows Vista 之後被放開了，或者嚴格的說是
 基於 WDDM 規範下的顯卡驅動支持了多個 DirectX 繪圖平面。
 在早期的 Windows 包括 XP 上，整個桌面上同一時刻只能有一個程序的窗口處於 DirectX 的
-&lt;em&gt;直接繪製&lt;/em&gt; 模式，而別的窗口如果想用 DirectX 的話，要麼必須改用軟件渲染要麼就不能工作。
+&lt;strong&gt;直接繪製&lt;/strong&gt; 模式，而別的窗口如果想用 DirectX 的話，要麼必須改用軟件渲染要麼就不能工作。
 這種現象可以通過打開多個播放器或者窗口化的遊戲界面觀察到。
 而在 WDDM 規範的 Vista 中，所有窗口最終都繪製到 DirectX 平面上，換句話說每個窗口都是
 DirectX 窗口。又或者我們可以認爲，整個界面上只有一個真正的窗口也就是 DWM 繪製的全屏窗口，
@@ -296,7 +296,7 @@ DirectX 窗口。又或者我們可以認爲，整個界面上只有一個真正
 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。
 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。&lt;/p&gt;
 &lt;p&gt;Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到，
-直接 ssh X forwarding 效果也不錯。只是這些方案的一個 &lt;em&gt;不太易用&lt;/em&gt; 的地方在於，需要
+直接 ssh X forwarding 效果也不錯。只是這些方案的一個 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在於，需要
 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。&lt;/p&gt;
 &lt;p&gt;於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux
 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手）

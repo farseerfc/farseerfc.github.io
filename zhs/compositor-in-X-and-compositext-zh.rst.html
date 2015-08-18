@@ -120,7 +120,7 @@ Chromium）都需要首先渲染到內部的 <span class="s">`XPixMap </span><sp
 <span class="m">#.</span> 混成的部分是交由外部的程序完成的，對混成的繪製方式和繪製普通窗口一樣。
    出於效率考慮，絕大多數 X 上的混成器額外使用了 XRender 擴展或者
    OpenGL/EGL 來加速繪製貼圖。不過即使如此，還是不能避免同樣的位圖（內容不一定完全一致，
-   比如 X 可以在窗口交給它的位圖上加上邊框然後再返還給混成器） <span class="ge">*在不同的三個程序之間來回傳遞*</span> 。
+   比如 X 可以在窗口交給它的位圖上加上邊框然後再返還給混成器） <span class="gs">**在不同的三個程序之間來回傳遞**</span> 。
 <span class="m">#.</span> <span class="na">:code:</span><span class="nv">`RedirectSubwindows`</span> 調用針對的是一個窗口樹，換句話說是一個窗口
    及其全部子窗口，不同於 Mac OS X 中混成器會拿到全部窗口的輸出。
    這個特點其實並不算是限制，因爲 X 中每個虛擬桌面都有一個根窗口，只要指定這個根窗口
@@ -129,7 +129,7 @@ Chromium）都需要首先渲染到內部的 <span class="s">`XPixMap </span><sp
    拿到某個特定窗口的輸出，而不用在意別的窗口。
 <span class="m">#.</span> 爲了讓窗口有輸出，窗口必須顯示在當前桌面上，不能處於最小化
    狀態或者顯示在別的虛擬桌面，用 X 的術語說就是窗口必須處於 <span class="na">:ruby:</span><span class="nv">`被映射|mapped`</span>
-   的狀態。因此直接用上述方法 <span class="ge">*不能得到沒有顯示的窗口的輸出*</span> ，比如不能對最小化的窗口
+   的狀態。因此直接用上述方法 <span class="gs">**不能得到沒有顯示的窗口的輸出**</span> ，比如不能對最小化的窗口
    直接實現 Windows 7 中的 Aero Peak 之類的效果。這個限制可以想辦法繞開，
    比如在需要窗口輸出的時候臨時把窗口映射到桌面上，拿到輸出之後再隱藏起來，
    不過要實現這一點需要混成器和窗口管理器相互配合。
@@ -150,8 +150,8 @@ Chromium）都需要首先渲染到內部的 <span class="s">`XPixMap </span><sp
 <span class="gh">輸入事件的重定向，這可能做到麼？</span>
 <span class="gh">++++++++++++++++++++++++++++++++++++++++++</span>
 
-通過上述 Composite 擴展提供的 API ，混成器可以把窗口的 <span class="ge">*輸出*</span> 重定向到自己的窗口上。
-但是僅僅重定向輸出，整個 X 還不處於可用狀態，因爲 <span class="ge">*沒有重定向輸入*</span> 。
+通過上述 Composite 擴展提供的 API ，混成器可以把窗口的 <span class="gs">**輸出**</span> 重定向到自己的窗口上。
+但是僅僅重定向輸出，整個 X 還不處於可用狀態，因爲 <span class="gs">**沒有重定向輸入**</span> 。
 考慮一下用戶試圖用鼠標點擊某個按鈕或者文本框，這時鼠標處於的位置是在 OverlayWindow
 上繪製的位置，這個鼠標事件會交給 OverlayWindow ，而用戶期待這個事件被發送給他看到的按鈕上。
 
@@ -161,7 +161,7 @@ Chromium）都需要首先渲染到內部的 <span class="s">`XPixMap </span><sp
 假設要重定向鍵盤事件，混成器需要效仿輸入法框架（fcitx, ibus, scim）
 那樣處理一部分按鍵事件並把其餘事件轉給具有輸入焦點的程序。
 看看現有的輸入法框架和諸多程序間的問題，我們就能知道這裏的坑有多深。
-於是 <span class="ge">*大部分 X 的混成器都不處理鍵盤事件重定向*</span> 
+於是 <span class="gs">**大部分 X 的混成器都不處理鍵盤事件重定向**</span> 
 。再來看重定向鼠標事件，這邊的坑比重定向鍵盤事件的坑更多，
 因爲不像重定向窗口輸出那樣只需要考慮 <span class="na">:ruby:</span><span class="nv">`頂層|top-level`</span> 窗口，
 重定向鼠標輸入的時候要考慮所有子窗口（它們有獨立的事件隊列），
@@ -169,25 +169,25 @@ Chromium）都需要首先渲染到內部的 <span class="s">`XPixMap </span><sp
 中描述的轉交窗口焦點的複雜規則，所有這些都已經在 X 中實現過的事情需要重新實現一遍。
 
 由於坑太多難以實現，所以所有 X 下的混成器的實現方式都是直接忽略這個繁重的任務，
-<span class="ge">*不重定向輸入事件*</span> 而把它交給 X 處理。具體的實現方式就是通過
+<span class="gs">**不重定向輸入事件**</span> 而把它交給 X 處理。具體的實現方式就是通過
 <span class="s">`XFixes </span><span class="si">&lt;http://freedesktop.org/wiki/Software/FixesExt/&gt;</span><span class="s">`_</span>
-擴展提供的 <span class="na">:code:</span><span class="nv">`SetWindowShapeRegion`</span> API 將 OverlayWindow 的 <span class="ge">*輸入區域*</span>
+擴展提供的 <span class="na">:code:</span><span class="nv">`SetWindowShapeRegion`</span> API 將 OverlayWindow 的 <span class="gs">**輸入區域**</span>
 <span class="na">:code:</span><span class="nv">`ShapeInput`</span> 設爲空區域，從而忽略對這個 OverlayWindow 的一切鼠標鍵盤事件。
 這樣一來對 OverlayWindow 的點擊會透過 OverlayWindow 直接作用到底下的窗口上。
 
 因爲選擇了不重定向輸入事件， X 下的混成器通常會處於以下兩種狀態：
 
 <span class="m">#.</span> 選擇狀態下可以縮放窗口的大小，扭曲窗口的形狀，並且可以把窗口繪製在任意想要繪製的位置上
-   （並不是移動窗口的位置）， <span class="ge">*但是不能讓用戶與窗口的內容交互*</span> 。
+   （並不是移動窗口的位置）， <span class="gs">**但是不能讓用戶與窗口的內容交互**</span> 。
 <span class="m">#.</span> 正常狀態下可以讓用戶與窗口的內容交互，但是
-   <span class="ge">*繪製的窗口位置、大小和形狀必須嚴格地和 X 記錄的窗口的位置、大小和形狀保持一致*</span>
+   <span class="gs">**繪製的窗口位置、大小和形狀必須嚴格地和 X 記錄的窗口的位置、大小和形狀保持一致**</span>
    。持續時間短暫的動畫效果可以允許位置和形狀稍有偏差，但是在動畫的過程中如果用戶點擊了
    變形縮放過的窗口，那麼鼠標事件將發往錯誤的（ X 記錄中的而非顯示出的）窗口元素上。
 
 可以發現這兩種狀態就直接對應了 Gnome 3 的普通狀態和縮略圖狀態（點擊 <span class="na">:ruby:</span><span class="nv">`活動|Activity`</span>
 或者戳畫面左上角之後顯示的狀態），這也解釋了爲什麼儘管 Gnome 3
 的窗口有碩大的關閉按鈕，但是在縮略圖狀態下 Gnome 3 仍然需要給窗口加上額外的關閉按鈕：
-<span class="ge">*因爲處於縮略狀態下的窗口只是一張畫而不能點*</span> 。
+<span class="gs">**因爲處於縮略狀態下的窗口只是一張畫而不能點**</span> 。
 
 Composite 擴展的這些限制使得 X 下的混成器目前只能實現 Mac OS X 那樣的 Exposé
 效果，而不能實現 LG3D_ 那樣直接在 3D 空間中操縱窗口內容。

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-ubuntu.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
 &lt;div class="label label-warning"&gt;
-&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
 &lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
 本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
 &lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
 Github Pages 原本就有的
 &lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
-生成静态网站。另一种是在 &lt;em&gt;本地&lt;/em&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
 到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
 &lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
 还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
@@ -27,9 +27,9 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
 原本是 &lt;ruby&gt;&lt;rb&gt;敏捷开发&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者 &lt;ruby&gt;&lt;rb&gt;极限编程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是说在开发的过程中，
-一旦有微小的变更，就全自动地 &lt;em&gt;持续&lt;/em&gt; 合并到主线中， &lt;em&gt;整合&lt;/em&gt; 变更的内容到发布版本里。
-这里的 &lt;em&gt;整合&lt;/em&gt; 实际上可以理解为 &lt;em&gt;全自动测试&lt;/em&gt; 加上 &lt;em&gt;生成最终产品&lt;/em&gt; 。
-可以看到 &lt;em&gt;持续整合&lt;/em&gt; 实际强调 &lt;em&gt;全自动&lt;/em&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有微小的变更，就全自动地 &lt;strong&gt;持续&lt;/strong&gt; 合并到主线中， &lt;strong&gt;整合&lt;/strong&gt; 变更的内容到发布版本里。
+这里的 &lt;strong&gt;整合&lt;/strong&gt; 实际上可以理解为 &lt;strong&gt;全自动测试&lt;/strong&gt; 加上 &lt;strong&gt;生成最终产品&lt;/strong&gt; 。
+可以看到 &lt;strong&gt;持续整合&lt;/strong&gt; 实际强调 &lt;strong&gt;全自动&lt;/strong&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
 一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。&lt;/p&gt;
 &lt;p&gt;于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
 提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
@@ -42,13 +42,13 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
 每个 push 调用测试了。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="{filename}/images/travis-repo-enable.png"/&gt;
+&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="//farseerfc.me/zhs/images/travis-repo-enable.png"/&gt;
 &lt;p class="caption"&gt;在 Travis-CI 中开启对 Github Repo 的持续整合&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;然后在 repo 的根目录放一个 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件描述编译的步骤。
-&lt;em&gt;暂时&lt;/em&gt; 测试的目的下我写的 &lt;code class="code"&gt;
+&lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面这样。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
@@ -117,7 +117,7 @@ ssh key 添加到 github 账户就可以了，在编译细节都通过 github re
 &lt;div class="panel-heading"&gt;
 Github 上创建 Personal Access Token&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="{filename}/images/travis-blog-push.png"/&gt;
+&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="//farseerfc.me/zhs/images/travis-blog-push.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;好在 Github 支持通过 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
@@ -131,7 +131,7 @@ Github 上创建 Personal Access Token&lt;/div&gt;
 如果你不能使用 travis 命令&lt;/div&gt;
 &lt;div class="panel-body"&gt;
 &lt;div class="label label-warning"&gt;
-&lt;em&gt;2015年2月21日更新&lt;/em&gt;&lt;/div&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
 &lt;p&gt;使用 &lt;code class="code"&gt;
 travis encrypt&lt;/code&gt;
  命令来加密重要数据最方便，不过如果有任何原因，
@@ -233,7 +233,7 @@ Readme.md&lt;/code&gt;
 &lt;p&gt;这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
 编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="{filename}/images/travis-edit-github-web.png"/&gt;
+&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="//farseerfc.me/zhs/images/travis-edit-github-web.png"/&gt;
 &lt;p class="caption"&gt;在 Github 的 Web 界面中直接编辑文章内容&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录

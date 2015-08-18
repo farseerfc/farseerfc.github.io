@@ -5,8 +5,8 @@
 
 &lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
 是一个混成器，替代 X 作为显示服务器。
-那么 &lt;em&gt;混成器&lt;/em&gt; 是个什么东西，桌面系统为什么需要它呢？
-要理解为什么桌面系统需要 &lt;em&gt;混成器&lt;/em&gt; （或者它的另一个叫法，
+那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
 &lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 ），在这篇文章中我想回顾一下历史，
 了解一下混成器出现的前因后果。&lt;/p&gt;
@@ -21,7 +21,7 @@
 &lt;div class="panel-heading"&gt;
 栈式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="栈式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/zhs/../images/Windows_3.11_workspace.png"/&gt;
+&lt;img alt="栈式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/zhs/images/Windows_3.11_workspace.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
@@ -46,10 +46,10 @@
 &lt;span class="math"&gt;\(25 \text{MHz} \times 32 \text{bits} = 100 \text{MiB/s}\)&lt;/span&gt; 左右，
 而 Windows 3.1 的最低内存需求是 1MB，对当时的硬件而言无论是显示设备、内存或是CPU，
 这无疑都是一个庞大的负担。&lt;/p&gt;
-&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;em&gt;优势&lt;/em&gt; ：如果正确地采用画家算法，
-并且合理地控制重绘时 &lt;em&gt;只绘制没有被别的窗口覆盖的部分&lt;/em&gt; ，那么无论有多少窗口互相
+&lt;p&gt;于是在当时的硬件条件下采用栈式窗口管理器有一个巨大 &lt;strong&gt;优势&lt;/strong&gt; ：如果正确地采用画家算法，
+并且合理地控制重绘时 &lt;strong&gt;只绘制没有被别的窗口覆盖的部分&lt;/strong&gt; ，那么无论有多少窗口互相
 遮盖，都可以保证每次绘制屏幕的最大面积不会超过整个显示器的面积。
-同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;em&gt;限制&lt;/em&gt; ：&lt;/p&gt;
+同样因为实现方式栈式窗口管理器也有一些难以回避的 &lt;strong&gt;限制&lt;/strong&gt; ：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;窗口必须是矩形的，不能支持不规则形状的窗口。&lt;/li&gt;
 &lt;li&gt;不支持透明或者半透明的颜色。&lt;/li&gt;
@@ -70,13 +70,13 @@
 &lt;div class="panel-heading"&gt;
 NeXTSTEP 桌面&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="NeXTSTEP 桌面" class="img-responsive" src="//farseerfc.me/zhs/../images/NeXTSTEP_desktop.png"/&gt;
+&lt;img alt="NeXTSTEP 桌面" class="img-responsive" src="//farseerfc.me/zhs/images/NeXTSTEP_desktop.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;转眼进入了千禧年， Windows 称霸了 PC 产业，苹果为重振 Macintosh 请回了 Jobs 基于 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/NeXTSTEP"&gt;NeXTSTEP&lt;/a&gt;
 开发 Mac OSX 。&lt;/p&gt;
 &lt;p&gt;NeXTSTEP 在当时提供的 GUI 界面技术相比较于同年代的 X 和 Windows 有一个很特别的地方：
-拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;em&gt;实时更新&lt;/em&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
+拖动滚动条或者移动窗口的时候，窗口的内容是 &lt;strong&gt;实时更新&lt;/strong&gt; 的，这比只显示一个缩放大小的框框来说被认为更直观。
 而实现这个特性的基础是在 NeXTSTEP 中运用了
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
@@ -91,7 +91,7 @@ Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间�
 &lt;div class="panel-heading"&gt;
 Mission Control&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Mission Control" class="img-responsive" src="//farseerfc.me/zhs/../images/Mac_OS_X_Lion_Preview_-_Mission_Control.jpg"/&gt;
+&lt;img alt="Mission Control" class="img-responsive" src="//farseerfc.me/zhs/images/Mac_OS_X_Lion_Preview_-_Mission_Control.jpg"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;也就是说在 Mac OS X 中无论窗口用何种方式绘图，都会绘制输出成一副内存中的位图交给混成器，
@@ -147,14 +147,14 @@ Mission Control) 功能，把窗口的缩略图（而不是事先绘制的图标
 &lt;div class="panel-heading"&gt;
 LG3D&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="LG3D" class="img-responsive" src="//farseerfc.me/zhs/../images/LG3D.jpg"/&gt;
+&lt;img alt="LG3D" class="img-responsive" src="//farseerfc.me/zhs/images/LG3D.jpg"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;如视频中展示的那样， LG3D 完全突破了传统的栈式窗口管理方式，
 在三维空间中操纵二维的窗口平面，不仅像传统的窗口管理器那样可以缩放和移动窗口，
 还能够旋转角度甚至翻转到背面去。从视频中难以体会到的一点是， LG3D 在实现方式上与
 Mac OS X 中的混成器有一个本质上的不同，那就是处于（静止或动画中）缩放或旋转状态
-下的窗口是 &lt;em&gt;可以接受输入事件&lt;/em&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
+下的窗口是 &lt;strong&gt;可以接受输入事件&lt;/strong&gt; 的。这一重要区别在后面 Wayland 的说明中还会提到。
 LG3D 项目展示了窗口管理器将如何突破传统的栈式管理的框架，可以说代表了窗口管理器的未来发展趋势。&lt;/p&gt;
 &lt;p&gt;LG3D 虽然以 GPL 放出了实现的源代码，不过整个项目已经停滞开发许久了。
 官方曾经放出过一个
@@ -214,7 +214,7 @@ Objective-C 下的 Cocoa API 调用 Quartz 的情况类似。&lt;/p&gt;
 &lt;p&gt;另外需要注意的细节是 DirectX 的单窗口限制在 Windows Vista 之后被放开了，或者严格的说是
 基于 WDDM 规范下的显卡驱动支持了多个 DirectX 绘图平面。
 在早期的 Windows 包括 XP 上，整个桌面上同一时刻只能有一个程序的窗口处于 DirectX 的
-&lt;em&gt;直接绘制&lt;/em&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
+&lt;strong&gt;直接绘制&lt;/strong&gt; 模式，而别的窗口如果想用 DirectX 的话，要么必须改用软件渲染要么就不能工作。
 这种现象可以通过打开多个播放器或者窗口化的游戏界面观察到。
 而在 WDDM 规范的 Vista 中，所有窗口最终都绘制到 DirectX 平面上，换句话说每个窗口都是
 DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正的窗口也就是 DWM 绘制的全屏窗口，
@@ -296,7 +296,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。&lt;/p&gt;
 &lt;p&gt;Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
-直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;em&gt;不太易用&lt;/em&gt; 的地方在于，需要
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在于，需要
 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。&lt;/p&gt;
 &lt;p&gt;于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
@@ -306,7 +306,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
 &lt;div class="panel-heading"&gt;
 Chrome Remote Desktop 插件&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="{filename}/images/chrome-remote-desktop-plugin.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-plugin.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chrome-remote-desktop"&gt;
@@ -363,7 +363,7 @@ host#.json&lt;/code&gt;
 &lt;p&gt;接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
 应该可以看到一个「启用远程链接」的按钮。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="{filename}/images/chrome-remote-desktop-enable-button.png"/&gt;
+&lt;img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-enable-button.png"/&gt;
 &lt;p class="caption"&gt;Chrome Remote Desktop 插件中「启用远程链接」的按钮&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="alert alert-warning compound"&gt;
@@ -381,7 +381,7 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 &lt;p&gt;点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
 你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="{filename}/images/chrome-remote-desktop-after-enabled.png"/&gt;
+&lt;img alt="启用远程链接之后的样子" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-after-enabled.png"/&gt;
 &lt;p class="caption"&gt;启用远程链接之后的样子&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
@@ -397,12 +397,12 @@ systemctl --user enable&lt;/code&gt;
 &lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="{filename}/images/chrome-remote-desktop-htop.png"/&gt;
+&lt;img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-htop.png"/&gt;
 &lt;p class="caption"&gt;htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="{filename}/images/chrome-remote-desktop-xfce4.png"/&gt;
+&lt;img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-xfce4.png"/&gt;
 &lt;p class="caption"&gt;「远程」登录到新的 XFCE4&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -422,7 +422,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;div class="panel-heading"&gt;
 手机上的 Chrome 远程桌面 App&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android.png"/&gt;
+&lt;img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-android.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
@@ -431,7 +431,7 @@ Ubuntu 12.04 和 12.10 （14.04之后似乎有
 &lt;p&gt;除了桌面的 Chrome 之外还有一个客户端是 Android 上的
 &lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop"&gt;Chrome 远程桌面 App&lt;/a&gt; 经过上面的设置之后，从这个 App 也能看到并登录：&lt;/p&gt;
 &lt;div class="figure"&gt;
-&lt;img alt="手机远程登录" class="img-responsive" src="{filename}/images/chrome-remote-desktop-android-logined.png"/&gt;
+&lt;img alt="手机远程登录" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-android-logined.png"/&gt;
 &lt;p class="caption"&gt;手机远程登录&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;好啦，开始享受国家自然科学一等奖的透明计算技术吧！&lt;/p&gt;

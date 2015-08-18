@@ -64,7 +64,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，對混成的繪製方式和繪製普通窗口一樣。
 出於效率考慮，絕大多數 X 上的混成器額外使用了 XRender 擴展或者
 OpenGL/EGL 來加速繪製貼圖。不過即使如此，還是不能避免同樣的位圖（內容不一定完全一致，
-比如 X 可以在窗口交給它的位圖上加上邊框然後再返還給混成器） &lt;em&gt;在不同的三個程序之間來回傳遞&lt;/em&gt; 。&lt;/li&gt;
+比如 X 可以在窗口交給它的位圖上加上邊框然後再返還給混成器） &lt;strong&gt;在不同的三個程序之間來回傳遞&lt;/strong&gt; 。&lt;/li&gt;
 &lt;li&gt;&lt;code class="code"&gt;
 RedirectSubwindows&lt;/code&gt;
  調用針對的是一個窗口樹，換句話說是一個窗口
@@ -75,7 +75,7 @@ RedirectSubwindows&lt;/code&gt;
 拿到某個特定窗口的輸出，而不用在意別的窗口。&lt;/li&gt;
 &lt;li&gt;爲了讓窗口有輸出，窗口必須顯示在當前桌面上，不能處於最小化
 狀態或者顯示在別的虛擬桌面，用 X 的術語說就是窗口必須處於 &lt;ruby&gt;&lt;rb&gt;被映射&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mapped&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
-的狀態。因此直接用上述方法 &lt;em&gt;不能得到沒有顯示的窗口的輸出&lt;/em&gt; ，比如不能對最小化的窗口
+的狀態。因此直接用上述方法 &lt;strong&gt;不能得到沒有顯示的窗口的輸出&lt;/strong&gt; ，比如不能對最小化的窗口
 直接實現 Windows 7 中的 Aero Peak 之類的效果。這個限制可以想辦法繞開，
 比如在需要窗口輸出的時候臨時把窗口映射到桌面上，拿到輸出之後再隱藏起來，
 不過要實現這一點需要混成器和窗口管理器相互配合。&lt;/li&gt;
@@ -95,8 +95,8 @@ OpenGL Surface 則無視了這些設備相關的屬性。&lt;/li&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;輸入事件的重定向，這可能做到麼？&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;通過上述 Composite 擴展提供的 API ，混成器可以把窗口的 &lt;em&gt;輸出&lt;/em&gt; 重定向到自己的窗口上。
-但是僅僅重定向輸出，整個 X 還不處於可用狀態，因爲 &lt;em&gt;沒有重定向輸入&lt;/em&gt; 。
+&lt;p&gt;通過上述 Composite 擴展提供的 API ，混成器可以把窗口的 &lt;strong&gt;輸出&lt;/strong&gt; 重定向到自己的窗口上。
+但是僅僅重定向輸出，整個 X 還不處於可用狀態，因爲 &lt;strong&gt;沒有重定向輸入&lt;/strong&gt; 。
 考慮一下用戶試圖用鼠標點擊某個按鈕或者文本框，這時鼠標處於的位置是在 OverlayWindow
 上繪製的位置，這個鼠標事件會交給 OverlayWindow ，而用戶期待這個事件被發送給他看到的按鈕上。&lt;/p&gt;
 &lt;p&gt;需要重定向的事件主要有鍵盤和鼠標事件兩大類（暫時先不考慮觸摸屏之類的額外輸入）。
@@ -104,18 +104,18 @@ OpenGL Surface 則無視了這些設備相關的屬性。&lt;/li&gt;
 &lt;p&gt;假設要重定向鍵盤事件，混成器需要效仿輸入法框架（fcitx, ibus, scim）
 那樣處理一部分按鍵事件並把其餘事件轉給具有輸入焦點的程序。
 看看現有的輸入法框架和諸多程序間的問題，我們就能知道這裏的坑有多深。
-於是 &lt;em&gt;大部分 X 的混成器都不處理鍵盤事件重定向&lt;/em&gt;
+於是 &lt;strong&gt;大部分 X 的混成器都不處理鍵盤事件重定向&lt;/strong&gt;
 。再來看重定向鼠標事件，這邊的坑比重定向鍵盤事件的坑更多，
 因爲不像重定向窗口輸出那樣只需要考慮 &lt;ruby&gt;&lt;rb&gt;頂層&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;top-level&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 窗口，
 重定向鼠標輸入的時候要考慮所有子窗口（它們有獨立的事件隊列），
 以及要準確記錄輸入事件事件發生時的鍵盤組合鍵狀態，還要正確實現 ICCCM/EWMH
 中描述的轉交窗口焦點的複雜規則，所有這些都已經在 X 中實現過的事情需要重新實現一遍。&lt;/p&gt;
 &lt;p&gt;由於坑太多難以實現，所以所有 X 下的混成器的實現方式都是直接忽略這個繁重的任務，
-&lt;em&gt;不重定向輸入事件&lt;/em&gt; 而把它交給 X 處理。具體的實現方式就是通過
+&lt;strong&gt;不重定向輸入事件&lt;/strong&gt; 而把它交給 X 處理。具體的實現方式就是通過
 &lt;a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/"&gt;XFixes&lt;/a&gt;
 擴展提供的 &lt;code class="code"&gt;
 SetWindowShapeRegion&lt;/code&gt;
- API 將 OverlayWindow 的 &lt;em&gt;輸入區域&lt;/em&gt;
+ API 將 OverlayWindow 的 &lt;strong&gt;輸入區域&lt;/strong&gt;
 &lt;code class="code"&gt;
 ShapeInput&lt;/code&gt;
  設爲空區域，從而忽略對這個 OverlayWindow 的一切鼠標鍵盤事件。
@@ -123,16 +123,16 @@ ShapeInput&lt;/code&gt;
 &lt;p&gt;因爲選擇了不重定向輸入事件， X 下的混成器通常會處於以下兩種狀態：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;選擇狀態下可以縮放窗口的大小，扭曲窗口的形狀，並且可以把窗口繪製在任意想要繪製的位置上
-（並不是移動窗口的位置）， &lt;em&gt;但是不能讓用戶與窗口的內容交互&lt;/em&gt; 。&lt;/li&gt;
+（並不是移動窗口的位置）， &lt;strong&gt;但是不能讓用戶與窗口的內容交互&lt;/strong&gt; 。&lt;/li&gt;
 &lt;li&gt;正常狀態下可以讓用戶與窗口的內容交互，但是
-&lt;em&gt;繪製的窗口位置、大小和形狀必須嚴格地和 X 記錄的窗口的位置、大小和形狀保持一致&lt;/em&gt;
+&lt;strong&gt;繪製的窗口位置、大小和形狀必須嚴格地和 X 記錄的窗口的位置、大小和形狀保持一致&lt;/strong&gt;
 。持續時間短暫的動畫效果可以允許位置和形狀稍有偏差，但是在動畫的過程中如果用戶點擊了
 變形縮放過的窗口，那麼鼠標事件將發往錯誤的（ X 記錄中的而非顯示出的）窗口元素上。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;可以發現這兩種狀態就直接對應了 Gnome 3 的普通狀態和縮略圖狀態（點擊 &lt;ruby&gt;&lt;rb&gt;活動&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Activity&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
 或者戳畫面左上角之後顯示的狀態），這也解釋了爲什麼儘管 Gnome 3
 的窗口有碩大的關閉按鈕，但是在縮略圖狀態下 Gnome 3 仍然需要給窗口加上額外的關閉按鈕：
-&lt;em&gt;因爲處於縮略狀態下的窗口只是一張畫而不能點&lt;/em&gt; 。&lt;/p&gt;
+&lt;strong&gt;因爲處於縮略狀態下的窗口只是一張畫而不能點&lt;/strong&gt; 。&lt;/p&gt;
 &lt;p&gt;Composite 擴展的這些限制使得 X 下的混成器目前只能實現 Mac OS X 那樣的 Exposé
 效果，而不能實現 &lt;a class="reference external" href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 那樣直接在 3D 空間中操縱窗口內容。&lt;/p&gt;
 &lt;p&gt;解決重定向問題曾經的一縷曙光是 &lt;ruby&gt;&lt;rb&gt;昇陽公司&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Sun Microsystems&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在開發 &lt;a class="reference external" href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d"&gt;LG3D&lt;/a&gt; 的過程中同時提議過另一個 X
@@ -190,7 +190,7 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。
 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。&lt;/p&gt;
 &lt;p&gt;Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到，
-直接 ssh X forwarding 效果也不錯。只是這些方案的一個 &lt;em&gt;不太易用&lt;/em&gt; 的地方在於，需要
+直接 ssh X forwarding 效果也不錯。只是這些方案的一個 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在於，需要
 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。&lt;/p&gt;
 &lt;p&gt;於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux
 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手）

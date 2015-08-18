@@ -10,6 +10,8 @@
 
 
     <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
 
 <link rel="canonical" href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html">
 
@@ -49,9 +51,6 @@
 
         <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
         <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/han.min.css">
-
 </head>
 <body>
 <div style="display:none" id="title">X 中的混成器与 Composite 扩展 - Farseerfc的小窝</div>
@@ -315,7 +314,7 @@ CreateRegionFromBorderClip</code>
 <li>混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
 出于效率考虑，绝大多数 X 上的混成器额外使用了 XRender 扩展或者
 OpenGL/EGL 来加速绘制贴图。不过即使如此，还是不能避免同样的位图（内容不一定完全一致，
-比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） <em>在不同的三个程序之间来回传递</em> 。</li>
+比如 X 可以在窗口交给它的位图上加上边框然后再返还给混成器） <strong>在不同的三个程序之间来回传递</strong> 。</li>
 <li><code class="code">
 RedirectSubwindows</code>
  调用针对的是一个窗口树，换句话说是一个窗口
@@ -326,7 +325,7 @@ RedirectSubwindows</code>
 拿到某个特定窗口的输出，而不用在意别的窗口。</li>
 <li>为了让窗口有输出，窗口必须显示在当前桌面上，不能处于最小化
 状态或者显示在别的虚拟桌面，用 X 的术语说就是窗口必须处于 <ruby><rb>被映射</rb><rp>(</rp><rt>mapped</rt><rp>)</rp></ruby>
-的状态。因此直接用上述方法 <em>不能得到没有显示的窗口的输出</em> ，比如不能对最小化的窗口
+的状态。因此直接用上述方法 <strong>不能得到没有显示的窗口的输出</strong> ，比如不能对最小化的窗口
 直接实现 Windows 7 中的 Aero Peak 之类的效果。这个限制可以想办法绕开，
 比如在需要窗口输出的时候临时把窗口映射到桌面上，拿到输出之后再隐藏起来，
 不过要实现这一点需要混成器和窗口管理器相互配合。</li>
@@ -346,8 +345,8 @@ OpenGL Surface 则无视了这些设备相关的属性。</li>
 </div>
 <div class="section" id="id5">
 <h2><a class="toc-backref" href="#id10">输入事件的重定向，这可能做到么？</a></h2>
-<p>通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 <em>输出</em> 重定向到自己的窗口上。
-但是仅仅重定向输出，整个 X 还不处于可用状态，因为 <em>没有重定向输入</em> 。
+<p>通过上述 Composite 扩展提供的 API ，混成器可以把窗口的 <strong>输出</strong> 重定向到自己的窗口上。
+但是仅仅重定向输出，整个 X 还不处于可用状态，因为 <strong>没有重定向输入</strong> 。
 考虑一下用户试图用鼠标点击某个按钮或者文本框，这时鼠标处于的位置是在 OverlayWindow
 上绘制的位置，这个鼠标事件会交给 OverlayWindow ，而用户期待这个事件被发送给他看到的按钮上。</p>
 <p>需要重定向的事件主要有键盘和鼠标事件两大类（暂时先不考虑触摸屏之类的额外输入）。
@@ -355,18 +354,18 @@ OpenGL Surface 则无视了这些设备相关的属性。</li>
 <p>假设要重定向键盘事件，混成器需要效仿输入法框架（fcitx, ibus, scim）
 那样处理一部分按键事件并把其余事件转给具有输入焦点的程序。
 看看现有的输入法框架和诸多程序间的问题，我们就能知道这里的坑有多深。
-于是 <em>大部分 X 的混成器都不处理键盘事件重定向</em>
+于是 <strong>大部分 X 的混成器都不处理键盘事件重定向</strong>
 。再来看重定向鼠标事件，这边的坑比重定向键盘事件的坑更多，
 因为不像重定向窗口输出那样只需要考虑 <ruby><rb>顶层</rb><rp>(</rp><rt>top-level</rt><rp>)</rp></ruby> 窗口，
 重定向鼠标输入的时候要考虑所有子窗口（它们有独立的事件队列），
 以及要准确记录输入事件事件发生时的键盘组合键状态，还要正确实现 ICCCM/EWMH
 中描述的转交窗口焦点的复杂规则，所有这些都已经在 X 中实现过的事情需要重新实现一遍。</p>
 <p>由于坑太多难以实现，所以所有 X 下的混成器的实现方式都是直接忽略这个繁重的任务，
-<em>不重定向输入事件</em> 而把它交给 X 处理。具体的实现方式就是通过
+<strong>不重定向输入事件</strong> 而把它交给 X 处理。具体的实现方式就是通过
 <a class="reference external" href="http://freedesktop.org/wiki/Software/FixesExt/">XFixes</a>
 扩展提供的 <code class="code">
 SetWindowShapeRegion</code>
- API 将 OverlayWindow 的 <em>输入区域</em>
+ API 将 OverlayWindow 的 <strong>输入区域</strong>
 <code class="code">
 ShapeInput</code>
  设为空区域，从而忽略对这个 OverlayWindow 的一切鼠标键盘事件。
@@ -374,16 +373,16 @@ ShapeInput</code>
 <p>因为选择了不重定向输入事件， X 下的混成器通常会处于以下两种状态：</p>
 <ol class="arabic simple">
 <li>选择状态下可以缩放窗口的大小，扭曲窗口的形状，并且可以把窗口绘制在任意想要绘制的位置上
-（并不是移动窗口的位置）， <em>但是不能让用户与窗口的内容交互</em> 。</li>
+（并不是移动窗口的位置）， <strong>但是不能让用户与窗口的内容交互</strong> 。</li>
 <li>正常状态下可以让用户与窗口的内容交互，但是
-<em>绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致</em>
+<strong>绘制的窗口位置、大小和形状必须严格地和 X 记录的窗口的位置、大小和形状保持一致</strong>
 。持续时间短暂的动画效果可以允许位置和形状稍有偏差，但是在动画的过程中如果用户点击了
 变形缩放过的窗口，那么鼠标事件将发往错误的（ X 记录中的而非显示出的）窗口元素上。</li>
 </ol>
 <p>可以发现这两种状态就直接对应了 Gnome 3 的普通状态和缩略图状态（点击 <ruby><rb>活动</rb><rp>(</rp><rt>Activity</rt><rp>)</rp></ruby>
 或者戳画面左上角之后显示的状态），这也解释了为什么尽管 Gnome 3
 的窗口有硕大的关闭按钮，但是在缩略图状态下 Gnome 3 仍然需要给窗口加上额外的关闭按钮：
-<em>因为处于缩略状态下的窗口只是一张画而不能点</em> 。</p>
+<strong>因为处于缩略状态下的窗口只是一张画而不能点</strong> 。</p>
 <p>Composite 扩展的这些限制使得 X 下的混成器目前只能实现 Mac OS X 那样的 Exposé
 效果，而不能实现 <a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d">LG3D</a> 那样直接在 3D 空间中操纵窗口内容。</p>
 <p>解决重定向问题曾经的一缕曙光是 <ruby><rb>升阳公司</rb><rp>(</rp><rt>Sun Microsystems</rt><rp>)</rp></ruby> 在开发 <a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html#project-looking-glass-3d">LG3D</a> 的过程中同时提议过另一个 X
@@ -1076,7 +1075,6 @@ $.ajax( {
     </script>
     <!-- End Google Analytics Code -->
 
-<script src="//farseerfc.me/zhs/../theme/js/han.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
 <script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
@@ -1104,14 +1102,6 @@ $.ajax( {
           }
         });
         $('#affix-toc').width($('#sidebar').width());
-        Han()
-          .initCond()
-          .renderElem()
-          // .renderHanging()
-          // .renderJiya()
-          .renderHWS()
-          .correctBasicBD()
-          .substCombLigaWithPUA();
     });
     $(window).resize(function () {
        $('#affix-toc').width($('#sidebar').width());
