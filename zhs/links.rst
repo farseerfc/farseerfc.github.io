@@ -66,3 +66,10 @@ Links
 	:logo: https://mazk.github.io/images/avatar.jpg
 
 	我的完整博客模板的第一个用户，似乎还是高中生，前途无量呀。
+
+.. friend:: Wicast
+    :nick: `Wicast TNT酱 <http://tnt.wicast.tk/>`_
+    :logo: https://a.disquscdn.com/uploads/users/13133/6304/avatar92.jpg?1447121837.jpg
+
+    Golang大大的漂亮Hexo博客。
+
