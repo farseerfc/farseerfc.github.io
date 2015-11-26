@@ -67,9 +67,14 @@ Links
 
 	我的完整博客模板的第一个用户，似乎还是高中生，前途无量呀。
 
-.. friend:: Wicast
-    :nick: `Wicast TNT酱 <http://tnt.wicast.tk/>`_
-    :logo: https://a.disquscdn.com/uploads/users/13133/6304/avatar92.jpg?1447121837.jpg
+.. friend:: wicast
+	:nick: `wicast TNT酱 <http://tnt.wicast.tk/>`_
+	:logo: https://a.disquscdn.com/uploads/users/13133/6304/avatar92.jpg?1447121837.jpg
 
-    Golang大大的漂亮Hugo博客。
+	Golang大大的漂亮Hugo博客。
 
+.. friend:: lastavengers
+	:nick: `LastAvengers 谷月轩 <http://lastavenger.github.io/>`_
+	:logo: https://lastavenger.github.io/assets/avatar_big.jpg
+
+	有 `自己写的内核 <https://github.com/LastAvenger/OS67>`_ 的厉害的LA的博客。
