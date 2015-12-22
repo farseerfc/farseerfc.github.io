@@ -84,3 +84,9 @@ Links
 	:logo: https://yoitsu.xyz/w/images/c/c9/Logo.png
 
 	来自约伊兹的萌狼，博客是用 MediaWiki 搭的，是个萌物。
+
+.. friend:: frantic1048
+	:nick: `Frantic1048 Chino Kafuu 智乃 香风 <https://frantic1048.com/>`_
+	:gravatar: Archer@frantic1048.com
+
+	萌萌的智乃，喜欢一切萌物，前端技艺精湛，C++ 作业都用 Emscripten 转换到前端去的高手。貌似正在构建新的博客框架，翘首以待中。
