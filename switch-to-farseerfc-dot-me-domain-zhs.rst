@@ -7,6 +7,8 @@
 :tags: pelican, domain, cloudflare, github
 :series: pelican
 
+
+
 上个月就在 :ruby:`狗爹|godaddy` 上买了个自己的域名 :code:`farseerfc.me` 准备用在这个
 博客上，当时试着转到过这个域名，发现 :ruby:`自定义域名|custom domain` 
 只支持 http 不支持 https ，想着还要买自己的证书，于是就扔在了一旁。不用自定义域名的话，
@@ -24,6 +26,12 @@
 #. 支持 SPDY 协议
 #. 支持 IPv6 
 
+.. label-warning::
+
+    **2015年12月29日更新**
+
+现在不光支持 SPDY 而且支持 HTTP/2 了。
+
 然后 **免费账户** 的一些缺点有：
 
 #. CloudFlare 和 github.io 之间的数据不是加密的，因为 github
@@ -35,6 +43,12 @@
    ，所以不能从服务器这边强制浏览器用 HTTPS。当然可以放个 javascript 跳转，
    也可以用 `HTTPSEverywhere <https://www.eff.org/https-everywhere>`_ 这种方案。
 
+.. label-warning::
+
+    **2015年12月29日更新**
+
+如评论中 `提到的 <http://farseerfc.me/switch-to-farseerfc-dot-me-domain.html#comment-2015037231>`_
+现在支持 HSTS 了。
 
 设置步骤 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
