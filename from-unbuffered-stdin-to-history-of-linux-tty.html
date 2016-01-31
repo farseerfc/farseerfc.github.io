@@ -273,8 +273,8 @@ Farseerfc的小窩            </a>
 <p>WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到：</p>
 <blockquote>
 <p>請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序</p>
-<div class="highlight"><pre><span class="code-line"><span class="cp">#include &lt;stdio.h&gt;</span></span>
-<span class="code-line"><span class="cp">#include &lt;unistd.h&gt;</span></span>
+<div class="highlight"><pre><span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span></span>
+<span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span></span>
 <span class="code-line">    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">,</span> <span class="s">"r"</span><span class="p">);</span></span>
@@ -362,9 +362,9 @@ read</code>
 <p>沒錯，這個是你的進程內C庫做的緩存，tty屬於字符設備所以是一個一個字符塞給你的
 程序的。</p>
 <p>如果想感受一下 raw mode 可以試試下面這段程序（沒有檢測錯誤返回值）</p>
-<div class="highlight"><pre><span class="code-line"><span class="cp">#include &lt;stdio.h&gt;</span></span>
-<span class="code-line"><span class="cp">#include &lt;unistd.h&gt;</span></span>
-<span class="code-line"><span class="cp">#include &lt;termios.h&gt;</span></span>
+<div class="highlight"><pre><span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span></span>
+<span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span></span>
+<span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;termios.h&gt;</span><span class="cp"></span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="k">static</span> <span class="kt">int</span> <span class="n">ttyfd</span> <span class="o">=</span> <span class="n">STDIN_FILENO</span><span class="p">;</span></span>
 <span class="code-line"><span class="k">static</span> <span class="k">struct</span> <span class="n">termios</span> <span class="n">orig_termios</span><span class="p">;</span></span>

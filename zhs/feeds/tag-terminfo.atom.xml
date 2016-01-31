@@ -7,8 +7,8 @@
 &lt;p&gt;WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;请问对于标准输入流可以设置不带缓冲吗？比如以下程序&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
@@ -96,9 +96,9 @@ read&lt;/code&gt;
 &lt;p&gt;没错，这个是你的进程内C库做的缓存，tty属于字符设备所以是一个一个字符塞给你的
 程序的。&lt;/p&gt;
 &lt;p&gt;如果想感受一下 raw mode 可以试试下面这段程序（没有检测错误返回值）&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include &amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include &amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;ttyfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;

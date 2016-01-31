@@ -632,13 +632,13 @@ Pelican 實現顯示源代碼按鈕</div>
 OUTPUT_SOURCES</code>
  選項將源文件複製到輸出文件夾：</p>
 <div class="highlight"><pre><span class="code-line"><span class="n">OUTPUT_SOURCES</span> <span class="o">=</span> <span class="bp">True</span></span>
-<span class="code-line"><span class="n">OUTPUT_SOURCES_EXTENSION</span> <span class="o">=</span> <span class="s">'.rst'</span></span>
+<span class="code-line"><span class="n">OUTPUT_SOURCES_EXTENSION</span> <span class="o">=</span> <span class="s1">'.rst'</span></span>
 </pre></div>
 <p>然後在 Makefile 裏用 pygmentize 把所有源代碼文件着色：</p>
 <div class="highlight"><pre><span class="code-line">find -iname <span class="s2">"*.rst"</span> <span class="p">|</span> parallel -I@  pygmentize -f html -o @.html @</span>
 </pre></div>
 <p>最後在按鈕按下的時候用 jQuery 載入源代碼：</p>
-<div class="highlight"><pre><span class="code-line"><span class="nt">&lt;a</span> <span class="na">onclick=</span><span class="s">"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"</span><span class="nt">&gt;</span></span>
+<div class="highlight"><pre><span class="code-line"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">onclick</span><span class="o">=</span><span class="s">"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"</span><span class="p">&gt;</span></span>
 </pre></div>
 <p>雖然難看的 hack 比較多，但是能用！</p>
 </div>
@@ -667,18 +667,18 @@ modal</code>
 <div class="section" id="pelican-restructuredtext">
 <h2><a class="toc-backref" href="#id50">插件: 發揮 Pelican 和 reStructuredText 的優勢</a></h2>
 <p>先列舉一下我目前用到的所有插件：</p>
-<div class="highlight"><pre><span class="code-line"><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s">"i18n_subsites"</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">"plantuml"</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">"youku"</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">"youtube"</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'tipue_search'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'neighbors'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'series'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'bootstrapify'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'twitter_bootstrap_rst_directives'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">"render_math"</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'extract_toc'</span><span class="p">,</span></span>
-<span class="code-line">           <span class="s">'summary'</span><span class="p">]</span></span>
+<div class="highlight"><pre><span class="code-line"><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i18n_subsites"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"plantuml"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"youku"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"youtube"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'tipue_search'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'neighbors'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'series'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'bootstrapify'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'twitter_bootstrap_rst_directives'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"render_math"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'extract_toc'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'summary'</span><span class="p">]</span></span>
 </pre></div>
 <p>嗯其實不算多。接下來逐一介紹一下這些各具特色的插件。</p>
 <div class="section" id="i18n-subsites">
