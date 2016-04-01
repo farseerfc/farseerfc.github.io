@@ -296,7 +296,7 @@ CloudFlare 的，如下图：</li>
 <p>等一切都反映到 DNS 服务器上就设置完成了，接下来给
 <a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/">farseerfc.github.io push 一个 CNAME 文件</a>
 写上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做这个：</p>
-<div class="highlight"><pre><span class="code-line"><span class="nf">publish</span><span class="o">:</span> <span class="n">rmdrafts</span> <span class="n">cc</span> <span class="n">clean</span> <span class="n">theme</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nf">publish</span><span class="o">:</span> <span class="n">rmdrafts</span> <span class="n">cc</span> <span class="n">clean</span> <span class="n">theme</span></span>
 <span class="code-line">  <span class="o">[</span> ! -d <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">]</span> <span class="o">||</span> find <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -mindepth <span class="m">1</span> -not -wholename <span class="s2">"*/.git*"</span> -delete</span>
 <span class="code-line">  rm -rf cache</span>
 <span class="code-line">  <span class="nb">echo</span> <span class="k">$(</span>SITEURL<span class="k">)</span> &gt; content/static/CNAME</span>
@@ -308,7 +308,7 @@ CloudFlare 的，如下图：</li>
 <span class="code-line">  env <span class="nv">SITEURL</span><span class="o">=</span><span class="s2">"farseerfc.me"</span> <span class="k">$(</span>MAKE<span class="k">)</span> publish</span>
 <span class="code-line">  <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git add . <span class="o">&amp;&amp;</span> git commit -m <span class="s2">"update"</span> <span class="o">&amp;&amp;</span> git push<span class="o">)</span></span>
 </pre></div>
-<div class="highlight"><pre><span class="code-line"><span class="n">SITEURL</span> <span class="o">=</span> <span class="s1">'//'</span> <span class="o">+</span> <span class="n">getenv</span><span class="p">(</span><span class="s2">"SITEURL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'localhost:8000'</span><span class="p">)</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">SITEURL</span> <span class="o">=</span> <span class="s1">'//'</span> <span class="o">+</span> <span class="n">getenv</span><span class="p">(</span><span class="s2">"SITEURL"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'localhost:8000'</span><span class="p">)</span></span>
 <span class="code-line"><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'static'</span><span class="p">,</span> <span class="s1">'images'</span><span class="p">,</span> <span class="s1">'uml'</span><span class="p">,</span> <span class="s1">'images/favicon.ico'</span><span class="p">,</span> <span class="s1">'static/CNAME'</span><span class="p">]</span></span>
 <span class="code-line"><span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span></span>
 <span class="code-line">    <span class="s1">'images/favicon.ico'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'path'</span><span class="p">:</span> <span class="s1">'favicon.ico'</span><span class="p">},</span></span>

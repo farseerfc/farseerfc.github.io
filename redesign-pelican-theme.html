@@ -401,7 +401,7 @@ plugins 指向 <a class="reference external" href="https://github.com/farseerfc/
 <div class="panel-heading">
 修改了 Bootstrap 3 響應式設備的大小</div>
 <div class="panel-body">
-<div class="highlight"><pre><span class="code-line"><span class="k">@screen-xs</span><span class="o">:</span>     <span class="nt">320px</span><span class="p">;</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="k">@screen-xs</span><span class="o">:</span>     <span class="nt">320px</span><span class="p">;</span></span>
 <span class="code-line"><span class="k">@screen-sm</span><span class="o">:</span>     <span class="nt">598px</span><span class="p">;</span> <span class="c">/*  768px; */</span></span>
 <span class="code-line"><span class="k">@screen-md</span><span class="o">:</span>     <span class="nt">952px</span><span class="p">;</span> <span class="c">/*  992px; */</span></span>
 <span class="code-line"><span class="k">@screen-lg</span><span class="o">:</span>    <span class="nt">1350px</span><span class="p">;</span> <span class="c">/* 1200px; */</span></span>
@@ -631,14 +631,14 @@ Pelican 實現顯示源代碼按鈕</div>
 <p>顯示源代碼按鈕借用了 Pelican 配置中自帶的 <code class="code">
 OUTPUT_SOURCES</code>
  選項將源文件複製到輸出文件夾：</p>
-<div class="highlight"><pre><span class="code-line"><span class="n">OUTPUT_SOURCES</span> <span class="o">=</span> <span class="bp">True</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">OUTPUT_SOURCES</span> <span class="o">=</span> <span class="bp">True</span></span>
 <span class="code-line"><span class="n">OUTPUT_SOURCES_EXTENSION</span> <span class="o">=</span> <span class="s1">'.rst'</span></span>
 </pre></div>
 <p>然後在 Makefile 裏用 pygmentize 把所有源代碼文件着色：</p>
-<div class="highlight"><pre><span class="code-line">find -iname <span class="s2">"*.rst"</span> <span class="p">|</span> parallel -I@  pygmentize -f html -o @.html @</span>
+<div class="highlight"><pre><span class="code-line"><span></span>find -iname <span class="s2">"*.rst"</span> <span class="p">|</span> parallel -I@  pygmentize -f html -o @.html @</span>
 </pre></div>
 <p>最後在按鈕按下的時候用 jQuery 載入源代碼：</p>
-<div class="highlight"><pre><span class="code-line"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">onclick</span><span class="o">=</span><span class="s">"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"</span><span class="p">&gt;</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">&lt;</span><span class="nt">a</span> <span class="na">onclick</span><span class="o">=</span><span class="s">"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"</span><span class="p">&gt;</span></span>
 </pre></div>
 <p>雖然難看的 hack 比較多，但是能用！</p>
 </div>
@@ -667,7 +667,7 @@ modal</code>
 <div class="section" id="pelican-restructuredtext">
 <h2><a class="toc-backref" href="#id50">插件: 發揮 Pelican 和 reStructuredText 的優勢</a></h2>
 <p>先列舉一下我目前用到的所有插件：</p>
-<div class="highlight"><pre><span class="code-line"><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i18n_subsites"</span><span class="p">,</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i18n_subsites"</span><span class="p">,</span></span>
 <span class="code-line">           <span class="s2">"plantuml"</span><span class="p">,</span></span>
 <span class="code-line">           <span class="s2">"youku"</span><span class="p">,</span></span>
 <span class="code-line">           <span class="s2">"youtube"</span><span class="p">,</span></span>
@@ -753,7 +753,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 ，把嵌入的內容提取出來調用 plantuml 命令處理
 成圖像然後再插入到文章中。</p>
 <p>比如示例裏的這個 UML 圖就是用這樣一段簡單的文字描述生成的：</p>
-<div class="highlight"><pre><span class="code-line"><span class="p">..</span> <span class="ow">uml</span><span class="p">::</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">..</span> <span class="ow">uml</span><span class="p">::</span></span>
 <span class="code-line"></span>
 <span class="code-line">    Object &lt;|-- ArrayList</span>
 <span class="code-line"></span>
@@ -778,7 +778,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 的，叫 <a class="reference external" href="http://ditaa.sourceforge.net/">ditaa</a> ，和 plantuml 非常像，也比較像
 reStructuredText 的表格。
 於是我也照貓畫虎實現了一個 ditaa 的 <ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> ，用起來類似這樣：</p>
-<div class="highlight"><pre><span class="code-line"><span class="p">..</span> <span class="ow">ditaa</span><span class="p">::</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">..</span> <span class="ow">ditaa</span><span class="p">::</span></span>
 <span class="code-line"></span>
 <span class="code-line">                       +-------------+</span>
 <span class="code-line">                       <span class="o">|</span>   ditaa     |-------+</span>

@@ -537,7 +537,7 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面这样。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;"2.7"&lt;/span&gt;&lt;/span&gt;
@@ -625,7 +625,7 @@ travis encrypt&lt;/code&gt;
 &lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
 也能加密数据。&lt;/p&gt;
 &lt;p&gt;第一步用这个命令得到你的repo的 pubkey ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替换成 github 上的 用户名/repo名， 比如我的是
 farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
@@ -640,7 +640,7 @@ xargs -0 echo -en&lt;/code&gt;
 解释掉转义字符，然后删掉其中的 "&amp;lt;空格&amp;gt;RSA" 几个字（否则 openssl 不能读），
 最后保存在名为 travis.pem 的文件里。&lt;/p&gt;
 &lt;p&gt;有了 pubkey 之后用 openssl 加密我们需要加密的东西并用 base64 编码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;替换了相应的身份信息和token之后，这行得到的结果就是 secure 里要写的加密过的内容。&lt;/p&gt;
 &lt;/div&gt;
@@ -651,25 +651,25 @@ travis&lt;/code&gt;
 &lt;code class="code"&gt;
 aur/ruby-travis&lt;/code&gt;
  ，其它用户可以用 gems 安装：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;装好之后，在设定了 Travis-CI 的 repo 的目录中执行一下 &lt;code class="code"&gt;
 travis status&lt;/code&gt;
  ，
 命令会指导你登录 Travis-CI 并验证 repo 。正常的话会显示最新的 build 状态。
 然后同样在这个 repo 目录下执行：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;当然上面一行里的相应信息替换为个人的信息，作为这个命令的执行结果会得到另一长串散列码，
 把这串散列写入刚才的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;base64&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
 然后在编译脚本中利用这些环境变量来生成博客：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.email "$GIT_EMAIL"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.name "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global push.default simple&lt;/span&gt;&lt;/span&gt;
@@ -845,7 +845,7 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 &lt;p&gt;那句报错是 AUR 里打的包还没跟上上游 Google 的更改导致的错误，
 首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
 新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后我们需要手动创建 &lt;code class="code"&gt;
 ~/.config/chrome-remote-desktop&lt;/code&gt;
@@ -853,14 +853,14 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 就好了，随后 chrome 会往这里面放 &lt;code class="code"&gt;
 host#.json&lt;/code&gt;
  文件用于身份验证。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后我们要创建一个 shell 脚本 &lt;code class="code"&gt;
 ~/.chrome-remote-desktop-session&lt;/code&gt;
  ，这是远程
 登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
 这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;#&lt;/span&gt;!/bin/bash&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;startxfce4&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session&lt;/span&gt;
@@ -891,13 +891,13 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 &lt;/div&gt;
 &lt;p&gt;同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
 文件夹中找到记录了验证信息的文件。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 &lt;code class="code"&gt;
 systemctl --user enable&lt;/code&gt;
  ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：&lt;/p&gt;
@@ -1003,7 +1003,7 @@ CloudFlare 的，如下图：&lt;/li&gt;
 &lt;p&gt;等一切都反映到 DNS 服务器上就设置完成了，接下来给
 &lt;a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/"&gt;farseerfc.github.io push 一个 CNAME 文件&lt;/a&gt;
 写上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做这个：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; find &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -mindepth &lt;span class="m"&gt;1&lt;/span&gt; -not -wholename &lt;span class="s2"&gt;"*/.git*"&lt;/span&gt; -delete&lt;/span&gt;
 &lt;span class="code-line"&gt;  rm -rf cache&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;SITEURL&lt;span class="k"&gt;)&lt;/span&gt; &amp;gt; content/static/CNAME&lt;/span&gt;
@@ -1015,7 +1015,7 @@ CloudFlare 的，如下图：&lt;/li&gt;
 &lt;span class="code-line"&gt;  env &lt;span class="nv"&gt;SITEURL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"farseerfc.me"&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; publish&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;"update"&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="n"&gt;STATIC_PATHS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'static'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'images'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'uml'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="n"&gt;EXTRA_PATH_METADATA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;'favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;/span&gt;
@@ -1160,7 +1160,7 @@ plugins 指向 &lt;a class="reference external" href="https://github.com/farseer
 &lt;div class="panel-heading"&gt;
 修改了 Bootstrap 3 响应式设备的大小&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;@screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;598px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  768px; */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;952px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  992px; */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;@screen-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;1350px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1200px; */&lt;/span&gt;&lt;/span&gt;
@@ -1390,14 +1390,14 @@ Pelican 实现显示源代码按钮&lt;/div&gt;
 &lt;p&gt;显示源代码按钮借用了 Pelican 配置中自带的 &lt;code class="code"&gt;
 OUTPUT_SOURCES&lt;/code&gt;
  选项将源文件复制到输出文件夹：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_SOURCES_EXTENSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'.rst'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后在 Makefile 里用 pygmentize 把所有源代码文件着色：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;最后在按钮按下的时候用 jQuery 载入源代码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt; &lt;span class="na"&gt;onclick&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt; &lt;span class="na"&gt;onclick&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;虽然难看的 hack 比较多，但是能用！&lt;/p&gt;
 &lt;/div&gt;
@@ -1426,7 +1426,7 @@ modal&lt;/code&gt;
 &lt;div class="section" id="pelican-restructuredtext"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id50"&gt;插件: 发挥 Pelican 和 reStructuredText 的优势&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;先列举一下我目前用到的所有插件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"plantuml"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"youku"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"youtube"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
@@ -1512,7 +1512,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 ，把嵌入的内容提取出来调用 plantuml 命令处理
 成图像然后再插入到文章中。&lt;/p&gt;
 &lt;p&gt;比如示例里的这个 UML 图就是用这样一段简单的文字描述生成的：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    Object &amp;lt;|-- ArrayList&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -1537,7 +1537,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 的，叫 &lt;a class="reference external" href="http://ditaa.sourceforge.net/"&gt;ditaa&lt;/a&gt; ，和 plantuml 非常像，也比较像
 reStructuredText 的表格。
 于是我也照猫画虎实现了一个 ditaa 的 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，用起来类似这样：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;ditaa&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;ditaa&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;                       +-------------+&lt;/span&gt;
 &lt;span class="code-line"&gt;                       &lt;span class="o"&gt;|&lt;/span&gt;   ditaa     |-------+&lt;/span&gt;
@@ -1884,7 +1884,7 @@ bootstrap-material-design 是在 Bootstrap 3 的基础上套用 Material Design 
 &lt;p&gt;WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;请问对于标准输入流可以设置不带缓冲吗？比如以下程序&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -1954,7 +1954,7 @@ Ctrl-Shift-C&lt;/kbd&gt;
 read&lt;/code&gt;
  系统调用，
 比如输入abc：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;read(0, abc&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;read(0, abc&lt;/span&gt;
 &lt;span class="code-line"&gt;"a", 1)                         = 1&lt;/span&gt;
 &lt;span class="code-line"&gt;read(0, "b", 1)                         = 1&lt;/span&gt;
 &lt;span class="code-line"&gt;read(0, "c", 1)                         = 1&lt;/span&gt;
@@ -1963,7 +1963,7 @@ read&lt;/code&gt;
 &lt;p&gt;如果有缓存的话就只调用一次了 &lt;code class="code"&gt;
 read&lt;/code&gt;
  系统调用了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;read(0, abc&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;read(0, abc&lt;/span&gt;
 &lt;span class="code-line"&gt;"abc\n", 1024)                  = 4&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/blockquote&gt;
@@ -1973,7 +1973,7 @@ read&lt;/code&gt;
 &lt;p&gt;没错，这个是你的进程内C库做的缓存，tty属于字符设备所以是一个一个字符塞给你的
 程序的。&lt;/p&gt;
 &lt;p&gt;如果想感受一下 raw mode 可以试试下面这段程序（没有检测错误返回值）&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -2935,7 +2935,7 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然后我想看看这个的源代码&lt;/h2&gt;
 &lt;p&gt;只有一个ruby.py文件，内容是：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"""&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -2996,7 +2996,7 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;原问题&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
@@ -3065,7 +3065,7 @@ T&lt;/code&gt;
  之后实例化得到的结果。&lt;/p&gt;
 &lt;div class="section" id="ff"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;首先看ff的情况。&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;处理到这句的时候，编译器看到了 &lt;code class="code"&gt;
 DD&amp;lt;long&amp;gt;&lt;/code&gt;
@@ -3075,7 +3075,7 @@ DD#long&lt;/code&gt;
 化了 &lt;code class="code"&gt;
 BB#long&lt;/code&gt;
  。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;这句，首先计算重载函数集合。&lt;/p&gt;
 &lt;p&gt;第一步，需要从参数 &lt;code class="code"&gt;
@@ -3125,7 +3125,7 @@ BB#long&lt;/code&gt;
 &lt;/div&gt;
 &lt;div class="section" id="f"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;再来看f的情况。&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;计算候选重载函数集合。&lt;/p&gt;
 &lt;p&gt;第一步，对所有 &lt;code class="code"&gt;
@@ -3226,17 +3226,17 @@ type&lt;/code&gt;
 &lt;div class="section" id="settings-py"&gt;
 &lt;h2&gt;我的设置 settings.py&lt;/h2&gt;
 &lt;p&gt;安装 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 很容易，一句话就够了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后把文章写成ReST的格式，放在`pages`文件夹里面。(重新)生成只要：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;上传到 Github:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git push&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;就这么简单。附上我的配置文件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Asia/Tokyo'&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -3371,7 +3371,7 @@ Linux 最好 :)&lt;/p&gt;
 &lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 
 &lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;        &lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;;&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++){&lt;/span&gt;&lt;/span&gt;

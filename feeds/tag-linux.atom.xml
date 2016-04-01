@@ -234,7 +234,7 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 &lt;p&gt;那句報錯是 AUR 裏打的包還沒跟上上游 Google 的更改導致的錯誤，
 首先我們需要把遠程登錄的用戶添加入 chrome-remote-desktop 這個用戶組裏。
 新版本的 chrome remote desktop 提供了一個命令做這個事情，所以執行以下命令就可以了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後我們需要手動創建 &lt;code class="code"&gt;
 ~/.config/chrome-remote-desktop&lt;/code&gt;
@@ -242,14 +242,14 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 就好了，隨後 chrome 會往這裏面放 &lt;code class="code"&gt;
 host#.json&lt;/code&gt;
  文件用於身份驗證。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後我們要創建一個 shell 腳本 &lt;code class="code"&gt;
 ~/.chrome-remote-desktop-session&lt;/code&gt;
  ，這是遠程
 登錄時的 .xinitrc ，內容麼就是啓動你想在遠程登錄時用的桌面環境。
 這裏可以指定一個和你正在登錄的 WM/DE 不同的桌面，比如我啓動 xfce4：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;#&lt;/span&gt;!/bin/bash&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;startxfce4&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session&lt;/span&gt;
@@ -280,13 +280,13 @@ Chrome 內部的 Remoting 功能更改了 API 導致可能出問題。如果你�
 &lt;/div&gt;
 &lt;p&gt;同時，啓用了遠程鏈接之後，可以在剛剛創建的 ~/.config/chrome-remote-desktop
 文件夾中找到記錄了驗證信息的文件。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後就可以啓動對應的 systemd 用戶服務了，如果想自動啓動服務要記得 &lt;code class="code"&gt;
 systemctl --user enable&lt;/code&gt;
  ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;如果上面的設置一切正常，就可以看到 chrome-remote-desktop 啓動了另外一個 Xorg 執行你
 剛剛指定的桌面環境：&lt;/p&gt;
@@ -338,7 +338,7 @@ Ubuntu 12.04 和 12.10 （14.04之後似乎有
 &lt;p&gt;WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -408,7 +408,7 @@ Ctrl-Shift-C&lt;/kbd&gt;
 read&lt;/code&gt;
  系統調用，
 比如輸入abc：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;read(0, abc&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;read(0, abc&lt;/span&gt;
 &lt;span class="code-line"&gt;"a", 1)                         = 1&lt;/span&gt;
 &lt;span class="code-line"&gt;read(0, "b", 1)                         = 1&lt;/span&gt;
 &lt;span class="code-line"&gt;read(0, "c", 1)                         = 1&lt;/span&gt;
@@ -417,7 +417,7 @@ read&lt;/code&gt;
 &lt;p&gt;如果有緩存的話就只調用一次了 &lt;code class="code"&gt;
 read&lt;/code&gt;
  系統調用了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;read(0, abc&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;read(0, abc&lt;/span&gt;
 &lt;span class="code-line"&gt;"abc\n", 1024)                  = 4&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/blockquote&gt;
@@ -427,7 +427,7 @@ read&lt;/code&gt;
 &lt;p&gt;沒錯，這個是你的進程內C庫做的緩存，tty屬於字符設備所以是一個一個字符塞給你的
 程序的。&lt;/p&gt;
 &lt;p&gt;如果想感受一下 raw mode 可以試試下面這段程序（沒有檢測錯誤返回值）&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;

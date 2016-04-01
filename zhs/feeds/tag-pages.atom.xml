@@ -51,7 +51,7 @@ Android 的 &lt;a class="reference external" href="https://code.google.com/p/and
 &lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  大概是下面这样。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;"2.7"&lt;/span&gt;&lt;/span&gt;
@@ -139,7 +139,7 @@ travis encrypt&lt;/code&gt;
 &lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
 也能加密数据。&lt;/p&gt;
 &lt;p&gt;第一步用这个命令得到你的repo的 pubkey ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替换成 github 上的 用户名/repo名， 比如我的是
 farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
@@ -154,7 +154,7 @@ xargs -0 echo -en&lt;/code&gt;
 解释掉转义字符，然后删掉其中的 "&amp;lt;空格&amp;gt;RSA" 几个字（否则 openssl 不能读），
 最后保存在名为 travis.pem 的文件里。&lt;/p&gt;
 &lt;p&gt;有了 pubkey 之后用 openssl 加密我们需要加密的东西并用 base64 编码：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;替换了相应的身份信息和token之后，这行得到的结果就是 secure 里要写的加密过的内容。&lt;/p&gt;
 &lt;/div&gt;
@@ -165,25 +165,25 @@ travis&lt;/code&gt;
 &lt;code class="code"&gt;
 aur/ruby-travis&lt;/code&gt;
  ，其它用户可以用 gems 安装：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;装好之后，在设定了 Travis-CI 的 repo 的目录中执行一下 &lt;code class="code"&gt;
 travis status&lt;/code&gt;
  ，
 命令会指导你登录 Travis-CI 并验证 repo 。正常的话会显示最新的 build 状态。
 然后同样在这个 repo 目录下执行：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;当然上面一行里的相应信息替换为个人的信息，作为这个命令的执行结果会得到另一长串散列码，
 把这串散列写入刚才的 &lt;code class="code"&gt;
 .travis.yml&lt;/code&gt;
  文件：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;base64&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
 然后在编译脚本中利用这些环境变量来生成博客：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.email "$GIT_EMAIL"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.name "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global push.default simple&lt;/span&gt;&lt;/span&gt;

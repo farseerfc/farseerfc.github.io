@@ -50,7 +50,7 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 &lt;p&gt;那句报错是 AUR 里打的包还没跟上上游 Google 的更改导致的错误，
 首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
 新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后我们需要手动创建 &lt;code class="code"&gt;
 ~/.config/chrome-remote-desktop&lt;/code&gt;
@@ -58,14 +58,14 @@ To {enable,start} the service use systemctl --user {enable,start} chrome-remote-
 就好了，随后 chrome 会往这里面放 &lt;code class="code"&gt;
 host#.json&lt;/code&gt;
  文件用于身份验证。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; mkdir ~/.config/chrome-remote-desktop&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后我们要创建一个 shell 脚本 &lt;code class="code"&gt;
 ~/.chrome-remote-desktop-session&lt;/code&gt;
  ，这是远程
 登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
 这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat ~/.chrome-remote-desktop-session&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;#&lt;/span&gt;!/bin/bash&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;startxfce4&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; chmod &lt;span class="m"&gt;755&lt;/span&gt; .chrome-remote-desktop-session&lt;/span&gt;
@@ -96,13 +96,13 @@ Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你�
 &lt;/div&gt;
 &lt;p&gt;同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
 文件夹中找到记录了验证信息的文件。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ls .config/chrome-remote-desktop&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 &lt;code class="code"&gt;
 systemctl --user enable&lt;/code&gt;
  ：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; systemctl --user start chrome-remote-desktop.service&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：&lt;/p&gt;

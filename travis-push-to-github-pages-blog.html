@@ -305,7 +305,7 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 <strong>暫時</strong> 測試的目的下我寫的 <code class="code">
 .travis.yml</code>
  大概是下面這樣。</p>
-<div class="highlight"><pre><span class="code-line"><span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="l l-Scalar l-Scalar-Plain">python</span><span class="p p-Indicator">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="s">"2.7"</span></span>
@@ -393,7 +393,7 @@ travis encrypt</code>
 <a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys">travis api</a>
 也能加密數據。</p>
 <p>第一步用這個命令得到你的repo的 pubkey ：</p>
-<div class="highlight"><pre><span class="code-line"><span class="go">curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&lt;github-id/repo&gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &gt; travis.pem</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="go">curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&lt;github-id/repo&gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &gt; travis.pem</span></span>
 </pre></div>
 <p>其中的 &lt;github-id/repo&gt; 替換成 github 上的 用戶名/repo名， 比如我的是
 farseerfc/farseer 。travis api 獲得的結果是一個 json ，所以還用 python 的
@@ -408,7 +408,7 @@ xargs -0 echo -en</code>
 解釋掉轉義字符，然後刪掉其中的 "&lt;空格&gt;RSA" 幾個字（否則 openssl 不能讀），
 最後保存在名爲 travis.pem 的文件裏。</p>
 <p>有了 pubkey 之後用 openssl 加密我們需要加密的東西並用 base64 編碼：</p>
-<div class="highlight"><pre><span class="code-line"><span class="go">echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="go">echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0</span></span>
 </pre></div>
 <p>替換了相應的身份信息和token之後，這行得到的結果就是 secure 裏要寫的加密過的內容。</p>
 </div>
@@ -419,25 +419,25 @@ travis</code>
 <code class="code">
 aur/ruby-travis</code>
  ，其它用戶可以用 gems 安裝：</p>
-<div class="highlight"><pre><span class="code-line"><span class="gp">$</span> gem install travis</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> gem install travis</span>
 </pre></div>
 <p>裝好之後，在設定了 Travis-CI 的 repo 的目錄中執行一下 <code class="code">
 travis status</code>
  ，
 命令會指導你登錄 Travis-CI 並驗證 repo 。正常的話會顯示最新的 build 狀態。
 然後同樣在這個 repo 目錄下執行：</p>
-<div class="highlight"><pre><span class="code-line"><span class="gp">$</span> travis encrypt <span class="s1">'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;'</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> travis encrypt <span class="s1">'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&lt;Personal Access Token&gt;'</span></span>
 </pre></div>
 <p>當然上面一行裏的相應信息替換爲個人的信息，作爲這個命令的執行結果會得到另一長串散列碼，
 把這串散列寫入剛纔的 <code class="code">
 .travis.yml</code>
  文件：</p>
-<div class="highlight"><pre><span class="code-line"><span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secure</span><span class="p p-Indicator">:</span> <span class="s">"long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string"</span></span>
 </pre></div>
 <p>有了這段聲明之後， Travis-CI 就會在每次編譯之前，設置上面加密的環境變量。
 然後在編譯腳本中利用這些環境變量來生成博客：</p>
-<div class="highlight"><pre><span class="code-line"><span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.email "$GIT_EMAIL"</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.name "$GIT_NAME"</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global push.default simple</span></span>
