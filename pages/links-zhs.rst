@@ -90,3 +90,9 @@ Links
 	:gravatar: archer@frantic1048.com
 
 	萌萌的智乃，喜欢一切萌物，前端技艺精湛，C++ 作业都用 Emscripten 转换到前端去的高手。貌似正在构建新的博客框架，翘首以待中。
+
+.. friend:: petercai
+	:nick: `Peter Cai 颠倒的阿卡林型次元 PeterCxy <https://typeblog.net/>`_
+	:gravatar: peter@typeblog.net
+
+	彼得菜，据说高中用 AIDE 在手机上徒手撸出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客用漂亮的 MD 主题。
