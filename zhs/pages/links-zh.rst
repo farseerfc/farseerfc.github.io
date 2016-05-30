@@ -63,7 +63,7 @@ Links
 
 .. friend:: mazk
 	:nick: `mazk <https://mazk.github.io/>`_
-	:logo: https://mazk.github.io/images/avatar.jpg
+	:logo: https://mazk.net/images/avatar.jpg
 
 	我的完整博客模板的第一個用戶，似乎還是高中生，前途無量呀。
 
@@ -95,4 +95,4 @@ Links
 	:nick: `Peter Cai 颠倒的阿卡林型次元 PeterCxy <https://typeblog.net/>`_
 	:gravatar: peter@typeblog.net
 
-	彼得菜，據說高中用 AIDE 在手機上徒手擼出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客用漂亮的 MD 主題。
+	彼得蔡，據說高中用 AIDE 在手機上徒手擼出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客用漂亮的 MD 主題。
