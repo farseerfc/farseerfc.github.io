@@ -95,4 +95,11 @@ Links
 	:nick: `Peter Cai 颠倒的阿卡林型次元 PeterCxy <https://typeblog.net/>`_
 	:gravatar: peter@typeblog.net
 
-	彼得蔡，据说高中用 AIDE 在手机上徒手撸出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客用漂亮的 MD 主题。
+	彼得蔡，据说高中用 AIDE 在手机上徒手撸出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客 :del:`用漂亮的 MD 主题|几经改版每一次都越来越漂亮` 。
+
+.. friend:: csslayer
+	:nick: `CS Slayer 老K  <https://www.csslayer.info/wordpress/>`_
+	:gravatar: wengxt@gmail.com
+
+	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。
+
