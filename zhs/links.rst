@@ -22,7 +22,7 @@ Links
 	:nick: `felixonmars 火星猫大大 <http://blog.felixc.at/>`_
 	:gravatar: felixonmars@archlinux.org
 
-	archlinux官方打包者， :irc:`archlinuxcn` 社区管理者之一。
+	archlinux官方开发者， :irc:`archlinuxcn` 社区管理者之一。
 
 .. friend:: phoenixlzx
 	:nick: `phoenixlzx 凤凰菊苣 <http://blog.phoenixlzx.com/>`_
@@ -35,7 +35,7 @@ Links
 	:nick: `fixme <https://fbq.github.io/>`_
 	:logo: https://avatars3.githubusercontent.com/u/673448
 
-	水源技站，本科同窗。
+	水源技站，本科同窗，内核贡献者。
 
 .. friend:: LQYMGT
 	:nick: `LQYMGT <https://lqymgt.github.io/>`_
@@ -47,7 +47,7 @@ Links
 	:nick: `quininer <http://quininer.github.io/>`_
 	:gravatar: quininer@live.com
 
-	纯JavaScript的帅气博客。
+	纯JavaScript的帅气博客。 :del:`无奎宁妄言安全`。
 
 .. friend:: acgtyrant
 	:nick: `acgtyrant <http://acgtyrant.com/>`_
@@ -101,5 +101,5 @@ Links
 	:nick: `CS Slayer 老K  <https://www.csslayer.info/wordpress/>`_
 	:gravatar: wengxt@gmail.com
 
-	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。
+	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。有个刚出生的小女儿叫 Alice :del:`（下一个叫 Marisa ）`。
 
