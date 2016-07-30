@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-Hans"
+>
+<head>
+    <title>PacVis: 可视化 pacman 本地数据库 - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+<link rel="canonical" href="//farseerfc.me/zhs/pacvis.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="python,pacvis,pacman,arch,linux,pacgraph" />
+        <meta name="description" content="PacVis 我为什么要做 PacVis 我喜欢 Arch Linux ，大概是因为唯有 Arch Linux 能给我对整个系统「了如指掌」的感觉。 在 Arch Linux 里我能清楚地知道我安装的每一个包，能知道系统里任何一个文件是来自哪个包， 以及我为什么要装它。或许对 Debian/Fedora/openSUSE 足够熟悉了之后也能做到这两点， 不过他们的细致打包的结果通常是包的数量比 Arch 要多个 3 到 10 倍，并且打包的细节也比 Arch Linux 简单的 PKGBUILD 要复杂一个数量级。 每一个装过 Arch Linux 的人大概都知道，装了 Arch Linux 之后得到的系统非常朴素，按照 ArchWiki 上的流程一路走下来的话，最关键的一条命令就是 pacstrap /mnt ..." />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="PacVis: 可视化 pacman 本地数据库"/>
+        <meta property="og:url" content="//farseerfc.me/zhs/pacvis.html"/>
+        <meta property="og:description" content="PacVis 我为什么要做 PacVis 我喜欢 Arch Linux ，大概是因为唯有 Arch Linux 能给我对整个系统「了如指掌」的感觉。 在 Arch Linux 里我能清楚地知道我安装的每一个包，能知道系统里任何一个文件是来自哪个包， 以及我为什么要装它。或许对 Debian/Fedora/openSUSE 足够熟悉了之后也能做到这两点， 不过他们的细致打包的结果通常是包的数量比 Arch 要多个 3 到 10 倍，并且打包的细节也比 Arch Linux 简单的 PKGBUILD 要复杂一个数量级。 每一个装过 Arch Linux 的人大概都知道，装了 Arch Linux 之后得到的系统非常朴素，按照 ArchWiki 上的流程一路走下来的话，最关键的一条命令就是 pacstrap /mnt ..."/>
+        <meta property="article:published_time" content="2016-07-31" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="python" />
+            <meta property="article:tag" content="pacvis" />
+            <meta property="article:tag" content="pacman" />
+            <meta property="article:tag" content="arch" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="pacgraph" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/zhs/pacvis.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/zhs/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">PacVis: 可视化 pacman 本地数据库 - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                                 About
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                                 Links
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                         Links
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
+              <li><a href="//farseerfc.me/zhs/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/zhs/" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/zhs/category/tech.html" title="tech">tech</a></li>
+                <li class="active">PacVis: 可视化 pacman 本地数据库</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        PacVis: 可视化 pacman 本地数据库
+                        <a href="//farseerfc.me/zhs/pacvis.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 PacVis: 可视化 pacman 本地数据库 的永久链接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2016-07-31T03:52:00+09:00"><i class="fa fa-calendar"></i> 2016年07月31日(周日)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/pacvis.html">简体</a></li><li><a href="//farseerfc.me/zhs/../pacvis.html" class="translate">繁體</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/zhs/pacvis.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/zhs/pacvis.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/pacvis.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/zhs/pacvis.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="pacvis" data-disqus-url="http://farseerfc.me/zhs/pacvis.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/zhs/tag/python.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> python</a>
+	<a href="//farseerfc.me/zhs/tag/pacvis.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pacvis</a>
+	<a href="//farseerfc.me/zhs/tag/pacman.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pacman</a>
+	<a href="//farseerfc.me/zhs/tag/arch.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> arch</a>
+	<a href="//farseerfc.me/zhs/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.me/zhs/tag/pacgraph.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pacgraph</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目录                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#pacvis" id="id11">我为什么要做 PacVis</a></li>
+<li><a class="reference internal" href="#id1" id="id12">PacVis的老前辈们</a><ul>
+<li><a class="reference internal" href="#pactree" id="id13">pactree</a></li>
+<li><a class="reference internal" href="#pacgraph" id="id14">pacgraph</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4" id="id15">于是就有了 PacVis</a></li>
+<li><a class="reference internal" href="#id5" id="id16">PacVis 的图例和用法</a></li>
+<li><a class="reference internal" href="#id6" id="id17">从 PacVis 能了解到的一些事实</a><ul>
+<li><a class="reference internal" href="#id7" id="id18">有些包没有依赖关系</a></li>
+<li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
+<li><a class="reference internal" href="#id9" id="id20">依赖层次</a></li>
+<li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10" id="id22">PacVis 的未来</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<div class="panel panel-default">
+<div class="panel-heading">
+PacVis</div>
+<div class="panel-body">
+<img alt="Demo of PacVis" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-first.png"/>
+</div>
+</div>
+<div class="section" id="pacvis">
+<h2><a class="toc-backref" href="#id11">我为什么要做 PacVis</a></h2>
+<p>我喜欢 Arch Linux ，大概是因为唯有 Arch Linux 能给我对整个系统「了如指掌」的感觉。
+在 Arch Linux 里我能清楚地知道我安装的每一个包，能知道系统里任何一个文件是来自哪个包，
+以及我为什么要装它。或许对 Debian/Fedora/openSUSE 足够熟悉了之后也能做到这两点，
+不过他们的细致打包的结果通常是包的数量比 Arch 要多个 3 到 10 倍，并且打包的细节也比 Arch
+Linux 简单的 PKGBUILD 要复杂一个数量级。</p>
+<p>每一个装过 Arch Linux 的人大概都知道，装了 Arch Linux 之后得到的系统非常朴素，按照
+ArchWiki 上的流程一路走下来的话，最关键的一条命令就是 <code class="code">
+pacstrap /mnt base</code>
+ ，
+它在 <code class="code">
+/mnt</code>
+ 里作为根调用 <code class="code">
+pacman -S base</code>
+ 装上了整个 base 组，
+然后就没有然后了。这个系统一开始空无一物，你需要的任何东西都是后来一点点用
+<code class="code">
+pacman</code>
+ 手动装出来的，没有累赘，按你所需。</p>
+<p>然而时间长了，系统中难免会有一些包，是你装过用过然后忘记了，
+然后这些包就堆在系统的角落里，就像家里陈年的老家具，占着地，落着灰。虽然
+<code class="code">
+pacman -Qtd</code>
+ 能方便地帮你找出所有
+<strong>曾经作为依赖被装进来，而现在不被任何包依赖</strong> 的包，但是对于那些你手动指定的包，
+它就无能为力了。</p>
+<p>于是我就一直在找一个工具能帮我梳理系统中包的关系，方便我：</p>
+<ol class="arabic simple">
+<li>找出那些曾经用过而现在不需要的包</li>
+<li>找出那些体积大而且占地方的包</li>
+<li>厘清系统中安装了的包之间的关系</li>
+</ol>
+<div class="figure">
+<img alt="Android System Architecture" class="img-responsive" src="//farseerfc.me/zhs/images/Android-System-Architecture.jpg"/>
+<p class="caption"><a class="reference external" href="https://en.wikipedia.org/wiki/Android_(operating_system)">Android 系统架构</a></p>
+</div>
+<p>关于最后一点「厘清包的关系」，我曾经看到过
+<a class="reference external" href="https://en.wikipedia.org/wiki/Architecture_of_OS_X">macOS 系统架构图</a>
+和 Android 的系统架构图，对其中的层次化架构印象深刻，之后就一直在想，是否能画出现代
+Linux 桌面系统上类似的架构图呢？又或者 Linux 桌面系统是否会展现完全不同的样貌？
+从维基百科或者别的渠道能找到 Linux 内核、或者 Linux 图形栈，
+或者某个桌面环境的架构，但是没有找到覆盖一整个发行版的样貌的。
+于是我便想，能不能从包的依赖关系中自动生成这样一张图呢。</p>
+</div>
+<div class="section" id="id1">
+<h2><a class="toc-backref" href="#id12">PacVis的老前辈们</a></h2>
+<p>在开始写 PacVis 之前，我试过一些类似的工具，他们都或多或少能解决一部分我的需要，
+又在某些方面有所不足。这些工具成为了 PacVis 的雏形，启发了 PacVis
+应该做成什么样子。</p>
+<div class="section" id="pactree">
+<h3><a class="toc-backref" href="#id13">pactree</a></h3>
+<p>pactree 曾经是一个
+<a class="reference external" href="https://bbs.archlinux.org/viewtopic.php?id=51795">独立的项目</a> ，现在则是
+<a class="reference external" href="https://www.archlinux.org/pacman/pactree.8.html">pacman 的一部分</a> 了。
+从手册页可以看出， pactree 的输出是由某个包开始的依赖树。
+加上 <code class="code">
+--graph</code>
+ 参数之后 pactree 还能输出
+<a class="reference external" href="http://www.graphviz.org/">dot</a> 格式的矢量图描述，然后可以用 dot 画出依赖图：</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+<code class="code">
+pactree pacvis-git -d3 --graph | dot -Tpng &gt;pacvis-pactree.png</code>
+</div>
+<div class="panel-body">
+<img alt="pactree --graph" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-pactree.png"/>
+</div>
+</div>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> pactree pacvis-git -d3</span>
+<span class="code-line"><span class="go">pacvis-git</span></span>
+<span class="code-line"><span class="go">├─python-tornado</span></span>
+<span class="code-line"><span class="go">│ └─python</span></span>
+<span class="code-line"><span class="go">│   ├─expat</span></span>
+<span class="code-line"><span class="go">│   ├─bzip2</span></span>
+<span class="code-line"><span class="go">│   ├─gdbm</span></span>
+<span class="code-line"><span class="go">│   ├─openssl</span></span>
+<span class="code-line"><span class="go">│   ├─libffi</span></span>
+<span class="code-line"><span class="go">│   └─zlib</span></span>
+<span class="code-line"><span class="go">├─pyalpm</span></span>
+<span class="code-line"><span class="go">│ ├─python</span></span>
+<span class="code-line"><span class="go">│ └─pacman</span></span>
+<span class="code-line"><span class="go">│   ├─bash</span></span>
+<span class="code-line"><span class="go">│   ├─glibc</span></span>
+<span class="code-line"><span class="go">│   ├─libarchive</span></span>
+<span class="code-line"><span class="go">│   ├─curl</span></span>
+<span class="code-line"><span class="go">│   ├─gpgme</span></span>
+<span class="code-line"><span class="go">│   ├─pacman-mirrorlist</span></span>
+<span class="code-line"><span class="go">│   └─archlinux-keyring</span></span>
+<span class="code-line"><span class="go">└─python-setuptools</span></span>
+<span class="code-line"><span class="go">  └─python-packaging</span></span>
+<span class="code-line"><span class="go">    ├─python-pyparsing</span></span>
+<span class="code-line"><span class="go">    └─python-six</span></span>
+<span class="code-line"><span class="gp"> $</span> pactree pacvis-git -d3 --graph <span class="p">|</span> dot -Tpng &gt;pacvis-pactree.png</span>
+</pre></div>
+<p>从画出的图可以看出，因为有共用的依赖，所以从一个包开始的依赖关系已经不再是一棵
+<a class="reference external" href="https://zh.wikipedia.org/wiki/%E6%A8%B9%E7%8B%80%E7%B5%90%E6%A7%8B">图论意义上的树(Tree)</a>
+了。最初尝试做 PacVis 的早期实现的时候，就是试图用 bash/python 脚本解析 pactree 和
+pacman 的输出，在 pactree 的基础上把整个系统中所有安装的包全都包含到一张图里。
+当然后来画出的结果并不那么理想，首先由于图非常巨大，导致 dot
+的自动布局要耗费数小时，最后画出的图也过于巨大基本上没法看。</p>
+<p>然而不得不说没有 pactree 就不会有 PacVis ，甚至 pacman 被分离出 alpm
+库也和 pactree 用 C 重写的过程有很大关系，而 PacVis 用来查询 pacman 数据库的库
+pyalpm 正是 alpm 的 Python 绑定。因为 pactree 的需要而增加出的 alpm 库奠定了 PacVis
+实现的基石。</p>
+</div>
+<div class="section" id="pacgraph">
+<h3><a class="toc-backref" href="#id14">pacgraph</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+pacgraph 的输出</div>
+<div class="panel-body">
+<img alt="pacgraph" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-pacgraph.png"/>
+</div>
+</div>
+<p><a class="reference external" href="http://kmkeen.com/pacgraph/index.html">pacgraph</a> 是一位 Arch Linux 的
+Trusted User <a class="reference external" href="http://kmkeen.com/">keenerd</a> 写的程序，和
+PacVis 一样也是用 Python 实现的。
+比起 pactree ， pacgraph 明显更接近我的需求，它默认绘制整个系统的所有安装包，
+并且用聪明的布局算法解决了 dot 布局的性能问题。</p>
+<p>pacgraph 的输出是一个富有艺术感的依赖图，图中用不同的字体大小表示出了每个包占用
+的磁盘空间。通过观察 pacgraph 的输出，我们可以清楚地把握系统全局的样貌，
+比如一眼看出这是个桌面系统还是个服务器系统，并且可以很容易地发现那些占用磁盘空间
+巨大的包，考虑清理这些包以节约空间。</p>
+<p>更棒的是 pacgraph 还提供了一个交互性的 GUI 叫做 pacgraph-tk ，显然通过 tk 实现。
+用这个 GUI 可以缩放观察整幅图的细节，或者选中某个包观察它和别的包的依赖关系。</p>
+<p>pacgraph 还支持通过参数指定只绘制个别包的依赖关系，就像 pactree 那样。</p>
+<p>不过 pacgraph 也不是完全满足我的需要。如我前面说过，我希望绘制出的图能反应
+<strong>这个发行版的架构面貌</strong> ，而 pacgraph 似乎并不区别「该包依赖的包」和「依赖该包的包」
+这两种截然相反的依赖关系。换句话说 pacgraph 画出的是一张无向图，
+而我更想要一张有向图，或者说是 <strong>有层次结构的依赖关系图</strong> 。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2><a class="toc-backref" href="#id15">于是就有了 PacVis</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+PacVis 刚打开的样子</div>
+<div class="panel-body">
+<img alt="PacVis on startup" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-second.png"/>
+</div>
+</div>
+<p>总结了老前辈们的优势与不足，我便开始利用空余时间做我心目中的 PacVis 。
+前后断断续续写了两个月，又分为两个阶段，第一阶段做了基本的功能和雏形，
+第二阶段套用上 <a class="reference external" href="https://getmdl.io/">https://getmdl.io/</a> 的模板，总算有了能拿得出手给别人看的样子。</p>
+<p>于是乎前两天在 AUR 上给 pacvis 打了个
+<a class="reference external" href="https://aur.archlinux.org/packages/pacvis-git/">pacvis-git</a>
+包，现在想在本地跑 pacvis 应该很方便了，用任何你熟悉的 aurhelper
+就可以安装，也可以直接从 aur 下载 PKGBUILD 打包：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="go">~$ git clone aur@aur.archlinux.org:pacvis-git.git</span></span>
+<span class="code-line"><span class="go">~$ cd pacvis-git</span></span>
+<span class="code-line"><span class="go">~/pacvis-git$ makepkg -si</span></span>
+<span class="code-line"><span class="go">~/pacvis-git$ pacvis</span></span>
+<span class="code-line"><span class="go">Start PacVis at http://localhost:8888/</span></span>
+</pre></div>
+<p>按照提示说的，接下来打开浏览器访问 <a class="reference external" href="http://localhost:8888/">http://localhost:8888/</a> 就能看到 PacVis
+的样子了。仅仅作为尝试也可以直接打开跑在我的服务器上的 demo:
+<a class="reference external" href="https://pacvis.farseerfc.me/">https://pacvis.farseerfc.me/</a> ，这个作为最小安装的服务器载入速度大概比普通的桌面系统快一点。</p>
+</div>
+<div class="section" id="id5">
+<h2><a class="toc-backref" href="#id16">PacVis 的图例和用法</a></h2>
+<p>操作上 PacVis 仿照地图程序比如 Google Maps 的用法，可以用滚轮或者触摸屏的手势
+缩放、拖拽，右上角有个侧边栏，不需要的话可以点叉隐藏掉，右下角有缩放的按钮和
+回到全局视图的按钮，用起来应该还算直观。</p>
+<div class="figure">
+<img alt="PacVis showing pacvis-git" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-pacvis-git.png"/>
+<p class="caption">pacvis-git 包的依赖</p>
+</div>
+<p>先解释图形本身，整张图由很多小圆圈的节点，以及节点之间的箭头组成。
+一个圆圈就代表一个软件包，而一条箭头代表一个依赖关系。缩放到细节的话，
+能看到每个小圆圈的下方标注了这个软件包的名字，鼠标悬浮在圆圈上也会显示响应信息。
+还可以点开软件包，在右侧的边栏里会有更详细的信息。</p>
+<p>比如图例中显示了 pacvis-git 自己的依赖，它依赖 pyalpm, python-tornado 和
+python-setuptools ，其中 pyalpm 又依赖 pacman 。图中用
+<span class="label label-primary">紫色</span> 表示手动安装的包，
+<span class="label label-warning">橙色</span> 表示被作为依赖安装的包，
+箭头的颜色也随着包的颜色改变。</p>
+<p>值得注意的是图中大多数箭头都是由下往上指的，这是因为 PacVis 按照包的依赖关系做
+了拓扑排序，并且给每个包赋予了一个拓扑层级。比如 pacvis-git 位于 39
+层，那么它依赖的 pyalpm 就位于 38 层，而 pyalpm 依赖的 pacman 就位于 37
+层。根据层级关系排列包是 PacVis 于 pacgraph 之间最大的不同之处。</p>
+<p>除了手动缩放， PacVis 还提供了搜索框，根据包名快速定位你感兴趣的包。
+以及在右侧边栏中的 Dep 和 Req-By 等页中，包的依赖关系也是做成了按钮的形式，
+可以由此探索包和包之间的关联。</p>
+<p>最后稍微解释一下两个和实现相关的参数：</p>
+<div class="label label-info">
+Max Level</div>
+<p>这是限制 PacVis 载入的最大拓扑层。系统包非常多的时候 PacVis
+的布局算法会显得很慢，限制层数有助于加快载入，特别是在调试 PacVis 的时候比较有用。</p>
+<div class="label label-info">
+Max Required-By</div>
+<p>这是限制 PacVis 绘制的最大被依赖关系。稍微把玩一下 PacVis 就会发现系统内绝大多数
+的包都直接依赖了 glibc 或者 gcc-libs 等个别的几个包，而要绘制这些依赖的话会导致
+渲染出的图中有大量长直的依赖线，不便观察。于是可以通过限制这个值，使得 PacVis
+不绘制被依赖太多的包的依赖关系，有助于让渲染出的图更易观察。</p>
+</div>
+<div class="section" id="id6">
+<h2><a class="toc-backref" href="#id17">从 PacVis 能了解到的一些事实</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+一个 KDE 桌面的 PacVis 结果全图， <a class="reference external" href="//farseerfc.me/zhs/images/pacvis-16384.png">放大（17M）</a></div>
+<div class="panel-body">
+<img alt="A normal KDE desktop in PacVis" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-4096-anno.png"/>
+</div>
+</div>
+<p>稍微玩一下 PacVis 就能发现不少有趣现象，上述「绝大多数包依赖 glibc 」就是一例。
+除此之外还有不少值得玩味的地方。</p>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id18">有些包没有依赖关系</a></h3>
+<div class="figure">
+<img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-level0.png"/>
+<p class="caption">man-pages 和 licenses 没有依赖关系</p>
+</div>
+<p>有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
+man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
+<span class="label label-info">蓝色</span> 正方形特别绘制它们。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id19">循环依赖</a></h3>
+<p>有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
+是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
+另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
+后者初始化 KDE 桌面环境。</p>
+<div class="figure">
+<img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-freetype2-harfbuzz.png"/>
+<p class="caption">freetype2 和 harfbuzz 之间的循环依赖</p>
+</div>
+<p>因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
+算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
+因此我在图中用红色的箭头表示这些会导致环的依赖关系。</p>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id20">依赖层次</a></h3>
+<p>系统中安装的包被明显地分成了这样几个层次：</p>
+<ul class="simple">
+<li>glibc 等 C 库</li>
+<li>Bash/Perl/Python 等脚本语言</li>
+<li>coreutils/gcc/binutils 等核心工具</li>
+<li>pacman / systemd 等较大的系统工具</li>
+<li>gtk{2,3}/qt{4,5} 等 GUI toolkit</li>
+<li>chromium 等 GUI 应用</li>
+<li>Plasma/Gnome 等桌面环境</li>
+</ul>
+<p>大体上符合直观的感受，不过细节上有很多有意思的地方，比如 zsh 因为 gdbm
+间接依赖了 bash，这也说明我们不可能在系统中用 zsh 完全替代掉 bash。
+再比如 python （在 Arch Linux 中是 python3）和 python2 和 pypy
+几乎在同一个拓扑层级。</p>
+<div class="figure">
+<img alt="zsh depends on bash because of gdbm" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-zsh-bash.png"/>
+<p class="caption">zsh 因为 gdbm 间接依赖了 bash</p>
+</div>
+<p>不过偶尔显示的依赖层级不太符合直观，比如 qt5-base &lt; qt4 &lt; gtk2 &lt; gtk3 。
+qt5 因为被拆成了数个包所以比 qt4 更低级这可以理解，而 gtk 系比 qt
+系更高级这一点是很多人（包括我）没有预料到的吧。</p>
+</div>
+<div class="section" id="linux">
+<h3><a class="toc-backref" href="#id21">只看依赖关系的话 Linux 内核完全不重要</a></h3>
+<p>所有用户空间的程序都依赖着 glibc ，而 glibc 则从定义良好的 syscall 调用内核。
+因此理所当然地，如果只看用户空间的话， glibc 和别的 GNU 组建是整个 GNU/Linux
+发行版的中心，而 Linux 则是位于依赖层次中很深的位置，甚至在我的 demo 服务器上
+Linux 位于整个图中的最底端，因为它的安装脚本依赖 mkinitcpio
+而后者依赖了系统中的众多组件。</p>
+</div>
+</div>
+<div class="section" id="id10">
+<h2><a class="toc-backref" href="#id22">PacVis 的未来</a></h2>
+<p>目前的 PacVis 基本上是我最初开始做的时候设想的样子，随着开发逐渐又增加了不少功能。
+一些是迫于布局算法的性能而增加的（比如限制层数）。</p>
+<p>今后准备再加入以下这些特性：</p>
+<ol class="arabic simple">
+<li>更合理的 optdeps 处理。目前只是把 optdeps 关系在图上画出来了。</li>
+<li>更合理的 <strong>依赖关系抉择</strong> 。有时候包的依赖关系并不是直接根据包名，而是
+<code class="code">
+provides</code>
+ 由一个包提供另一个包的依赖。目前 PacVis 用 alpm
+提供的方式抉择这种依赖，于是这种关系并没有记录在图上。</li>
+<li>目前的层级关系没有考虑包所在的仓库 (code/extra/community/...) 或者包所属的组。
+加入这些关系能更清晰地表达依赖层次。</li>
+<li>目前没有办法只显示一部分包的关系。以后准备加入像 pactree/pacgraph 一样显示部分包。</li>
+</ol>
+<p>如果你希望 PacVis 出现某些有趣的用法和功能，也请给我提 issue 。</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        X 中的混成器与 Composite 扩展
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="true" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'pacvis';
+                        var disqus_url = 'http://farseerfc.me/zhs/pacvis.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/zhs/about.html">
+关于 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/zhs/about.html"><img width="100%" src="//farseerfc.me/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+<div style="margin:-10px" data-width="200px" data-theme="github" class="zhihu-card" data-userhash="b74efb573bbdb13e54ac55171a4f5644"></div>
+<script src="//cdn.jsdelivr.net/zhihu-card/latest/widget.js"></script>
+<div style="margin:-10px" class="github-card" data-github="farseerfc" data-width="200" data-theme="medium"></div>
+<script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">标签云</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/linux.html">
+                    linux <sup> 6</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pages.html">
+                    pages <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/c.html">
+                    c <sup> 14</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/github.html">
+                    github <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub仓库</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目录</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#pacvis" id="id11">我为什么要做 PacVis</a></li>
+<li><a class="reference internal" href="#id1" id="id12">PacVis的老前辈们</a><ul>
+<li><a class="reference internal" href="#pactree" id="id13">pactree</a></li>
+<li><a class="reference internal" href="#pacgraph" id="id14">pacgraph</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4" id="id15">于是就有了 PacVis</a></li>
+<li><a class="reference internal" href="#id5" id="id16">PacVis 的图例和用法</a></li>
+<li><a class="reference internal" href="#id6" id="id17">从 PacVis 能了解到的一些事实</a><ul>
+<li><a class="reference internal" href="#id7" id="id18">有些包没有依赖关系</a></li>
+<li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
+<li><a class="reference internal" href="#id9" id="id20">依赖层次</a></li>
+<li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10" id="id22">PacVis 的未来</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; 通过            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
