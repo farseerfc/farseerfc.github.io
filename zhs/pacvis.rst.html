@@ -239,42 +239,9 @@ python-setuptools ，其中 pyalpm 又依赖 pacman 。图中用
 稍微玩一下 PacVis 就能发现不少有趣现象，上述「绝大多数包依赖 glibc 」就是一例。
 除此之外还有不少值得玩味的地方。
 
-<span class="gh">有些包没有依赖关系</span>
-<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
-
-<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-level0.png
-  <span class="nc">:alt:</span> <span class="nf">PacVis Level 0</span>
-
-  man-pages 和 licenses 没有依赖关系
-
-有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
-man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
-<span class="na">:html:</span><span class="nv">`&lt;span class=&quot;label label-info&quot;&gt;蓝色&lt;/span&gt;`</span> 正方形特别绘制它们。
-
-<span class="gh">循环依赖</span>
-<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
-
-有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
-是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
-另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
-后者初始化 KDE 桌面环境。
-
-
-<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-freetype2-harfbuzz.png
-  <span class="nc">:alt:</span> <span class="nf">freetype2 harfbuzz</span>
-
-  freetype2 和 harfbuzz 之间的循环依赖
-
-因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
-算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
-因此我在图中用红色的箭头表示这些会导致环的依赖关系。
 
 <span class="gh">依赖层次</span>
 <span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
-
-
 
 系统中安装的包被明显地分成了这样几个层次：
 
@@ -300,6 +267,40 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 不过偶尔显示的依赖层级不太符合直观，比如 qt5-base &lt; qt4 &lt; gtk2 &lt; gtk3 。
 qt5 因为被拆成了数个包所以比 qt4 更低级这可以理解，而 gtk 系比 qt
 系更高级这一点是很多人（包括我）没有预料到的吧。
+
+
+<span class="gh">循环依赖</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
+是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
+另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
+后者初始化 KDE 桌面环境。
+
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-freetype2-harfbuzz.png
+  <span class="nc">:alt:</span> <span class="nf">freetype2 harfbuzz</span>
+
+  freetype2 和 harfbuzz 之间的循环依赖
+
+因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
+算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
+因此我在图中用红色的箭头表示这些会导致环的依赖关系。
+
+
+<span class="gh">有些包没有依赖关系</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-level0.png
+  <span class="nc">:alt:</span> <span class="nf">PacVis Level 0</span>
+
+  man-pages 和 licenses 没有依赖关系
+
+有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
+man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
+<span class="na">:html:</span><span class="nv">`&lt;span class=&quot;label label-info&quot;&gt;蓝色&lt;/span&gt;`</span> 正方形特别绘制它们。
+
+
 
 <span class="gh">只看依赖关系的话 Linux 内核完全不重要</span>
 <span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>

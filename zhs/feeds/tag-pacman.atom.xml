@@ -215,31 +215,7 @@ Max Required-By&lt;/div&gt;
 &lt;p&gt;稍微玩一下 PacVis 就能发现不少有趣现象，上述「绝大多数包依赖 glibc 」就是一例。
 除此之外还有不少值得玩味的地方。&lt;/p&gt;
 &lt;div class="section" id="id7"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;有些包没有依赖关系&lt;/a&gt;&lt;/h3&gt;
-&lt;div class="figure"&gt;
-&lt;img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-level0.png"/&gt;
-&lt;p class="caption"&gt;man-pages 和 licenses 没有依赖关系&lt;/p&gt;
-&lt;/div&gt;
-&lt;p&gt;有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
-man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
-&lt;span class="label label-info"&gt;蓝色&lt;/span&gt; 正方形特别绘制它们。&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="id8"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;循环依赖&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
-是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
-另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
-后者初始化 KDE 桌面环境。&lt;/p&gt;
-&lt;div class="figure"&gt;
-&lt;img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-freetype2-harfbuzz.png"/&gt;
-&lt;p class="caption"&gt;freetype2 和 harfbuzz 之间的循环依赖&lt;/p&gt;
-&lt;/div&gt;
-&lt;p&gt;因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
-算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
-因此我在图中用红色的箭头表示这些会导致环的依赖关系。&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="id9"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;依赖层次&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;依赖层次&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;系统中安装的包被明显地分成了这样几个层次：&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;glibc 等 C 库&lt;/li&gt;
@@ -261,6 +237,30 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 &lt;p&gt;不过偶尔显示的依赖层级不太符合直观，比如 qt5-base &amp;lt; qt4 &amp;lt; gtk2 &amp;lt; gtk3 。
 qt5 因为被拆成了数个包所以比 qt4 更低级这可以理解，而 gtk 系比 qt
 系更高级这一点是很多人（包括我）没有预料到的吧。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;循环依赖&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
+是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
+另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
+后者初始化 KDE 桌面环境。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-freetype2-harfbuzz.png"/&gt;
+&lt;p class="caption"&gt;freetype2 和 harfbuzz 之间的循环依赖&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
+算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
+因此我在图中用红色的箭头表示这些会导致环的依赖关系。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;有些包没有依赖关系&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-level0.png"/&gt;
+&lt;p class="caption"&gt;man-pages 和 licenses 没有依赖关系&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
+man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
+&lt;span class="label label-info"&gt;蓝色&lt;/span&gt; 正方形特别绘制它们。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="linux"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;只看依赖关系的话 Linux 内核完全不重要&lt;/a&gt;&lt;/h3&gt;

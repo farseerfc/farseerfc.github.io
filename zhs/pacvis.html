@@ -254,9 +254,9 @@ Farseerfc的小窝            </a>
 <li><a class="reference internal" href="#id4" id="id15">于是就有了 PacVis</a></li>
 <li><a class="reference internal" href="#id5" id="id16">PacVis 的图例和用法</a></li>
 <li><a class="reference internal" href="#id6" id="id17">从 PacVis 能了解到的一些事实</a><ul>
-<li><a class="reference internal" href="#id7" id="id18">有些包没有依赖关系</a></li>
+<li><a class="reference internal" href="#id7" id="id18">依赖层次</a></li>
 <li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
-<li><a class="reference internal" href="#id9" id="id20">依赖层次</a></li>
+<li><a class="reference internal" href="#id9" id="id20">有些包没有依赖关系</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
 </ul>
 </li>
@@ -481,31 +481,7 @@ Max Required-By</div>
 <p>稍微玩一下 PacVis 就能发现不少有趣现象，上述「绝大多数包依赖 glibc 」就是一例。
 除此之外还有不少值得玩味的地方。</p>
 <div class="section" id="id7">
-<h3><a class="toc-backref" href="#id18">有些包没有依赖关系</a></h3>
-<div class="figure">
-<img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-level0.png"/>
-<p class="caption">man-pages 和 licenses 没有依赖关系</p>
-</div>
-<p>有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
-man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
-<span class="label label-info">蓝色</span> 正方形特别绘制它们。</p>
-</div>
-<div class="section" id="id8">
-<h3><a class="toc-backref" href="#id19">循环依赖</a></h3>
-<p>有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
-是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
-另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
-后者初始化 KDE 桌面环境。</p>
-<div class="figure">
-<img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-freetype2-harfbuzz.png"/>
-<p class="caption">freetype2 和 harfbuzz 之间的循环依赖</p>
-</div>
-<p>因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
-算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
-因此我在图中用红色的箭头表示这些会导致环的依赖关系。</p>
-</div>
-<div class="section" id="id9">
-<h3><a class="toc-backref" href="#id20">依赖层次</a></h3>
+<h3><a class="toc-backref" href="#id18">依赖层次</a></h3>
 <p>系统中安装的包被明显地分成了这样几个层次：</p>
 <ul class="simple">
 <li>glibc 等 C 库</li>
@@ -527,6 +503,30 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 <p>不过偶尔显示的依赖层级不太符合直观，比如 qt5-base &lt; qt4 &lt; gtk2 &lt; gtk3 。
 qt5 因为被拆成了数个包所以比 qt4 更低级这可以理解，而 gtk 系比 qt
 系更高级这一点是很多人（包括我）没有预料到的吧。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id19">循环依赖</a></h3>
+<p>有些包的依赖关系形成了循环依赖，一个例子是 freetype2 和 harfbuzz，freetype2
+是绘制字体的库，harfbuzz 是解析 OpenType 字形的库，两者对对方互相依赖。
+另一个例子是 KDE 的 kio 和 kinit，前者提供类似 FUSE 的资源访问抽象层，
+后者初始化 KDE 桌面环境。</p>
+<div class="figure">
+<img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-freetype2-harfbuzz.png"/>
+<p class="caption">freetype2 和 harfbuzz 之间的循环依赖</p>
+</div>
+<p>因为这些循环依赖的存在，使得 PacVis 在实现时不能直接拓扑排序，我采用环探测
+算法找出有向图中所有的环，并且打破这些环，然后再使用拓扑排序。
+因此我在图中用红色的箭头表示这些会导致环的依赖关系。</p>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id20">有些包没有依赖关系</a></h3>
+<div class="figure">
+<img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-level0.png"/>
+<p class="caption">man-pages 和 licenses 没有依赖关系</p>
+</div>
+<p>有些包既不被别的包依赖，也不依赖别的包，而是孤立在整张图中，比如
+man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 ，我用
+<span class="label label-info">蓝色</span> 正方形特别绘制它们。</p>
 </div>
 <div class="section" id="linux">
 <h3><a class="toc-backref" href="#id21">只看依赖关系的话 Linux 内核完全不重要</a></h3>
@@ -1047,9 +1047,9 @@ provides</code>
 <li><a class="reference internal" href="#id4" id="id15">于是就有了 PacVis</a></li>
 <li><a class="reference internal" href="#id5" id="id16">PacVis 的图例和用法</a></li>
 <li><a class="reference internal" href="#id6" id="id17">从 PacVis 能了解到的一些事实</a><ul>
-<li><a class="reference internal" href="#id7" id="id18">有些包没有依赖关系</a></li>
+<li><a class="reference internal" href="#id7" id="id18">依赖层次</a></li>
 <li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
-<li><a class="reference internal" href="#id9" id="id20">依赖层次</a></li>
+<li><a class="reference internal" href="#id9" id="id20">有些包没有依赖关系</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
 </ul>
 </li>

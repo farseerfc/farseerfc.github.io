@@ -254,9 +254,9 @@ Farseerfc的小窩            </a>
 <li><a class="reference internal" href="#id4" id="id15">於是就有了 PacVis</a></li>
 <li><a class="reference internal" href="#id5" id="id16">PacVis 的圖例和用法</a></li>
 <li><a class="reference internal" href="#id6" id="id17">從 PacVis 能瞭解到的一些事實</a><ul>
-<li><a class="reference internal" href="#id7" id="id18">有些包沒有依賴關係</a></li>
+<li><a class="reference internal" href="#id7" id="id18">依賴層次</a></li>
 <li><a class="reference internal" href="#id8" id="id19">循環依賴</a></li>
-<li><a class="reference internal" href="#id9" id="id20">依賴層次</a></li>
+<li><a class="reference internal" href="#id9" id="id20">有些包沒有依賴關係</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依賴關係的話 Linux 內核完全不重要</a></li>
 </ul>
 </li>
@@ -481,31 +481,7 @@ Max Required-By</div>
 <p>稍微玩一下 PacVis 就能發現不少有趣現象，上述「絕大多數包依賴 glibc 」就是一例。
 除此之外還有不少值得玩味的地方。</p>
 <div class="section" id="id7">
-<h3><a class="toc-backref" href="#id18">有些包沒有依賴關係</a></h3>
-<div class="figure">
-<img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/images/pacvis-level0.png"/>
-<p class="caption">man-pages 和 licenses 沒有依賴關係</p>
-</div>
-<p>有些包既不被別的包依賴，也不依賴別的包，而是孤立在整張圖中，比如
-man-pages 和 licenses 。這些包在圖中位於最頂端，拓撲層級是 0 ，我用
-<span class="label label-info">藍色</span> 正方形特別繪製它們。</p>
-</div>
-<div class="section" id="id8">
-<h3><a class="toc-backref" href="#id19">循環依賴</a></h3>
-<p>有些包的依賴關係形成了循環依賴，一個例子是 freetype2 和 harfbuzz，freetype2
-是繪製字體的庫，harfbuzz 是解析 OpenType 字形的庫，兩者對對方互相依賴。
-另一個例子是 KDE 的 kio 和 kinit，前者提供類似 FUSE 的資源訪問抽象層，
-後者初始化 KDE 桌面環境。</p>
-<div class="figure">
-<img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/images/pacvis-freetype2-harfbuzz.png"/>
-<p class="caption">freetype2 和 harfbuzz 之間的循環依賴</p>
-</div>
-<p>因爲這些循環依賴的存在，使得 PacVis 在實現時不能直接拓撲排序，我採用環探測
-算法找出有向圖中所有的環，並且打破這些環，然後再使用拓撲排序。
-因此我在圖中用紅色的箭頭表示這些會導致環的依賴關係。</p>
-</div>
-<div class="section" id="id9">
-<h3><a class="toc-backref" href="#id20">依賴層次</a></h3>
+<h3><a class="toc-backref" href="#id18">依賴層次</a></h3>
 <p>系統中安裝的包被明顯地分成了這樣幾個層次：</p>
 <ul class="simple">
 <li>glibc 等 C 庫</li>
@@ -527,6 +503,30 @@ man-pages 和 licenses 。這些包在圖中位於最頂端，拓撲層級是 0 
 <p>不過偶爾顯示的依賴層級不太符合直觀，比如 qt5-base &lt; qt4 &lt; gtk2 &lt; gtk3 。
 qt5 因爲被拆成了數個包所以比 qt4 更低級這可以理解，而 gtk 系比 qt
 系更高級這一點是很多人（包括我）沒有預料到的吧。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id19">循環依賴</a></h3>
+<p>有些包的依賴關係形成了循環依賴，一個例子是 freetype2 和 harfbuzz，freetype2
+是繪製字體的庫，harfbuzz 是解析 OpenType 字形的庫，兩者對對方互相依賴。
+另一個例子是 KDE 的 kio 和 kinit，前者提供類似 FUSE 的資源訪問抽象層，
+後者初始化 KDE 桌面環境。</p>
+<div class="figure">
+<img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/images/pacvis-freetype2-harfbuzz.png"/>
+<p class="caption">freetype2 和 harfbuzz 之間的循環依賴</p>
+</div>
+<p>因爲這些循環依賴的存在，使得 PacVis 在實現時不能直接拓撲排序，我採用環探測
+算法找出有向圖中所有的環，並且打破這些環，然後再使用拓撲排序。
+因此我在圖中用紅色的箭頭表示這些會導致環的依賴關係。</p>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id20">有些包沒有依賴關係</a></h3>
+<div class="figure">
+<img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/images/pacvis-level0.png"/>
+<p class="caption">man-pages 和 licenses 沒有依賴關係</p>
+</div>
+<p>有些包既不被別的包依賴，也不依賴別的包，而是孤立在整張圖中，比如
+man-pages 和 licenses 。這些包在圖中位於最頂端，拓撲層級是 0 ，我用
+<span class="label label-info">藍色</span> 正方形特別繪製它們。</p>
 </div>
 <div class="section" id="linux">
 <h3><a class="toc-backref" href="#id21">只看依賴關係的話 Linux 內核完全不重要</a></h3>
@@ -1047,9 +1047,9 @@ provides</code>
 <li><a class="reference internal" href="#id4" id="id15">於是就有了 PacVis</a></li>
 <li><a class="reference internal" href="#id5" id="id16">PacVis 的圖例和用法</a></li>
 <li><a class="reference internal" href="#id6" id="id17">從 PacVis 能瞭解到的一些事實</a><ul>
-<li><a class="reference internal" href="#id7" id="id18">有些包沒有依賴關係</a></li>
+<li><a class="reference internal" href="#id7" id="id18">依賴層次</a></li>
 <li><a class="reference internal" href="#id8" id="id19">循環依賴</a></li>
-<li><a class="reference internal" href="#id9" id="id20">依賴層次</a></li>
+<li><a class="reference internal" href="#id9" id="id20">有些包沒有依賴關係</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依賴關係的話 Linux 內核完全不重要</a></li>
 </ul>
 </li>
