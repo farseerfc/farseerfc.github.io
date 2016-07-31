@@ -1,5 +1,349 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc's Nest</title><link href="//farseerfc.me/en/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/en/</id><updated>2014-12-09T01:54:00+09:00</updated><entry><title>Jumping KDE5 Plasma Activities Button</title><link href="//farseerfc.me/en/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><published>2014-12-09T01:54:00+09:00</published><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:en/jumping-kde5-plasma-activities-button.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc's Nest</title><link href="//farseerfc.me/en/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/en/</id><updated>2016-07-31T03:52:00+09:00</updated><entry><title>PacVis: visualize pacman local database</title><link href="//farseerfc.me/en/pacvis.html" rel="alternate"></link><published>2016-07-31T03:52:00+09:00</published><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-07-31:en/pacvis.html</id><summary type="html">
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Demo of PacVis" class="img-responsive" src="//farseerfc.me/en/images/pacvis-first.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="motivation-for-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Motivation for PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I must admit that I love Arch Linux, largely because Arch Linux made me feel
+like I really &lt;strong&gt;own&lt;/strong&gt; the whole system. In my Arch Linux system, I know clearly
+each package that I have installed and why I installed it. I can find which
+package brings in a give file. A Debian/Fedora/openSUSE user with enough experience
+may achieve this with their favorite package manager too, but they must overcome
+a much higher complexity with their distro's fine-grinding packaging strategy.
+Usually they have 3 to 10 times more packages than Arch Linux on a
+similar setup. And with regard to packaging system, they must work with much more
+details than Arch's simple PKGBUILD based packaging.&lt;/p&gt;
+&lt;p&gt;Every user who successfully installed Arch Linux should have learned that, after
+the initial installation, you will only get a minimum setup. The most important
+step in the installation guide on ArchWiki is a command
+&lt;code class="code"&gt;
+pactrap /mnt base&lt;/code&gt;
+ , which will use &lt;code class="code"&gt;
+/mnt&lt;/code&gt;
+ as the filesystem root
+and call &lt;code class="code"&gt;
+pacman -S base&lt;/code&gt;
+ inside that root to install the whole base
+group. And that's basically all you will get after the install. The initial
+system has nearly nothing. Everything you need will be installed afterwards,
+manually by using &lt;code class="code"&gt;
+pacman&lt;/code&gt;
+. It is nothing unnecessary, only for &lt;strong&gt;your&lt;/strong&gt; need.&lt;/p&gt;
+&lt;p&gt;But after using the system for a long time, there are unavoidably some packages
+inside the system which are installed and used for awhile and abandoned.
+They are like the old furnitures inside your house, taking space and covered by
+ash. We have &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ to help you find all packages that are
+&lt;strong&gt;installed as dependency for other packages once but not needed for now&lt;/strong&gt;
+, but for those manually installed packages, we have no good tool but manually
+checking them one by one.&lt;/p&gt;
+&lt;p&gt;So I was looking for a tool to help me understand the relations in my system.
+In particular, I want a tool to help me do these things:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Find the packages that I installed manually but not needed now&lt;/li&gt;
+&lt;li&gt;Find those large and space-consuming packages&lt;/li&gt;
+&lt;li&gt;Understand th relationship between packages&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="Android System Architecture" class="img-responsive" src="//farseerfc.me/en/images/Android-System-Architecture.jpg"/&gt;
+&lt;p class="caption"&gt;&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Android_(operating_system)"&gt;Android System Architecture&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;About the last thing "relations between packages", I once saw the diagram of
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Architecture_of_OS_X"&gt;macOS Architecture&lt;/a&gt;
+and Android System Architecture, and I was impressed by the layered hierarchy
+in these diagrams. I was wondering since then that &lt;em&gt;is it possible to draw a
+similar layered architecture diagram for modern Linux desktop&lt;/em&gt; ?
+Or will it be much different? I can find hierarchy diagram for Linux kernel or
+Xorg graphic stack on Wikipedia or other sites, but I don't know such a diagram
+for the whole distribution. And further I thought, can I &lt;em&gt;draw such diagram from
+the dependency relationships between packages automatically&lt;/em&gt;?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="predecessors-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Predecessors of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before working on PacVis, I have tried several similar tools. Some of them meet
+some of my needs, but they all lack certain features that I considered important.
+These tools became the prototype of PacVis, as they enlightened me of how PacVis
+should be.&lt;/p&gt;
+&lt;div class="section" id="pactree"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;pactree&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;pactree started as an &lt;a class="reference external" href="https://bbs.archlinux.org/viewtopic.php?id=51795"&gt;individual project&lt;/a&gt;
+, but now it is &lt;a class="reference external" href="https://www.archlinux.org/pacman/pactree.8.html"&gt;part of pacman&lt;/a&gt;.
+From its manpage we can see that the output of pactree is a dependency tree
+starting from a given package. By appending &lt;code class="code"&gt;
+--graph&lt;/code&gt;
+ parameter, pactree
+can also output a diagram in &lt;a class="reference external" href="http://www.graphviz.org/"&gt;dot&lt;/a&gt; format,
+then we can render this diagram using dot command:&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;code class="code"&gt;
+pactree pacvis-git -d3 --graph | dot -Tpng &amp;gt;pacvis-pactree.png&lt;/code&gt;
+&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="pactree --graph" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pactree.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pactree pacvis-git -d3&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;pacvis-git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;├─python-tornado&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ └─python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─expat&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─bzip2&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─gdbm&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─openssl&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─libffi&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   └─zlib&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;├─pyalpm&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ ├─python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ └─pacman&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─bash&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─glibc&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─libarchive&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─curl&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─gpgme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─pacman-mirrorlist&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   └─archlinux-keyring&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;└─python-setuptools&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;  └─python-packaging&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;    ├─python-pyparsing&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;    └─python-six&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt; $&lt;/span&gt; pactree pacvis-git -d3 --graph &lt;span class="p"&gt;|&lt;/span&gt; dot -Tpng &amp;gt;pacvis-pactree.png&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;From the rendered diagram we can see that, because some packages may share
+common dependencies, the whole diagram is no longer a
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tree_structure"&gt;tree in  graph theory&lt;/a&gt; .
+During the initial prototyping of PacVis, I tried to parse the output of pactree
+and pacman using bash/python scripts, to draw a single diagram for the whole
+system. However the rendered picture is so large that it takes hours for
+dot to layout them, and the result is barely viewable in an image viewer or a
+browser.&lt;/p&gt;
+&lt;p&gt;I need to say that there will be no PacVis if there is no pactree.
+Even the pyalpm library that I used in PacVis is a python binding for alpm,
+which is born during the rewrite of pactree in C language.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pacgraph"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;pacgraph&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+pacgraph 的輸出&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="pacgraph" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pacgraph.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://kmkeen.com/pacgraph/index.html"&gt;pacgraph&lt;/a&gt; is developped by a
+Arch Linux Trusted User &lt;a class="reference external" href="http://kmkeen.com/"&gt;keenerd&lt;/a&gt; . It is written
+in Python, as is PacVis. Comparing with pactree, pacgraph is definitely more
+suitable for my needs. It will draw a diagram for all the packages in the
+system, using a clever layout algorithm that surpass the performance of
+dot's layout.&lt;/p&gt;
+&lt;p&gt;The output of pacgraph is an artistic diagram with different font size of
+package names showing their disk usage. By viewing pacgraph's output, we can
+determine the overall system structure, e.g. whether the system is a desktop
+system or a server. We can easily find large packages and consider remove them.&lt;/p&gt;
+&lt;p&gt;There's more. pacgraph provided an interactive GUI called pacgraph-tk, written
+clearly in tk. You can zoom in to see details or zoom out to see the whole
+graph in GUI, and you can highlight one package to see its relations to others.&lt;/p&gt;
+&lt;p&gt;And pacgraph support to render the dependencies of a selected group of packages,
+not all, like pactree does.&lt;/p&gt;
+&lt;p&gt;But pacgraph does not meet all my needs. I want a diagram to show the
+architecture of the system, but pacgraph don't differ
+"the packages that this package depend on" and
+"the packages that depends on this package". In other words, pacgraph draws a
+&lt;strong&gt;undirected graph&lt;/strong&gt;, but I want a &lt;strong&gt;directed graph&lt;/strong&gt;, that reflects the
+&lt;strong&gt;layered hierarchy of dependency relationship&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="so-here-is-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;So here is PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis on startup&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on startup" class="img-responsive" src="//farseerfc.me/en/images/pacvis-second.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;With these predecessors, I started working on PacVis. The development takes
+me 2 month, and largely break into 2 stages. In the first stage I wrote basic
+logics and a prototype of the UI. In the second stage I applied the templates
+from &lt;a class="reference external" href="https://getmdl.io/"&gt;https://getmdl.io/&lt;/a&gt; . Now finally it is usable for others.&lt;/p&gt;
+&lt;p&gt;So several days ago I made a PKGBUILD for pacvis on AUR:
+&lt;a class="reference external" href="https://aur.archlinux.org/packages/pacvis-git/"&gt;pacvis-git&lt;/a&gt;.
+Now it's fairly easy to run pacvis locally on a Arch Linux system.
+You can use any aurhelper you familiar with, or build it directly from AUR:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;~$ git clone aur@aur.archlinux.org:pacvis-git.git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~$ cd pacvis-git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~/pacvis-git$ makepkg -si&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~/pacvis-git$ pacvis&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;Start PacVis at http://localhost:8888/&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Following the instruction, open &lt;a class="reference external" href="http://localhost:8888/"&gt;http://localhost:8888/&lt;/a&gt; in a browser then you can
+see PacVis's result of your own system. As a demonstration you can also visit
+PacVis on my Arch Linux server :
+&lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; . It is showing a minimal server setup, that might
+load and layout faster than a normal desktop system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-legend-and-usage-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;The legend and usage of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;PacVis resembles the UI of a map app such as Google Maps. You can use
+wheel of mouse to zoom and drag to move, or pinch gestures on a touch screen.
+There is a side panel on the right top corner and you can hide it when you don't
+need it. There are some zoom buttons on the right bottom corner.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="PacVis showing pacvis-git" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pacvis-git.png"/&gt;
+&lt;p class="caption"&gt;The dependencies of pacvis-git package&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The whole diagram is made up of small circles and arrows in between circles.
+A circle represent a package, while an arrow represents a dependency
+relationship. If you zoom into details, you can see text under the circles
+showing their package names. Hover on packages will also give you infos
+about the package. You can select a package, and in the side panel there will be
+more detailed infomation about that package.&lt;/p&gt;
+&lt;p&gt;The above picture is showing the dependencies of pacvis-git package itself.
+It dependes on pyalpm, python-tornado and python-setuptools, while pyalpm
+is in-turn depend on pacman.
+A package in &lt;span class="label label-primary"&gt;purple&lt;/span&gt; means it is
+installed manually, while a package in
+&lt;span class="label label-warning"&gt;orange&lt;/span&gt; means it is installed
+as a dependency for other packages. The color of arrows usually follow their
+origin package's color.&lt;/p&gt;
+&lt;p&gt;Note that most arrows in the diagram are pointing bottom-up, this is because
+PacVis will do a topology sort based on the dependencies of packages.
+From the topology sort, PacVis assigned a &lt;em&gt;topology level&lt;/em&gt; to each package,
+e.g. pacvis-git has a topo-level of 39, its dependency pyalpm has a topo-level
+of 38, and pacman is sat on the topo-level 37.
+Layering packages with their topo-level is the main difference of PacVis with
+pacgraph.&lt;/p&gt;
+&lt;p&gt;Besides manually zoom-in to look around, you can also use PacVis's search box
+to locate a particular package by its name. And when you select a package,
+the related package names will be shown in the Dep and Req-By tabs in the
+sidebar. These package names are made as buttons so you can click them to
+browse the whole dependency graph.&lt;/p&gt;
+&lt;p&gt;Let me describe some arguments related to the implementation:&lt;/p&gt;
+&lt;div class="label label-info"&gt;
+Max Level&lt;/div&gt;
+&lt;p&gt;This will limit the max topo-level that PacVis renders.
+When there are too many packages, the layout algorithm will take a lot of time.
+Limiting this is very useful during debug of PacVis.&lt;/p&gt;
+&lt;div class="label label-info"&gt;
+Max Required-By&lt;/div&gt;
+&lt;p&gt;This will limit the max required-by-relationship that PacVis renders.
+If you play around in PacVis, you will soon find that most packages in the
+system directly depends on glibc or gcc-libs. Rendering these &lt;em&gt;well-known&lt;/em&gt;
+dependency may result in a lot of long arrows, that reduce the readability of
+the whole diagram. You can limit this to a lower number so that PacVis will
+not render these &lt;em&gt;well-known&lt;/em&gt; dependencies.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-facts-you-can-learn-from-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Some facts you can learn from PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis's result of a KDE desktop PacVis &lt;a class="reference external" href="//farseerfc.me/en/images/pacvis-16384.png"&gt;Full image（17M）&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="A normal KDE desktop in PacVis" class="img-responsive" src="//farseerfc.me/en/images/pacvis-4096-anno.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;You may find many facts by playing around in PacVis. An example will be the
+aforementioned "most packages depends on glibc".
+Besides that, I will give some more examples below.&lt;/p&gt;
+&lt;div class="section" id="dependency-hierachy"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;Dependency hierachy&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The packages in the system is clearly divided into several layers:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;glibc, etc. C runtime&lt;/li&gt;
+&lt;li&gt;Bash/Perl/Python etc. script languages&lt;/li&gt;
+&lt;li&gt;coreutils/gcc/binutils etc. core binary utilities&lt;/li&gt;
+&lt;li&gt;pacman/systemd etc. large system utilities&lt;/li&gt;
+&lt;li&gt;gtk{2,3}/qt{4,5} etc. GUI toolkit&lt;/li&gt;
+&lt;li&gt;chromium etc. GUI Applications&lt;/li&gt;
+&lt;li&gt;Plasma/Gnome etc. Desktop environments&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This largely suit my overall understanding, but some details are interesting to
+me. For example, zsh dependes on gdbm which in-turn depends on bash, which means
+that you can not get rid of bash even if you only use zsh.
+For another example, python package (which is python3 in Arch Linux) and
+python2 and pypy sit roughly on the same topo-level in the diagram.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="zsh indirectly depends on bash because of gdbm" class="img-responsive" src="//farseerfc.me/en/images/pacvis-zsh-bash.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;zsh indirectly depends on bash because of gdbm&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;However there are some facts beyond common knowledge, e.g.
+qt5-base &amp;lt; qt4 &amp;lt; gtk2 &amp;lt; gtk3 with regard to topo-level.
+Qt5 was split into several packages therefore it is understandable that
+qt5-base is lower than qt4. The fact that gtk is more high level than qt
+may beyond most expectations (including mine).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="circular-dependencies"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;Circular dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There are some packages that have circular dependencies in between.
+An example will be freetype2 and harfbuzz. freetype2 is a library for font
+rendering, and harfbuzz is a library to deal with OpenType font shapes.
+They depend on each other. Another example is kio and kinit of KDE.
+kio provides VFS-like and FUSE-like resource abstraction for KDE applications,
+while kinit is in charge of initializing KDE desktop environment.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/en/images/pacvis-freetype2-harfbuzz.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;Circular dependency between freetype2 and harfbuzz&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Because of these circular dependencies, PacVis cannot simply apply topology sort
+directly. Before that, PacVis will firstly find all circles in the dependency
+graph to break these circles. It renders the relationship that will cause a
+circle as red arrows in the diagram.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-packages-don-t-have-dependency-relationship"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;Some packages don't have dependency relationship&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/en/images/pacvis-level0.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;man-pages and licenses don't have dependencies&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;There are some packages that don't depend on others, and don't depended
+by others. They are isolated in the whole diagram, e.g. man-pages and licenses.
+These packages sit on the most top level of the diagram, with a topo-level of 0.
+PacVis will render them as &lt;span class="label label-info"&gt;blue&lt;/span&gt;
+squares specially.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linux-the-kernel-is-unimportant-if-we-only-look-at-dependencies"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;Linux (the kernel) is unimportant, if we only look at dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All userspace program depend on glibc, which calls the kernel using well-defined
+syscalls. As a result, if we only look at userspace dependencies, glibc and
+other GNU components are the center of the GNU/Linux distribution, while
+Linux the kernel is just located in a random place deeply blew the dependency
+graph. On my demo server the Linux package is even located on the most bottom
+level because it depends on mkinitcpio which in-turn depend on many components
+in the system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-future-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;The future of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Currently PacVis is what I planned to make, with some features added during
+the development. Some of these added features are related to the poor
+performance of the layout algorithm (e.g. limiting the max level).&lt;/p&gt;
+&lt;p&gt;In the future I planned to add more features:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;More reasonable behavior for optdeps. Currently PacVis draw optdeps but do
+not consider it during the topology sort.&lt;/li&gt;
+&lt;li&gt;More reasonable &lt;strong&gt;dependency resolution&lt;/strong&gt;. Sometimes the dependency is not
+written directly as package names, instead they appear in &lt;code class="code"&gt;
+provides&lt;/code&gt;
+
+array in the metadata. Currently PacVis resolve all dependencies using
+alpm directly, which will lose these information.&lt;/li&gt;
+&lt;li&gt;Currently PacVis did not consider the repository (core/extra/community) and
+package group that a package belongs to. In the future PacVis may consider
+these infomation to render a clearer hierarchy.&lt;/li&gt;
+&lt;li&gt;Currently PacVis cannot show only part of the packages. In the future we may
+provide the ability to draw only a part of all the installed packages like
+pactree/pacgraph does.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you want some features in PacVis, please
+&lt;a class="reference external" href="https://github.com/farseerfc/pacvis/issues"&gt;leave me an issue&lt;/a&gt; .&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="python"></category><category term="pacvis"></category><category term="pacman"></category><category term="arch"></category><category term="linux"></category><category term="pacgraph"></category></entry><entry><title>Jumping KDE5 Plasma Activities Button</title><link href="//farseerfc.me/en/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><published>2014-12-09T01:54:00+09:00</published><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:en/jumping-kde5-plasma-activities-button.html</id><summary type="html">
 &lt;p&gt;I found this when using activities under KDE5 today.
 One can drag the activities button out of the edge of the screen,
 then it will jump back and forth at the edge.
