@@ -165,6 +165,17 @@ PacVis 剛打開的樣子&lt;/div&gt;
 &lt;p&gt;按照提示說的，接下來打開瀏覽器訪問 &lt;a class="reference external" href="http://localhost:8888/"&gt;http://localhost:8888/&lt;/a&gt; 就能看到 PacVis
 的樣子了。僅僅作爲嘗試也可以直接打開跑在我的服務器上的 demo:
 &lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; ，這個作爲最小安裝的服務器載入速度大概比普通的桌面系統快一點。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+在 Windows msys2 跑 PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/images/pacvis-msys2.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;另外補充一下，因爲 PacVis 只依賴 pyalpm 和 tornado ，所以在別的基於 pacman
+的系統上跑它應該也沒有任何問題，包括
+&lt;a class="reference external" href="https://msys2.github.io/"&gt;Windows 上的 msys2&lt;/a&gt; 裏（儘管在 msys2 上編譯
+tornado 的包可能要花些功夫）。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;PacVis 的圖例和用法&lt;/a&gt;&lt;/h2&gt;
@@ -270,9 +281,24 @@ man-pages 和 licenses 。這些包在圖中位於最頂端，拓撲層級是 0 
 Linux 位於整個圖中的最底端，因爲它的安裝腳本依賴 mkinitcpio
 而後者依賴了系統中的衆多組件。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="pacman-qtd"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id22"&gt;pacman -Qtd 不能找到帶有循環依賴的孤兒包&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;msys2 中帶有循環依賴的孤兒包&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;這是我在 msys2 上測試 PacVis 的時候發現的，我看到在渲染的圖中有一片羣島，
+沒有連上任何手動安裝的包。這種情況很不正常，因爲我一直在我的所有系統中跑
+&lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 找出孤兒包並刪掉他們。放大之後我發現這些包中有一條循環依賴，
+這說明 &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 不能像語言的垃圾回收機制那樣找出有循環依賴的孤兒包。&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id10"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;PacVis 的未來&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;PacVis 的未來&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;目前的 PacVis 基本上是我最初開始做的時候設想的樣子，隨着開發逐漸又增加了不少功能。
 一些是迫於佈局算法的性能而增加的（比如限制層數）。&lt;/p&gt;
 &lt;p&gt;今後準備再加入以下這些特性：&lt;/p&gt;

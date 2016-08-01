@@ -18,13 +18,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="python,pacvis,pacman,arch,linux,pacgraph" />
-        <meta name="description" content="PacVis Motivation for PacVis I must admit that I love Arch Linux, largely because Arch Linux made me feel like I really own the whole system. In my Arch Linux system, I know clearly each package that I have installed and why I installed it. I can find which package ..." />
+        <meta name="description" content="PacVis Motivation for PacVis I must admit that I love Arch Linux, largely because Arch Linux made me feel like I really own the whole system. In my Arch Linux system, I know clearly every package I have installed and why I installed it. I can find which package brings ..." />
 
         <meta property="og:site_name" content="Farseerfc's Nest" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="PacVis: visualize pacman local database"/>
         <meta property="og:url" content="//farseerfc.me/en/pacvis.html"/>
-        <meta property="og:description" content="PacVis Motivation for PacVis I must admit that I love Arch Linux, largely because Arch Linux made me feel like I really own the whole system. In my Arch Linux system, I know clearly each package that I have installed and why I installed it. I can find which package ..."/>
+        <meta property="og:description" content="PacVis Motivation for PacVis I must admit that I love Arch Linux, largely because Arch Linux made me feel like I really own the whole system. In my Arch Linux system, I know clearly every package I have installed and why I installed it. I can find which package brings ..."/>
         <meta property="article:published_time" content="2016-07-31" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="python" />
@@ -252,9 +252,10 @@ Table of Contents                        </div>
 <li><a class="reference internal" href="#circular-dependencies" id="id10">Circular dependencies</a></li>
 <li><a class="reference internal" href="#some-packages-don-t-have-dependency-relationship" id="id11">Some packages don't have dependency relationship</a></li>
 <li><a class="reference internal" href="#linux-the-kernel-is-unimportant-if-we-only-look-at-dependencies" id="id12">Linux (the kernel) is unimportant, if we only look at dependencies</a></li>
+<li><a class="reference internal" href="#pacman-qtd-cannot-find-orphan-packages-with-circle-dependency" id="id13">pacman -Qtd cannot find orphan packages with circle dependency</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-future-of-pacvis" id="id13">The future of PacVis</a></li>
+<li><a class="reference internal" href="#the-future-of-pacvis" id="id14">The future of PacVis</a></li>
 </ul>
 </div>
                         </div>
@@ -271,7 +272,7 @@ PacVis</div>
 <h2><a class="toc-backref" href="#id2">Motivation for PacVis</a></h2>
 <p>I must admit that I love Arch Linux, largely because Arch Linux made me feel
 like I really <strong>own</strong> the whole system. In my Arch Linux system, I know clearly
-each package that I have installed and why I installed it. I can find which
+every package I have installed and why I installed it. I can find which
 package brings in a give file. A Debian/Fedora/openSUSE user with enough experience
 may achieve this with their favorite package manager too, but they must overcome
 a much higher complexity with their distro's fine-grinding packaging strategy.
@@ -293,22 +294,23 @@ group. And that's basically all you will get after the install. The initial
 system has nearly nothing. Everything you need will be installed afterwards,
 manually by using <code class="code">
 pacman</code>
-. It is nothing unnecessary, only for <strong>your</strong> need.</p>
+. It is nothing unnecessary, only for
+<strong>your</strong> own need.</p>
 <p>But after using the system for a long time, there are unavoidably some packages
 inside the system which are installed and used for awhile and abandoned.
 They are like the old furnitures inside your house, taking space and covered by
-ash. We have <code class="code">
+dusts. We have <code class="code">
 pacman -Qtd</code>
- to help you find all packages that are
-<strong>installed as dependency for other packages once but not needed for now</strong>
-, but for those manually installed packages, we have no good tool but manually
+ to help you find all orphan packages, namely
+those <strong>installed as dependency for other packages once but not needed for now</strong>
+, but for manually installed packages, we have no good tool but manually
 checking them one by one.</p>
 <p>So I was looking for a tool to help me understand the relations in my system.
 In particular, I want a tool to help me do these things:</p>
 <ol class="arabic simple">
-<li>Find the packages that I installed manually but not needed now</li>
+<li>Find packages that I installed manually but not needed now</li>
 <li>Find those large and space-consuming packages</li>
-<li>Understand th relationship between packages</li>
+<li>Understand the relationships between packages</li>
 </ol>
 <div class="figure">
 <img alt="Android System Architecture" class="img-responsive" src="//farseerfc.me/en/images/Android-System-Architecture.jpg"/>
@@ -317,10 +319,11 @@ In particular, I want a tool to help me do these things:</p>
 <p>About the last thing "relations between packages", I once saw the diagram of
 <a class="reference external" href="https://en.wikipedia.org/wiki/Architecture_of_OS_X">macOS Architecture</a>
 and Android System Architecture, and I was impressed by the layered hierarchy
-in these diagrams. I was wondering since then that <em>is it possible to draw a
+in these diagrams. I was wondering since then, <em>is it possible to draw a
 similar layered architecture diagram for modern Linux desktop</em> ?
-Or will it be much different? I can find hierarchy diagram for Linux kernel or
-Xorg graphic stack on Wikipedia or other sites, but I don't know such a diagram
+Or <em>will a Linux desktop be much different</em>?
+I can find out hierarchy diagrams for Linux kernel or
+Xorg graphic stack on Wikipedia or other sites, but I don't know such diagrams
 for the whole distribution. And further I thought, can I <em>draw such diagram from
 the dependency relationships between packages automatically</em>?</p>
 </div>
@@ -447,6 +450,17 @@ see PacVis's result of your own system. As a demonstration you can also visit
 PacVis on my Arch Linux server :
 <a class="reference external" href="https://pacvis.farseerfc.me/">https://pacvis.farseerfc.me/</a> . It is showing a minimal server setup, that might
 load and layout faster than a normal desktop system.</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+PacVis on Windows msys2</div>
+<div class="panel-body">
+<img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/en/images/pacvis-msys2.png"/>
+</div>
+</div>
+<p>As a side note, pacvis only depends on pyalpm and tornado, so there should be
+no problem running it on other pacman-based systems, including
+<a class="reference external" href="https://msys2.github.io/">msys2 on Windows</a> (altough building a msys2
+python-tornado may take some non-trival effort).</p>
 </div>
 <div class="section" id="the-legend-and-usage-of-pacvis">
 <h2><a class="toc-backref" href="#id7">The legend and usage of PacVis</a></h2>
@@ -523,7 +537,7 @@ Besides that, I will give some more examples below.</p>
 <li>chromium etc. GUI Applications</li>
 <li>Plasma/Gnome etc. Desktop environments</li>
 </ul>
-<p>This largely suit my overall understanding, but some details are interesting to
+<p>This largely meet my overall understanding, but some details are interesting to
 me. For example, zsh dependes on gdbm which in-turn depends on bash, which means
 that you can not get rid of bash even if you only use zsh.
 For another example, python package (which is python3 in Arch Linux) and
@@ -577,9 +591,26 @@ graph. On my demo server the Linux package is even located on the most bottom
 level because it depends on mkinitcpio which in-turn depend on many components
 in the system.</p>
 </div>
+<div class="section" id="pacman-qtd-cannot-find-orphan-packages-with-circle-dependency">
+<h3><a class="toc-backref" href="#id13">pacman -Qtd cannot find orphan packages with circle dependency</a></h3>
+<div class="figure">
+<img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/en/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/>
+<p class="caption">msys2 packages with circle dependency</p>
+</div>
+<p>I saw an archipelago of packages from mingw repo when testing PacVis on msys2.
+To my surprise, they don't connected to any manually installed packages,
+something strange as I routinely run <code class="code">
+pacman -Qtd</code>
+ and remove the results on
+all my systems. After zoomed in I found that they contained a circle dependency
+which indicated <code class="code">
+pacman -Qtd</code>
+ cannot find these orphan packages,
+not like a GC algorithm.</p>
+</div>
 </div>
 <div class="section" id="the-future-of-pacvis">
-<h2><a class="toc-backref" href="#id13">The future of PacVis</a></h2>
+<h2><a class="toc-backref" href="#id14">The future of PacVis</a></h2>
 <p>Currently PacVis is what I planned to make, with some features added during
 the development. Some of these added features are related to the poor
 performance of the layout algorithm (e.g. limiting the max level).</p>
@@ -907,9 +938,10 @@ Table of Contents</h4>
 <li><a class="reference internal" href="#circular-dependencies" id="id10">Circular dependencies</a></li>
 <li><a class="reference internal" href="#some-packages-don-t-have-dependency-relationship" id="id11">Some packages don't have dependency relationship</a></li>
 <li><a class="reference internal" href="#linux-the-kernel-is-unimportant-if-we-only-look-at-dependencies" id="id12">Linux (the kernel) is unimportant, if we only look at dependencies</a></li>
+<li><a class="reference internal" href="#pacman-qtd-cannot-find-orphan-packages-with-circle-dependency" id="id13">pacman -Qtd cannot find orphan packages with circle dependency</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-future-of-pacvis" id="id13">The future of PacVis</a></li>
+<li><a class="reference internal" href="#the-future-of-pacvis" id="id14">The future of PacVis</a></li>
 </ul>
 </div>
             </div>

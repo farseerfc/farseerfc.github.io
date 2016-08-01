@@ -258,9 +258,10 @@ Farseerfc的小窝            </a>
 <li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
 <li><a class="reference internal" href="#id9" id="id20">有些包没有依赖关系</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
+<li><a class="reference internal" href="#pacman-qtd" id="id22">pacman -Qtd 不能找到带有循环依赖的孤儿包</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id10" id="id22">PacVis 的未来</a></li>
+<li><a class="reference internal" href="#id10" id="id23">PacVis 的未来</a></li>
 </ul>
 </div>
                         </div>
@@ -431,6 +432,17 @@ PacVis 刚打开的样子</div>
 <p>按照提示说的，接下来打开浏览器访问 <a class="reference external" href="http://localhost:8888/">http://localhost:8888/</a> 就能看到 PacVis
 的样子了。仅仅作为尝试也可以直接打开跑在我的服务器上的 demo:
 <a class="reference external" href="https://pacvis.farseerfc.me/">https://pacvis.farseerfc.me/</a> ，这个作为最小安装的服务器载入速度大概比普通的桌面系统快一点。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+在 Windows msys2 跑 PacVis</div>
+<div class="panel-body">
+<img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-msys2.png"/>
+</div>
+</div>
+<p>另外补充一下，因为 PacVis 只依赖 pyalpm 和 tornado ，所以在别的基于 pacman
+的系统上跑它应该也没有任何问题，包括
+<a class="reference external" href="https://msys2.github.io/">Windows 上的 msys2</a> 里（尽管在 msys2 上编译
+tornado 的包可能要花些功夫）。</p>
 </div>
 <div class="section" id="id5">
 <h2><a class="toc-backref" href="#id16">PacVis 的图例和用法</a></h2>
@@ -536,9 +548,24 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 Linux 位于整个图中的最底端，因为它的安装脚本依赖 mkinitcpio
 而后者依赖了系统中的众多组件。</p>
 </div>
+<div class="section" id="pacman-qtd">
+<h3><a class="toc-backref" href="#id22">pacman -Qtd 不能找到带有循环依赖的孤儿包</a></h3>
+<div class="figure">
+<img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/>
+<p class="caption">msys2 中带有循环依赖的孤儿包</p>
+</div>
+<p>这是我在 msys2 上测试 PacVis 的时候发现的，我看到在渲染的图中有一片群岛，
+没有连上任何手动安装的包。这种情况很不正常，因为我一直在我的所有系统中跑
+<code class="code">
+pacman -Qtd</code>
+ 找出孤儿包并删掉他们。放大之后我发现这些包中有一条循环依赖，
+这说明 <code class="code">
+pacman -Qtd</code>
+ 不能像语言的垃圾回收机制那样找出有循环依赖的孤儿包。</p>
+</div>
 </div>
 <div class="section" id="id10">
-<h2><a class="toc-backref" href="#id22">PacVis 的未来</a></h2>
+<h2><a class="toc-backref" href="#id23">PacVis 的未来</a></h2>
 <p>目前的 PacVis 基本上是我最初开始做的时候设想的样子，随着开发逐渐又增加了不少功能。
 一些是迫于布局算法的性能而增加的（比如限制层数）。</p>
 <p>今后准备再加入以下这些特性：</p>
@@ -1050,9 +1077,10 @@ provides</code>
 <li><a class="reference internal" href="#id8" id="id19">循环依赖</a></li>
 <li><a class="reference internal" href="#id9" id="id20">有些包没有依赖关系</a></li>
 <li><a class="reference internal" href="#linux" id="id21">只看依赖关系的话 Linux 内核完全不重要</a></li>
+<li><a class="reference internal" href="#pacman-qtd" id="id22">pacman -Qtd 不能找到带有循环依赖的孤儿包</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id10" id="id22">PacVis 的未来</a></li>
+<li><a class="reference internal" href="#id10" id="id23">PacVis 的未来</a></li>
 </ul>
 </div>
             </div>

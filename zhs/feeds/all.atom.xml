@@ -165,6 +165,17 @@ PacVis 刚打开的样子&lt;/div&gt;
 &lt;p&gt;按照提示说的，接下来打开浏览器访问 &lt;a class="reference external" href="http://localhost:8888/"&gt;http://localhost:8888/&lt;/a&gt; 就能看到 PacVis
 的样子了。仅仅作为尝试也可以直接打开跑在我的服务器上的 demo:
 &lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; ，这个作为最小安装的服务器载入速度大概比普通的桌面系统快一点。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+在 Windows msys2 跑 PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-msys2.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;另外补充一下，因为 PacVis 只依赖 pyalpm 和 tornado ，所以在别的基于 pacman
+的系统上跑它应该也没有任何问题，包括
+&lt;a class="reference external" href="https://msys2.github.io/"&gt;Windows 上的 msys2&lt;/a&gt; 里（尽管在 msys2 上编译
+tornado 的包可能要花些功夫）。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;PacVis 的图例和用法&lt;/a&gt;&lt;/h2&gt;
@@ -270,9 +281,24 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 Linux 位于整个图中的最底端，因为它的安装脚本依赖 mkinitcpio
 而后者依赖了系统中的众多组件。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="pacman-qtd"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id22"&gt;pacman -Qtd 不能找到带有循环依赖的孤儿包&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;msys2 中带有循环依赖的孤儿包&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;这是我在 msys2 上测试 PacVis 的时候发现的，我看到在渲染的图中有一片群岛，
+没有连上任何手动安装的包。这种情况很不正常，因为我一直在我的所有系统中跑
+&lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 找出孤儿包并删掉他们。放大之后我发现这些包中有一条循环依赖，
+这说明 &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 不能像语言的垃圾回收机制那样找出有循环依赖的孤儿包。&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id10"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;PacVis 的未来&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;PacVis 的未来&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;目前的 PacVis 基本上是我最初开始做的时候设想的样子，随着开发逐渐又增加了不少功能。
 一些是迫于布局算法的性能而增加的（比如限制层数）。&lt;/p&gt;
 &lt;p&gt;今后准备再加入以下这些特性：&lt;/p&gt;
@@ -302,7 +328,7 @@ PacVis&lt;/div&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Motivation for PacVis&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I must admit that I love Arch Linux, largely because Arch Linux made me feel
 like I really &lt;strong&gt;own&lt;/strong&gt; the whole system. In my Arch Linux system, I know clearly
-each package that I have installed and why I installed it. I can find which
+every package I have installed and why I installed it. I can find which
 package brings in a give file. A Debian/Fedora/openSUSE user with enough experience
 may achieve this with their favorite package manager too, but they must overcome
 a much higher complexity with their distro's fine-grinding packaging strategy.
@@ -324,22 +350,23 @@ group. And that's basically all you will get after the install. The initial
 system has nearly nothing. Everything you need will be installed afterwards,
 manually by using &lt;code class="code"&gt;
 pacman&lt;/code&gt;
-. It is nothing unnecessary, only for &lt;strong&gt;your&lt;/strong&gt; need.&lt;/p&gt;
+. It is nothing unnecessary, only for
+&lt;strong&gt;your&lt;/strong&gt; own need.&lt;/p&gt;
 &lt;p&gt;But after using the system for a long time, there are unavoidably some packages
 inside the system which are installed and used for awhile and abandoned.
 They are like the old furnitures inside your house, taking space and covered by
-ash. We have &lt;code class="code"&gt;
+dusts. We have &lt;code class="code"&gt;
 pacman -Qtd&lt;/code&gt;
- to help you find all packages that are
-&lt;strong&gt;installed as dependency for other packages once but not needed for now&lt;/strong&gt;
-, but for those manually installed packages, we have no good tool but manually
+ to help you find all orphan packages, namely
+those &lt;strong&gt;installed as dependency for other packages once but not needed for now&lt;/strong&gt;
+, but for manually installed packages, we have no good tool but manually
 checking them one by one.&lt;/p&gt;
 &lt;p&gt;So I was looking for a tool to help me understand the relations in my system.
 In particular, I want a tool to help me do these things:&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt;Find the packages that I installed manually but not needed now&lt;/li&gt;
+&lt;li&gt;Find packages that I installed manually but not needed now&lt;/li&gt;
 &lt;li&gt;Find those large and space-consuming packages&lt;/li&gt;
-&lt;li&gt;Understand th relationship between packages&lt;/li&gt;
+&lt;li&gt;Understand the relationships between packages&lt;/li&gt;
 &lt;/ol&gt;
 &lt;div class="figure"&gt;
 &lt;img alt="Android System Architecture" class="img-responsive" src="//farseerfc.me/zhs/images/Android-System-Architecture.jpg"/&gt;
@@ -348,10 +375,11 @@ In particular, I want a tool to help me do these things:&lt;/p&gt;
 &lt;p&gt;About the last thing "relations between packages", I once saw the diagram of
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Architecture_of_OS_X"&gt;macOS Architecture&lt;/a&gt;
 and Android System Architecture, and I was impressed by the layered hierarchy
-in these diagrams. I was wondering since then that &lt;em&gt;is it possible to draw a
+in these diagrams. I was wondering since then, &lt;em&gt;is it possible to draw a
 similar layered architecture diagram for modern Linux desktop&lt;/em&gt; ?
-Or will it be much different? I can find hierarchy diagram for Linux kernel or
-Xorg graphic stack on Wikipedia or other sites, but I don't know such a diagram
+Or &lt;em&gt;will a Linux desktop be much different&lt;/em&gt;?
+I can find out hierarchy diagrams for Linux kernel or
+Xorg graphic stack on Wikipedia or other sites, but I don't know such diagrams
 for the whole distribution. And further I thought, can I &lt;em&gt;draw such diagram from
 the dependency relationships between packages automatically&lt;/em&gt;?&lt;/p&gt;
 &lt;/div&gt;
@@ -478,6 +506,17 @@ see PacVis's result of your own system. As a demonstration you can also visit
 PacVis on my Arch Linux server :
 &lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; . It is showing a minimal server setup, that might
 load and layout faster than a normal desktop system.&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis on Windows msys2&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-msys2.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;As a side note, pacvis only depends on pyalpm and tornado, so there should be
+no problem running it on other pacman-based systems, including
+&lt;a class="reference external" href="https://msys2.github.io/"&gt;msys2 on Windows&lt;/a&gt; (altough building a msys2
+python-tornado may take some non-trival effort).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-legend-and-usage-of-pacvis"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;The legend and usage of PacVis&lt;/a&gt;&lt;/h2&gt;
@@ -554,7 +593,7 @@ Besides that, I will give some more examples below.&lt;/p&gt;
 &lt;li&gt;chromium etc. GUI Applications&lt;/li&gt;
 &lt;li&gt;Plasma/Gnome etc. Desktop environments&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;This largely suit my overall understanding, but some details are interesting to
+&lt;p&gt;This largely meet my overall understanding, but some details are interesting to
 me. For example, zsh dependes on gdbm which in-turn depends on bash, which means
 that you can not get rid of bash even if you only use zsh.
 For another example, python package (which is python3 in Arch Linux) and
@@ -608,9 +647,26 @@ graph. On my demo server the Linux package is even located on the most bottom
 level because it depends on mkinitcpio which in-turn depend on many components
 in the system.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="pacman-qtd-cannot-find-orphan-packages-with-circle-dependency"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id13"&gt;pacman -Qtd cannot find orphan packages with circle dependency&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;msys2 packages with circle dependency&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;I saw an archipelago of packages from mingw repo when testing PacVis on msys2.
+To my surprise, they don't connected to any manually installed packages,
+something strange as I routinely run &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ and remove the results on
+all my systems. After zoomed in I found that they contained a circle dependency
+which indicated &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ cannot find these orphan packages,
+not like a GC algorithm.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-future-of-pacvis"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;The future of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;The future of PacVis&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Currently PacVis is what I planned to make, with some features added during
 the development. Some of these added features are related to the poor
 performance of the layout algorithm (e.g. limiting the max level).&lt;/p&gt;
@@ -800,6 +856,17 @@ PacVis 剛打開的樣子&lt;/div&gt;
 &lt;p&gt;按照提示說的，接下來打開瀏覽器訪問 &lt;a class="reference external" href="http://localhost:8888/"&gt;http://localhost:8888/&lt;/a&gt; 就能看到 PacVis
 的樣子了。僅僅作爲嘗試也可以直接打開跑在我的服務器上的 demo:
 &lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; ，這個作爲最小安裝的服務器載入速度大概比普通的桌面系統快一點。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+在 Windows msys2 跑 PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-msys2.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;另外補充一下，因爲 PacVis 只依賴 pyalpm 和 tornado ，所以在別的基於 pacman
+的系統上跑它應該也沒有任何問題，包括
+&lt;a class="reference external" href="https://msys2.github.io/"&gt;Windows 上的 msys2&lt;/a&gt; 裏（儘管在 msys2 上編譯
+tornado 的包可能要花些功夫）。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id5"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;PacVis 的圖例和用法&lt;/a&gt;&lt;/h2&gt;
@@ -905,9 +972,24 @@ man-pages 和 licenses 。這些包在圖中位於最頂端，拓撲層級是 0 
 Linux 位於整個圖中的最底端，因爲它的安裝腳本依賴 mkinitcpio
 而後者依賴了系統中的衆多組件。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="pacman-qtd"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id22"&gt;pacman -Qtd 不能找到帶有循環依賴的孤兒包&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;msys2 中帶有循環依賴的孤兒包&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;這是我在 msys2 上測試 PacVis 的時候發現的，我看到在渲染的圖中有一片羣島，
+沒有連上任何手動安裝的包。這種情況很不正常，因爲我一直在我的所有系統中跑
+&lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 找出孤兒包並刪掉他們。放大之後我發現這些包中有一條循環依賴，
+這說明 &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ 不能像語言的垃圾回收機制那樣找出有循環依賴的孤兒包。&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id10"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;PacVis 的未來&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;PacVis 的未來&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;目前的 PacVis 基本上是我最初開始做的時候設想的樣子，隨着開發逐漸又增加了不少功能。
 一些是迫於佈局算法的性能而增加的（比如限制層數）。&lt;/p&gt;
 &lt;p&gt;今後準備再加入以下這些特性：&lt;/p&gt;

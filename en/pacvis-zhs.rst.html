@@ -178,6 +178,16 @@ pacgraph 还支持通过参数指定只绘制个别包的依赖关系，就像 p
 的样子了。仅仅作为尝试也可以直接打开跑在我的服务器上的 demo:
 https://pacvis.farseerfc.me/ ，这个作为最小安装的服务器载入速度大概比普通的桌面系统快一点。
 
+<span class="p">..</span> <span class="ow">panel-default</span><span class="p">::</span>
+  <span class="nc">:title:</span> <span class="nf">在 Windows msys2 跑 PacVis</span>
+
+<span class="p">  ..</span> <span class="ow">image</span><span class="p">::</span> {filename}/images/pacvis-msys2.png
+      <span class="nc">:alt:</span> <span class="nf">PacVis on Windows msys2</span>
+
+另外补充一下，因为 PacVis 只依赖 pyalpm 和 tornado ，所以在别的基于 pacman
+的系统上跑它应该也没有任何问题，包括
+<span class="s">`Windows 上的 msys2 </span><span class="si">&lt;https://msys2.github.io/&gt;</span><span class="s">`_</span> 里（尽管在 msys2 上编译
+tornado 的包可能要花些功夫）。
 
 <span class="gh">PacVis 的图例和用法</span>
 <span class="gh">----------------------------------------</span>
@@ -313,6 +323,24 @@ man-pages 和 licenses 。这些包在图中位于最顶端，拓扑层级是 0 
 发行版的中心，而 Linux 则是位于依赖层次中很深的位置，甚至在我的 demo 服务器上
 Linux 位于整个图中的最底端，因为它的安装脚本依赖 mkinitcpio
 而后者依赖了系统中的众多组件。
+
+
+
+<span class="gh">pacman -Qtd 不能找到带有循环依赖的孤儿包</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-circledeps-Qtd.png
+  <span class="nc">:alt:</span> <span class="nf">pacman -Qtd cannot find packages with circle dependency</span>
+  <span class="nc">:width:</span> <span class="nf">45%</span>
+
+  msys2 中带有循环依赖的孤儿包
+
+
+这是我在 msys2 上测试 PacVis 的时候发现的，我看到在渲染的图中有一片群岛，
+没有连上任何手动安装的包。这种情况很不正常，因为我一直在我的所有系统中跑
+<span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> 找出孤儿包并删掉他们。放大之后我发现这些包中有一条循环依赖，
+这说明 <span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> 不能像语言的垃圾回收机制那样找出有循环依赖的孤儿包。
+
 
 <span class="gh">PacVis 的未来</span>
 <span class="gh">----------------------------------------</span>

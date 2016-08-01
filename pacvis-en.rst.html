@@ -19,7 +19,7 @@
 
 I must admit that I love Arch Linux, largely because Arch Linux made me feel
 like I really <span class="gs">**own**</span> the whole system. In my Arch Linux system, I know clearly
-each package that I have installed and why I installed it. I can find which
+every package I have installed and why I installed it. I can find which
 package brings in a give file. A Debian/Fedora/openSUSE user with enough experience
 may achieve this with their favorite package manager too, but they must overcome
 a much higher complexity with their distro&#39;s fine-grinding packaging strategy.
@@ -34,22 +34,23 @@ step in the installation guide on ArchWiki is a command
 and call <span class="na">:code:</span><span class="nv">`pacman -S base`</span> inside that root to install the whole base
 group. And that&#39;s basically all you will get after the install. The initial
 system has nearly nothing. Everything you need will be installed afterwards,
-manually by using <span class="na">:code:</span><span class="nv">`pacman`</span>. It is nothing unnecessary, only for <span class="gs">**your**</span> need.
+manually by using <span class="na">:code:</span><span class="nv">`pacman`</span>. It is nothing unnecessary, only for
+<span class="gs">**your**</span> own need.
 
 But after using the system for a long time, there are unavoidably some packages
 inside the system which are installed and used for awhile and abandoned.
 They are like the old furnitures inside your house, taking space and covered by
-ash. We have <span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> to help you find all packages that are
-<span class="gs">**installed as dependency for other packages once but not needed for now**</span>
-, but for those manually installed packages, we have no good tool but manually
+dusts. We have <span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> to help you find all orphan packages, namely
+those <span class="gs">**installed as dependency for other packages once but not needed for now**</span>
+, but for manually installed packages, we have no good tool but manually
 checking them one by one.
 
 So I was looking for a tool to help me understand the relations in my system.
 In particular, I want a tool to help me do these things:
 
-<span class="m">#.</span> Find the packages that I installed manually but not needed now
+<span class="m">#.</span> Find packages that I installed manually but not needed now
 <span class="m">#.</span> Find those large and space-consuming packages
-<span class="m">#.</span> Understand th relationship between packages
+<span class="m">#.</span> Understand the relationships between packages
 
 
 <span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/Android-System-Architecture.jpg
@@ -60,10 +61,11 @@ In particular, I want a tool to help me do these things:
 About the last thing &quot;relations between packages&quot;, I once saw the diagram of
 <span class="s">`macOS Architecture </span><span class="si">&lt;https://en.wikipedia.org/wiki/Architecture_of_OS_X&gt;</span><span class="s">`_</span>
 and Android System Architecture, and I was impressed by the layered hierarchy
-in these diagrams. I was wondering since then that *is it possible to draw a
+in these diagrams. I was wondering since then, *is it possible to draw a
 similar layered architecture diagram for modern Linux desktop* ?
-Or will it be much different? I can find hierarchy diagram for Linux kernel or
-Xorg graphic stack on Wikipedia or other sites, but I don&#39;t know such a diagram
+Or <span class="ge">*will a Linux desktop be much different*</span>?
+I can find out hierarchy diagrams for Linux kernel or
+Xorg graphic stack on Wikipedia or other sites, but I don&#39;t know such diagrams
 for the whole distribution. And further I thought, can I *draw such diagram from
 the dependency relationships between packages automatically*?
 
@@ -203,6 +205,16 @@ PacVis on my Arch Linux server :
 https://pacvis.farseerfc.me/ . It is showing a minimal server setup, that might
 load and layout faster than a normal desktop system.
 
+<span class="p">..</span> <span class="ow">panel-default</span><span class="p">::</span>
+  <span class="nc">:title:</span> <span class="nf">PacVis on Windows msys2</span>
+
+<span class="p">  ..</span> <span class="ow">image</span><span class="p">::</span> {filename}/images/pacvis-msys2.png
+      <span class="nc">:alt:</span> <span class="nf">PacVis on Windows msys2</span>
+
+As a side note, pacvis only depends on pyalpm and tornado, so there should be
+no problem running it on other pacman-based systems, including 
+<span class="s">`msys2 on Windows </span><span class="si">&lt;https://msys2.github.io/&gt;</span><span class="s">`_</span> (altough building a msys2
+python-tornado may take some non-trival effort).
 
 <span class="gh">The legend and usage of PacVis</span>
 <span class="gh">----------------------------------------</span>
@@ -293,7 +305,7 @@ The packages in the system is clearly divided into several layers:
 <span class="m">*</span> chromium etc. GUI Applications
 <span class="m">*</span> Plasma/Gnome etc. Desktop environments
 
-This largely suit my overall understanding, but some details are interesting to
+This largely meet my overall understanding, but some details are interesting to
 me. For example, zsh dependes on gdbm which in-turn depends on bash, which means
 that you can not get rid of bash even if you only use zsh.
 For another example, python package (which is python3 in Arch Linux) and
@@ -361,6 +373,23 @@ graph. On my demo server the Linux package is even located on the most bottom
 level because it depends on mkinitcpio which in-turn depend on many components
 in the system.
 
+
+<span class="gh">pacman -Qtd cannot find orphan packages with circle dependency</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/pacvis-circledeps-Qtd.png
+  <span class="nc">:alt:</span> <span class="nf">pacman -Qtd cannot find packages with circle dependency</span>
+  <span class="nc">:width:</span> <span class="nf">45%</span>
+
+  msys2 packages with circle dependency
+
+
+I saw an archipelago of packages from mingw repo when testing PacVis on msys2.
+To my surprise, they don&#39;t connected to any manually installed packages, 
+something strange as I routinely run <span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> and remove the results on
+all my systems. After zoomed in I found that they contained a circle dependency
+which indicated <span class="na">:code:</span><span class="nv">`pacman -Qtd`</span> cannot find these orphan packages,
+not like a GC algorithm.
 
 <span class="gh">The future of PacVis</span>
 <span class="gh">----------------------------------------</span>
