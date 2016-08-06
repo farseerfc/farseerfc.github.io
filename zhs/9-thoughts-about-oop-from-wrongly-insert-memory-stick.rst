@@ -4,6 +4,7 @@
 :slug: 9-thoughts-about-oop-from-wrongly-insert-memory-stick
 :lang: zhs
 :tags: oop
+:issueid: 11
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

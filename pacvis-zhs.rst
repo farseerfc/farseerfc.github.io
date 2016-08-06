@@ -5,6 +5,7 @@ PacVis: 可视化 pacman 本地数据库
 :lang: zhs
 :date: 2016-07-31 03:52
 :tags: python, pacvis, pacman, arch, linux, pacgraph
+:issueid: 50
 
 .. contents::
 

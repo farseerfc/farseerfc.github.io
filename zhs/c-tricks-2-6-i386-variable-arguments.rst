@@ -6,6 +6,7 @@ C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments)
 :tags: C++
 :series: CPP_Tricks
 :series_index: 09
+:issueid: 22
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

@@ -5,6 +5,7 @@ PyRuby
 :lang: zhs
 :date: 2012-03-02 23:09
 :tags: python, ruby
+:issueid: 42
 
 今天在GitHub上闲逛的时候看到一个叫做 `PyRuby <https://github.com/danielfm/pyruby>`_ 的项目。项目的Readme说得很好：
 

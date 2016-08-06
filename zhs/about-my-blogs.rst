@@ -3,6 +3,7 @@
 :date: 2011-09-27 02:35
 :slug: about-my-blogs
 :lang: zhs
+:issueid: 13
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

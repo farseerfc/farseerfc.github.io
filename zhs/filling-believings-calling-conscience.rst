@@ -3,6 +3,7 @@
 :date: 2006-08-07 21:36
 :slug: filling-believings-calling-conscience
 :lang: zhs
+:issueid: 27
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

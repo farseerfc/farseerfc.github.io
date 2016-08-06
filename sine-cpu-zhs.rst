@@ -5,6 +5,7 @@
 :lang: zhs
 :date: 2008-06-02 23:27
 :tags: java, microsoft
+:issueid: 30
 
 导入自
 `renren <http://blog.renren.com/blog/230263946/298871889>`_

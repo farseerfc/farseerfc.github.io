@@ -6,6 +6,7 @@ C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&&,||)与运算符重载的�
 :tags: C++
 :series: CPP_Tricks
 :series_index: 03
+:issueid: 16
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

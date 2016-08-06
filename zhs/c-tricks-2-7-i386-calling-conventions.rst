@@ -6,6 +6,7 @@ C++ Tricks 2.7 I386平台的其它函数调用模型
 :tags: C++
 :series: CPP_Tricks
 :series_index: 10
+:issueid: 23
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

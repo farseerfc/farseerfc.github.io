@@ -6,6 +6,7 @@ C++ Tricks 2.2 I386平台的内存布局
 :tags: C++
 :series: CPP_Tricks
 :series_index: 05
+:issueid: 18
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

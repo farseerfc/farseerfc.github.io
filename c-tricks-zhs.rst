@@ -6,6 +6,7 @@ C++ Tricks
 :tags: C++
 :series: CPP_Tricks
 :series_index: 01
+:issueid: 26
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

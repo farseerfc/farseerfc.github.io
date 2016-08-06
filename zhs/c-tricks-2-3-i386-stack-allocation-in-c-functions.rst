@@ -6,6 +6,7 @@ C++ Tricks 2.3 I386平台C函数内部的栈分配
 :tags: C++
 :series: CPP_Tricks
 :series_index: 06
+:issueid: 19
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 

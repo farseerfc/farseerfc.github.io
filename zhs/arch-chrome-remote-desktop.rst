@@ -5,6 +5,7 @@ archlinux 上用 chrome 实现 :del:`透明计算` 远程登录
 :lang: zhs
 :date: 2015-02-13 20:39
 :tags: linux, archlinux, arch, chrome, remote, desktop
+:issueid: 33
 
 .. contents::
 

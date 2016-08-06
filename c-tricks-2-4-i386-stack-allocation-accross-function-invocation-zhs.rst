@@ -6,6 +6,7 @@ C++ Tricks 2.4 I386平台C函数调用边界的栈分配
 :tags: C++
 :series: CPP_Tricks
 :series_index: 07
+:issueid: 20
 
 从 `farseerfc.wordpress.com <http://farseerfc.wordpress.com/>`_ 导入
 
