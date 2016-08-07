@@ -19,18 +19,18 @@
 一个限制是要求评论者必须有 GitHub
 账户，考虑到我的博客的受众这个要求估计不算太过分。
 使用 GitHub Issue 的好处么，比如自带的 GFMD
-副文本格式，邮件通知，还能订阅和取消订阅通知，邮件回复，
+富文本格式，邮件通知，还有订阅和取消订阅通知，邮件回复，
 这些方面都不比第三方留言系统逊色。
 
-换用 GitHub Issue 另一方面是最近听说 Disqus 被部分墙了，想必以后墙也会越来越
-高。之前曾经试过在这个博客换上多说，然而效果我并不喜欢，多说喜欢侵入页面加
-很多奇怪的东西，比如用户的头像通常是 http 的……
-也试过结合新浪微博的评论，而新浪微博越来越封闭，API 也越来越不靠谱。
+换用 GitHub Issue 另一方面原因是最近听说 Disqus
+被部分墙了，想必以后墙也会越来越高。之前曾经试过在这个博客换上多说，
+然而效果我并不喜欢，多说喜欢侵入页面加很多奇怪的东西，比如用户的头像通常是
+http 的……也试过结合新浪微博的评论，而新浪微博越来越封闭，API 也越来越不靠谱。
 
 使用 GitHub Issue 作为评论的方式比较简单，上面那篇博客里面提到了，代码量不比
 加载 Disqus 多多少，而且没有了 iframe 的困扰，唯一麻烦的地方就是要稍微设计一下布局方式让它融入
 现有的页面布局。
-`我参考上面的实现在这里 <https://github.com/farseerfc/pelican-bootstrap3/blob/master/templates/includes/comments.html#L32>`_ 。
+`我参考上面的实现在这里 <https://github.com/farseerfc/pelican-bootstrap3/blob/2ea6c9f3227275fe86ddaa75d8fc6496b3b03d8c/templates/includes/comments.html#L32>`_ 。
 这个加载代码使用两个变量加载 Issue Comments ，一个是在 pelicanconf.py 里的
 :code:`GITHUB_REPO` ，可以指向任何 Repo ，我指向 farseerfc/farseerfc.github.io
 的这个 GitHub Page repo ，另一个变量是每篇文章里需要加上 :code:`issueid`
