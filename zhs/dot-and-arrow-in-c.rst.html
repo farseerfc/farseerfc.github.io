@@ -1,0 +1,101 @@
+<div class="highlight"><pre><span></span><span class="gh">C语言中“.”与“-&gt;”有什么区别？</span>
+<span class="gh">==================================</span>
+
+<span class="nc">:date:</span> <span class="nf">2016-08-08 00:02</span>
+<span class="nc">:slug:</span> <span class="nf">dot-and-arrow-in-c</span>
+<span class="nc">:lang:</span> <span class="nf">zhs</span>
+<span class="nc">:tags:</span> <span class="nf">C, zhihu</span>
+<span class="nc">:issueid:</span> <span class="nf">62</span>
+
+
+从 <span class="s">`知乎 </span><span class="si">&lt;https://www.zhihu.com/question/49164544/answer/114584541&gt;</span><span class="s">`_</span> 转载
+
+转载几篇知乎上我自己的回答，因为不喜欢知乎的排版，所以在博客里重新排版一遍。
+
+<span class="gh">原问题：C语言中“.”与“-&gt;”有什么区别？</span>
+<span class="gh">----------------------------------------------------------</span>
+
+除了表达形式有些不同，功能可以说完全一样阿。那为何又要构造两个功能一样的运算符？ 效率有差异？可是现在编译器优化都那么强了，如果真是这样岂不是有些多此一举 
+
+
+-----------------------------------------------
+
+
+刚刚翻了下书，说早期的C实现无法用结构直接当作参数在函数间传递，只能用指向结构的指针在函数间进行传递！我想这应该也是最直观的原因吧。
+
+<span class="gh">我的回答</span>
+<span class="gh">----------------------------------------------------------</span>
+
+首先 <span class="na">:code:</span><span class="nv">`a-&gt;b`</span> 的含义是 <span class="na">:code:</span><span class="nv">`(*a).b`</span> ，所以他们是不同的，不过的确 <span class="na">:code:</span><span class="nv">`-&gt;`</span> 可以用 <span class="na">:code:</span><span class="nv">`*`</span> 和 <span class="na">:code:</span><span class="nv">`.`</span> 实现，不需要单独一个运算符。
+嗯，我这是说现代的标准化的 C 语义上来说， <span class="na">:code:</span><span class="nv">`-&gt;`</span> 可以用 <span class="na">:code:</span><span class="nv">`*`</span> 和 <span class="na">:code:</span><span class="nv">`.`</span> 的组合实现。
+
+早期的 C 有一段时间的语义和现代的 C 的语义不太一样。
+
+稍微有点汇编的基础的同学可能知道，在机器码和汇编的角度来看，不存在变量，不存在 struct 这种东西，只存在寄存器和一个叫做内存的大数组。
+
+所以变量，是 C 对内存地址的一个抽象，它代表了一个位置。举个例子，C 里面我们写：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+
+其实在汇编的角度来看更像是
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="o">*</span><span class="n">A</span> <span class="o">=</span> <span class="o">*</span><span class="n">B</span>
+
+其中 A 和 B 各是两个内存地址，是指针。
+
+好，以上是基本背景。
+
+基于这个背景我们讨论一下 struct 是什么，以及 struct 的成员是什么。
+假设我们有 
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="k">struct</span> <span class="n">Point</span> <span class="p">{</span>
+		<span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+		<span class="kt">int</span> <span class="n">y</span><span class="p">;</span>
+	<span class="p">};</span>
+	<span class="k">struct</span> <span class="n">Point</span> <span class="n">p</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">Point</span> <span class="o">*</span><span class="n">pp</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">;</span>
+
+从现代语义上讲 <span class="na">:code:</span><span class="nv">`p`</span> 就是一个结构体对象， <span class="na">:code:</span><span class="nv">`x`</span> 和 <span class="na">:code:</span><span class="nv">`y`</span> 各是其成员，嗯。
+
+从汇编的语义上讲， <span class="na">:code:</span><span class="nv">`p`</span>是一个不完整的地址，或者说，半个地址，再或者说，一个指向的东西是虚构出来的地址。而 <span class="na">:code:</span><span class="nv">`x`</span> 和 <span class="na">:code:</span><span class="nv">`y`</span> 各是在 Point 结构中的地址偏移量。也就是说，必须有 <span class="na">:code:</span><span class="nv">`p`</span> 和 <span class="na">:code:</span><span class="nv">`x`</span> 或者 <span class="na">:code:</span><span class="nv">`p`</span> 和 <span class="na">:code:</span><span class="nv">`y`</span> 同时出现，才形成一个完整的地址，单独的一个 <span class="na">:code:</span><span class="nv">`p`</span> 没有意义。
+
+早期的 C 就是在这样的模型上建立的。所以对早期的 C 而言， <span class="na">:code:</span><span class="nv">`*pp`</span> 没有意义，你取得了一个 struct ，而这个 struct 不能塞在任何一个寄存器里，编译器和 CPU 都无法表达这个东西。
+
+这时候只有 <span class="na">:code:</span><span class="nv">`p.x`</span> 和 <span class="na">:code:</span><span class="nv">`p.y`</span> 有意义，它们有真实的地址。
+
+早期的 C 就是这样一个看起来怪异的语义，而它更贴近机器的表达。
+所以对早期的 C 而言，以下的代码是对的：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="o">*</span><span class="n">a</span><span class="p">;</span>
+	<span class="n">a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+
+而以下代码是错的：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="p">(</span><span class="o">*</span><span class="n">pp</span><span class="p">).</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+因为作为这个赋值的目标地址表达式的一部分， <span class="na">:code:</span><span class="nv">`*pp`</span> ，这个中间结果没法直译到机器码。
+
+所以对早期的 C 而言，对 pp 解引用的操作，必须和取成员的偏移的操作，这两者紧密结合起来变成一个单独的操作，其结果才有意义。
+
+所以早期的 C 就发明了 -&gt; ，表示这两个操作紧密结合的操作。于是才能写：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">C</span>
+
+	<span class="n">pp</span><span class="o">-&gt;</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+嗯，这就是它存在的历史原因。
+而这个历史原因现在已经不重要了，现代的符合标准的 C 编译器都知道 <span class="na">:code:</span><span class="nv">`(*pp).x`</span> 和 <span class="na">:code:</span><span class="nv">`pp-&gt;x`</span> 是等价的了。
+
+说句题外话， C++ 里面还发明了 <span class="na">:code:</span><span class="nv">`.*`</span> 和 <span class="na">:code:</span><span class="nv">`-&gt;*`</span> 这两个运算符（注意 <span class="na">:code:</span><span class="nv">`-&gt;*`</span> 不是单独的 <span class="na">:code:</span><span class="nv">`-&gt;`</span> 和 <span class="na">:code:</span><span class="nv">`*`</span> 并排放的意思），关于为什么要发明这两个运算符，而不能直接说 <span class="na">:code:</span><span class="nv">`a -&gt;* b`</span> 的意思就是 <span class="na">:code:</span><span class="nv">`a -&gt;(*b)`</span> ，这个就作为课堂作业吧。
+</pre></div>

@@ -187,6 +187,46 @@ Farseerfc的小窝            </a>
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.3 I386平台C函数内部的栈分配
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            <div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html">简体</a></li><li><a href="//farseerfc.me/zhs/../c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="translate">繁體</a></li></ul>
+</div>
+
+                            <div>
+<small><span><a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-3-i386-stack-allocation-in-c-functions" data-disqus-url="http://farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="i386c">
+<h2>2.3 I386平台C函数内部的栈分配</h2>
+<p>函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。</p>
+<p>为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例：</p>
+<p>void f()</p>
+<p>{</p>
+<p>int a=0; //a的地址被分配为ebp-4</p>
+<p>char c=1; //c的地址被分配为ebp-8</p>
+<p>}</p>
+<p>产生的汇编代码为：</p>
+<p>push ebp ;将ebp压栈</p>
+<p>mov ebp,esp ;ebp=esp 用栈底备份栈顶指针</p>
+<p>sub ...</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
                             <a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.4 I386平台C函数调用边界的栈分配
                             </h2></a>
                         </div>
@@ -559,6 +599,11 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                 </a>
             </li>
             <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/macosx.html">
                     macosx <sup> 1</sup>
                 </a>
@@ -598,7 +643,7 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                     zz <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-1">
+            <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/zhs/tag/linux.html">
                     linux <sup> 6</sup>
                 </a>
@@ -608,9 +653,9 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                     japan <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/writing.html">
-                    writing <sup> 1</sup>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/desktop.html">
+                    desktop <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -658,9 +703,9 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                     msr <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-3">
-                <a href="//farseerfc.me/zhs/tag/desktop.html">
-                    desktop <sup> 2</sup>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -704,8 +749,8 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
-                    cloudflare <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/zhihu.html">
+                    zhihu <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -714,8 +759,8 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/acpi.html">
-                    acpi <sup> 1</sup>
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -790,7 +835,7 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
             </li>
             <li class="list-group-item tag-1">
                 <a href="//farseerfc.me/zhs/tag/c.html">
-                    c <sup> 14</sup>
+                    C <sup> 15</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
@@ -898,7 +943,7 @@ Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如�
       <div class="row">
          <div class="col-md-24">
          <p><small>
-            &copy; 2011 farseerfc
+            &copy; 2016 farseerfc
             &middot; 通过            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
     <!-- Content -->
   <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
