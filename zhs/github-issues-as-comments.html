@@ -276,6 +276,19 @@ issueid</code>
 Accept: application/vnd.github.squirrel-girl-preview</code>
 
 HTTP 头才能拿到。</p>
+<div class="label label-warning">
+<strong>2016年8月7日23:16更新</strong></div>
+<p>感谢 @iovxw 的测试让我发现 github 的高亮回复和邮件回复是需要特殊处理的。
+高亮回复用上了 <a class="reference external" href="https://github.com/sindresorhus/github-markdown-css">这里的 CSS</a>
+邮件引言的展开事件直接用 jQuery 做了：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>    <span class="nx">$</span><span class="p">(</span><span class="s2">".email-hidden-toggle &gt; a"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">){</span></span>
+<span class="code-line">  <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span></span>
+<span class="code-line">  <span class="nx">$</span><span class="p">(</span><span class="s2">".email-hidden-reply"</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">parent</span><span class="p">).</span><span class="nx">toggle</span><span class="p">();</span></span>
+<span class="code-line"><span class="p">});</span></span>
+</pre></div>
+<p>还得注意邮件的回复需要 CSS 里面 <code class="code">
+white-space: pre-wrap</code>
+ 。</p>
 
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
@@ -355,6 +368,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
       }
       $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言于 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
     }
   }
   $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/52/comments", {
