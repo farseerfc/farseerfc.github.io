@@ -27,7 +27,7 @@
 .. panel-default::
 	:title: DebConf 14: Q&A with Linus Torvalds
 
-	.. youtubeku:: 1Mg5_gxNXTo XMTY3NjIzNDU0NA==
+	.. youtubeku:: 1Mg5_gxNXTo XMTY3NjIzNDU0NA
 
 然后接下来就是我承诺的翻译了
 ------------------------------------------------------------
