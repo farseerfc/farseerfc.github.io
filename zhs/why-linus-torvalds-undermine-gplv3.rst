@@ -24,6 +24,11 @@
 	看u2b或者听英语有困难的请留评论，我抽空可以试着翻译一下。
 
 
+.. panel-default::
+	:title: DebConf 14: Q&A with Linus Torvalds
+
+	.. youtubeku:: 1Mg5_gxNXTo&t=47m20s XMTY3NjIzNDU0NA==
+
 然后接下来就是我承诺的翻译了
 ------------------------------------------------------------
 
@@ -53,7 +58,7 @@ L: 什么？
 	I understand why people would want to do them but I think it should have
 	been a completely new license.
 
-L: 哦我讨厌 GPLv3 ，我是在故意贬低它。我实际上觉得 GPLv3 的扩展非常可怕。
+L: 哦我讨厌 GPLv3 ，我是在故意贬低它。实际上我觉得 GPLv3 的扩展非常可怕。
 我能理解为什么人们想要做这个，但是我觉得它本应是一个全新的协议。
 
 	Emm my argument for liking version 2, and I still think version 2 is a
@@ -61,7 +66,7 @@ L: 哦我讨厌 GPLv3 ，我是在故意贬低它。我实际上觉得 GPLv3 的
 	changes back, we are even." Right? That's my take on GPL version 2, right,
 	it's that simple.
 
-嗯我喜欢版本2的那些理由，并且我仍然觉得版本 2 是一个非常棒的协议，
+嗯我喜欢版本 2 的那些理由，并且我仍然觉得版本 2 是一个非常棒的协议，
 理由是：「我给你源代码，你给我你对它的修改，我们就扯平了」
 对吧？这是我用 GPL 版本 2 的理由，就是这么简单。
 
@@ -72,9 +77,9 @@ L: 哦我讨厌 GPLv3 ，我是在故意贬低它。我实际上觉得 GPLv3 的
 	version 2 stood for. And I understand why the FSF did it because I know
 	what the FSF wants.	But to me it's not the same license at all. 
 
-然后版本3的扩展在某些方面让我个人觉得非常不舒服，也就是说「我给你源代码，
+然后版本 3 的扩展在某些方面让我个人觉得非常不舒服，也就是说「我给你源代码，
 这意味着你必须服从我的一些规则，否则你不能把它用在你的设备上。」
-对我来说，这是违反了版本2协议所追求的所有目的。然而我理解为什么 FSF 要这么做，
+对我来说，这是违反了版本 2 协议所追求的所有目的。然而我理解为什么 FSF 要这么做，
 因为我知道 FSF 想要达成什么，但是对我来说这完全是不同的协议了。
 
 	So I was very upset and made it very clear, and this was months before
@@ -92,7 +97,7 @@ L: 哦我讨厌 GPLv3 ，我是在故意贬低它。我实际上觉得 GPLv3 的
 事实上几年之前，那时我就说过：「不，这不可能工作」。
 并且在那个早期的讨论阶段我已经在内核里写好了「嘿，我可没有写过版本 2
 或者更高版本」。所以之后也没有过（争议）……随后版本 3 出来的时候我非常开心，
-因为我早就在大概 5 年前做了预防，之后也就再也没有过关于内核的协议究竟是哪个
+因为我早在大概 5 年前做了预防，之后也就再也没有过关于内核的协议究竟是哪个
 版本的讨论。
 
 	But I actually thought that version 3 is ... Uh, no ... I actually think
@@ -131,9 +136,9 @@ L: 哦我讨厌 GPLv3 ，我是在故意贬低它。我实际上觉得 GPLv3 的
 	the Tivoization part", right. This is ... How many people heard this
 	particular statement from the FSF? (Please raise your hands)
 
-L: 没错，Tivoization 的事情一直是我的主要反对版本 3 的根据。并且，FSF
+L: 没错，Tivoization 的事情一直是我反对版本 3 的主要根据。并且，FSF
 在这件事上表现得极不诚实。「嘿，其实我们允许你无效化 Tivoization 条款」，这样他们试图，
-应该他们明白着欺骗别人，并且说「嘿，这意味着你可以使用除去 Tivoization 部分的 GPLv3」。
+应该说他们是在明白着欺骗别人，并且说「嘿，这意味着你可以使用除去 Tivoization 部分的 GPLv3」。
 这很……在场的诸位中有谁从 FSF 那儿听过这个说法？（请举手）
 
 	Ok, maybe they only tried to convince me with that one.
@@ -162,7 +167,7 @@ GPLv3 写驱动。」然后我就囧了。我的困境在于说「嘿，我给�
 	I overstated that a bit, right. The FSF has a lot of nice people in it,
 	but some of them are bit too extreme.
 
-所以 FSF 是，我是说那时暗地里他们做的那些事情，让我当下决定永远不再和 FSF 有任何瓜葛。
+所以 FSF 是，我是说那时他们暗地里做的那些事情，让我当下决定永远不再和 FSF 有任何瓜葛。
 所以如果你想捐钱给一个行善的组织，那就捐给 EFF 吧。FSF 充满了疯狂难处的人。这只是我的观点。
 呃其实我……嗯……我说得有点过分了。FSF 里有很多不错的人，不过其中有些人有点过激。
 
