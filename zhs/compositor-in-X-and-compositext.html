@@ -18,13 +18,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,wayland,xorg,compositor" />
-        <meta name="description" content="在上篇文章 「桌面系统的混成器简史」 中我介绍了其它桌面系统中的混成器的发展史和工作原理， 话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。 这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 结论 。 原始的 X 的绘图模型 首先，没有混成器的时候 X 是这样画图的： X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 Cairo 绘图， 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的， GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行， 其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图 ..." />
+        <meta name="description" content="在上篇文章 「桌面系统的混成器简史」 中我介绍了其它桌面系统中的混成器的发展史和工作原理， 话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。 这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 结论 。 原始的 X 的绘图模型 首先，没有混成器的时候 X 是这样画图的： System Message: ERROR/3 (/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst, line 23) Error in &#34;ditaa&#34; directive: .. ditaa:: /--------\ +----------+ +----------+ /------\ /--------\ | GTK | Cairo : Internal | | Internal | xlib/xcb : | | | | Window |-------&gt;| PDF |-&gt;| XPM |----------------------&gt;| | |cGRE ..." />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="X 中的混成器与 Composite 扩展"/>
         <meta property="og:url" content="//farseerfc.me/zhs/compositor-in-X-and-compositext.html"/>
-        <meta property="og:description" content="在上篇文章 「桌面系统的混成器简史」 中我介绍了其它桌面系统中的混成器的发展史和工作原理， 话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。 这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 结论 。 原始的 X 的绘图模型 首先，没有混成器的时候 X 是这样画图的： X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 Cairo 绘图， 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的， GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行， 其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图 ..."/>
+        <meta property="og:description" content="在上篇文章 「桌面系统的混成器简史」 中我介绍了其它桌面系统中的混成器的发展史和工作原理， 话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。 这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 结论 。 原始的 X 的绘图模型 首先，没有混成器的时候 X 是这样画图的： System Message: ERROR/3 (/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst, line 23) Error in &#34;ditaa&#34; directive: .. ditaa:: /--------\ +----------+ +----------+ /------\ /--------\ | GTK | Cairo : Internal | | Internal | xlib/xcb : | | | | Window |-------&gt;| PDF |-&gt;| XPM |----------------------&gt;| | |cGRE ..."/>
         <meta property="article:published_time" content="2015-03-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -259,7 +259,34 @@ Farseerfc的小窝            </a>
 <div class="section" id="x">
 <h2><a class="toc-backref" href="#id8">原始的 X 的绘图模型</a></h2>
 <p>首先，没有混成器的时候 X 是这样画图的：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst</tt>, line 23)</p>
+<p>Error in "ditaa" directive: </p>
+<pre class="literal-block">
+.. ditaa::
+
+        /--------\        +----------+  +----------+           /------\    /--------\
+        | GTK    | Cairo  : Internal |  | Internal | xlib/xcb  :      |    |        |
+        | Window |-------&gt;|   PDF    |-&gt;|   XPM    |----------------------&gt;|        |
+        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           |      |    |        |
+        \--------/        +----------+  +----------+           |      |    |        |
+                                                               :      :    |        |
+        /--------\        +----------+  +----------+           | Xorg |    |        |
+        | QT     | QPaint : Internal |  | Internal | xlib/xcb  |      |    |        |
+        | Window |-------&gt;|  Format  |-&gt;|   XPM    |----------------------&gt;| Screen |
+        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           |      |    |        |
+        \--------/        +----------+  +----------+           |      |    |        |
+                                                               :      :    |        |
+        /----------\                                           |      |    |        |
+        | Xlib/XCB |                   xlib/xcb                |      |    |        |
+        | Window   |------------------------------------------------------&gt;|        |
+        |cGRE      |                                           :      |    | cBLU   |
+        \----------/                                           \------/    \--------/
+
+
+
+</pre>
+</div>
 <p>X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 <a class="reference external" href="http://cairographics.org/">Cairo</a> 绘图，
 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
@@ -310,7 +337,39 @@ CreateRegionFromBorderClip</code>
 </ol>
 <p>有了 Composite 扩展，一个 X 程序就可以调用这些 API 实现混成器。
 这里有篇 <a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/">教学解释如何使用 Composite 扩展</a> 。开启了混成的 X 是这样绘图的：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst</tt>, line 92)</p>
+<p>Error in "ditaa" directive: </p>
+<pre class="literal-block">
+.. ditaa::
+
+        /--------\        +----------+  +----------+               /--------------\
+        | GTK    | Cairo  : Internal |  | Internal | xlib/xcb      |  +---------+ |
+        | Window |-------&gt;|   PDF    |-&gt;|   XPM    |-----------------&gt;| XPM {d} | |
+        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           /------|cYEL     | |
+        \--------/        +----------+  +----------+           |   |  +---------+ |
+                                                               |   :              :
+        /--------\        +----------+  +----------+           |   |              |
+        | QT     | QPaint : Internal |  | Internal | xlib/xcb  |   |  +---------+ |
+        | Window |-------&gt;|  Format  |-&gt;|   XPM    |-----------------&gt;| XPM {d} | |
+        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           | /----|cYEL     | |
+        \--------/        +----------+  +----------+           | | |  +---------+ |
+                                                               | | :              |
+        +-------------+             NameWindowPixmap           | | |     Xorg     |
+        | Compositor  |&lt;---------------------------------------/ | |    Server    |   /--------\
+        | Overlay     |&lt;-----------------------------------------/ |              |   |        |
+        | Window      |--------------------------------------------------------------&gt;| Screen |
+        |cGRE         |&lt;-----------------------------------------\ |  XRender/    |   |cBLU    |
+        +-------------+                                          | |  OpenGL      |   \--------/
+                                                                 | :              :
+        /----------\                                             | |  +---------+ |
+        | Xlib/XCB |                   xlib/xcb                  \----| XPM {d} | |
+        | Window   |-------------------------------------------------&gt;|cYEL     | |
+        |cGRE      |                                               |  +---------+ |
+        \----------/                                               \--------------/
+
+</pre>
+</div>
 <p>整个 X 的混成器模型与 Mac OS X 的混成器模型相比，有如下几点显著的区别：</p>
 <ol class="arabic simple">
 <li>混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
@@ -629,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             
 
-<div class="sidebar-item ">
+<div class="sidebar-item hidden-xs">
 <div class="panel panel-default">
 	<div class="panel-heading">
         <h4>
