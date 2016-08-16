@@ -337,54 +337,12 @@ NeXTSTEP 桌面</div>
 <a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript">Display PostScript (DPS)</a>
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
 格式交给窗口管理器，然后窗口管理器再在需要的时候把 PostScript 用软件解释器解释成位图显示在屏幕上。</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst</tt>, line 112)</p>
-<p>Error in "ditaa" directive: </p>
-<pre class="literal-block">
-.. ditaa::
-
-        /--------\          +---------+     Window    +--------+
-        |        |  Render  |  Saved  |     Server    |        |
-        | Window |---------&gt;|   DPS   |--------------&gt;| Screen |
-        |cGRE    |          |cPNK  {d}|               |cBLU    |
-        \--------/          +---------+               +--------+
-
-
-</pre>
-</div>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/>
 <p>比起让窗口直接绘制，这种方案在滚动和移动窗口的时候不需要重新渲染保存好的 DPS ，
 所以能实现实时渲染。到了实现 Mac OS X 的时候，为了同时兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考虑到 Adobe 对苹果收取的高昂的 Display PostScript 授权费，
 Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间又插入了一层抽象：</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst</tt>, line 126)</p>
-<p>Error in "ditaa" directive: </p>
-<pre class="literal-block">
-.. ditaa::
-
-
-        /--------\
-        | Carbon |
-        | Window |----------------------------------------\
-        |cGRE    |           QuickDraw                    |
-        \--------/                                        |
-                                                          v
-        /--------\          +----------+             +----------+      Quartz        +--------+
-        | Cocoa  | Quartz2D : Internal |  Rasterize  | Rendered |    Compositor      |        |
-        | Window |---------&gt;|   PDF    |------------&gt;|  Bitmap  |-------------------&gt;| Screen |
-        |cGRE    |          |cPNK   {d}| (QuartzGL†) |cYEL   {d}| (Quartz Extreme†)  |cBLU    |
-        \--------/          +----------+             +----------+                    +--------+
-                                                          ^
-        /--------\                                        |
-        | OpenGL |            Core OpenGL                 |
-        | Window |----------------------------------------/        † Optional
-        |cGRE    |
-        \--------/
-
-
-
-</pre>
-</div>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/>
 <div class="panel panel-default">
 <div class="panel-heading">
 Mission Control</div>
@@ -494,33 +452,7 @@ Longhorn 中的 Wobbly 效果</div>
 并且跳票推迟多年之后的 Windows Vista 中实现了完整的混成器
 <a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager">Desktop Window Manager (DWM)</a>
 。整个 DWM 的架构和 Mac OS X 上看到的很像：</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst</tt>, line 227)</p>
-<p>Error in "ditaa" directive: </p>
-<pre class="literal-block">
-.. ditaa::
-
-
-        /--------------\
-        | Windows cGRE |
-        | Presentation |----------------------------------\
-        | Foundation   |         DirectX 9                |
-        \--------------/                                  |
-                                          Canonical       v       Desktop
-        /--------\          +----------+   Display   +---------+  Window    +--------+
-        |  GDI+  |  render  : Internal |   Driver    | DirectX |  Manager   |  WDDM  |
-        | Window |---------&gt;|   WMF    |------------&gt;| Surface |-----------&gt;| Screen |
-        |cGRE    |          |cPNK   {d}|             |cYEL  {d}|            |cBLU    |
-        \--------/          +----------+             +---------+            +--------+
-                                                          ^
-        /---------\                                       |
-        | DirectX |                                       |
-        | Window  |---------------------------------------/
-        |cGRE     |              DirectX
-        \---------/
-
-</pre>
-</div>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/>
 <p>和 Mac OS X 的情况类似， Windows Vista 之后的应用程序有两套主要的绘图库，一套是从早期
 Win32API 就沿用至今的 GDI（以及GDI+），另一套是随着 Longhorn 计划开发出的 WPF 。
 WPF 的所有用户界面控件都绘制在 DirectX 贴图上，所以使用了 WPF 的程序也可以看作是

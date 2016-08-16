@@ -7,34 +7,7 @@
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;tt class="docutils"&gt;/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst&lt;/tt&gt;, line 23)&lt;/p&gt;
-&lt;p&gt;Error in "ditaa" directive: &lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. ditaa::
-
-        /--------\        +----------+  +----------+           /------\    /--------\
-        | GTK    | Cairo  : Internal |  | Internal | xlib/xcb  :      |    |        |
-        | Window |-------&amp;gt;|   PDF    |-&amp;gt;|   XPM    |----------------------&amp;gt;|        |
-        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           |      |    |        |
-        \--------/        +----------+  +----------+           |      |    |        |
-                                                               :      :    |        |
-        /--------\        +----------+  +----------+           | Xorg |    |        |
-        | QT     | QPaint : Internal |  | Internal | xlib/xcb  |      |    |        |
-        | Window |-------&amp;gt;|  Format  |-&amp;gt;|   XPM    |----------------------&amp;gt;| Screen |
-        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           |      |    |        |
-        \--------/        +----------+  +----------+           |      |    |        |
-                                                               :      :    |        |
-        /----------\                                           |      |    |        |
-        | Xlib/XCB |                   xlib/xcb                |      |    |        |
-        | Window   |------------------------------------------------------&amp;gt;|        |
-        |cGRE      |                                           :      |    | cBLU   |
-        \----------/                                           \------/    \--------/
-
-
-
-&lt;/pre&gt;
-&lt;/div&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
@@ -85,39 +58,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;/ol&gt;
 &lt;p&gt;有了 Composite 扩展，一个 X 程序就可以调用这些 API 实现混成器。
 这里有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教学解释如何使用 Composite 扩展&lt;/a&gt; 。开启了混成的 X 是这样绘图的：&lt;/p&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;tt class="docutils"&gt;/home/travis/build/farseerfc/farseerfc/content/tech/compositor-in-X-and-compositext.zhs.rst&lt;/tt&gt;, line 92)&lt;/p&gt;
-&lt;p&gt;Error in "ditaa" directive: &lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. ditaa::
-
-        /--------\        +----------+  +----------+               /--------------\
-        | GTK    | Cairo  : Internal |  | Internal | xlib/xcb      |  +---------+ |
-        | Window |-------&amp;gt;|   PDF    |-&amp;gt;|   XPM    |-----------------&amp;gt;| XPM {d} | |
-        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           /------|cYEL     | |
-        \--------/        +----------+  +----------+           |   |  +---------+ |
-                                                               |   :              :
-        /--------\        +----------+  +----------+           |   |              |
-        | QT     | QPaint : Internal |  | Internal | xlib/xcb  |   |  +---------+ |
-        | Window |-------&amp;gt;|  Format  |-&amp;gt;|   XPM    |-----------------&amp;gt;| XPM {d} | |
-        |cGRE    |        |cPNK   {d}|  |cPNK   {d}|           | /----|cYEL     | |
-        \--------/        +----------+  +----------+           | | |  +---------+ |
-                                                               | | :              |
-        +-------------+             NameWindowPixmap           | | |     Xorg     |
-        | Compositor  |&amp;lt;---------------------------------------/ | |    Server    |   /--------\
-        | Overlay     |&amp;lt;-----------------------------------------/ |              |   |        |
-        | Window      |--------------------------------------------------------------&amp;gt;| Screen |
-        |cGRE         |&amp;lt;-----------------------------------------\ |  XRender/    |   |cBLU    |
-        +-------------+                                          | |  OpenGL      |   \--------/
-                                                                 | :              :
-        /----------\                                             | |  +---------+ |
-        | Xlib/XCB |                   xlib/xcb                  \----| XPM {d} | |
-        | Window   |-------------------------------------------------&amp;gt;|cYEL     | |
-        |cGRE      |                                               |  +---------+ |
-        \----------/                                               \--------------/
-
-&lt;/pre&gt;
-&lt;/div&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
 &lt;p&gt;整个 X 的混成器模型与 Mac OS X 的混成器模型相比，有如下几点显著的区别：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
@@ -324,54 +265,12 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
 格式交给窗口管理器，然后窗口管理器再在需要的时候把 PostScript 用软件解释器解释成位图显示在屏幕上。&lt;/p&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;tt class="docutils"&gt;/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst&lt;/tt&gt;, line 112)&lt;/p&gt;
-&lt;p&gt;Error in "ditaa" directive: &lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. ditaa::
-
-        /--------\          +---------+     Window    +--------+
-        |        |  Render  |  Saved  |     Server    |        |
-        | Window |---------&amp;gt;|   DPS   |--------------&amp;gt;| Screen |
-        |cGRE    |          |cPNK  {d}|               |cBLU    |
-        \--------/          +---------+               +--------+
-
-
-&lt;/pre&gt;
-&lt;/div&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/&gt;
 &lt;p&gt;比起让窗口直接绘制，这种方案在滚动和移动窗口的时候不需要重新渲染保存好的 DPS ，
 所以能实现实时渲染。到了实现 Mac OS X 的时候，为了同时兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考虑到 Adobe 对苹果收取的高昂的 Display PostScript 授权费，
 Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间又插入了一层抽象：&lt;/p&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;tt class="docutils"&gt;/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst&lt;/tt&gt;, line 126)&lt;/p&gt;
-&lt;p&gt;Error in "ditaa" directive: &lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. ditaa::
-
-
-        /--------\
-        | Carbon |
-        | Window |----------------------------------------\
-        |cGRE    |           QuickDraw                    |
-        \--------/                                        |
-                                                          v
-        /--------\          +----------+             +----------+      Quartz        +--------+
-        | Cocoa  | Quartz2D : Internal |  Rasterize  | Rendered |    Compositor      |        |
-        | Window |---------&amp;gt;|   PDF    |------------&amp;gt;|  Bitmap  |-------------------&amp;gt;| Screen |
-        |cGRE    |          |cPNK   {d}| (QuartzGL†) |cYEL   {d}| (Quartz Extreme†)  |cBLU    |
-        \--------/          +----------+             +----------+                    +--------+
-                                                          ^
-        /--------\                                        |
-        | OpenGL |            Core OpenGL                 |
-        | Window |----------------------------------------/        † Optional
-        |cGRE    |
-        \--------/
-
-
-
-&lt;/pre&gt;
-&lt;/div&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Mission Control&lt;/div&gt;
@@ -481,33 +380,7 @@ Longhorn 中的 Wobbly 效果&lt;/div&gt;
 并且跳票推迟多年之后的 Windows Vista 中实现了完整的混成器
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager"&gt;Desktop Window Manager (DWM)&lt;/a&gt;
 。整个 DWM 的架构和 Mac OS X 上看到的很像：&lt;/p&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;tt class="docutils"&gt;/home/travis/build/farseerfc/farseerfc/content/tech/brief-history-of-compositors-in-desktop-os.zhs.rst&lt;/tt&gt;, line 227)&lt;/p&gt;
-&lt;p&gt;Error in "ditaa" directive: &lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. ditaa::
-
-
-        /--------------\
-        | Windows cGRE |
-        | Presentation |----------------------------------\
-        | Foundation   |         DirectX 9                |
-        \--------------/                                  |
-                                          Canonical       v       Desktop
-        /--------\          +----------+   Display   +---------+  Window    +--------+
-        |  GDI+  |  render  : Internal |   Driver    | DirectX |  Manager   |  WDDM  |
-        | Window |---------&amp;gt;|   WMF    |------------&amp;gt;| Surface |-----------&amp;gt;| Screen |
-        |cGRE    |          |cPNK   {d}|             |cYEL  {d}|            |cBLU    |
-        \--------/          +----------+             +---------+            +--------+
-                                                          ^
-        /---------\                                       |
-        | DirectX |                                       |
-        | Window  |---------------------------------------/
-        |cGRE     |              DirectX
-        \---------/
-
-&lt;/pre&gt;
-&lt;/div&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/&gt;
 &lt;p&gt;和 Mac OS X 的情况类似， Windows Vista 之后的应用程序有两套主要的绘图库，一套是从早期
 Win32API 就沿用至今的 GDI（以及GDI+），另一套是随着 Longhorn 计划开发出的 WPF 。
 WPF 的所有用户界面控件都绘制在 DirectX 贴图上，所以使用了 WPF 的程序也可以看作是
