@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.2 I386平台的内存布局 众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用： 1 代码及静态数据区 由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。 在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 ..." />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.2 I386平台的内存布局 众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用： 1 代码及静态数据区 由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。 在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.2 I386平台的内存布局"/>
         <meta property="og:url" content="//farseerfc.me/zhs/c-tricks-2-2-i386-memory-layout.html"/>
-        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.2 I386平台的内存布局 众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用： 1 代码及静态数据区 由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。 在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 ..."/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.2 I386平台的内存布局 众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。 32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用： 1 代码及静态数据区 由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。 在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 …"/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -99,22 +99,10 @@ Farseerfc的小窝            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

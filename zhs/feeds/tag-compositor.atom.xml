@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-compositor.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-19T17:45:00+09:00</updated><entry><title>X 中的混成器与 Composite 扩展</title><link href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" rel="alternate"></link><published>2015-03-19T17:45:00+09:00</published><updated>2015-03-19T17:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/compositor-in-X-and-compositext.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - compositor</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-compositor.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-03-19T17:45:00+09:00</updated><entry><title>X 中的混成器与 Composite 扩展</title><link href="//farseerfc.me/zhs/compositor-in-X-and-compositext.html" rel="alternate"></link><published>2015-03-19T17:45:00+09:00</published><updated>2015-03-19T17:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:/zhs/compositor-in-X-and-compositext.html</id><summary type="html">
+&lt;p&gt;在上篇文章 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"&gt;「桌面系统的混成器简史」&lt;/a&gt;
+中我介绍了其它桌面系统中的混成器的发展史和工作原理，
+话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。
+这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 &lt;a class="reference external" href="#id6"&gt;结论&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
+而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
+其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;p&gt;在上篇文章 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"&gt;「桌面系统的混成器简史」&lt;/a&gt;
 中我介绍了其它桌面系统中的混成器的发展史和工作原理，
 话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。
@@ -183,7 +195,17 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 &lt;a class="reference external" href="http://projects.mini-dweeb.org/attachments/download/3/report.pdf"&gt;Master thesis: Writing an X compositing manager&lt;/a&gt;
 其中也对实现一个简单的混成器做了详尽描述，包括介绍了相关的 X 扩展和调用。&lt;/p&gt;
 &lt;/div&gt;
-</summary><category term="linux"></category><category term="wayland"></category><category term="xorg"></category><category term="compositor"></category></entry><entry><title>桌面系统的混成器简史</title><link href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><published>2015-03-19T13:45:00+09:00</published><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:zhs/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">
+</content><category term="linux"></category><category term="wayland"></category><category term="xorg"></category><category term="compositor"></category></entry><entry><title>桌面系统的混成器简史</title><link href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><published>2015-03-19T13:45:00+09:00</published><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:/zhs/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">
+&lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
+是一个混成器，替代 X 作为显示服务器。
+那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
+&lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+），在这篇文章中我想回顾一下历史，
+了解一下混成器出现的前因后果。&lt;/p&gt;
+&lt;p&gt;首先介绍一下混成器出现前主要的一类窗口管理器，也就是
+&lt;ruby&gt;&lt;rb&gt;栈式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的实现方式。&lt;/p&gt;
+</summary><content type="html">
 &lt;p&gt;（原本是想写篇关于 Wayland 的文章，后来越写越长感觉能形成一个系列，
 于是就先把这篇背景介绍性质的部分发出来了。）&lt;/p&gt;
 
@@ -428,12 +450,12 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         indent = (screen.width &lt; 768) ? "0em" : indent;
         linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
     }
-    
+
     var mathjaxscript = document.createElement('script');
     var location_protocol = (false) ? 'https' : document.location.protocol;
     if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
@@ -444,6 +466,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "    displayAlign: '"+ align +"'," +
         "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
         "        displayMath: [ ['$$','$$'] ]," +
@@ -473,4 +496,4 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</summary><category term="desktop"></category><category term="compositor"></category><category term="macosx"></category><category term="windows"></category><category term="window"></category><category term="manager"></category></entry></feed>
+&lt;/script&gt;</content><category term="desktop"></category><category term="compositor"></category><category term="macosx"></category><category term="windows"></category><category term="window"></category><category term="manager"></category></entry></feed>

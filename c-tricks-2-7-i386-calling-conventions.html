@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 ..." />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.7 I386平臺的其它函數調用模型"/>
         <meta property="og:url" content="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html"/>
-        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 ..."/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 2.7 I386平臺的其它函數調用模型 上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同： 1 __cdecl 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：主調函數(caller) __cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。 2 __stdcall 參數壓棧順序：逆序(從右至左) 參數堆棧恢復者：被調函數(callee) __stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 …"/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -99,22 +99,10 @@ Farseerfc的小窩            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

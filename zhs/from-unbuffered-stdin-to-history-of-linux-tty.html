@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="c,linux,stdio,tty,unix,ugh,ncurses,termcap,terminfo" />
-        <meta name="description" content="这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 原帖在这里 。 可以设置不带缓冲的标准输入流吗？ WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到： 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer ..." />
+        <meta name="description" content="这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 原帖在这里 。 可以设置不带缓冲的标准输入流吗？ WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到： 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="从非缓冲输入流到 Linux 控制台的历史"/>
         <meta property="og:url" content="//farseerfc.me/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html"/>
-        <meta property="og:description" content="这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 原帖在这里 。 可以设置不带缓冲的标准输入流吗？ WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到： 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer ..."/>
+        <meta property="og:description" content="这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。 原帖在这里 。 可以设置不带缓冲的标准输入流吗？ WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到： 请问对于标准输入流可以设置不带缓冲吗？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer …"/>
         <meta property="article:published_time" content="2014-12-12" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="c" />
@@ -107,22 +107,10 @@ Farseerfc的小窝            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

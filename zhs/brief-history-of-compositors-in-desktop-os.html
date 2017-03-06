@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="desktop,compositor,macosx,windows,window,manager" />
-        <meta name="description" content="Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland 是一个混成器，替代 X 作为显示服务器。 那么 混成器 是个什么东西，桌面系统为什么需要它呢？ 要理解为什么桌面系统需要 混成器 （或者它的另一个叫法， 混成窗口管理器(Compositing Window Manager) ），在这篇文章中我想回顾一下历史， 了解一下混成器出现的前因后果。 首先介绍一下混成器出现前主要的一类窗口管理器，也就是 栈式窗口管理器(Stacking Window Manager) 的实现方式。 我们知道最初图形界面的应用程序是全屏的，独占整个显示器（现在很多游戏机和手持设备的实现仍旧如此）。 所有程序都全屏并且任何时刻只能看到一个程序的输出，这个限制显然不能满足人们使用计算机的需求， 于是就有了 窗口 的概念，有了 桌面隐喻 。 在 桌面隐喻(Desktop Metaphor) 中每个窗口只占用显示面积的一小部分， 有其显示的位置和大小，可以互相遮盖。于是栈式窗口管理器就是在图形界面中实现桌面隐喻的核心功能， 其实现方式大体就是：给每个窗口一个相对的“高度”或者说“远近”，比较高的窗口显得距离用户比较近， 会覆盖其下比较低的窗口。绘图的时候窗口管理器会从把窗口按高低排序，按照从低到高的顺序使用 画家算法 绘制整个屏幕。" />
+        <meta name="description" content="Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland 是一个混成器，替代 X 作为显示服务器。 那么 混成器 是个什么东西，桌面系统为什么需要它呢？ 要理解为什么桌面系统需要 混成器 （或者它的另一个叫法， 混成窗口管理器(Compositing Window Manager) ），在这篇文章中我想回顾一下历史， 了解一下混成器出现的前因后果。 首先介绍一下混成器出现前主要的一类窗口管理器，也就是 栈式窗口管理器(Stacking Window Manager) 的实现方式。" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="桌面系统的混成器简史"/>
         <meta property="og:url" content="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"/>
-        <meta property="og:description" content="Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland 是一个混成器，替代 X 作为显示服务器。 那么 混成器 是个什么东西，桌面系统为什么需要它呢？ 要理解为什么桌面系统需要 混成器 （或者它的另一个叫法， 混成窗口管理器(Compositing Window Manager) ），在这篇文章中我想回顾一下历史， 了解一下混成器出现的前因后果。 首先介绍一下混成器出现前主要的一类窗口管理器，也就是 栈式窗口管理器(Stacking Window Manager) 的实现方式。 我们知道最初图形界面的应用程序是全屏的，独占整个显示器（现在很多游戏机和手持设备的实现仍旧如此）。 所有程序都全屏并且任何时刻只能看到一个程序的输出，这个限制显然不能满足人们使用计算机的需求， 于是就有了 窗口 的概念，有了 桌面隐喻 。 在 桌面隐喻(Desktop Metaphor) 中每个窗口只占用显示面积的一小部分， 有其显示的位置和大小，可以互相遮盖。于是栈式窗口管理器就是在图形界面中实现桌面隐喻的核心功能， 其实现方式大体就是：给每个窗口一个相对的“高度”或者说“远近”，比较高的窗口显得距离用户比较近， 会覆盖其下比较低的窗口。绘图的时候窗口管理器会从把窗口按高低排序，按照从低到高的顺序使用 画家算法 绘制整个屏幕。"/>
+        <meta property="og:description" content="Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland 是一个混成器，替代 X 作为显示服务器。 那么 混成器 是个什么东西，桌面系统为什么需要它呢？ 要理解为什么桌面系统需要 混成器 （或者它的另一个叫法， 混成窗口管理器(Compositing Window Manager) ），在这篇文章中我想回顾一下历史， 了解一下混成器出现的前因后果。 首先介绍一下混成器出现前主要的一类窗口管理器，也就是 栈式窗口管理器(Stacking Window Manager) 的实现方式。"/>
         <meta property="article:published_time" content="2015-03-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="desktop" />
@@ -104,22 +104,10 @@ Farseerfc的小窝            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 
@@ -506,12 +494,12 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         indent = (screen.width < 768) ? "0em" : indent;
         linebreak = (screen.width < 768) ? 'true' : linebreak;
     }
-    
+
     var mathjaxscript = document.createElement('script');
     var location_protocol = (false) ? 'https' : document.location.protocol;
     if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript'; 
+    mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
@@ -522,6 +510,7 @@ DirectX 窗口。又或者我们可以认为，整个界面上只有一个真正
         "    displayAlign: '"+ align +"'," +
         "    displayIndent: '"+ indent +"'," +
         "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
         "    tex2jax: { " +
         "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
         "        displayMath: [ ['$$','$$'] ]," +

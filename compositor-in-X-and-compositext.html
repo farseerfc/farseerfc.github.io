@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,wayland,xorg,compositor" />
-        <meta name="description" content="在上篇文章 「桌面系統的混成器簡史」 中我介紹了其它桌面系統中的混成器的發展史和工作原理， 話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。 這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 結論 。 原始的 X 的繪圖模型 首先，沒有混成器的時候 X 是這樣畫圖的： X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 Cairo 繪圖， 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的， GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行， 其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 ..." />
+        <meta name="description" content="在上篇文章 「桌面系統的混成器簡史」 中我介紹了其它桌面系統中的混成器的發展史和工作原理， 話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。 這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 結論 。 原始的 X 的繪圖模型 首先，沒有混成器的時候 X 是這樣畫圖的： X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 Cairo 繪圖， 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的， GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行， 其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="X 中的混成器與 Composite 擴展"/>
         <meta property="og:url" content="//farseerfc.me/compositor-in-X-and-compositext.html"/>
-        <meta property="og:description" content="在上篇文章 「桌面系統的混成器簡史」 中我介紹了其它桌面系統中的混成器的發展史和工作原理， 話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。 這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 結論 。 原始的 X 的繪圖模型 首先，沒有混成器的時候 X 是這樣畫圖的： X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 Cairo 繪圖， 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的， GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行， 其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 ..."/>
+        <meta property="og:description" content="在上篇文章 「桌面系統的混成器簡史」 中我介紹了其它桌面系統中的混成器的發展史和工作原理， 話題回到我們的正題 Linux 系統上，來說說目前 X 中混成器是如何工作的。 這篇文章將比上一篇深入更多技術細節，不想看太多細節的可以直接跳過看 結論 。 原始的 X 的繪圖模型 首先，沒有混成器的時候 X 是這樣畫圖的： X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 Cairo 繪圖， 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的， GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行， 其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 …"/>
         <meta property="article:published_time" content="2015-03-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -102,22 +102,10 @@ Farseerfc的小窩            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="c,linux,stdio,tty,unix,ugh,ncurses,termcap,terminfo" />
-        <meta name="description" content="這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer ..." />
+        <meta name="description" content="這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="從非緩衝輸入流到 Linux 控制檯的歷史"/>
         <meta property="og:url" content="//farseerfc.me/from-unbuffered-stdin-to-history-of-linux-tty.html"/>
-        <meta property="og:description" content="這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer ..."/>
+        <meta property="og:description" content="這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。 原帖在這裏 。 可以設置不帶緩衝的標準輸入流嗎？ WaterElement(UnChanged) 於 2014年12月09日23:29:51 星期二 問到： 請問對於標準輸入流可以設置不帶緩衝嗎？比如以下程序 #include &lt;stdio.h&gt; #include &lt;unistd.h&gt; int main(int argc, char *argv[]) { FILE *fp = fdopen(STDIN_FILENO, &#34;r&#34;); setvbuf(fp, NULL, _IONBF, 0); char buffer[20]; buffer[0] = 0; fgets(buffer, 20, fp); printf(&#34;buffer …"/>
         <meta property="article:published_time" content="2014-12-12" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="c" />
@@ -107,22 +107,10 @@ Farseerfc的小窩            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

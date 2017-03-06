@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="C++" />
-        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.3 I386平台C函数内部的栈分配 函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。 为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例： void f() { int a=0; //a的地址被分配为ebp-4 char c=1; //c的地址被分配为ebp-8 } 产生的汇编代码为： push ebp ;将ebp压栈 mov ebp,esp ;ebp=esp 用栈底备份栈顶指针 sub ..." />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 2.3 I386平台C函数内部的栈分配 函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。 为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例： void f() { int a=0; //a的地址被分配为ebp-4 char c=1; //c的地址被分配为ebp-8 } 产生的汇编代码为： push ebp ;将ebp压栈 mov ebp,esp ;ebp=esp 用栈底备份栈顶指针 sub …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="C++ Tricks 2.3 I386平台C函数内部的栈分配"/>
         <meta property="og:url" content="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"/>
-        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.3 I386平台C函数内部的栈分配 函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。 为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例： void f() { int a=0; //a的地址被分配为ebp-4 char c=1; //c的地址被分配为ebp-8 } 产生的汇编代码为： push ebp ;将ebp压栈 mov ebp,esp ;ebp=esp 用栈底备份栈顶指针 sub ..."/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 2.3 I386平台C函数内部的栈分配 函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。 为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例： void f() { int a=0; //a的地址被分配为ebp-4 char c=1; //c的地址被分配为ebp-8 } 产生的汇编代码为： push ebp ;将ebp压栈 mov ebp,esp ;ebp=esp 用栈底备份栈顶指针 sub …"/>
         <meta property="article:published_time" content="2007-08-28" />
             <meta property="article:section" content="import" />
             <meta property="article:tag" content="C++" />
@@ -99,22 +99,10 @@ Farseerfc的小窝            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 

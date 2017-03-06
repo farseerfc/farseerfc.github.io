@@ -104,3 +104,8 @@ Links
 
 	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。有个刚出生的小女儿叫 Alice :del:`（下一个叫 Marisa ）`。
 
+.. friend:: void001
+	:nick: `VOID 001 <https://voidisprogramer.com/>`_
+	:gravatar: zhangjianqiu13@gmail.com
+	
+	头像是夏娜，/dev/horo 绝赞开发中。	

@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,archlinux,arch,chrome,remote,desktop" />
-        <meta name="description" content="透明計算 具體是什麼，因爲他們沒有公開技術細節所以我並不知道，只是看 公開出來的演示視頻 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。 Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到， 直接 ssh X forwarding 效果也不錯。只是這些方案的一個 不太易用 的地方在於，需要 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。 於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手） 方便地實現了 NAT 穿透，無論什麼網絡環境基本都能使用。當然，要支持遠程登錄， 位於遠端的登錄的計算機必須一直開着 ..." />
+        <meta name="description" content="透明計算 具體是什麼，因爲他們沒有公開技術細節所以我並不知道，只是看 公開出來的演示視頻 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。 Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到， 直接 ssh X forwarding 效果也不錯。只是這些方案的一個 不太易用 的地方在於，需要 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。 於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手） 方便地實現了 NAT 穿透，無論什麼網絡環境基本都能使用。當然，要支持遠程登錄， 位於遠端的登錄的計算機必須一直開着 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="archlinux 上用 chrome 實現 透明計算 遠程登錄"/>
         <meta property="og:url" content="//farseerfc.me/arch-chrome-remote-desktop.html"/>
-        <meta property="og:description" content="透明計算 具體是什麼，因爲他們沒有公開技術細節所以我並不知道，只是看 公開出來的演示視頻 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。 Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到， 直接 ssh X forwarding 效果也不錯。只是這些方案的一個 不太易用 的地方在於，需要 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。 於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手） 方便地實現了 NAT 穿透，無論什麼網絡環境基本都能使用。當然，要支持遠程登錄， 位於遠端的登錄的計算機必須一直開着 ..."/>
+        <meta property="og:description" content="透明計算 具體是什麼，因爲他們沒有公開技術細節所以我並不知道，只是看 公開出來的演示視頻 ，感覺似乎只要能從手機上遠程登錄系統桌面，就能算是透明計算了。 如果透明計算真是這個意思，那麼我似乎已經用着這個技術很多年了嘛。 Xorg 上常用的遠程桌面工具有很多，基於 VNC 協議的、基於NX的和基於 RDP 協議的都能找到， 直接 ssh X forwarding 效果也不錯。只是這些方案的一個 不太易用 的地方在於，需要 通過 ip 訪問到遠程的電腦，所以在跨越 NAT 之類的情況下不太容易使用。 於是今天介紹一個使用方便設置也簡單的方法： 通過 chrome-remote-desktop 在 archlinux 上使用遠程桌面。這個方案的優勢在於，藉助 Google 的雲端服務器（內部貌似是XMPP協議下的握手） 方便地實現了 NAT 穿透，無論什麼網絡環境基本都能使用。當然，要支持遠程登錄， 位於遠端的登錄的計算機必須一直開着 …"/>
         <meta property="article:published_time" content="2015-02-13" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -104,22 +104,10 @@ Farseerfc的小窩            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                                 About
-                              </a></li>
-                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                                 Links
-                              </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
-                         About
-                      </a></li>
-                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
-                         Links
-                      </a></li>
                   </ul>
             </ul>
 
