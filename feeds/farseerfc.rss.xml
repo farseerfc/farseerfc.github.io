@@ -103,6 +103,9 @@ pacstrap /mnt …&lt;/code&gt;&lt;/p&gt;&lt;/div&gt;</description><dc:creator xm
 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
 其餘則通過 xlib 或者 xcb 調用 X 核心協議提供的繪圖原語繪圖 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 19 Mar 2015 17:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-19:/compositor-in-X-and-compositext.html</guid><category>linux</category><category>wayland</category><category>xorg</category><category>compositor</category></item><item><title>桌面系統的混成器簡史</title><link>//farseerfc.me/brief-history-of-compositors-in-desktop-os.html</link><description>
+&lt;p&gt;（原本是想寫篇關於 Wayland 的文章，後來越寫越長感覺能形成一個系列，
+於是就先把這篇背景介紹性質的部分發出來了。）&lt;/p&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
 是一個混成器，替代 X 作爲顯示服務器。
 那麼 &lt;strong&gt;混成器&lt;/strong&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
@@ -112,7 +115,22 @@ GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進�
 瞭解一下混成器出現的前因後果。&lt;/p&gt;
 &lt;p&gt;首先介紹一下混成器出現前主要的一類窗口管理器，也就是
 &lt;ruby&gt;&lt;rb&gt;棧式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的實現方式。&lt;/p&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 19 Mar 2015 13:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-19:/brief-history-of-compositors-in-desktop-os.html</guid><category>desktop</category><category>compositor</category><category>macosx</category><category>windows</category><category>window</category><category>manager</category></item><item><title>避免在博文中寫「簡單地」</title><link>//farseerfc.me/stop-write-simply.html</link><description>&lt;p&gt;我的 RSS 訂閱着一個博客叫 &lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/"&gt;The Old New Thing&lt;/a&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+本文中所有桌面截圖來自維基百科，不具有著作權保護。&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;早期的棧式窗口管理器&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+棧式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="棧式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/images/Windows_3.11_workspace.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;我們知道最初圖形界面的應用程序是全屏的，獨佔整個顯示器（現在很多遊戲機和手持設備的實現仍舊如此）。
+所有程序都全屏並且任何時刻只能看到一個程序的輸出，這個限制顯然不能滿足人們使用計算機的需求，
+於是就有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)"&gt;窗口 …&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 19 Mar 2015 13:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-19:/brief-history-of-compositors-in-desktop-os.html</guid><category>desktop</category><category>compositor</category><category>macosx</category><category>windows</category><category>window</category><category>manager</category></item><item><title>避免在博文中寫「簡單地」</title><link>//farseerfc.me/stop-write-simply.html</link><description>&lt;p&gt;我的 RSS 訂閱着一個博客叫 &lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/"&gt;The Old New Thing&lt;/a&gt;
 ，作者是Windows開發者之一的 Raymond Chen ，記錄 Windows 中的很多有趣的技術細節。
 這個博客中的一些精彩內容還被他寫成了一本書，中文名叫《Windows編程啓示錄》
 (ISBN: &lt;a class="reference external" href="http://www.amazon.cn/dp/B0011C1ZEG/"&gt;978-7-111-21919-4&lt;/a&gt;) 而英文書名就叫
@@ -182,9 +200,24 @@ farseerfc.me&lt;/code&gt;
 趕快去申請了一個，感覺非常讚，於是就換過來了。&lt;/p&gt;
 &lt;p&gt;設置的方法按照 &lt;a class="reference external" href="https://me.net.nz/blog/github-pages-secure-with-cloudflare/"&gt;這篇博文&lt;/a&gt;
 說的一步步做下來，如它所述，用 CloudFlare …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 26 Jan 2015 23:32:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-26:/switch-to-farseerfc-dot-me-domain.html</guid><category>pelican</category><category>domain</category><category>cloudflare</category><category>github</category></item><item><title>重新設計了 Pelican 的主題與插件</title><link>//farseerfc.me/redesign-pelican-theme.html</link><description>
-
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 25 Jan 2015 22:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-25:/redesign-pelican-theme.html</guid><category>python</category><category>pelican</category><category>bootstrap</category><category>material</category><category>subsite</category></item><item><title>總結一下 Material Design 的 CSS 框架</title><link>//farseerfc.me/summarize-material-design-css-framework.html</link><description>
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;不知不覺間放任這邊長草很久了，從上次
+&lt;a class="reference external" href="//farseerfc.me/try-pelican.html"&gt;折騰主題&lt;/a&gt; 到現在都快三年了，
+而從上次 &lt;a class="reference external" href="//farseerfc.me/marry-me.html"&gt;寫了篇告白信&lt;/a&gt; 到現在也有快兩年了。
+這期間曾經把主題配色從 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默認的
+白底黑字改成了讓眼睛更舒適的黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千載，兩年裏 Bootstrap 已經升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 則已經升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。&lt;/p&gt;
+&lt;p&gt;近日想寫的東西越積越多，終於下定決心花了前前後後 &lt;strong&gt;兩個月&lt;/strong&gt; 的時間重新設計了一遍
+Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。
+（以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 25 Jan 2015 22:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-25:/redesign-pelican-theme.html</guid><category>python</category><category>pelican</category><category>bootstrap</category><category>material</category><category>subsite</category></item><item><title>總結一下 Material Design 的 CSS 框架</title><link>//farseerfc.me/summarize-material-design-css-framework.html</link><description>&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
 上公佈Android L 也即 後來的 Lollipop 說起。 他們在談論界面設計的時候公佈了他們的
 設計準則： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻譯&lt;/a&gt; )。
@@ -194,9 +227,19 @@ farseerfc.me&lt;/code&gt;
 &lt;p&gt;看到 Material Design 之後就覺得這個設計風格非常符合直覺，於是想在這邊也用上
 Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，所以想找找別人實現好的模板
 或者框架直接套用上。在網絡上搜索數日找到了這幾個：&lt;/p&gt;
-
+&lt;div class="section" id="polymer-paper-elements"&gt;
 &lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 16 Jan 2015 03:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-16:/summarize-material-design-css-framework.html</guid><category>css</category><category>material</category><category>paper</category></item><item><title>從非緩衝輸入流到 Linux 控制檯的歷史</title><link>//farseerfc.me/from-unbuffered-stdin-to-history-of-linux-tty.html</link><description>
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Polymer&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;object class="embed-responsive-item" data="https://www.polymer-project.org/images/logos/p-logo.svg" type="image/svg+xml"&gt;
+Polymer logo&lt;/object&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Google …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 16 Jan 2015 03:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-16:/summarize-material-design-css-framework.html</guid><category>css</category><category>material</category><category>paper</category></item><item><title>從非緩衝輸入流到 Linux 控制檯的歷史</title><link>//farseerfc.me/from-unbuffered-stdin-to-history-of-linux-tty.html</link><description>
 &lt;p&gt;這篇也是源自於水源C板上板友的一個問題，涉及Linux上的控制檯的實現方式和歷史原因。因爲內容比較長，所以在這裏再排版一下發出來。
 &lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"&gt;原帖在這裏&lt;/a&gt; 。&lt;/p&gt;
 &lt;div class="section" id="id2"&gt;
@@ -213,24 +256,92 @@ Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，�
 &lt;span class="code-line"&gt;    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/blockquote&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 12 Dec 2014 17:06:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-12:/from-unbuffered-stdin-to-history-of-linux-tty.html</guid><category>c</category><category>linux</category><category>stdio</category><category>tty</category><category>unix</category><category>ugh</category><category>ncurses</category><category>termcap</category><category>terminfo</category></item><item><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link>//farseerfc.me/jumping-kde5-plasma-activities-button.html</link><description>
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/blockquote&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 12 Dec 2014 17:06:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-12:/from-unbuffered-stdin-to-history-of-linux-tty.html</guid><category>c</category><category>linux</category><category>stdio</category><category>tty</category><category>unix</category><category>ugh</category><category>ncurses</category><category>termcap</category><category>terminfo</category></item><item><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link>//farseerfc.me/jumping-kde5-plasma-activities-button.html</link><description>&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;今天嘗試 KDE5 Plasma 的活動的時候無意間發現這個現象。
 只要把活動按鈕拖出桌面，它就會在桌面邊緣來回跳動。
 視頻如下：&lt;/p&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 09 Dec 2014 01:54:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-09:/jumping-kde5-plasma-activities-button.html</guid><category>kde5</category><category>plasma</category><category>linux</category><category>gnome3</category></item><item><title>嫁給我好麼</title><link>//farseerfc.me/marry-me.html</link><description>
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;當然你可以把它再拖回來，所以這個問題還無傷大雅，只是賣萌。&lt;/p&gt;
+&lt;p&gt;比比之前 Gnome3 那個跳動的界面真是好太多了：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_TRQJdRHYwrw"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XNjc4MjQ5NjE2"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_TRQJdRHYwrw"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XNjc4MjQ5NjE2"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;順便，今天還看到一個賣萌的 KDE5 Plasma 靜音圖標的翻譯：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 09 Dec 2014 01:54:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-09:/jumping-kde5-plasma-activities-button.html</guid><category>kde5</category><category>plasma</category><category>linux</category><category>gnome3</category></item><item><title>嫁給我好麼</title><link>//farseerfc.me/marry-me.html</link><description>&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+渲染的樣子&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;blockquote&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;img alt="嫁給我好麼" class="img-responsive" src="/images/marry-me.png"/&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 20 Feb 2013 20:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2013-02-20:/marry-me.html</guid><category>will</category><category>you</category><category>marry</category><category>me</category></item><item><title>ICSE 2012</title><link>//farseerfc.me/icse2012.html</link><description>
-
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;可以玩的是下面這個：&lt;/p&gt;
+&lt;script src="/static/three.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/FirstPersonControls.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/helvetiker_regular.typeface.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/214game.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;div id="game_area" style="width: 600px; height: 450px; margin-left: 10px;clear:both"&gt;
+&lt;/div&gt;
+&lt;p style="margin-left: 100px; margin-top: 10px; "&gt;* 用 WASD←→ 移動，需要 WebGL 支持&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 20 Feb 2013 20:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2013-02-20:/marry-me.html</guid><category>will</category><category>you</category><category>marry</category><category>me</category></item><item><title>ICSE 2012</title><link>//farseerfc.me/icse2012.html</link><description>
+&lt;div class="section" id="june-6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;June 6&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="section" id="keynote-1"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id2"&gt;Keynote 1&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;沒怎麼聽懂，只記得講到了finance is not money但是沒聽懂這個和軟件有什麼關係。&lt;/p&gt;
-
-
+&lt;/div&gt;
+&lt;div class="section" id="cost-estimation-for-distributed-software-project"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id3"&gt;Cost Estimation for Distributed Software Project&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;講到他們試圖改善現有的模型去更精確地評估軟件開發的開銷。&lt;/p&gt;
 &lt;p&gt;他們會給PM建議之前的項目的歷史數據，然後對於新項目，他們建議歷史上已有
 的項目的數據，從而幫助PM得到更精確的評估。他們試圖儘量減少項目評估對PM
 的經驗的需求，從而幫助即使經驗很少的PM也能準確評估項目的開銷。&lt;/p&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 06 Jun 2012 10:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-06-06:/icse2012.html</guid><category>icse</category><category>software</category></item><item><title>MSR 2012 @ ICSE</title><link>//farseerfc.me/msr2012.html</link><description>
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;p&gt;他們的觀點：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Context-specfic solutions needed!&lt;/p&gt;
+&lt;p&gt;我們需要更上下文相關的解決方案！&lt;/p&gt;
+&lt;p&gt;Early user paticipation is key!&lt;/p&gt;
+&lt;p&gt;早期用戶的參與是關鍵&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="characterizing-logging-practices-in-open-source-software"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;Characterizing Logging Practices in Open-Source Software&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Common mistakes in logging messages&lt;/p&gt;
+&lt;p&gt;在日誌記錄中容易犯的錯誤&lt;/p&gt;
+&lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 06 Jun 2012 10:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-06-06:/icse2012.html</guid><category>icse</category><category>software</category></item><item><title>MSR 2012 @ ICSE</title><link>//farseerfc.me/msr2012.html</link><description>
 &lt;div class="section" id="mining-software-repository-2012-icse"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Mining Software Repository 2012 @ ICSE&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;參加了今年的MSR，會場在University of Zurich。一大早來到大學，註冊有點
@@ -330,7 +441,19 @@ Reset 包。以前劍橋大學有人實驗過，客戶端和服務器都忽略 R
 &lt;p&gt;據說是一道微軟的面試題。如題，寫程序，讓Windows的任務管理器中的性能監視器呈現正弦曲線。&lt;/p&gt;
 &lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
 &lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 02 Jun 2008 23:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2008-06-02:/sine-cpu.html</guid><category>java</category><category>microsoft</category></item><item><title>關於神創論的一些見解</title><link>//farseerfc.me/some-thought-on-creationism.html</link><description>&lt;p&gt;導入自
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;p&gt;潛心鑽研良久，得代碼：（java）&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;;&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;work&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 02 Jun 2008 23:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2008-06-02:/sine-cpu.html</guid><category>java</category><category>microsoft</category></item><item><title>關於神創論的一些見解</title><link>//farseerfc.me/some-thought-on-creationism.html</link><description>&lt;p&gt;導入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/292274803"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;看到陳驫同學很有感想的一篇神創論與命運日誌，覺得近日很久沒有看到這樣的評論了。想說幾句自己的觀點。&lt;/p&gt;
 &lt;p&gt;首先我認爲，神創論與宿命論沒有多少關聯，甚至進化論者相較於神創論者更容易接受宿命論的觀點。因爲神創論主張意志的存在，人所具有的個體意志與神的意志，因此在神創論者的眼中事件的結果是可以通過意志來改變的，亦即如果我從物理樓11樓跳下，那麼我就可以改變自己死亡時間的宿命。上帝的意志同樣可以左右事件的結果，也就是所謂的宿命不復存在。而進化論者不承認意志獨立於物質世界的存在，你我的思考、行爲，都受到物理學法則諸如量子力學的約束，這就引出了北大物理系教授的那句“宇宙中的一切都是可以計算的”，亦即宿命論。如我我選擇現在從物理樓上跳下，我這一行爲並不是處於個人的獨立意志，乃是想證明這一點，亦即我跳樓這一舉動是有其背後的動機與原因的，就如同計算機的輸入必然導致了輸出，宿命的必然終結於此。&lt;/p&gt;

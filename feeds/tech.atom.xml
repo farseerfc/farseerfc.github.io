@@ -597,19 +597,9 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 其中也對實現一個簡單的混成器做了詳盡描述，包括介紹了相關的 X 擴展和調用。&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="linux"></category><category term="wayland"></category><category term="xorg"></category><category term="compositor"></category></entry><entry><title>桌面系統的混成器簡史</title><link href="//farseerfc.me/brief-history-of-compositors-in-desktop-os.html" rel="alternate"></link><published>2015-03-19T13:45:00+09:00</published><updated>2015-03-19T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-03-19:/brief-history-of-compositors-in-desktop-os.html</id><summary type="html">
-&lt;p&gt;Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
-是一個混成器，替代 X 作爲顯示服務器。
-那麼 &lt;strong&gt;混成器&lt;/strong&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
-要理解爲什麼桌面系統需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一個叫法，
-&lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
-），在這篇文章中我想回顧一下歷史，
-瞭解一下混成器出現的前因後果。&lt;/p&gt;
-&lt;p&gt;首先介紹一下混成器出現前主要的一類窗口管理器，也就是
-&lt;ruby&gt;&lt;rb&gt;棧式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的實現方式。&lt;/p&gt;
-</summary><content type="html">
 &lt;p&gt;（原本是想寫篇關於 Wayland 的文章，後來越寫越長感覺能形成一個系列，
 於是就先把這篇背景介紹性質的部分發出來了。）&lt;/p&gt;
-
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
 是一個混成器，替代 X 作爲顯示服務器。
 那麼 &lt;strong&gt;混成器&lt;/strong&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
@@ -619,7 +609,35 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 瞭解一下混成器出現的前因後果。&lt;/p&gt;
 &lt;p&gt;首先介紹一下混成器出現前主要的一類窗口管理器，也就是
 &lt;ruby&gt;&lt;rb&gt;棧式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的實現方式。&lt;/p&gt;
-
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+本文中所有桌面截圖來自維基百科，不具有著作權保護。&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;早期的棧式窗口管理器&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+棧式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="棧式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/images/Windows_3.11_workspace.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;我們知道最初圖形界面的應用程序是全屏的，獨佔整個顯示器（現在很多遊戲機和手持設備的實現仍舊如此）。
+所有程序都全屏並且任何時刻只能看到一個程序的輸出，這個限制顯然不能滿足人們使用計算機的需求，
+於是就有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)"&gt;窗口 …&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;p&gt;（原本是想寫篇關於 Wayland 的文章，後來越寫越長感覺能形成一個系列，
+於是就先把這篇背景介紹性質的部分發出來了。）&lt;/p&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Linux 系統上要迎來 Wayland 了，或許大家能從各種渠道打聽到 Wayland
+是一個混成器，替代 X 作爲顯示服務器。
+那麼 &lt;strong&gt;混成器&lt;/strong&gt; 是個什麼東西，桌面系統爲什麼需要它呢？
+要理解爲什麼桌面系統需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一個叫法，
+&lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+），在這篇文章中我想回顧一下歷史，
+瞭解一下混成器出現的前因後果。&lt;/p&gt;
+&lt;p&gt;首先介紹一下混成器出現前主要的一類窗口管理器，也就是
+&lt;ruby&gt;&lt;rb&gt;棧式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的實現方式。&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;div class="label label-warning"&gt;
 本文中所有桌面截圖來自維基百科，不具有著作權保護。&lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
@@ -1417,13 +1435,28 @@ CloudFlare 的，如下圖：&lt;/li&gt;
 方便免費的 Pages 託管。&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新設計了 Pelican 的主題與插件</title><link href="//farseerfc.me/redesign-pelican-theme.html" rel="alternate"></link><published>2015-01-25T22:45:00+09:00</published><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:/redesign-pelican-theme.html</id><summary type="html">
-
-&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;
-</summary><content type="html">
-
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;div class="label label-warning"&gt;
 &lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
-
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;不知不覺間放任這邊長草很久了，從上次
+&lt;a class="reference external" href="//farseerfc.me/try-pelican.html"&gt;折騰主題&lt;/a&gt; 到現在都快三年了，
+而從上次 &lt;a class="reference external" href="//farseerfc.me/marry-me.html"&gt;寫了篇告白信&lt;/a&gt; 到現在也有快兩年了。
+這期間曾經把主題配色從 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默認的
+白底黑字改成了讓眼睛更舒適的黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千載，兩年裏 Bootstrap 已經升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 則已經升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。&lt;/p&gt;
+&lt;p&gt;近日想寫的東西越積越多，終於下定決心花了前前後後 &lt;strong&gt;兩個月&lt;/strong&gt; 的時間重新設計了一遍
+Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。
+（以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，將一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
 &lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
@@ -2172,19 +2205,7 @@ bootstrap-material-design 樣式。自己草草修改的東西被別人用到果
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>總結一下 Material Design 的 CSS 框架</title><link href="//farseerfc.me/summarize-material-design-css-framework.html" rel="alternate"></link><published>2015-01-16T03:27:00+09:00</published><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-16:/summarize-material-design-css-framework.html</id><summary type="html">
-&lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
-上公佈Android L 也即 後來的 Lollipop 說起。 他們在談論界面設計的時候公佈了他們的
-設計準則： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻譯&lt;/a&gt; )。
-當然這只是一些準則，總結並描述了之前在 Web 設計和移動端 App 界面設計方面的一些規範，
-並且用材料的類比來形象化的比喻這個準則。關於 Material Design 的更多中文資料可
-&lt;a class="reference external" href="http://www.ui.cn/Material/"&gt;參考這裏&lt;/a&gt; 。&lt;/p&gt;
-&lt;p&gt;看到 Material Design 之後就覺得這個設計風格非常符合直覺，於是想在這邊也用上
-Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，所以想找找別人實現好的模板
-或者框架直接套用上。在網絡上搜索數日找到了這幾個：&lt;/p&gt;
-
-&lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
-</summary><content type="html">
+&lt;/script&gt;</content><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>總結一下 Material Design 的 CSS 框架</title><link href="//farseerfc.me/summarize-material-design-css-framework.html" rel="alternate"></link><published>2015-01-16T03:27:00+09:00</published><updated>2015-01-16T03:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-16:/summarize-material-design-css-framework.html</id><summary type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
 上公佈Android L 也即 後來的 Lollipop 說起。 他們在談論界面設計的時候公佈了他們的
 設計準則： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻譯&lt;/a&gt; )。
@@ -2196,7 +2217,29 @@ Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，�
 或者框架直接套用上。在網絡上搜索數日找到了這幾個：&lt;/p&gt;
 &lt;div class="section" id="polymer-paper-elements"&gt;
 &lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
-
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Polymer&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;object class="embed-responsive-item" data="https://www.polymer-project.org/images/logos/p-logo.svg" type="image/svg+xml"&gt;
+Polymer logo&lt;/object&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Google …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;現在這裏的界面風格要從 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大會&lt;/a&gt;
+上公佈Android L 也即 後來的 Lollipop 說起。 他們在談論界面設計的時候公佈了他們的
+設計準則： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻譯&lt;/a&gt; )。
+當然這只是一些準則，總結並描述了之前在 Web 設計和移動端 App 界面設計方面的一些規範，
+並且用材料的類比來形象化的比喻這個準則。關於 Material Design 的更多中文資料可
+&lt;a class="reference external" href="http://www.ui.cn/Material/"&gt;參考這裏&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;看到 Material Design 之後就覺得這個設計風格非常符合直覺，於是想在這邊也用上
+Material Design。 但是我在 Web 前端科技樹上沒點多少技能點，所以想找找別人實現好的模板
+或者框架直接套用上。在網絡上搜索數日找到了這幾個：&lt;/p&gt;
+&lt;div class="section" id="polymer-paper-elements"&gt;
+&lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Polymer&lt;/div&gt;
@@ -2532,15 +2575,51 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 裏的相關歷史評論和吐槽，那一段非常有意思。&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</content><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link href="//farseerfc.me/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><published>2014-12-09T01:54:00+09:00</published><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:/jumping-kde5-plasma-activities-button.html</id><summary type="html">
+</content><category term="c"></category><category term="linux"></category><category term="stdio"></category><category term="tty"></category><category term="unix"></category><category term="ugh"></category><category term="ncurses"></category><category term="termcap"></category><category term="terminfo"></category></entry><entry><title>KDE5 Plasma 之跳動賣萌的活動按鈕</title><link href="//farseerfc.me/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><published>2014-12-09T01:54:00+09:00</published><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:/jumping-kde5-plasma-activities-button.html</id><summary type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;今天嘗試 KDE5 Plasma 的活動的時候無意間發現這個現象。
 只要把活動按鈕拖出桌面，它就會在桌面邊緣來回跳動。
 視頻如下：&lt;/p&gt;
-</summary><content type="html">
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;當然你可以把它再拖回來，所以這個問題還無傷大雅，只是賣萌。&lt;/p&gt;
+&lt;p&gt;比比之前 Gnome3 那個跳動的界面真是好太多了：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_TRQJdRHYwrw"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XNjc4MjQ5NjE2"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"&gt;&lt;/embed&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_TRQJdRHYwrw"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XNjc4MjQ5NjE2"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;順便，今天還看到一個賣萌的 KDE5 Plasma 靜音圖標的翻譯：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
 &lt;p&gt;今天嘗試 KDE5 Plasma 的活動的時候無意間發現這個現象。
 只要把活動按鈕拖出桌面，它就會在桌面邊緣來回跳動。
 視頻如下：&lt;/p&gt;
-
+&lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;div class="well" style="padding: 0"&gt;
 &lt;div class="tab-content" id="youtubeku"&gt;
 &lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;

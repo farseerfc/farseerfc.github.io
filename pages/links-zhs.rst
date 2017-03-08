@@ -1,4 +1,4 @@
-Links
+友情链接
 =======================================
 
 :slug: links
@@ -8,10 +8,7 @@ Links
 :issueid: 4
 
 
-友情链接
------------------------------------------------------------------------
-
-以下列出我在网上认识的好 :ruby:`朋友|jī yǒu` 们，排名不分先后。欢迎申请友链。
+以下列出我在网上认识的好 :ruby:`朋友|jī yǒu` 们，排名不分先后。欢迎交换友链。
 
 .. friend:: lilydjwg
 	:nick: `lilydjwg 依云 百合仙子 <http://lilydjwg.is-programmer.com/>`_
@@ -99,13 +96,25 @@ Links
 	彼得蔡，据说高中用 AIDE 在手机上徒手撸出了 `BlackLight <https://github.com/PaperAirplane-Dev-Team/BlackLight>`_ 的大大，博客 :del:`用漂亮的 MD 主题|几经改版每一次都越来越漂亮` 。
 
 .. friend:: csslayer
-	:nick: `CS Slayer 老K  <https://www.csslayer.info/wordpress/>`_
+	:nick: `CS Slayer 老K  <https://www.csslayer.info/wordpress/>`_ 另一个博客是 `恋符「Master Spark」 <https://marisa-kirisa.me/>`_
 	:gravatar: wengxt@gmail.com
 
-	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。有个刚出生的小女儿叫 Alice :del:`（下一个叫 Marisa ）`。
+	Fcitx 开发者 ， KDE 开发者， Chakra 开发者， `ikde 社区 <https://www.ikde.org/>`_ 维护者。强悍的开源贡献实力无人能出其右。有个刚出生的小女儿叫 Alice :del:`（下一个叫 Marisa ）`，新博客是魔理沙主题的。
 
 .. friend:: void001
 	:nick: `VOID 001 <https://voidisprogramer.com/>`_
 	:gravatar: zhangjianqiu13@gmail.com
 	
 	头像是夏娜，/dev/horo 绝赞开发中。	
+
+.. friend:: poi
+	:nick: `PoiScript <https://poi.works/>`_
+	:gravatar: poiscript@gmail.com
+	
+	萌萌哒 Poi ，博客引擎是自己写的 `Solomon <https://github.com/PoiScript/Solomon>`_ :del:`和我的博客是情侣色`。:del:`不过不用 Arch` 用 openSUSE。 
+
+.. friend:: amamiya
+	:nick: `雨宫千鹤 宫水三叶 <https://bismarck.moe/>`_
+	:logo: https://avatars3.githubusercontent.com/u/9009218
+	
+	:del:`老婆` 暱称有点多，最近是宫水三叶，医学菊苣，白帽子。相当 :del:`黏人` 可爱。
