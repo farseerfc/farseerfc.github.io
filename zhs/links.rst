@@ -117,4 +117,4 @@
 	:nick: `雨宫千鹤 宫水三叶 <https://bismarck.moe/>`_
 	:logo: https://avatars3.githubusercontent.com/u/9009218
 	
-	:del:`老婆` 暱称有点多，最近是宫水三叶，医学菊苣，白帽子。相当 :del:`黏人` 可爱。
+	:ruby:`暱称|老婆` 有点多，最近是宫水三叶，医学菊苣， :del:`白帽子` 。相当 :del:`黏人` 可爱。
