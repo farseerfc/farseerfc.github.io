@@ -123,4 +123,4 @@
 	:nick: `南浦月 <https://blog.nanpuyue.com/links.html/>`_
 	:logo: https://avatars2.githubusercontent.com/u/1524609
 	
-	南老师，在线直播，声音甜美。アスナ粉，贡献过很多 deepin 组件不过现在似乎不在了。修了 powerline 的 `fontpatcher <https://github.com/nanpuyue/fontpatcher>`_ 。
+	南老师，在线直播，声音甜美。アスナ粉，自称装机民工的 linux 桌面环境开发者。修了 powerline 的 `fontpatcher <https://github.com/nanpuyue/fontpatcher>`_ 。
