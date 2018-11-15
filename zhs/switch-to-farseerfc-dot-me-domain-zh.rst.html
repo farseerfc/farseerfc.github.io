@@ -1,0 +1,124 @@
+<div class="highlight"><pre><span></span><span class="gh">換到 farseerfc.me 域名</span>
+<span class="gh">=======================================</span>
+
+<span class="nc">:slug:</span> <span class="nf">switch-to-farseerfc-dot-me-domain</span>
+<span class="nc">:lang:</span> <span class="nf">zh</span>
+<span class="nc">:date:</span> <span class="nf">2015-01-26 23:32</span>
+<span class="nc">:tags:</span> <span class="nf">pelican, domain, cloudflare, github</span>
+<span class="nc">:series:</span> <span class="nf">pelican</span>
+<span class="nc">:issueid:</span> <span class="nf">48</span>
+
+
+上個月就在 <span class="na">:ruby:</span><span class="nv">`狗爹|godaddy`</span> 上買了個自己的域名 <span class="na">:code:</span><span class="nv">`farseerfc.me`</span> 準備用在這個
+博客上，當時試着轉到過這個域名，發現 <span class="na">:ruby:</span><span class="nv">`自定義域名|custom domain`</span> 
+只支持 http 不支持 https ，想着還要買自己的證書，於是就扔在了一旁。不用自定義域名的話，
+放在 github.io 上是可以用 HTTPS 的。
+今天在 <span class="na">:irc:</span><span class="nv">`archlinux-cn`</span> 上受大牛 <span class="na">:fref:</span><span class="nv">`quininer`</span> 和 <span class="na">:fref:</span><span class="nv">`lilydjwg`</span> 點播，
+發現 cloudflare 有提供
+<span class="s">`免費的支持 SSL 的 CDN 服務 </span><span class="si">&lt;https://blog.cloudflare.com/introducing-universal-ssl/&gt;</span><span class="s">`_</span>
+趕快去申請了一個，感覺非常讚，於是就換過來了。
+
+設置的方法按照 <span class="s">`這篇博文 </span><span class="si">&lt;https://me.net.nz/blog/github-pages-secure-with-cloudflare/&gt;</span><span class="s">`_</span>
+說的一步步做下來，如它所述，用 CloudFlare 的優點如下：
+
+<span class="m">#.</span> CDN 加速
+<span class="m">#.</span> SSL (HTTPS) 加密
+<span class="m">#.</span> 支持 SPDY 協議
+<span class="m">#.</span> 支持 IPv6 
+
+<span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
+
+    <span class="gs">**2015年12月29日更新**</span>
+
+現在不光支持 SPDY 而且支持 HTTP/2 了。
+
+然後 <span class="gs">**免費賬戶**</span> 的一些缺點有：
+
+<span class="m">#.</span> CloudFlare 和 github.io 之間的數據不是加密的，因爲 github
+   <span class="na">:ruby:</span><span class="nv">`自定義域名|custom domain`</span> 還不支持使用自己的證書。這也是一開始我沒用
+   自定義域名的原因嘛，這沒有辦法……
+<span class="m">#.</span> CloudFlare 給免費賬戶簽名的 SSL 證書比較新，不支持一些老的設備和瀏覽器，比如不支持
+   老的 XP 系統的 IE 或者 2.x 的 Android。這種情況下沒辦法只能用沒有加密的 HTTP 了。
+<span class="m">#.</span> 不支持 <span class="s">`HSTS 頭 </span><span class="si">&lt;https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security&gt;</span><span class="s">`_</span>
+   ，所以不能從服務器這邊強制瀏覽器用 HTTPS。當然可以放個 javascript 跳轉，
+   也可以用 <span class="s">`HTTPSEverywhere </span><span class="si">&lt;https://www.eff.org/https-everywhere&gt;</span><span class="s">`_</span> 這種方案。
+
+<span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
+
+    <span class="gs">**2015年12月29日更新**</span>
+
+如評論中 <span class="s">`提到的 </span><span class="si">&lt;http://farseerfc.me/switch-to-farseerfc-dot-me-domain.html#comment-2015037231&gt;</span><span class="s">`_</span>
+現在支持 HSTS 了。
+
+<span class="gh">設置步驟 </span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+基本按照默認的選項下一步就可以了。
+
+<span class="m">#.</span> 和那個博主一樣我把 <span class="na">:ruby:</span><span class="nv">`安全級別|Security profile`</span> 降到了 Low ，即使是可疑流量也
+   不會要求輸入 CAPTCHA 。
+<span class="m">#.</span> 把 SSL 方式開在 Flexible SSL，訪客到 CloudFlare 是加密的，而 CloudFlare 到 
+   github.io 是不加密的。
+<span class="m">#.</span> 把 CDN 開到了 CDT+Full Optimization ，可以對訪問加速。由於是完全靜態的博客，沒有
+   動態變化的內容，所以應該比較安全。
+<span class="m">#.</span> 服務器設置的一步需要將 <span class="na">:ruby:</span><span class="nv">`域名解析服務器|DNS nameservers`</span> 從狗爹的服務器改到
+   CloudFlare 的，如下圖：
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/godaddy.png
+    <span class="nc">:alt:</span> <span class="nf">更改狗爹的域名服務器</span>
+
+    更改狗爹的域名服務器
+
+申請好之後就由 CloudFlare 接管域名解析了，接下來在 CloudFlare 的 DNS 設置添加一條
+<span class="s">`A 類規則指向 github pages 的 IP </span><span class="si">&lt;https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/&gt;</span><span class="s">`_</span> 。
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/cloudflaredns.png
+    <span class="nc">:alt:</span> <span class="nf">更改CloudFlare的DNS規則</span>
+
+    更改CloudFlare的DNS規則
+
+等一切都反映到 DNS 服務器上就設置完成了，接下來給 
+<span class="s">`farseerfc.github.io push 一個 CNAME 文件 </span><span class="si">&lt;https://help.github.com/articles/adding-a-cname-file-to-your-repository/&gt;</span><span class="s">`_</span>
+寫上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做這個：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">Makefile</span>
+
+    <span class="nf">publish</span><span class="o">:</span> <span class="n">rmdrafts</span> <span class="n">cc</span> <span class="n">clean</span> <span class="n">theme</span>
+      <span class="o">[</span> ! -d <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">]</span> <span class="o">||</span> find <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -mindepth <span class="m">1</span> -not -wholename <span class="s2">&quot;*/.git*&quot;</span> -delete
+      rm -rf cache
+      <span class="nb">echo</span> <span class="k">$(</span>SITEURL<span class="k">)</span> &gt; content/static/CNAME
+      <span class="k">$(</span>PELICAN<span class="k">)</span> <span class="k">$(</span>INPUTDIR<span class="k">)</span> -o <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> -s <span class="k">$(</span>PUBLISHCONF<span class="k">)</span> <span class="k">$(</span>PELICANOPTS<span class="k">)</span>
+      <span class="k">$(</span>MAKE<span class="k">)</span> rsthtml
+
+    <span class="nf">github</span><span class="o">:</span>
+      <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git checkout master<span class="o">)</span>
+      env <span class="nv">SITEURL</span><span class="o">=</span><span class="s2">&quot;farseerfc.me&quot;</span> <span class="k">$(</span>MAKE<span class="k">)</span> publish
+      <span class="o">(</span><span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git add . <span class="o">&amp;&amp;</span> git commit -m <span class="s2">&quot;update&quot;</span> <span class="o">&amp;&amp;</span> git push<span class="o">)</span>
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">python</span>
+
+    <span class="n">SITEURL</span> <span class="o">=</span> <span class="s1">&#39;//&#39;</span> <span class="o">+</span> <span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SITEURL&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;localhost:8000&#39;</span><span class="p">)</span>
+    <span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="s1">&#39;uml&#39;</span><span class="p">,</span> <span class="s1">&#39;images/favicon.ico&#39;</span><span class="p">,</span> <span class="s1">&#39;static/CNAME&#39;</span><span class="p">]</span>
+    <span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;images/favicon.ico&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;favicon.ico&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;static/CNAME&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;CNAME&#39;</span><span class="p">}</span>
+    <span class="p">}</span>
+
+然後把生成的靜態網站 push 到 github 之後可以從項目設置裏看到域名的變化：
+
+<span class="p">..</span> <span class="ow">figure</span><span class="p">::</span> {filename}/images/githubdomain.png
+    <span class="nc">:alt:</span> <span class="nf">Github 配置好自定義域名之後的變化</span>
+
+    Github 配置好自定義域名之後的變化
+
+最後把Disqus的評論也遷移到新的域名，disqus有方便的遷移嚮導，一直下一步就可以了。
+
+這樣就一切都設置妥當了。
+
+<span class="gh">致謝</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+最後要感謝提供消息的 <span class="na">:fref:</span><span class="nv">`quininer`</span> 和 <span class="na">:fref:</span><span class="nv">`lilydjwg`</span> ，感謝撰寫設置步驟的
+<span class="ge">*Jonathan J Hunt*</span> ， 感謝 CloudFlare 提供免費 SSL CDN 服務，感謝 Github 提供
+方便免費的 Pages 託管。
+</pre></div>

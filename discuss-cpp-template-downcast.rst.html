@@ -1,0 +1,149 @@
+<div class="highlight"><pre><span></span><span class="gh">關於C++模板的類型轉換的討論</span>
+<span class="gh">=======================================</span>
+
+<span class="nc">:slug:</span> <span class="nf">discuss-cpp-template-downcast</span>
+<span class="nc">:lang:</span> <span class="nf">zh</span>
+<span class="nc">:date:</span> <span class="nf">2012-02-26 05:54:57</span>
+<span class="nc">:tags:</span> <span class="nf">template, C</span>
+<span class="nc">:series:</span> <span class="nf">飲水思源C板</span>
+<span class="nc">:issueid:</span> <span class="nf">36</span>
+
+<span class="p">..</span> <span class="ow">contents</span><span class="p">::</span>
+
+這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。
+
+
+<span class="gh">討論地址</span>
+<span class="gh">++++++++++++</span>
+
+
+http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html
+
+<span class="gh">原問題</span>
+<span class="gh">+++++++++</span>
+
+
+
+今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
+    
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">_Type</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="n">_Type</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="k">typedef</span> <span class="n">_Type</span> <span class="n">type</span><span class="p">;</span>
+    <span class="p">};</span>
+    
+    <span class="k">class</span> <span class="nc">A</span> <span class="p">{</span> <span class="p">};</span>
+    <span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A</span> <span class="p">{</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">traits</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;&gt;</span>
+    <span class="k">struct</span> <span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="kt">void</span> <span class="n">f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+    
+    <span class="k">template</span> <span class="o">&lt;&gt;</span>
+    <span class="kt">void</span> <span class="n">f</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+    
+    
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">class</span> <span class="nc">BB</span> <span class="p">{};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">class</span> <span class="nc">DD</span> <span class="o">:</span> <span class="k">public</span> <span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">ff</span><span class="p">(</span><span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{};</span>
+    
+    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+    <span class="p">{</span>
+        <span class="n">A</span> <span class="n">a</span><span class="p">;</span> <span class="n">B</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
+        <span class="c1">//f(b);</span>
+        <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
+    <span class="p">}</span>
+
+奇怪的是重載決議的時候， <span class="na">:code:</span><span class="nv">`f`</span> 的情況下它就不讓我特化的 <span class="na">:code:</span><span class="nv">`f&lt;A&gt;`</span> 進來。
+
+但是在 <span class="na">:code:</span><span class="nv">`ff`</span> 的情況下， <span class="na">:code:</span><span class="nv">`ff&lt;BB&lt;long&gt;&gt;`</span> 卻進來了。
+
+在VC10和GCC3.4下測試
+
+<span class="gh">我的解答</span>
+<span class="gh">++++++++++++</span>
+
+我們來設身處地地作爲編譯器，看一遍到底發生了什麼。
+
+約定符號 <span class="na">:code:</span><span class="nv">`#`</span> : <span class="na">:code:</span><span class="nv">`A#B`</span> 是把 <span class="na">:code:</span><span class="nv">`B`</span> 帶入 <span class="na">:code:</span><span class="nv">`A&lt;T&gt;`</span> 的參數 <span class="na">:code:</span><span class="nv">`T`</span> 之後實例化得到的結果。
+
+<span class="gh">首先看ff的情況。</span>
+<span class="gh">***********************</span>
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
+
+處理到這句的時候，編譯器看到了 <span class="na">:code:</span><span class="nv">`DD&lt;long&gt;`</span> 的實例化，於是去實例化 <span class="na">:code:</span><span class="nv">`DD#long`</span> ，繼而實例
+化了 <span class="na">:code:</span><span class="nv">`BB#long`</span> 。
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
+
+這句，首先計算重載函數集合。
+
+第一步，需要從參數 <span class="na">:code:</span><span class="nv">`DD#long -&gt; BB&lt;T&gt;`</span> 推斷 <span class="na">:code:</span><span class="nv">`ff&lt;T&gt;`</span> 的 <span class="na">:code:</span><span class="nv">`T`</span> 。根據函數模板參數推斷規則：
+
+<span class="se">::</span>
+
+<span class="s">    :code:`class_template_name&lt;T&gt;` 類型的參數，可以用於推斷 :code:`T` 。</span>
+
+於是編譯器推斷 <span class="na">:code:</span><span class="nv">`T`</span> 爲 <span class="na">:code:</span><span class="nv">`long`</span> 。這裏就算不是 <span class="na">:code:</span><span class="nv">`BB`</span> 而是完全無關的 <span class="na">:code:</span><span class="nv">`CC`</span> 都可以推斷成功，只要 <span class="na">:code:</span><span class="nv">`CC`</span> 也
+是一個 <span class="na">:code:</span><span class="nv">`CC&lt;T&gt;`</span> 形式的模板。
+
+第二步，模板特化匹配。因爲只有一個模板，所以匹配了最泛化的 <span class="na">:code:</span><span class="nv">`ff&lt;T&gt;`</span> 。
+
+第三步，模板實例化。
+
+推斷了 <span class="na">:code:</span><span class="nv">`long -&gt; T`</span> 之後，編譯器實例化 <span class="na">:code:</span><span class="nv">`ff#long`</span> 。
+
+重載函數集合： <span class="na">:code:</span><span class="nv">`{ff#long}`</span> 
+
+然後重載抉擇找到唯一的可匹配的實例 <span class="na">:code:</span><span class="nv">`ff#long`</span> ，檢查實際參數 <span class="na">:code:</span><span class="nv">`DD#long`</span> 可以隱式轉換到
+形式參數 <span class="na">:code:</span><span class="nv">`BB#long`</span> ，從而生成了這次函數調用。
+
+<span class="gh">再來看f的情況。</span>
+<span class="gh">**********************</span>
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+
+計算候選重載函數集合。
+
+第一步，對所有 <span class="na">:code:</span><span class="nv">`f`</span> 模板推斷實參。根據函數模板參數推斷規則：
+
+<span class="se">::</span>
+
+<span class="s">    帶有 :code:`T` 類型的參數，可以用於推斷 :code:`T` 。</span>
+
+於是 <span class="na">:code:</span><span class="nv">`B -&gt; T`</span> 被推斷出來了。
+
+第二步，模板特化匹配。
+
+這裏 <span class="na">:code:</span><span class="nv">`B`</span> 不是 <span class="na">:code:</span><span class="nv">`A`</span> ，所以不能用 <span class="na">:code:</span><span class="nv">`f&lt;A&gt;`</span> 特化，只能用 <span class="na">:code:</span><span class="nv">`f&lt;T&gt;`</span> 模板。
+
+第三步，模板實例化。
+
+<span class="na">:code:</span><span class="nv">`B`</span> 帶入 <span class="na">:code:</span><span class="nv">`f&lt;T&gt;`</span> 實例化成 <span class="na">:code:</span><span class="nv">`f#B`</span> 的過程中，實例化 <span class="na">:code:</span><span class="nv">`traits#B`</span> 。
+
+由於沒有針對 <span class="na">:code:</span><span class="nv">`B`</span> 的特化，所以用 <span class="na">:code:</span><span class="nv">`traits&lt;T&gt;`</span> 模板， <span class="na">:code:</span><span class="nv">`traits#B::value=false`</span> ，進而 <span class="na">:code:</span><span class="nv">`enable_if#false`</span> 沒有 <span class="na">:code:</span><span class="nv">`type`</span> ，出錯。
+
+唯一的模板匹配出錯，重載函數集合爲空，SFINAE原則不能找到合適的匹配，於是報錯。
+</pre></div>

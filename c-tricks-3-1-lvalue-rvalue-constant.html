@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue & constant) - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++" />
+        <meta name="description" content="從 farseerfc.wordpress.com 導入 3.1 左值右值與常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義： 1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。 2、左值是可讀可寫的值，右值是隻讀的值。 3、左值有地址，右值沒有地址。 根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 這個複製操作在C++中是語法錯誤，MSVC給出的錯誤提示爲“error C2106: &#39;=&#39; : left operand must be l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。 根據第二定義，一個左值也是一個右值 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)"/>
+        <meta property="og:url" content="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html"/>
+        <meta property="og:description" content="從 farseerfc.wordpress.com 導入 3.1 左值右值與常量性(lvalue，rvalue &amp; constant) 首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義： 1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。 2、左值是可讀可寫的值，右值是隻讀的值。 3、左值有地址，右值沒有地址。 根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如： 1=1;//Error 這個複製操作在C++中是語法錯誤，MSVC給出的錯誤提示爲“error C2106: &#39;=&#39; : left operand must be l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。 根據第二定義，一個左值也是一個右值 …"/>
+        <meta property="article:published_time" content="2007-09-16" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue & constant) - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                                 About
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active">
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li class="active">
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)
+                        <a href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue & constant)">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2007-09-16T13:07:00+09:00"><i class="fa fa-calendar"></i> 2007年09月16日(週日)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-3-1-lvalue-rvalue-constant.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page"><i class="fa fa-code"></i></a>
+    <!--<a href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.pdf" class="btn btn-primary" title="Show pdf version of this page" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.png" class="btn btn-primary" title="Show captured png of this page" target="_blank""><i class="fa fa-file-photo-o"></i></a>-->
+
+<small><span><a href="//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-3-1-lvalue-rvalue-constant" data-disqus-url="http://farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="lvalue-rvalue-constant">
+<h2>3.1 左值右值與常量性(lvalue，rvalue &amp; constant)</h2>
+<p>首先要搞清楚的是，什麼是左值，什麼是右值。這裏給出左值右值的定義：</p>
+<p>1、左值是可以出現在等號(=)左邊的值，右值是隻能出現在等號右邊的值。</p>
+<p>2、左值是可讀可寫的值，右值是隻讀的值。</p>
+<p>3、左值有地址，右值沒有地址。</p>
+<p>根據左值右值的第二定義，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：</p>
+<p>1=1;//Error</p>
+<p>這個複製操作在C++中是語法錯誤，MSVC給出的錯誤提示爲“error C2106: '=' :
+left operand must be
+l-value”，就是說’=’的左操作數必須是一個左值，而字面常數1是一個右值。可見，嚴格的區分左值右值可以從語法分析的角度找出程序的邏輯錯誤。</p>
+<p>根據第二定義，一個左值也是一個右值，因爲左值也可讀，而一個右值不是一個左值，因爲右值不可寫。</p>
+<p>通常情況下，聲明的變量是一個左值，除非你指定const將它變成一個右值：</p>
+<p>int lv=1;</p>
+<p>const int rv=lv;</p>
+<p>由於右值的值在程序執行期間不能改變，所以必須用另一個右值初始化它。</p>
+<p>一個普通變量只能用右值初始化，如果你想傳遞左值，必須聲明一個引用或一個指針：</p>
+<p>int &amp; ref=lv;//用引用傳遞左值</p>
+<p>int * plv=&amp;lv;//傳遞指針以間接傳遞左值</p>
+<p>必須用左值初始化引用，然而，可以用右值初始化常量引用：</p>
+<p>int &amp; r1=1; //Error!</p>
+<p>const int &amp; r2=1; //OK</p>
+<p>這實際上相當於：</p>
+<p>int _r2=1;</p>
+<p>const int &amp; r2=_r2;</p>
+<p>這樣的寫法在函數體內沒什麼作用，但是在傳遞函數參數時，它可以避免潛在的(傳遞左值時的)複製操作，同時又可以接受右值。</p>
+<p>通常情況下，函數的參數和返回值都只傳回右值，除非你明確的通過引用傳遞左值。</p>
+<p>明確了左值與右值的區別，有助於我們寫函數時確定什麼時候應該有const，什麼時候不該有。比如，我們寫了一個代表數學中複數的類Complex：</p>
+<p>class Complex;</p>
+<p>然後，我們寫針對Complex的運算符重載：operator+和operator=。問題在於，參數和返回值應該是什麼類型，可選類型有四種：
+Complex、const Complex、Complex&amp;、const Complex&amp;。</p>
+<p>對於operator+，我們不會改變參數的值，所以可以通過const
+Complex&amp;傳遞參數。至於返回值類型，由於int類型的加法返回右值，所以根據Do
+as the ints do的原則，返回值類型爲const Complex：</p>
+<p>const Complex operator+(const Complex&amp;,const Complex&amp;);</p>
+<p>對於operator=，同樣要思考這些問題。我們寫入第一個參數，所以第一個參數爲Complex&amp;，我們只讀取第二個參數，所以第二個參數爲const
+Complex&amp;。至於返回值，還是Do as the ints
+do。int的賦值返回左值，不信你可以試一試：</p>
+<p>int i;</p>
+<p>(i=1)=2;</p>
+<p>雖然比較傻，先將i賦爲1，再將其改爲2，但是這是被C++語法支持的做法，我們就理應遵守。所以返回第一個參數的左值：</p>
+<p>Complex&amp; operator=(Complex&amp;,const Complex&amp;);</p>
+<p>const是C++引入的語言特性，也被ANSI
+C99借鑑，在經典版本的C語言中是沒有的。關於const的歷史，有幾點值得玩味。最初Bjarne
+Stroustrup引入const時，可寫性是和可讀性分開的。那時使用關鍵字readonly和writeonly。這個特點被首先提交到C的ANSI標準化委員會(當時還沒有C++標準化的計劃)，但是ANSI
+C標準只接受了readonly的概念，並將其命名爲const。隨後，有人發現在多線程同步的環境下，有些變量的值會在編譯器的預料之外改變，爲了防止過度優化破壞這些變量，C++又引入關鍵字violate。從語義特點來看，violate是const的反義詞，因爲const表示不會變的量，而violate表示會不按照預期自行變化的量。從語法特點而言，violate與const是極爲相似的，適用於const的一切語法規則同樣適用於violate。</p>
+<p>值的常量性可以被劃分爲兩種：編譯期常量和運行期常量。C++語法並沒有嚴格區分這兩種常量，導致了少許混亂：</p>
+<p>const int i=5;const int * pi=&amp;i;</p>
+<p>const_cast&lt;int&amp;&gt;i=1;//對於運行期常量，在需要時可以去除它的常量性</p>
+<p>int a[i];//對於編譯期常量，可以用它來指定數組大小</p>
+<p>cout&lt;&lt;i&lt;&lt;sizeof(a)/sizeof(a[0])&lt;&lt;*pi;</p>
+<p>這種將編譯期與運行期常量的特性混用的方法，勢必導致語義的混亂。數組a的大小最終是5，因爲採用了i的編譯期值，而不管i在運行期是否被改變了值。最後一句代碼將（有可能）輸出551，第一個i的值作爲一種優化在編譯期綁定，第二個值標明瞭a的大小，第三個值通過指針顯示地輸出i的運行期真實值。</p>
+<p>在C++的近親C#的語法中，這兩種常量被嚴格地區分開：編譯期常量由const指定，只能是內建類型變量；運行期常量由readonly指定，可以是任何類型。永遠不會改變的常量，如圓周率pi的值，應該用const聲明；而其它有可能改變的常量，皆由readonly聲明。</p>
+<p>C++中的const的特點更傾向於C#中的readonly，雖然語法上允許使用const的編譯期常量性，但正如上文所展示的，這容易造成混亂。爲了得到C#中const的語義，在C++中，我們不必迴歸惡魔#define的懷抱，可以使用所謂“匿名enum技巧”。當匿名聲明一個enum類型時，其中的枚舉值就是一個int類型的編譯期常量，比如：</p>
+<p>enum{Size=5;};</p>
+<p>int a[Size];</p>
+<p>這種使用匿名enum來聲明編譯期常量的做法，被廣泛應用於STL、boost等模板庫的實現代碼中。</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/c-tricks-2-2-i386-memory-layout.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        C++ Tricks 2.2 I386平臺的內存佈局
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/c-tricks-3-2-label-goto-and-implementation-of-switch.html" class="btn btn-default btn-lg" style="float:right;clear:both;background-color:#fff;">
+                        <h4>
+                        C++ Tricks 3.2 標號、goto，以及switch的實現<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+This is part 11 of the "CPP_Tricks" series:                  </h4>
+                </div>
+                <ul class="list-group">
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks.html' style="text-align:left">C++ Tricks</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-1-1-conditional-operator.html' style="text-align:left">C++ Tricks 1.1  條件運算符(?:)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operator.html' style="text-align:left">C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-1-x86-architecture.html' style="text-align:left">C++ Tricks 2.1 X86概述</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-2-i386-memory-layout.html' style="text-align:left">C++ Tricks 2.2 I386平臺的內存佈局</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functions.html' style="text-align:left">C++ Tricks 2.3 I386平臺C函數內部的棧分配</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html' style="text-align:left">C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-5-address-alignment.html' style="text-align:left">C++ Tricks 2.5 I386平臺的邊界對齊(Align)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-6-i386-variable-arguments.html' style="text-align:left">C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable Arguments)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html' style="text-align:left">C++ Tricks 2.7 I386平臺的其它函數調用模型</a></li>
+                        <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html' style="text-align:left">C++ Tricks 3.1 左值右值與常量性(lvalue，rvalue &amp; constant)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/c-tricks-3-2-label-goto-and-implementation-of-switch.html' style="text-align:left">C++ Tricks 3.2 標號、goto，以及switch的實現</a></li>
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue comments            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+Leave a comment from <a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/24#new_comment_field" target="_blank"> this post's issue page </a> using your Github account.                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/24#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; left a comment on &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/24/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus comments            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'c-tricks-3-1-lvalue-rvalue-constant';
+                        var disqus_url = 'http://farseerfc.me/c-tricks-3-1-lvalue-rvalue-constant.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/about.html">
+About farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    Linux <sup> 7</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-usd fa-lg"></i><span class="icon-label">Promotions</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <a href="https://www.vultr.com/?ref=6924747-3B">
+<img src="https://www.vultr.com/media/banner_4.png" width="160" height="600">
+</a>
+    </div>
+</div>
+</div>
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; Powered by            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> generator                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

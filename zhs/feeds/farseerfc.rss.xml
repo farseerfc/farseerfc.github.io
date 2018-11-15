@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel><title>Farseerfc的小窝 - farseerfc</title><link>//farseerfc.me/zhs/</link><description></description><lastBuildDate>Mon, 08 Aug 2016 16:15:00 +0900</lastBuildDate><item><title>为什么 Linus Torvalds 不愿意将 Linux 变成 GPLv3 授权？</title><link>//farseerfc.me/zhs/why-linus-torvalds-undermine-gplv3.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="https://www.zhihu.com/question/48884264/answer/113454129"&gt;知乎&lt;/a&gt; 转载&lt;/p&gt;
+&lt;p&gt;和上篇文章一样，这篇也是来自一个知乎上我回答的问题。&lt;/p&gt;
+&lt;p&gt;原问题：为什么 Linus Torvalds 不愿意将 Linux 变成 GPLv3 授权？&lt;/p&gt;
+&lt;p&gt;我的回答：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里有段 Linus Torvalds 在 DebConf 14 上的 Q&amp;amp;A:
+&lt;a class="reference external" href="https://youtu.be/1Mg5_gxNXTo?t=47m20s"&gt;https://youtu.be/1Mg5_gxNXTo?t=47m20s&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;其中关于 GPLv3 和协议的那一段在47:20开始到57:00左右。
+里面 Linus 对自己的观点澄清得很清楚了。
+看u2b或者听英语有困难的请留评论，我抽空可以试着翻译一下。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_1Mg5_gxNXTo"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/1Mg5_gxNXTo"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XMTY3NjIzNDU0NA"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XMTY3NjIzNDU0NA/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_1Mg5_gxNXTo"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XMTY3NjIzNDU0NA"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;然后接下来就是我承诺的翻译了 …&lt;/h2&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 08 Aug 2016 16:15:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2016-08-08:/zhs/why-linus-torvalds-undermine-gplv3.html</guid><category>Linux</category><category>zhihu</category><category>GPLv3</category><category>licenses</category><category>Linus Torvalds</category><category>GPL</category><category>FSF</category><category>EFF</category></item><item><title>C语言中“.”与“-&gt;”有什么区别？</title><link>//farseerfc.me/zhs/dot-and-arrow-in-c.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="https://www.zhihu.com/question/49164544/answer/114584541"&gt;知乎&lt;/a&gt; 转载&lt;/p&gt;
+&lt;p&gt;转载几篇知乎上我自己的回答，因为不喜欢知乎的排版，所以在博客里重新排版一遍。&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;原问题：C语言中“.”与“-&amp;gt;”有什么区别？&lt;/h2&gt;
+&lt;p&gt;除了表达形式有些不同，功能可以说完全一样阿。那为何又要构造两个功能一样的运算符？ 效率有差异？可是现在编译器优化都那么强了，如果真是这样岂不是有些多此一举&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;刚刚翻了下书，说早期的C实现无法用结构直接当作参数在函数间传递，只能用指向结构的指针在函数间进行传递！我想这应该也是最直观的原因吧。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;我的回答&lt;/h2&gt;
+&lt;p&gt;首先 &lt;code class="code"&gt;
+a-&amp;gt;b&lt;/code&gt;
+ 的含义是 &lt;code class="code"&gt;
+(*a).b&lt;/code&gt;
+ ，所以他们是不同的，不过的确 &lt;code class="code"&gt;
+-&amp;gt;&lt;/code&gt;
+ 可以用 &lt;code class="code"&gt;
+*&lt;/code&gt;
+ 和 &lt;code class="code"&gt;
+.&lt;/code&gt;
+ 实现，不需要单独一个运算符。
+嗯，我这是说现代的标准化的 C 语义上来说， &lt;code class="code"&gt;
+-&amp;gt;&lt;/code&gt;
+ 可以用 &lt;code class="code"&gt;
+*&lt;/code&gt;
+ 和 &lt;code class="code"&gt;
+.&lt;/code&gt;
+ 的组合实现。&lt;/p&gt;
+&lt;p&gt;早期的 C 有一段时间的语义和现代的 C 的语义不太一样。&lt;/p&gt;
+&lt;p&gt;稍微有点汇编的基础的同学可能知道，在机器码和汇编的角度来看，不存在变量，不存在 struct …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 08 Aug 2016 00:02:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2016-08-08:/zhs/dot-and-arrow-in-c.html</guid><category>C</category><category>zhihu</category></item><item><title>启用 GitHub Issue 作为博客留言系统</title><link>//farseerfc.me/zhs/github-issues-as-comments.html</link><description>&lt;p&gt;从今天起本博客将启用 GitHub Issue 作为留言系统。
+原本使用的 Disqus 将继续保留一段时间，目前没有关闭的计划。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 是计划了好久的事情了，最初重做这个主题的时候就有考虑过。
+这个想法的契机是看到了这篇
+&lt;a class="reference external" href="http://ivanzuzak.info/2011/02/18/github-hosted-comments-for-github-hosted-blogs.html"&gt;GitHub hosted comments for GitHub hosted blogs&lt;/a&gt;
+，然后立马觉得这个想法很符合寄宿在 GitHub Pages 上的博客。
+一个限制是要求评论者必须有 GitHub
+账户，考虑到我的博客的受众这个要求估计不算太过分。
+使用 GitHub Issue 的好处么，比如自带的 GFMD
+富文本格式，邮件通知，还有订阅和取消订阅通知，邮件回复，
+这些方面都不比第三方留言系统逊色。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 另一方面原因是最近听说 Disqus
+被部分墙了，想必以后墙也会越来越高。之前曾经试过在这个博客换上多说，
+然而效果我并不喜欢，多说喜欢侵入页面加很多奇怪的东西 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 07 Aug 2016 16:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2016-08-07:/zhs/github-issues-as-comments.html</guid><category>pelican</category><category>github</category><category>pages</category><category>issues</category></item><item><title>PacVis: 可视化 pacman 本地数据库</title><link>//farseerfc.me/zhs/pacvis.html</link><description>
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Demo of PacVis" class="img-responsive" src="//farseerfc.me/zhs/images/pacvis-first.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;我为什么要做 PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;我喜欢 Arch Linux ，大概是因为唯有 Arch Linux 能给我对整个系统「了如指掌」的感觉。
+在 Arch Linux 里我能清楚地知道我安装的每一个包，能知道系统里任何一个文件是来自哪个包，
+以及我为什么要装它。或许对 Debian/Fedora/openSUSE 足够熟悉了之后也能做到这两点，
+不过他们的细致打包的结果通常是包的数量比 Arch 要多个 3 到 10 倍，并且打包的细节也比 Arch
+Linux 简单的 PKGBUILD 要复杂一个数量级。&lt;/p&gt;
+&lt;p&gt;每一个装过 Arch Linux 的人大概都知道，装了 Arch Linux 之后得到的系统非常朴素，按照
+ArchWiki 上的流程一路走下来的话，最关键的一条命令就是 &lt;code class="code"&gt;
+pacstrap /mnt …&lt;/code&gt;&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 31 Jul 2016 03:52:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2016-07-31:/zhs/pacvis.html</guid><category>python</category><category>pacvis</category><category>pacman</category><category>arch</category><category>linux</category><category>pacgraph</category></item><item><title>X 中的混成器与 Composite 扩展</title><link>//farseerfc.me/zhs/compositor-in-X-and-compositext.html</link><description>
+&lt;p&gt;在上篇文章 &lt;a class="reference external" href="//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html"&gt;「桌面系统的混成器简史」&lt;/a&gt;
+中我介绍了其它桌面系统中的混成器的发展史和工作原理，
+话题回到我们的正题 Linux 系统上，来说说目前 X 中混成器是如何工作的。
+这篇文章将比上一篇深入更多技术细节，不想看太多细节的可以直接跳过看 &lt;a class="reference external" href="#id6"&gt;结论&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="x"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
+而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
+GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
+其余则通过 xlib 或者 xcb 调用 X 核心协议提供的绘图原语绘图 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 19 Mar 2015 17:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-19:/zhs/compositor-in-X-and-compositext.html</guid><category>linux</category><category>wayland</category><category>xorg</category><category>compositor</category></item><item><title>桌面系统的混成器简史</title><link>//farseerfc.me/zhs/brief-history-of-compositors-in-desktop-os.html</link><description>
+&lt;p&gt;（原本是想写篇关于 Wayland 的文章，后来越写越长感觉能形成一个系列，
+于是就先把这篇背景介绍性质的部分发出来了。）&lt;/p&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Linux 系统上要迎来 Wayland 了，或许大家能从各种渠道打听到 Wayland
+是一个混成器，替代 X 作为显示服务器。
+那么 &lt;strong&gt;混成器&lt;/strong&gt; 是个什么东西，桌面系统为什么需要它呢？
+要理解为什么桌面系统需要 &lt;strong&gt;混成器&lt;/strong&gt; （或者它的另一个叫法，
+&lt;ruby&gt;&lt;rb&gt;混成窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Compositing Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+），在这篇文章中我想回顾一下历史，
+了解一下混成器出现的前因后果。&lt;/p&gt;
+&lt;p&gt;首先介绍一下混成器出现前主要的一类窗口管理器，也就是
+&lt;ruby&gt;&lt;rb&gt;栈式窗口管理器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Stacking Window Manager&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的实现方式。&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+本文中所有桌面截图来自维基百科，不具有著作权保护。&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;早期的栈式窗口管理器&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+栈式窗口管理器的例子，Windows 3.11 的桌面&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="栈式窗口管理器的例子，Windows 3.11 的桌面" class="img-responsive" src="//farseerfc.me/zhs/images/Windows_3.11_workspace.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;我们知道最初图形界面的应用程序是全屏的，独占整个显示器（现在很多游戏机和手持设备的实现仍旧如此）。
+所有程序都全屏并且任何时刻只能看到一个程序的输出，这个限制显然不能满足人们使用计算机的需求，
+于是就有了 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/WIMP_(computing)"&gt;窗口 …&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 19 Mar 2015 13:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-19:/zhs/brief-history-of-compositors-in-desktop-os.html</guid><category>desktop</category><category>compositor</category><category>macosx</category><category>windows</category><category>window</category><category>manager</category></item><item><title>避免在博文中写「简单地」</title><link>//farseerfc.me/zhs/stop-write-simply.html</link><description>&lt;p&gt;我的 RSS 订阅着一个博客叫 &lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/"&gt;The Old New Thing&lt;/a&gt;
+，作者是Windows开发者之一的 Raymond Chen ，记录 Windows 中的很多有趣的技术细节。
+这个博客中的一些精彩内容还被他写成了一本书，中文名叫《Windows编程启示录》
+(ISBN: &lt;a class="reference external" href="http://www.amazon.cn/dp/B0011C1ZEG/"&gt;978-7-111-21919-4&lt;/a&gt;) 而英文书名就叫
+&lt;em&gt;The Old New Thing — Practical Development Throughout the Evolution of Windows&lt;/em&gt;
+(ISBN: &lt;a class="reference external" href="http://www.amazon.com/gp/product/0321440307"&gt;978-0-321-44030-3&lt;/a&gt;)。&lt;/p&gt;
+&lt;p&gt;今天看到这个博客的一篇文章说
+&lt;a class="reference external" href="http://blogs.msdn.com/b/oldnewthing/archive/2015/03/10/10598846.aspx"&gt;你用「简单地」次数越多我越怀疑你不懂这个词的意思&lt;/a&gt; ， 描述他看到某个博客上指导读者打开命令行、执行某条魔法命令、从命令输出抽取参数、
+改写配置文件、用魔法命令重启服务，并把这些工作描述为「简单地」。&lt;/p&gt;
+&lt;p&gt;的确正如 Raymond 指出，一个人觉得简单的事情对别人并不一定是简单的。
+搜了一下我自己写的东西，的确很多地方写了「简单 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 11 Mar 2015 22:00:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-03-11:/zhs/stop-write-simply.html</guid><category>blog</category><category>writing</category></item><item><title>用 Travis-CI 生成 Github Pages 博客</title><link>//farseerfc.me/zhs/travis-push-to-github-pages-blog.html</link><description>
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
+&lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
+Github Pages 原本就有的
+&lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
+&lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 20 Feb 2015 11:10:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-02-20:/zhs/travis-push-to-github-pages-blog.html</guid><category>pelican</category><category>github</category><category>pages</category><category>travis</category><category>travis-ci</category><category>ubuntu</category></item><item><title>从天气预报谈谈日本的学术氛围</title><link>//farseerfc.me/zhs/weather-forcast-academic-in-japan.html</link><description>&lt;p&gt;最近 &lt;a class="reference external" href="/links.html#mazk"&gt;mazk&lt;/a&gt; 说我 &lt;a class="reference external" href="//farseerfc.me/zhs/about.html#comment-1856339316"&gt;life 分类里的文章太少&lt;/a&gt;
+，所以想了想写了这篇。&lt;/p&gt;
+&lt;p&gt;很多人问过我为什么要来日本留学，嘛原因之一是我英语太差了，相对而言日语比较好。
+另一方面，我比较喜欢日本的学术氛围。这个当然是主观体会，而不是客观的评价，只是我
+觉得相对于 &lt;strong&gt;欧美喜欢研究基础架构技术&lt;/strong&gt; ， &lt;strong&gt;日本则偏向实用层面&lt;/strong&gt; 。&lt;/p&gt;
+&lt;p&gt;说个具体一点例子，最近看到这篇新闻说
+&lt;a class="reference external" href="http://www.solidot.org/story?sid=43079"&gt;卢布贬值影响中央气象台预报准确率？&lt;/a&gt;
+，其中提到：&lt;/p&gt;
+&lt;blockquote&gt;
+因为卢布贬值，天气预报的准确率会有所降低&lt;/blockquote&gt;
+&lt;p&gt;也说道：&lt;/p&gt;
+&lt;blockquote&gt;
+不过经我多年的观察，中国中央气象台的预报准确率实在是不怎么样，具体到我生活的地区，
+实际天气状况和中国中央气象台预报的出入较大……&lt;/blockquote&gt;
+&lt;p&gt;相信不少人也有类似的体会。&lt;/p&gt;
+&lt;p&gt;天气预报是事关人们生活的重要信息，其准确度对生产生活当然有很大影响。
+说到增加天气预报的准确度，人们自然会想到高性能的超级计算机比如
+&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E5%A4%A9%E6%B2%B3%E4%BA%8C%E5%8F%B7"&gt;天河二号&lt;/a&gt;
+，想到环绕在地球高空的 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E6%B0%A3%E8%B1%A1%E8%A1%9B%E6%98%9F"&gt;气象卫星&lt;/a&gt;
+，想到遍布世界各地的气象站观测台。想想这么多耗资不菲的高尖端项目被国家投入，
+用来改善天气预报的准确程度，看起来这的确是一个困难的科研课题。&lt;/p&gt;
+&lt;p&gt;话说回来，准确预测气温、气压、湿度、降水概率等等这些事情对于生产生活固然重要，
+不过对一般民众而言，天气预报最重要的作用就只是回答 &lt;strong&gt;明天我该穿多厚的衣服，出门是否需要打伞&lt;/strong&gt;
+这种问题 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 18 Feb 2015 21:00:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-02-18:/zhs/weather-forcast-academic-in-japan.html</guid><category>japan</category><category>academic</category></item><item><title>archlinux 上用 chrome 实现 透明计算 远程登录</title><link>//farseerfc.me/zhs/arch-chrome-remote-desktop.html</link><description>
+&lt;p&gt;&lt;a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm"&gt;透明计算&lt;/a&gt;
+具体是什么，因为他们没有公开技术细节所以我并不知道，只是看
+&lt;a class="reference external" href="http://v.qq.com/page/h/v/q/h0145ebh1vq.html"&gt;公开出来的演示视频&lt;/a&gt;
+，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
+如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。&lt;/p&gt;
+&lt;p&gt;Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 &lt;strong&gt;不太易用&lt;/strong&gt; 的地方在于，需要
+通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。&lt;/p&gt;
+&lt;p&gt;于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
+上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
+方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录，
+位于远端的登录的计算机必须一直开着 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 13 Feb 2015 20:39:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-02-13:/zhs/arch-chrome-remote-desktop.html</guid><category>linux</category><category>archlinux</category><category>arch</category><category>chrome</category><category>remote</category><category>desktop</category></item><item><title>换到 farseerfc.me 域名</title><link>//farseerfc.me/zhs/switch-to-farseerfc-dot-me-domain.html</link><description>&lt;p&gt;上个月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上买了个自己的域名 &lt;code class="code"&gt;
+farseerfc.me&lt;/code&gt;
+ 准备用在这个
+博客上，当时试着转到过这个域名，发现 &lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+只支持 http 不支持 https ，想着还要买自己的证书，于是就扔在了一旁。不用自定义域名的话，
+放在 github.io 上是可以用 HTTPS 的。
+今天在 &lt;a class="reference external" href="//webchat.freenode.net/?channels=archlinux-cn"&gt;#archlinux-cn&lt;/a&gt; 上受大牛 &lt;a class="reference external" href="/links.html#quininer"&gt;quininer&lt;/a&gt; 和 &lt;a class="reference external" href="/links.html#lilydjwg"&gt;lilydjwg&lt;/a&gt; 点播，
+发现 cloudflare 有提供
+&lt;a class="reference external" href="https://blog.cloudflare.com/introducing-universal-ssl/"&gt;免费的支持 SSL 的 CDN 服务&lt;/a&gt;
+赶快去申请了一个，感觉非常赞，于是就换过来了。&lt;/p&gt;
+&lt;p&gt;设置的方法按照 &lt;a class="reference external" href="https://me.net.nz/blog/github-pages-secure-with-cloudflare/"&gt;这篇博文&lt;/a&gt;
+说的一步步做下来，如它所述，用 CloudFlare …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 26 Jan 2015 23:32:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-26:/zhs/switch-to-farseerfc-dot-me-domain.html</guid><category>pelican</category><category>domain</category><category>cloudflare</category><category>github</category></item><item><title>重新设计了 Pelican 的主题与插件</title><link>//farseerfc.me/zhs/redesign-pelican-theme.html</link><description>
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，将一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;不知不觉间放任这边长草很久了，从上次
+&lt;a class="reference external" href="//farseerfc.me/zhs/try-pelican.html"&gt;折腾主题&lt;/a&gt; 到现在都快三年了，
+而从上次 &lt;a class="reference external" href="//farseerfc.me/zhs/marry-me.html"&gt;写了篇告白信&lt;/a&gt; 到现在也有快两年了。
+这期间曾经把主题配色从 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默认的
+白底黑字改成了让眼睛更舒适的黑底白字，也不过是用 drop-in 的配色方案而已，没有本质上的改进。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千载，两年里 Bootstrap 已经升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 则已经升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。&lt;/p&gt;
+&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;strong&gt;两个月&lt;/strong&gt; 的时间重新设计了一遍
+Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
+（以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 25 Jan 2015 22:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-25:/zhs/redesign-pelican-theme.html</guid><category>python</category><category>pelican</category><category>bootstrap</category><category>material</category><category>subsite</category></item><item><title>总结一下 Material Design 的 CSS 框架</title><link>//farseerfc.me/zhs/summarize-material-design-css-framework.html</link><description>&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;现在这里的界面风格要从 Google 在 &lt;a class="reference external" href="https://www.google.com/events/io"&gt;I/O 2014 大会&lt;/a&gt;
+上公布Android L 也即 后来的 Lollipop 说起。 他们在谈论界面设计的时候公布了他们的
+设计准则： &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt; (&lt;a class="reference external" href="http://wcc723.gitbooks.io/google_design_translate/"&gt;中文非官方翻译&lt;/a&gt; )。
+当然这只是一些准则，总结并描述了之前在 Web 设计和移动端 App 界面设计方面的一些规范，
+并且用材料的类比来形象化的比喻这个准则。关于 Material Design 的更多中文资料可
+&lt;a class="reference external" href="http://www.ui.cn/Material/"&gt;参考这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;看到 Material Design 之后就觉得这个设计风格非常符合直觉，于是想在这边也用上
+Material Design。 但是我在 Web 前端科技树上没点多少技能点，所以想找找别人实现好的模板
+或者框架直接套用上。在网络上搜索数日找到了这几个：&lt;/p&gt;
+&lt;div class="section" id="polymer-paper-elements"&gt;
+&lt;h2&gt;Polymer Paper Elements&lt;/h2&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Polymer&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;object class="embed-responsive-item" data="https://www.polymer-project.org/images/logos/p-logo.svg" type="image/svg+xml"&gt;
+Polymer logo&lt;/object&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Google …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 16 Jan 2015 03:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2015-01-16:/zhs/summarize-material-design-css-framework.html</guid><category>css</category><category>material</category><category>paper</category></item><item><title>从非缓冲输入流到 Linux 控制台的历史</title><link>//farseerfc.me/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html</link><description>
+&lt;p&gt;这篇也是源自于水源C板上板友的一个问题，涉及Linux上的控制台的实现方式和历史原因。因为内容比较长，所以在这里再排版一下发出来。
+&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1418138991,file,M.1418138991.A.html"&gt;原帖在这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;可以设置不带缓冲的标准输入流吗？&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;WaterElement(UnChanged) 于 2014年12月09日23:29:51 星期二 问到：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;请问对于标准输入流可以设置不带缓冲吗？比如以下程序&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kt"&gt;FILE&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fdopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;"r"&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;setvbuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_IONBF&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;fgets&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fp&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"buffer …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/blockquote&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 12 Dec 2014 17:06:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-12:/zhs/from-unbuffered-stdin-to-history-of-linux-tty.html</guid><category>c</category><category>linux</category><category>stdio</category><category>tty</category><category>unix</category><category>ugh</category><category>ncurses</category><category>termcap</category><category>terminfo</category></item><item><title>KDE5 Plasma 之跳动卖萌的活动按钮</title><link>//farseerfc.me/zhs/jumping-kde5-plasma-activities-button.html</link><description>&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;今天尝试 KDE5 Plasma 的活动的时候无意间发现这个现象。
+只要把活动按钮拖出桌面，它就会在桌面边缘来回跳动。
+视频如下：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;当然你可以把它再拖回来，所以这个问题还无伤大雅，只是卖萌。&lt;/p&gt;
+&lt;p&gt;比比之前 Gnome3 那个跳动的界面真是好太多了：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_TRQJdRHYwrw"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XNjc4MjQ5NjE2"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_TRQJdRHYwrw"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XNjc4MjQ5NjE2"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;顺便，今天还看到一个卖萌的 KDE5 Plasma 静音图标的翻译：&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国语翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 09 Dec 2014 01:54:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2014-12-09:/zhs/jumping-kde5-plasma-activities-button.html</guid><category>kde5</category><category>plasma</category><category>linux</category><category>gnome3</category></item><item><title>嫁给我好么</title><link>//farseerfc.me/zhs/marry-me.html</link><description>&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+渲染的样子&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;blockquote&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;img alt="嫁给我好么" class="img-responsive" src="/images/marry-me.png"/&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;可以玩的是下面这个：&lt;/p&gt;
+&lt;script src="/static/three.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/FirstPersonControls.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/helvetiker_regular.typeface.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/214game.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;div id="game_area" style="width: 600px; height: 450px; margin-left: 10px;clear:both"&gt;
+&lt;/div&gt;
+&lt;p style="margin-left: 100px; margin-top: 10px; "&gt;* 用 WASD←→ 移动，需要 WebGL 支持&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 20 Feb 2013 20:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2013-02-20:/zhs/marry-me.html</guid><category>will</category><category>you</category><category>marry</category><category>me</category></item><item><title>ICSE 2012</title><link>//farseerfc.me/zhs/icse2012.html</link><description>
+&lt;div class="section" id="june-6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;June 6&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="section" id="keynote-1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id2"&gt;Keynote 1&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;没怎么听懂，只记得讲到了finance is not money但是没听懂这个和软件有什么关系。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="cost-estimation-for-distributed-software-project"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id3"&gt;Cost Estimation for Distributed Software Project&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;讲到他们试图改善现有的模型去更精确地评估软件开发的开销。&lt;/p&gt;
+&lt;p&gt;他们会给PM建议之前的项目的历史数据，然后对于新项目，他们建议历史上已有
+的项目的数据，从而帮助PM得到更精确的评估。他们试图尽量减少项目评估对PM
+的经验的需求，从而帮助即使经验很少的PM也能准确评估项目的开销。&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;p&gt;他们的观点：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Context-specfic solutions needed!&lt;/p&gt;
+&lt;p&gt;我们需要更上下文相关的解决方案！&lt;/p&gt;
+&lt;p&gt;Early user paticipation is key!&lt;/p&gt;
+&lt;p&gt;早期用户的参与是关键&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="characterizing-logging-practices-in-open-source-software"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;Characterizing Logging Practices in Open-Source Software&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Common mistakes in logging messages&lt;/p&gt;
+&lt;p&gt;在日志记录中容易犯的错误&lt;/p&gt;
+&lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 06 Jun 2012 10:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-06-06:/zhs/icse2012.html</guid><category>icse</category><category>software</category></item><item><title>MSR 2012 @ ICSE</title><link>//farseerfc.me/zhs/msr2012.html</link><description>
+&lt;div class="section" id="mining-software-repository-2012-icse"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Mining Software Repository 2012 @ ICSE&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;参加了今年的MSR，会场在University of Zurich。一大早来到大学，注册有点
+小插曲，显然瑞士人搞不清楚中国人的名字，3个杨（Yang）姓的中国人的名牌
+被搞错了。然后堀田学长的所属被写作了“Japan, Japan”，成为了全日本的代表。&lt;/p&gt;
+&lt;div class="section" id="msr-microsoft-research-talk-msr-mining-software-repositories"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;MSR(MicroSoft Research) talk @ MSR(Mining Software Repositories)&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;首先是来自微软亚洲研究院（MicroSoft Research @ Asia, MSR Asia）的Keynots，
+于是就变成了MSR在MSR的演讲。MSR的张冬梅（Dongmei Zhang）女士的演讲
+分为关于Software Analysis和XIAO的两部分。XIAO是MSRA开发的Code Clone
+Detector，似乎我要给井上研做的就是这个。想更多了解Xiao的细节，不过张女士
+演讲结束的时候的鼓掌导致了话筒的小故障 …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sat, 02 Jun 2012 10:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-06-02:/zhs/msr2012.html</guid><category>msr</category><category>icse</category><category>mining</category><category>software</category><category>repository</category></item><item><title>Pyssy 项目</title><link>//farseerfc.me/zhs/pyssy.html</link><description>&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;简介&lt;/h2&gt;
+&lt;p&gt;Pyssy 是用于 &lt;a class="reference external" href="https://bbs.sjtu.edu.cn"&gt;上海交通大学 饮水思源站&lt;/a&gt; 的一系列 Python 脚本和工具。&lt;/p&gt;
+&lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
+&lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="sae" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;依赖关系&lt;/h2&gt;
+&lt;p&gt;Pyssy 使用 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 作为网页服务器，
+并且使用 Memcached 或者 Redis 作为抓取 &lt;em&gt;水源Web&lt;/em&gt; 的缓存。&lt;/p&gt;
+&lt;p&gt;SAE Python 环境下请开启 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 02 Apr 2012 12:42:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-04-02:/zhs/pyssy.html</guid><category>python</category><category>sjtu</category><category>yssy</category></item><item><title>PyRuby</title><link>//farseerfc.me/zhs/mix-ruby.html</link><description>&lt;p&gt;今天在GitHub上闲逛的时候看到一个叫做 &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; 的项目。项目的Readme说得很好：&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+PyRuby - Some Ruby for your Python!
+PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.
+
+Usage
+All you have to do is import the ruby module:
+
+import ruby
+From now on you should be able …&lt;/pre&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 02 Mar 2012 23:09:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-03-02:/zhs/mix-ruby.html</guid><category>python</category><category>ruby</category></item><item><title>关于C++模板的类型转换的讨论</title><link>//farseerfc.me/zhs/discuss-cpp-template-downcast.html</link><description>
+&lt;p&gt;这两天在饮水思源的C板，关于C++模板的类型转换的一个讨论，后面是我的解答。&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;讨论地址&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html"&gt;http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;原问题&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;今天在书上看到模板演绎的时候可以允许cast-down，于是我写了个东西：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 26 Feb 2012 05:54:57 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-02-26:/zhs/discuss-cpp-template-downcast.html</guid><category>template</category><category>C</category></item><item><title>尝试一下 Pelican</title><link>//farseerfc.me/zhs/try-pelican.html</link><description>&lt;p&gt;似乎一夜之间所有的
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;极客们&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;都&lt;/a&gt;
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;有了&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;自己&lt;/a&gt;
+的 &lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github主页&lt;/a&gt;
+和 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 博客。就像所有人在他们的博客中指出的，静态博客的确比传统的WordPress方式具有更多优势。 自从看到这些
+我就一直在想着自己搭一个 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;但是似乎 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 不适合我&lt;/h2&gt;
+&lt;p&gt;一上手就被 &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Octopress的搭建步骤&lt;/a&gt; 烦到了。 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 是什么？ &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 又是什么？
+看来 Ruby 社区的快节奏发展已经超过了我的想象，他们似乎需要一套发行版管理器来调和不同版本之间的 Ruby 的兼容性问题。
+虽然同样的兼容性问题在 Python 社区也有 &lt;a class="footnote-reference" href="#id10" id="id8"&gt;[1]&lt;/a&gt; ，不过总觉得 Python 至少还没到需要一个发行版管理器的程度 &lt;a class="footnote-reference" href="#id11" id="id9"&gt;[2]&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;真正的问题是我手上还没有一个可以让我随便玩的 Linux 环境（真的想要……）。 而无论是 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 还是 &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 似乎都只支持 Unix/Linux …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 24 Feb 2012 17:33:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2012-02-24:/zhs/try-pelican.html</guid><category>python</category><category>pelican</category></item><item><title>关于我的Blogs</title><link>//farseerfc.me/zhs/about-my-blogs.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;p&gt;很久没有写过blog或者之类的东西了。这边一直荒废着。&lt;/p&gt;
+&lt;p&gt;由于国内被墙的原因，另一个wordpress： &lt;a class="reference external" href="http://fchome.sinaapp.com/"&gt;http://fchome.sinaapp.com/&lt;/a&gt;
+应该会同步更新这里的内容。&lt;/p&gt;
+&lt;p&gt;抽空写点什么吧。&lt;/p&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 27 Sep 2011 02:35:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2011-09-27:/zhs/about-my-blogs.html</guid></item><item><title>“…if we do this work … ” --Bill Gates</title><link>//farseerfc.me/zhs/if-we-do-this-work.html</link><description>&lt;p&gt;导入自
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/716517729"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;From: Bill Gates&lt;/p&gt;
+&lt;p&gt;’-- Sent: Sunday, January 24, 1999 8:41 AM&lt;/p&gt;
+&lt;p&gt;Jeff Westorinon; Ben Fathi ;&lt;/p&gt;
+&lt;p&gt;TO: Carl Stork (Exchange); Nathan Myhrvofd; Eric Rudder&lt;/p&gt;
+&lt;p&gt;Subject: ACPI extensions&lt;/p&gt;
+&lt;p&gt;One thing I find myself wondering about is whether we shouldn’t try and
+make the "ACPI" extensions somehow Windows specific.&lt;/p&gt;
+&lt;p&gt;It …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 14 Mar 2011 20:34:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2011-03-14:/zhs/if-we-do-this-work.html</guid><category>microsoft</category><category>linux</category><category>acpi</category></item><item><title>[zz]“西厢计划”原理小解</title><link>//farseerfc.me/zhs/zz-introducing-scholarzhang.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;p&gt;好神奇的想法，先存着，以后慢慢研究&lt;/p&gt;
+&lt;p&gt;原文： &lt;a class="reference external" href="http://blog.youxu.info/2010/03/14/west-chamber/"&gt;http://blog.youxu.info/2010/03/14/west-
+chamber/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;待月西厢下，迎风户半开。隔墙花影动，疑是玉人来。&lt;/p&gt;
+&lt;p&gt;最近推上最流行的一个关键词是”西厢计划”,
+这个计划名字取得很浪漫，客户端叫做张生，对，就是西厢记里面那个翻墙去见崔莺莺小姐的张生；显然，服务器端必然叫做崔莺莺。客户端的张生是最重要的部件，可以不依赖于服务端工作。因为西厢计划的作者只是简要的介绍了一下原理，其他报道又语焉不详，我当时就觉得很好奇，花了昨天一个晚上详细读了一下源代码，终于知道怎么回事了，觉得原理非常漂亮，所以写篇文章介绍总结一下。&lt;/p&gt;
+&lt;p&gt;先说大方向。大家都知道，连接被重置的本质，是因为收到了破坏连接的一个 TCP
+Reset 包。以前剑桥大学有人实验过，客户端和服务器都忽略 Reset,
+则通信可以不受影响 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 17 Mar 2010 09:40:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2010-03-17:/zhs/zz-introducing-scholarzhang.html</guid><category>zz</category></item><item><title>写程序让CPU占用率保持正弦函数</title><link>//farseerfc.me/zhs/sine-cpu.html</link><description>&lt;p&gt;导入自
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;据说是一道微软的面试题。如题，写程序，让Windows的任务管理器中的性能监视器呈现正弦曲线。&lt;/p&gt;
+&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;;&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;work&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 02 Jun 2008 23:27:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2008-06-02:/zhs/sine-cpu.html</guid><category>java</category><category>microsoft</category></item><item><title>关于神创论的一些见解</title><link>//farseerfc.me/zhs/some-thought-on-creationism.html</link><description>&lt;p&gt;导入自
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/292274803"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;看到陈骉同学很有感想的一篇神创论与命运日志，觉得近日很久没有看到这样的评论了。想说几句自己的观点。&lt;/p&gt;
+&lt;p&gt;首先我认为，神创论与宿命论没有多少关联，甚至进化论者相较于神创论者更容易接受宿命论的观点。因为神创论主张意志的存在，人所具有的个体意志与神的意志，因此在神创论者的眼中事件的结果是可以通过意志来改变的，亦即如果我从物理楼11楼跳下，那么我就可以改变自己死亡时间的宿命。上帝的意志同样可以左右事件的结果，也就是所谓的宿命不复存在。而进化论者不承认意志独立于物质世界的存在，你我的思考、行为，都受到物理学法则诸如量子力学的约束，这就引出了北大物理系教授的那句“宇宙中的一切都是可以计算的”，亦即宿命论。如我我选择现在从物理楼上跳下，我这一行为并不是处于个人的独立意志，乃是想证明这一点，亦即我跳楼这一举动是有其背后的动机与原因的，就如同计算机的输入必然导致了输出，宿命的必然终结于此。&lt;/p&gt;
+&lt;p&gt;其次，关于事件的复杂度所导致的随机化，在大量混沌随机中也存在着如统计学和随机分形学这样的规律，并不是否认宿命的充分理由。&lt;/p&gt;
+&lt;p&gt;关于神创论的合理性问题。我认为是否相信神的存在只是一个boolean二值问题，它为true为false本身并不重要，重要的是确定它的取值之后得到的推论与结果。如果否认神的存在，如现代数学这样的完美又何以存在，进化论者的解释是事物最终会向着更好更高级的方向发展，产生现代数学乃至现代科学是发展的必然。而这种论调显然有悖于物理中以热力学第二定律为首的，预言事物会随时间推演愈发混乱的论断。更进一步，甚至整个人类、整个生物系统的存在都是有悖于热力学推论的现象，是某种理论只能以“小概率事件”解释的现象。&lt;/p&gt;
+&lt;p&gt;神创论的核心观点之一，是神的唯一存在性 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 12 May 2008 11:16:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2008-05-12:/zhs/some-thought-on-creationism.html</guid><category>creationism</category></item><item><title>由记忆棒误差故障引发的关于面向对象设计的九点思考</title><link>//farseerfc.me/zhs/9-thoughts-about-oop-from-wrongly-insert-memory-stick.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;p&gt;故障描述:
+MMC Memory Stick Duo记忆棒未经Adapter适配器，直接插入SD Reader，致使MMC卡入SD Reader中。&lt;/p&gt;
+&lt;p&gt;栈展开：
+某日下午，无课。
+忙于数分作业，想查询用手机拍摄的板书照片。
+取出手机中的MMC。
+未经装配Adapter，直接插入SD Reader。
+(A runtime exception was thrown.)
+尝试翻转笔记本机身，倒出MMC，未果。(rethrow)
+尝试用手指甲取出，未果。(rethrow)
+考虑到有“推入反弹”机制，尝试将MMC推入更深，反弹机制由于类型不匹配而失效，未果。(rethrow)
+(The exception spread across the border of the …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Thu, 20 Sep 2007 14:38:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-09-20:/zhs/9-thoughts-about-oop-from-wrongly-insert-memory-stick.html</guid><category>oop</category></item><item><title>Program Development in Java Preface</title><link>//farseerfc.me/zhs/program-development-in-java-preface.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;程序开发原理&lt;/h2&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;——抽象、规格与面向对象设计&lt;/h3&gt;
+&lt;p&gt;Barbara Liskov 、John Guttag 著&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;杨嘉晨 等译&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h3&gt;关于翻译风格：&lt;/h3&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;多年来阅读计算机类的著作及译作，感觉总体的困难在于一大堆没有标准译名的技术术语。由于通行于工业界和学术界的还是英文原名和术语，我决定保留大量的英文术语。这样的翻译风格借鉴于台湾著名的译者和作者侯捷先生。对于译与不译的权衡，主要考虑阅读的流畅，以及读者的理解能力，或许难免带有一些主观色彩。&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="preface"&gt;
+&lt;h2&gt;前言 Preface&lt;/h2&gt;
+&lt;p&gt;构建产品级质量的程序——可以在很长一段时间内使用的程序——众所周知是极其困难的。本书的目标就是改善程序员解决这项任务的效率。我希望读者在阅读本书之后成为一名好程序员。我相信本书的成功在于改善编程技巧，因为我的学生告诉我这已经发生在他们身上。&lt;/p&gt;
+&lt;p&gt;怎么才算是一名好程序员？是产生整个程序产品的效率。关键是要在每一阶段减少浪费掉的努力。解决的方法包括：在开始编写代码之前就仔细考虑你的实现方案，通过未雨绸缪的方法来编写代码，使用严格的测试在早期发现错误，以及仔细注意模块化编程，这样当错误出现时，只需要改动极少数代码就可以修正整个程序。本书涉及所有这些领域的技术。&lt;/p&gt;
+&lt;p&gt;模块化编程(Modularity)是编写好程序的关键。把程序分解成许多小模块，每一个模块通过良好定义的狭窄接口和别的模块交互作用 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 16 Sep 2007 13:26:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-09-16:/zhs/program-development-in-java-preface.html</guid><category>Java</category></item><item><title>C++ Tricks 3.2 标号、goto，以及switch的实现</title><link>//farseerfc.me/zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="goto-switch"&gt;
+&lt;h2&gt;3.2 标号、goto，以及switch的实现&lt;/h2&gt;
+&lt;p&gt;goto语句及标号(label)是最古老的C语言特性，也是最早被人们抛弃的语言特性之一。像汇编语言中的jmp指令一样，goto语句可以跳转到同一函数体中任何标号位置：&lt;/p&gt;
+&lt;p&gt;void f()&lt;/p&gt;
+&lt;p&gt;{int i=0;&lt;/p&gt;
+&lt;p&gt;Loop: //A label&lt;/p&gt;
+&lt;p&gt;++i;&lt;/p&gt;
+&lt;p&gt;if(i&amp;lt;10)goto Loop; //Jump to the label&lt;/p&gt;
+&lt;p&gt;}&lt;/p&gt;
+&lt;p&gt;在原始而和谐的早期Fortran和Basic时代，我们没有if then
+else，没有for和while，甚至没有函数的概念，一切控制结构都靠goto(带条件的或无条件的)构件。软件工程师将这样的代码称作“意大利面条”代码。实践证明这样的代码极容易造成混乱。&lt;/p&gt;
+&lt;p&gt;自从证明了结构化的程序可以做意大利面条做到的任何事情，人们就开始不遗余力地推广结构化设计思想，将goto像猛兽一般囚禁在牢笼 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 16 Sep 2007 13:08:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-09-16:/zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html</guid><category>C++</category></item><item><title>C++ Tricks 3.1 左值右值与常量性(lvalue，rvalue &amp; constant)</title><link>//farseerfc.me/zhs/c-tricks-3-1-lvalue-rvalue-constant.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="lvalue-rvalue-constant"&gt;
+&lt;h2&gt;3.1 左值右值与常量性(lvalue，rvalue &amp;amp; constant)&lt;/h2&gt;
+&lt;p&gt;首先要搞清楚的是，什么是左值，什么是右值。这里给出左值右值的定义：&lt;/p&gt;
+&lt;p&gt;1、左值是可以出现在等号(=)左边的值，右值是只能出现在等号右边的值。&lt;/p&gt;
+&lt;p&gt;2、左值是可读可写的值，右值是只读的值。&lt;/p&gt;
+&lt;p&gt;3、左值有地址，右值没有地址。&lt;/p&gt;
+&lt;p&gt;根据左值右值的第二定义，值的左右性就是值的常量性——常量是右值，非常量是左值。比如：&lt;/p&gt;
+&lt;p&gt;1=1;//Error&lt;/p&gt;
+&lt;p&gt;这个复制操作在C++中是语法错误，MSVC给出的错误提示为“error C2106: '=' :
+left operand must be
+l-value”，就是说’=’的左操作数必须是一个左值，而字面常数1是一个右值。可见，严格的区分左值右值可以从语法分析的角度找出程序的逻辑错误。&lt;/p&gt;
+&lt;p&gt;根据第二定义，一个左值也是一个右值 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Sun, 16 Sep 2007 13:07:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-09-16:/zhs/c-tricks-3-1-lvalue-rvalue-constant.html</guid><category>C++</category></item><item><title>C++ Tricks 2.2 I386平台的内存布局</title><link>//farseerfc.me/zhs/c-tricks-2-2-i386-memory-layout.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386"&gt;
+&lt;h2&gt;2.2 I386平台的内存布局&lt;/h2&gt;
+&lt;p&gt;众所周知，I386是32位体系结构。因此对于绝大多数I386平台的C++编译器而言，sizeof(int)=sizeof(long)=sizeof(void*)=4。当然C++标准对此没有任何保证，我们也不应该试图编写依赖于此的代码。&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;32位指针的可寻址空间为4GB。为充分利用这么大的寻址空间，也是为了支持其它更先进的技术比如多任务技术或者动态链接库技术，WinNT使用虚拟内存技术，给与每个应用程序全部4GB的内存空间。4GB的地址被一分为二，前2GB供应用程序自己使用，后2GB由系统内核分配和管理。这2GB的内存地址，通常被划分成3种内存区使用：&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;1 代码及静态数据区&lt;/h3&gt;
+&lt;p&gt;由代码加载器从动态链接库镜像(通常是exe或dll文件)加载，通常定位到镜像文件中指定的基址开始的内存区。如果基址所在内存已被占用，动态连接器会将代码或数据重定向到其它可用地址。&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;在C++中，静态数据包括：名字空间(namespace)和全局(global)对象、函数的static对象、类的static数据成员 …&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:30:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-2-i386-memory-layout.html</guid><category>C++</category></item><item><title>C++ Tricks</title><link>//farseerfc.me/zhs/c-tricks.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;C++ Tricks&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;By  FarseerFc&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;从今天起，我再将在&lt;a class="reference external" href="http://firechildren.spaces.live.com/"&gt;Live
+Space&lt;/a&gt;和&lt;a class="reference external" href="http://76635424.qzone.qq.com/"&gt;QQZone&lt;/a&gt;同时发表一系列文章，暂定名为“C++Tricks”。&lt;/p&gt;
+&lt;p&gt;本文旨在记录和阐述一些本人学习C++时所得的心得、技巧。总体来看，本文涉及的内容是每一个C++程序员都应该知道的，但是很少见诸C++教材。希望对各位同仁学习C++有所帮助。&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;也可以通过QQ或MSN向我索要此文的DOC版或PDF版，会比网页上的更新的快一点。&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="lexical-problems"&gt;
+&lt;h2&gt;1      词法问题(Lexical Problems)&lt;/h2&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;&lt;br/&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!139.entry"&gt;1.1 条件运算符(?:)&lt;/a&gt;&lt;/h3&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;&lt;a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!140.entry"&gt;1.2 逗号运算符(,)、逻辑运算符(&amp;amp;&amp;amp;,||)与运算符重载的陷阱&lt;/a&gt;&lt;/h3&gt;
+&lt;/div&gt;
+&lt;div class="section" id="x86"&gt;
+&lt;h3&gt;2      X86体系结构&lt;/h3&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h4&gt;     &lt;a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!146.entry"&gt;2.1 X86概述&lt;/a&gt;&lt;/h4&gt;
+&lt;/div&gt;
+&lt;div class="section" id="i386"&gt;
+&lt;h4&gt;     &lt;a class="reference external" href="http://firechildren.spaces.live.com/blog/cns!1D8C01E7131A5AD4!147.entry"&gt;2.2 …&lt;/a&gt;&lt;/h4&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks.html</guid><category>C++</category></item><item><title>C++ Tricks 2.3 I386平台C函数内部的栈分配</title><link>//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386c"&gt;
+&lt;h2&gt;2.3 I386平台C函数内部的栈分配&lt;/h2&gt;
+&lt;p&gt;函数使用栈来保存局部变量，传递函数参数。进入函数时，函数在栈上为函数中的变量统一预留栈空间，将esp减去相应字节数。当函数执行流程途径变量声明语句时，如有需要就调用相应构造函数将变量初始化。当执行流程即将离开声明所在代码块时，以初始化的顺序的相反顺序逐一调用析构函数。当执行流程离开函数体时，将esp加上相应字节数，归还栈空间。&lt;/p&gt;
+&lt;p&gt;为了访问函数变量，必须有方法定位每一个变量。变量相对于栈顶esp的位置在进入函数体时就已确定，但是由于esp会在函数执行期变动，所以将esp的值保存在ebp中，并事先将ebp的值压栈。随后，在函数体中通过ebp减去偏移量来访问变量。以一个最简单的函数为例：&lt;/p&gt;
+&lt;p&gt;void f()&lt;/p&gt;
+&lt;p&gt;{&lt;/p&gt;
+&lt;p&gt;int a=0; //a的地址被分配为ebp-4&lt;/p&gt;
+&lt;p&gt;char c=1; //c的地址被分配为ebp-8&lt;/p&gt;
+&lt;p&gt;}&lt;/p&gt;
+&lt;p&gt;产生的汇编代码为：&lt;/p&gt;
+&lt;p&gt;push ebp ;将ebp压栈&lt;/p&gt;
+&lt;p&gt;mov ebp,esp ;ebp=esp 用栈底备份栈顶指针&lt;/p&gt;
+&lt;p&gt;sub …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html</guid><category>C++</category></item><item><title>C++ Tricks 2.4 I386平台C函数调用边界的栈分配</title><link>//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386c"&gt;
+&lt;h2&gt;2.4 I386平台C函数调用边界的栈分配&lt;/h2&gt;
+&lt;p&gt;当调用一个函数时，主调函数将参数以声明中相反的顺序压栈，然后将当前的代码执行指针(eip)压栈，然后跳转到被调函数的入口点。在被调函数中，通过将ebp加上一个偏移量来访问函数参数，以声明中的顺序(即压栈的相反顺序)来确定参数偏移量。被调函数返回时，弹出主调函数压在栈中的代码执行指针，跳回主调函数。再由主调函数恢复到调用前的栈。&lt;/p&gt;
+&lt;p&gt;函数的返回值不同于函数参数，通过寄存器传递。如果返回值类型可以放入32位变量，比如int、short、char、指针等类型，通过eax寄存器传递。如果返回值类型是64位变量，如_int64，同过edx+eax传递，edx存储高32位，eax存储低32位。如果返回值是浮点类型，如float和double，通过专用的浮点数寄存器栈的栈顶返回。如果返回值类型是用户自定义结构，或C++类类型，通过修改函数签名，以引用型参数的形式传回。&lt;/p&gt;
+&lt;p&gt;同样以最简单的函数为例：&lt;/p&gt;
+&lt;p&gt;void f(){&lt;/p&gt;
+&lt;p&gt;int i …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html</guid><category>C++</category></item><item><title>C++ Tricks 2.5 I386平台的边界对齐(Align)</title><link>//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386-align"&gt;
+&lt;h2&gt;2.5 I386平台的边界对齐(Align)&lt;/h2&gt;
+&lt;p&gt;首先提问，既然I386上sizeof(int)==4、sizeof(char)==1，那么如下结构(struct)A的sizeof是多少？&lt;/p&gt;
+&lt;p&gt;struct A{int i;char c;};&lt;/p&gt;
+&lt;p&gt;答案是sizeof(A)==8……1+5=8？&lt;/p&gt;
+&lt;p&gt;呵呵，这就是I386上的边界对齐问题。我们知道，I386上有整整4GB的地址空间，不过并不是每一个字节上都可以放置任何东西的。由于内存总线带宽等等的技术原因，很多体系结构都要求内存中的变量被放置于某一个边界的地址上。如果违反这个要求，重则导致停机出错，轻则减慢运行速度。对于I386平台而言，类型为T的变量必须放置在sizeof(T)的整数倍的地址上，char可以随便放置，short必须放在2的整数倍的地址上，int必须放在4的整数倍的地址上，double必须放在8的整数倍的地址上。如果违反边界对齐要求 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-5-address-alignment.html</guid><category>C++</category></item><item><title>C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments)</title><link>//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386c-variable-arguments"&gt;
+&lt;h2&gt;2.6 I386平台C函数的可变参数表(Variable Arguments)&lt;/h2&gt;
+&lt;p&gt;基于前文(2.4节)分析，我们可以不通过函数签名，直接通过指针运算，来得到函数的参数。由于参数的压栈和弹出操作都由主调函数进行，所以被调函数对于参数的真实数量不需要知晓。因此，函数签名中的变量声明不是必需的。为了支持这种参数使用形式，C语言提供可变参数表。可变参数表的语法形式是在参数表末尾添加三个句点形成的省略号“...”：&lt;/p&gt;
+&lt;p&gt;void g(int a,char* c,...);&lt;/p&gt;
+&lt;p&gt;省略号之前的逗号是可选的，并不影响词法语法分析。上面的函数g可以接受2个或2个以上的参数，前两个参数的类型固定，其后的参数类型未知，参数的个数也未知。为了知道参数个数，我们必须通过其他方法，比如通过第一个参数传递：&lt;/p&gt;
+&lt;p&gt;g(3,”Hello”,2,4,5);//调用g并传递5个参数，其中后3个为可变参数。&lt;/p&gt;
+&lt;p&gt;在函数的实现代码中，可以通过2.4节叙述的 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-6-i386-variable-arguments.html</guid><category>C++</category></item><item><title>C++ Tricks 2.7 I386平台的其它函数调用模型</title><link>//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="i386"&gt;
+&lt;h2&gt;2.7 I386平台的其它函数调用模型&lt;/h2&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;上文介绍的只是I386平台上C函数调用的标准模型，被称作__cdecl。事实上，Microsoft Visual C++编译器还支持其它一些函数调用模型，所有调用模型名称皆以双下划线开头，下面列出所有函数调用模型的异同：&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="cdecl"&gt;
+&lt;h3&gt;1 __cdecl&lt;/h3&gt;
+&lt;p&gt;参数压栈顺序：逆序(从右至左)&lt;/p&gt;
+&lt;p&gt;参数堆栈恢复者：主调函数(caller)&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;__cdecl明确地指出函数使用C函数调用模型，这是默认的调用模型。&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="stdcall"&gt;
+&lt;h3&gt;2 __stdcall&lt;/h3&gt;
+&lt;p&gt;参数压栈顺序：逆序(从右至左)&lt;/p&gt;
+&lt;p&gt;参数堆栈恢复者：被调函数(callee)&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;__stdcall是微软所谓的标准调用模型。可惜的是它与__cdecl不兼容。几乎所有的Win32API函数使用这种函数调用模型，希望在DLL之间，或者在程序和WinNT操作系统之间传递函数指针的函数也应该使用这种模型。与__cdecl模型的不同之处在于，__stdcall模型下由被调函数恢复堆栈。主调函数在call语句之后，不需要再加上add语句。而被调函数的ret语句则被添加一个参数，代表函数参数堆栈的长度。因此，被调函数需要明确的知晓函数参数的数量和类型，所以在__stdcall模型下不支持可变参数表，所有参数必须写明 …&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Tue, 28 Aug 2007 14:28:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-28:/zhs/c-tricks-2-7-i386-calling-conventions.html</guid><category>C++</category></item><item><title>C++ Tricks 2.1 X86概述</title><link>//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="x86"&gt;
+&lt;h2&gt;2.1   X86概述&lt;/h2&gt;
+&lt;p&gt;所谓X86体系结构，是指以Intel
+8086芯片为首的芯片所沿袭的CPU结构，一些文档中又被称作IA32体系结构。包括的芯片有但不限于:Intel
+8086至
+80486，奔腾(Pentium)系列处理器1至4，赛扬系列处理器，酷睿系列处理器，以及AMD的相应型号产品。X86体系结构在早期属于16位处理器，自80386之后扩展为32位处理器，所以一些文档中又把80386之后的32位处理器体系称作I386。自Pentium4后期，AMD的Athlon64开始，I386被进一步扩充为64位处理器，含有64位寻址能力的X86体系结构被称作X86-64或IA32-64。总之，市售的个人电脑用CPU，除苹果的Macintosh之外，全部采用X86体系结构芯片。&lt;/p&gt;
+&lt;p&gt;在X86早期，16位的寻址能力只支持64KB(2^16=64K)内存，这显然是不够的。Intel采用分段寻址的方法，用4位段位+16位偏移量，提供了总共1MB(2^20=1M)的寻址能力。所以在X86的16位编程中，有两种指针类型 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 27 Aug 2007 16:33:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-27:/zhs/c-tricks-2-1-x86-architecture.html</guid><category>C++</category></item><item><title>C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</title><link>//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;1.2   逗号运算符(,)、逻辑运算符(&amp;amp;&amp;amp;,||)与运算符重载的陷阱&lt;/h2&gt;
+&lt;p&gt;很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;for&lt;/strong&gt;(&lt;strong&gt;int&lt;/strong&gt;i=0,j=9;i&amp;lt;10;++i&lt;strong&gt;,&lt;/strong&gt;--j)std::cout&amp;lt;&amp;lt;i&amp;lt;&amp;lt;”+”&amp;lt;&amp;lt;j&amp;lt;&amp;lt;”=9\n”;&lt;/p&gt;
+&lt;p&gt;在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 22 Aug 2007 18:06:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-22:/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html</guid><category>C++</category></item><item><title>C++ Tricks 1.1 条件运算符(?:)</title><link>//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;1.1   条件运算符(?:)&lt;/h2&gt;
+&lt;p&gt;条件运算符(?:)是C++中唯一的三目运算符(trinary
+operator)，用于在表达式中作条件判断，通常可以替换if语句，与Visual
+Basic中的iif函数、Excel中的if函数有同样的作用。语法形式如下：&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;condition&lt;/em&gt; ? &lt;em&gt;true_value&lt;/em&gt; : &lt;em&gt;false_value&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;其中&lt;em&gt;condition
+*条件是任何可以转换为bool类型的表达式，包括但不仅限于**bool*&lt;/em&gt;、&lt;strong&gt;int&lt;/strong&gt;、指针。与&lt;strong&gt;if&lt;/strong&gt;和&lt;strong&gt;while&lt;/strong&gt;的条件部分稍显不同的是，这里不能定义变量，否则会导致语法错误。&lt;/p&gt;
+&lt;p&gt;另外，条件语句会切实地控制执行流程，而不仅仅是控制返回值。也就是说，两个返回值表达式中永远只有一个会被求值，在表达式的执行顺序很重要时，这点尤为值得注意。比如：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; *pi=getInt();&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;int&lt;/strong&gt; i=pi …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Wed, 22 Aug 2007 18:05:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2007-08-22:/zhs/c-tricks-1-1-conditional-operator.html</guid><category>C++</category></item><item><title>填补信仰、唤醒良知</title><link>//farseerfc.me/zhs/filling-believings-calling-conscience.html</link><description>&lt;p&gt;从 &lt;a class="reference external" href="http://farseerfc.wordpress.com/"&gt;farseerfc.wordpress.com&lt;/a&gt; 导入&lt;/p&gt;
+&lt;p&gt;填补信仰、唤醒良知&lt;/p&gt;
+&lt;p&gt;我们听尽了呼吁与号召，对于良知，我不必谴责丧失它的国人，不必盛赞良知的美好。我只想讨论，丧失了良知的原因——空缺的信仰。&lt;/p&gt;
+&lt;p&gt;一、空缺信仰丧失良知&lt;/p&gt;
+&lt;p&gt;现代的国人缺少信仰，以至于丧失良知。曾几何时，中华民族由良好的信仰凝聚而成。三皇五帝时，族民们以炎黄为信仰；春秋战国时，士大夫之族以周制礼乐为信仰；汉代以后，百姓延习孔孟之说、老聃之道，以儒家学说为信仰；自大唐起，以佛教为首的现代宗教纷纷传入中原，人民开始以它们作为信仰。&lt;/p&gt;
+&lt;p&gt;直至鸦片战争、五四运动，西方文化入侵中华，国人开始抛弃国学，转而去研究科学；文化大革命，十年文化浩劫，人们批判旧的信仰，却没有合适的新的信仰前来填补。从此，国人的信仰出现空缺，国人的良知也被一块块蚕食殆尽。&lt;/p&gt;
+&lt;p&gt;二、信仰、科学、迷信&lt;/p&gt;
+&lt;p&gt;在许多国人的心目中，信仰就等于迷信。从小到大的教育告诉我们 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Mon, 07 Aug 2006 21:36:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2006-08-07:/zhs/filling-believings-calling-conscience.html</guid></item></channel></rss>

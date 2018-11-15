@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>重新設計了 Pelican 的主題與插件 - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/redesign-pelican-theme.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="python,pelican,bootstrap,material,subsite" />
+        <meta name="description" content="2015年2月14日更新 前言: 新天新地，將一切都更新了 [1] 不知不覺間放任這邊長草很久了，從上次 折騰主題 到現在都快三年了， 而從上次 寫了篇告白信 到現在也有快兩年了。 這期間曾經把主題配色從 Bootstrap 2 默認的 白底黑字改成了讓眼睛更舒適的黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。 洞中一日世上千載，兩年裏 Bootstrap 已經升上 v3.3 , 而 Pelican 則已經升到 3.5 了。 早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。 近日想寫的東西越積越多，終於下定決心花了前前後後 兩個月 的時間重新設計了一遍 Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。 （以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="重新設計了 Pelican 的主題與插件"/>
+        <meta property="og:url" content="//farseerfc.me/redesign-pelican-theme.html"/>
+        <meta property="og:description" content="2015年2月14日更新 前言: 新天新地，將一切都更新了 [1] 不知不覺間放任這邊長草很久了，從上次 折騰主題 到現在都快三年了， 而從上次 寫了篇告白信 到現在也有快兩年了。 這期間曾經把主題配色從 Bootstrap 2 默認的 白底黑字改成了讓眼睛更舒適的黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。 洞中一日世上千載，兩年裏 Bootstrap 已經升上 v3.3 , 而 Pelican 則已經升到 3.5 了。 早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。 近日想寫的東西越積越多，終於下定決心花了前前後後 兩個月 的時間重新設計了一遍 Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。 （以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧 …"/>
+        <meta property="article:published_time" content="2015-01-25" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="python" />
+            <meta property="article:tag" content="pelican" />
+            <meta property="article:tag" content="bootstrap" />
+            <meta property="article:tag" content="material" />
+            <meta property="article:tag" content="subsite" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/redesign-pelican-theme.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">重新設計了 Pelican 的主題與插件 - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                                 About
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
+                <li class="active">重新設計了 Pelican 的主題與插件</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        重新設計了 Pelican 的主題與插件
+                        <a href="//farseerfc.me/redesign-pelican-theme.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to 重新設計了 Pelican 的主題與插件">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2015-01-25T22:45:00+09:00"><i class="fa fa-calendar"></i> 2015年01月25日(週日)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/redesign-pelican-theme.html">繁體</a></li><li><a href="//farseerfc.me/zhs/redesign-pelican-theme.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/redesign-pelican-theme.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page"><i class="fa fa-code"></i></a>
+    <!--<a href="//farseerfc.me/redesign-pelican-theme.pdf" class="btn btn-primary" title="Show pdf version of this page" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/redesign-pelican-theme.png" class="btn btn-primary" title="Show captured png of this page" target="_blank""><i class="fa fa-file-photo-o"></i></a>-->
+
+<small><span><a href="//farseerfc.me/redesign-pelican-theme.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="redesign-pelican-theme" data-disqus-url="http://farseerfc.me/redesign-pelican-theme.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/python.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> python</a>
+	<a href="//farseerfc.me/tag/pelican.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pelican</a>
+	<a href="//farseerfc.me/tag/bootstrap.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> bootstrap</a>
+	<a href="//farseerfc.me/tag/material.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> material</a>
+	<a href="//farseerfc.me/tag/subsite.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> subsite</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+Table of Contents                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id2" id="id38">前言: 新天新地，將一切都更新了 </a><ul>
+<li><a class="reference internal" href="#bootstrap-3" id="id39">Bootstrap 3 的新設計</a></li>
+<li><a class="reference internal" href="#pelican-3-5" id="id40">Pelican 3.5 的新功能</a></li>
+<li><a class="reference internal" href="#id11" id="id41">新的文件夾佈局</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#material-design-bootstrap-3" id="id42">主題： Material Design 風格的 Bootstrap 3</a><ul>
+<li><a class="reference internal" href="#id16" id="id43">對 Bootstrap 3 的定製</a><ul>
+<li><a class="reference internal" href="#id17" id="id44">響應式設備的大小</a></li>
+<li><a class="reference internal" href="#id20" id="id45">根據寬度自動分欄和瀑布式佈局</a></li>
+<li><a class="reference internal" href="#id21" id="id46">正文的樣式</a></li>
+<li><a class="reference internal" href="#id23" id="id47">一些細微的定製</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id24" id="id48">對 bootstrap-material-design 的定製</a></li>
+<li><a class="reference internal" href="#id25" id="id49">將以上兩者整合在 pelican-bootstrap3 裏</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pelican-restructuredtext" id="id50">插件: 發揮 Pelican 和 reStructuredText 的優勢</a><ul>
+<li><a class="reference internal" href="#i18n-subsites" id="id51">i18n-subsites</a></li>
+<li><a class="reference internal" href="#plantuml" id="id52">plantuml</a></li>
+<li><a class="reference internal" href="#render-math" id="id53">render-math</a></li>
+<li><a class="reference internal" href="#youtube-youku" id="id54">youtube 和 youku</a></li>
+<li><a class="reference internal" href="#tipue-search" id="id55">tipue_search</a></li>
+<li><a class="reference internal" href="#neighbors-series" id="id56">neighbors 和 series</a></li>
+<li><a class="reference internal" href="#bootstrapify-twitter-bootstrap-rst-directives" id="id57">bootstrapify 和 twitter_bootstrap_rst_directives</a></li>
+<li><a class="reference internal" href="#extract-toc-summary" id="id58">extract_toc 和 summary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id36" id="id59">結語</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<!-- PELICAN_BEGIN_SUMMARY -->
+<div class="label label-warning">
+<strong>2015年2月14日更新</strong></div>
+<!-- PELICAN_END_SUMMARY -->
+<div class="section" id="id2">
+<h2><a class="toc-backref" href="#id38">前言: 新天新地，將一切都更新了 <a class="footnote-reference" href="#id37" id="id1">[1]</a></a></h2>
+<!-- PELICAN_BEGIN_SUMMARY -->
+<p>不知不覺間放任這邊長草很久了，從上次
+<a class="reference external" href="//farseerfc.me/try-pelican.html">折騰主題</a> 到現在都快三年了，
+而從上次 <a class="reference external" href="//farseerfc.me/marry-me.html">寫了篇告白信</a> 到現在也有快兩年了。
+這期間曾經把主題配色從 <a class="reference external" href="http://getbootstrap.com/2.3.2/">Bootstrap 2</a> 默認的
+白底黑字改成了讓眼睛更舒適的黑底白字，也不過是用 drop-in 的配色方案而已，沒有本質上的改進。</p>
+<p>洞中一日世上千載，兩年裏 Bootstrap 已經升上 <a class="reference external" href="http://getbootstrap.com/">v3.3</a> ,
+而 Pelican 則已經升到 <a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0">3.5</a> 了。
+早就眼饞 Bootstrap 和 Pelican 中的諸多新功能新設計，不過無奈於時間有限只能飽飽眼福。</p>
+<p>近日想寫的東西越積越多，終於下定決心花了前前後後 <strong>兩個月</strong> 的時間重新設計了一遍
+Pelican 的主題，配合一些我覺得有用的插件。於是本博客就變成你們現在看到的樣子了。
+（以及本篇博文也用了兩個月的時間寫完，其間還發了幾篇別的短文，算是恢復寫博客的嘗試吧。）</p>
+<!-- PELICAN_END_SUMMARY -->
+<div class="panel panel-default">
+<div class="panel-heading">
+在邁阿密參加 <a class="reference external" href="http://icsr2015.ipd.kit.edu/">ICSR 2015</a> 的時候
+拍到的街邊一家叫 Pelican 的旅館</div>
+<div class="panel-body">
+<img alt="Pelican Hotel" class="img-responsive" src="//farseerfc.me/images/pelican.jpg"/>
+</div>
+</div>
+<div class="section" id="bootstrap-3">
+<h3><a class="toc-backref" href="#id39">Bootstrap 3 的新設計</a></h3>
+<ul class="simple">
+<li>全新的 <ruby><rb>優先移動設備</rb><rp>(</rp><rt>mobile-first</rt><rp>)</rp></ruby> <ruby><rb>響應式</rb><rp>(</rp><rt>responsive</rt><rp>)</rp></ruby> 設計。
+原本Bootstrap 2雖然有響應式設計，
+不過諸多細節不能符合我的需求，最終還是得手工 hack <code class="code">
+@media</code>
+ 查詢去微調。
+現在的 <ruby><rb>優先移動設備</rb><rp>(</rp><rt>mobile-first</rt><rp>)</rp></ruby> <ruby><rb>響應式</rb><rp>(</rp><rt>responsive</rt><rp>)</rp></ruby>
+<ruby><rb>柵格系統</rb><rp>(</rp><rt>grid system</rt><rp>)</rp></ruby> 則相對顯得科學很多了，也終於能在手持
+設備上看起來舒服一些。諸位可以嘗試改變窗口寬度，或者在不同的手持設備上打開這個
+blog ，體驗一下這個頁面在不同顯示器大小中的效果。如果仍有問題歡迎
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/issues">發 Issue 給我</a>  。</li>
+<li>科學的 <ruby><rb>導航欄</rb><rp>(</rp><rt>Navbar</rt><rp>)</rp></ruby> 。
+比 Bootstrap 2 那個科學很多了。無論是 <ruby><rb>保持</rb><rp>(</rp><rt>sticky</rt><rp>)</rp></ruby> 在上端還是跟着浮動，
+或者像這邊這樣 <a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/">自動隱藏</a> 都很簡單。</li>
+</ul>
+<p>更多細節參考 <a class="reference external" href="http://getbootstrap.com/">Bootstrap 3 主頁</a> 。</p>
+</div>
+<div class="section" id="pelican-3-5">
+<h3><a class="toc-backref" href="#id40">Pelican 3.5 的新功能</a></h3>
+<ul class="simple">
+<li>Python 2 和 Python 3 統一代碼：
+再沒有惱人的 unicode 相關的問題了。這對 blog 系統來說相當重要啊。
+而且還能方便切換 pypy 等不同的解釋器。</li>
+<li>全新的插件系統：非常多功能強大的 <a class="reference external" href="https://github.com/getpelican/pelican-plugins">插件</a> 等着你。</li>
+<li>增強了導入系統：嗯總算可以導入我的中文的 wordpress 博客了。（雖然那邊長草更久了……）</li>
+<li><a class="reference external" href="http://pelican.readthedocs.org/en/latest/content.html#linking-to-internal-content">站內鏈接</a>
+：不用 <ruby><rb>硬編碼</rb><rp>(</rp><rt>hard code</rt><rp>)</rp></ruby> 目標頁面的鏈接了，可以直接寫源文件的位置然後讓 pelican
+處理，這樣能簡化各種 <ruby><rb>插件</rb><rp>(</rp><rt>plugin</rt><rp>)</rp></ruby> 和 <ruby><rb>主題</rb><rp>(</rp><rt>theme</rt><rp>)</rp></ruby> 的實現。</li>
+</ul>
+<p>更多細節參考 <a class="reference external" href="http://pelican.readthedocs.org/en/latest/">Pelican 文檔</a> 。</p>
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id41">新的文件夾佈局</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+Pelican 的新文件夾佈局</div>
+<div class="panel-body">
+<pre><span class="code-line"></span>
+<span class="code-line"><span style="color:blue;font-weight:bold;">.</span></span>
+<span class="code-line">├── <span style="color:blue;font-weight:bold;">cache</span>             生成頁面的 pickle 緩存</span>
+<span class="code-line">├── <span style="color:blue;font-weight:bold;">content</span>           讀取的全部內容</span>
+<span class="code-line">│   ├── <span style="color:blue;font-weight:bold;">&lt;categories&gt;</span>      按分類存放的文章</span>
+<span class="code-line">│   ├── <span style="color:blue;font-weight:bold;">pages</span>             像 About 這樣的固定頁面</span>
+<span class="code-line">│   └── <span style="color:blue;font-weight:bold;">static</span>            文章內用到的靜態內容</span>
+<span class="code-line">├── <span style="color:blue;font-weight:bold;">drafts</span>            文章的草稿箱</span>
+<span class="code-line">├── <span style="color:green;font-weight:bold;">Makefile</span>          生成用的 makefile</span>
+<span class="code-line">├── <span style="color:green;font-weight:bold;">pelicanconf.py</span>    測試時用的快速 Pelican 配置</span>
+<span class="code-line">├── <span style="color:green;font-weight:bold;">publishconf.py</span>    部署時用的耗時 Pelican 配置</span>
+<span class="code-line">├── <span style="color:teal;font-weight:bold;">output</span>          -&gt; <span style="color:blue;font-weight:bold;">../farseerfc.github.io</span></span>
+<span class="code-line">├── <span style="color:teal;font-weight:bold;">plugins</span>         -&gt; <span style="color:blue;font-weight:bold;">../pelican-plugins</span></span>
+<span class="code-line">└── <span style="color:teal;font-weight:bold;">theme</span>           -&gt; <span style="color:blue;font-weight:bold;">../pelican-bootstrap3</span></span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://github.com/farseerfc/farseerfc.github.com">之前的博客</a> 仍然留在
+github 上，其中的內容完全搬過來了。開始寫老博客的時候 Pelican 版本較早，沒有形成好的
+文件夾佈局，導致生成的文章、使用的模板和撰寫的內容全都混在一起，非常難以管理，
+於是趁改版之際用了新的文件夾佈局方式，並分爲 4 個 git repo 分別管理歷史。</p>
+<p>首先是存放 <a class="reference external" href="https://github.com/farseerfc/farseerfc">總的博客內容的 repo</a> ，
+其佈局是如圖那樣的。這樣將生成的靜態網站和生成網站用的配置啦內容啦分開之後，頓時清晰了很多。</p>
+<p>然後這個內容 repo 中的三個符號鏈接分別指向三個子 repo（沒用 <code class="code">
+git submodule</code>
+
+管理純粹是因爲偷懶）。 theme 指向
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3">pelican-bootstrap3</a>
+，是我修改過的 pelican 主題。
+plugins 指向 <a class="reference external" href="https://github.com/farseerfc/pelican-plugins">pelican-plugins</a>
+，由於 plugins 的質量有些參差不齊，其中不少 plugin
+都按我的需要做了些許修改，一些是功能改進，另一些則是修bug（比如不少plugin只支持 python 2）。
+最後 output 指向
+<a class="reference external" href="https://github.com/farseerfc/farseerfc.github.io">farseerfc.github.io</a>
+也就是發佈的靜態網站啦。</p>
+<p>接下來從 <strong>主題</strong> 和 <strong>插件</strong> 兩個方面介紹一下改版的細節。</p>
+</div>
+</div>
+<div class="section" id="material-design-bootstrap-3">
+<h2><a class="toc-backref" href="#id42">主題： Material Design 風格的 Bootstrap 3</a></h2>
+<p>上篇 <a class="reference external" href="//farseerfc.me/summarize-material-design-css-framework.html">博文</a>
+就總結了我爲了這個博客尋找了一堆 CSS 框架，並且最終決定用
+<a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/">bootstrap-material-design</a>
+, <a class="reference external" href="https://github.com/DandyDev/pelican-bootstrap3">DandyDev/pelican-bootstrap3</a>
+和 <a class="reference external" href="http://getbootstrap.com/">Bootstrap 3</a> 這三個項目結合的方式實現這個模板的主題。
+這三個項目都或多或少經過了我的修改，修改後的項目以 pelican-bootstrap3 爲基礎放在
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3">這裏</a> ，包括 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap">Bootstrap3 樣式</a>
+和 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material">Material 樣式</a>。</p>
+<div class="section" id="id16">
+<h3><a class="toc-backref" href="#id43">對 Bootstrap 3 的定製</a></h3>
+<p>由於架構完善，修改 Bootstrap 3 感覺非常簡單。另一方面我在 Web 前端技術上的技能點也不多，
+所以修改的地方非常有限，只能按我自己的需求定製而已。</p>
+<div class="section" id="id17">
+<h4><a class="toc-backref" href="#id44">響應式設備的大小</a></h4>
+<div class="panel panel-default">
+<div class="panel-heading">
+修改了 Bootstrap 3 響應式設備的大小</div>
+<div class="panel-body">
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">@</span><span class="k">screen-xs</span><span class="o">:</span>     <span class="nt">320px</span><span class="p">;</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">screen-sm</span><span class="o">:</span>     <span class="nt">598px</span><span class="p">;</span> <span class="c">/*  768px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">screen-md</span><span class="o">:</span>     <span class="nt">952px</span><span class="p">;</span> <span class="c">/*  992px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">screen-lg</span><span class="o">:</span>    <span class="nt">1350px</span><span class="p">;</span> <span class="c">/* 1200px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">screen-xl</span><span class="o">:</span>    <span class="nt">2030px</span><span class="p">;</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">container-sm</span><span class="o">:</span>  <span class="nt">582px</span><span class="p">;</span> <span class="c">/*  750px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">container-md</span><span class="o">:</span>  <span class="nt">930px</span><span class="p">;</span> <span class="c">/*  970px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">container-lg</span><span class="o">:</span> <span class="nt">1320px</span><span class="p">;</span> <span class="c">/* 1170px; */</span></span>
+<span class="code-line"><span class="p">@</span><span class="k">container-xl</span><span class="o">:</span> <span class="nt">1990px</span><span class="p">;</span></span>
+</pre></div>
+</div>
+</div>
+<p>首先把 Bootstrap 3 默認適配的幾個 <a class="reference external" href="http://getbootstrap.com/css/#grid">響應式設備的大小</a>
+改成了我需要的大小。 <code class="code">
+xs</code>
+ 和 <code class="code">
+sm</code>
+ 的大小分別按照我的手機屏幕 <strong>豎屏</strong> 和
+<strong>橫屏</strong> 時候的瀏覽器頁面寬度來算， <code class="code">
+md</code>
+ 是想兼容 Nexus 7 橫屏 960 的寬度以及
+一個常見上網本 1024 的寬度。 <code class="code">
+lg</code>
+ 的大小則按照常見的筆記本 1366 寬的屏幕來適配。</p>
+<p>這裏 Bootstrap 3 支持的設備大小的一個問題是，它最多考慮到 1200 像素寬的顯示器，而更寬的
+比如 1600、 2048 甚至 2560 像素寬的顯示器現在也並不少見，其結果就是頁面中左右兩側
+有很大的空間被浪費掉了。作爲深受這一問題困擾的用戶之一，我用
+<a class="reference external" href="http://stackoverflow.com/a/25644266">這裏介紹的方法</a>
+給 bootstrap 增加了一類「 <ruby><rb>比大更大</rb><rp>(</rp><rt>bigger than bigger</rt><rp>)</rp></ruby> 」的
+<code class="code">
+xl</code>
+ 響應式設備尺寸，寬度設爲支持 2048 像素寬的顯示器，具體的修改反映在
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/variables.less">variables.less</a>
+文件裏。</p>
+</div>
+<div class="section" id="id20">
+<h4><a class="toc-backref" href="#id45">根據寬度自動分欄和瀑布式佈局</a></h4>
+<p>接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
+顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：</p>
+<table border="1" class=" table-striped docutils table-hover table">
+<colgroup>
+<col width="26%"/>
+<col width="17%"/>
+<col width="18%"/>
+<col width="39%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td><code class="code">
+xs</code>
+ 用單欄 <ruby><rb>流動</rb><rp>(</rp><rt>fluid</rt><rp>)</rp></ruby> 佈局</td>
+<td colspan="2"><code class="code">
+sm</code>
+ 用上方單欄文章列表、下方雙欄 <ruby><rb>側邊欄</rb><rp>(</rp><rt>sidebar</rt><rp>)</rp></ruby> 固定佈局</td>
+<td><code class="code">
+md</code>
+ 用單欄文章列表、單欄 側邊欄 固定佈局</td>
+</tr>
+<tr><td><table border="1" class="table-hover last docutils table-striped table first">
+<colgroup>
+<col width="100%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td><ruby><rb>導航欄</rb><rp>(</rp><rt>Navbar</rt><rp>)</rp></ruby></td>
+</tr>
+<tr><td>文章</td>
+</tr>
+<tr><td>側邊欄</td>
+</tr>
+<tr><td>底欄</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td colspan="2"><table border="1" class="table-hover last docutils table-striped table first">
+<colgroup>
+<col width="53%"/>
+<col width="47%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td colspan="2">導航欄</td>
+</tr>
+<tr><td colspan="2">文章</td>
+</tr>
+<tr><td>側邊欄 1</td>
+<td>側邊欄 2</td>
+</tr>
+<tr><td colspan="2"><ruby><rb>底欄</rb><rp>(</rp><rt>footer</rt><rp>)</rp></ruby></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td><table border="1" class="table-hover last docutils table-striped table first">
+<colgroup>
+<col width="53%"/>
+<col width="47%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td colspan="2">導航欄</td>
+</tr>
+<tr><td>文章 1</td>
+<td>側邊欄 1</td>
+</tr>
+<tr><td>文章 2</td>
+<td>側邊欄 2</td>
+</tr>
+<tr><td colspan="2"><ruby><rb>底欄</rb><rp>(</rp><rt>footer</rt><rp>)</rp></ruby></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr><td colspan="2"><code class="code">
+lg</code>
+ 用雙欄文章列表、單欄 側邊欄 固定佈局</td>
+<td colspan="2"><code class="code">
+xl</code>
+ 用三欄文章列表、雙欄 側邊欄 固定佈局</td>
+</tr>
+<tr><td colspan="2"><table border="1" class="table-hover last docutils table-striped table first">
+<colgroup>
+<col width="35%"/>
+<col width="35%"/>
+<col width="31%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td colspan="3">導航欄</td>
+</tr>
+<tr><td>文章 1</td>
+<td>文章 3</td>
+<td>側邊欄 1</td>
+</tr>
+<tr><td>文章 2</td>
+<td>文章 4</td>
+<td>側邊欄 2</td>
+</tr>
+<tr><td colspan="3"><ruby><rb>底欄</rb><rp>(</rp><rt>footer</rt><rp>)</rp></ruby></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td colspan="2"><table border="1" class="table-hover last docutils table-striped table first">
+<colgroup>
+<col width="26%"/>
+<col width="26%"/>
+<col width="26%"/>
+<col width="23%"/>
+</colgroup>
+<tbody valign="top">
+<tr><td colspan="4">導航欄</td>
+</tr>
+<tr><td>文章 1</td>
+<td>文章 3</td>
+<td>文章 5</td>
+<td>側邊欄 1</td>
+</tr>
+<tr><td>文章 2</td>
+<td>文章 4</td>
+<td>文章 6</td>
+<td>側邊欄 2</td>
+</tr>
+<tr><td colspan="4"><ruby><rb>底欄</rb><rp>(</rp><rt>footer</rt><rp>)</rp></ruby></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>一開始純粹用 Bootstrap3 的響應式柵格實現這個分欄佈局，結果發現效果不太理想，
+因爲文章列表和側邊欄的高度是變化的，會導致柵格間留下大片空白。後來改用
+<a class="reference external" href="http://cssdeck.com/labs/pinterest-like-waterfall-design-purely-css">這裏示範的純CSS瀑布式佈局</a>
+實現文章和側邊欄的佈局，具體的實現代碼在
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/waterfall.less">waterfall.less</a>
+，總算達到了想要的佈局了。</p>
+</div>
+<div class="section" id="id21">
+<h4><a class="toc-backref" href="#id46">正文的樣式</a></h4>
+<p>最最重要的是文章正文的樣式。這裏我想要達到的效果是，在大屏幕上用更大的字號，讓讀者
+看起來更舒適，同時在小屏幕上用比較小的字號，最終保證基本上「一行」的文字數接近。這個修改
+主要針對 <code class="code">
+.jumbotron</code>
+，
+用了 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/jumbotron.less">不太科學的方式</a>
+代碼太長就不貼全了。</p>
+</div>
+<div class="section" id="id23">
+<h4><a class="toc-backref" href="#id47">一些細微的定製</a></h4>
+<p>把主題配色改成了現在這樣的淡紫色
+<code class="code">
+@brand-primary: darken(#6B5594, 6.5%);</code>
+
+，配合我的頭像風格， 這個修改只需要一行。
+接着刪掉了 <code class="code">
+.btn</code>
+ 的 <code class="code">
+white-space: nowrap;</code>
+ 讓按鈕的文字可以換行，
+這也只是一行修改。</p>
+<div class="label label-warning">
+<strong>2015年1月29日更新</strong></div>
+<p>另外我也不太喜歡 Bootstrap 3 默認在手機上的 <ruby><rb>摺疊導航欄</rb><rp>(</rp><rt>collapsed navbar</rt><rp>)</rp></ruby> ，
+摺疊之後的操作不夠直觀方便而且依賴 javascript 所以有 bug …… 於是我把它關掉了，
+具體方式是在 variables.less 把 <code class="code">
+@grid-float-breakpoint</code>
+ 和
+<code class="code">
+@grid-float-breakpoint-max</code>
+ 都設爲0就可以了。</p>
+</div>
+</div>
+<div class="section" id="id24">
+<h3><a class="toc-backref" href="#id48">對 bootstrap-material-design 的定製</a></h3>
+<p>這裏定製的地方不多。原樣式中一個不太科學的做法是所有 <code class="code">
+.btn</code>
+ 都強制加上了陰影
+效果，這在已經有陰影的環境裏用的話非常礙眼，像是 Win9x 風格的厚重睫毛膏。既然可以單獨
+給每個樣式加陰影，於是就把 <code class="code">
+.btn</code>
+ 強制的陰影去掉了，只保留鼠標懸停之後強調的陰影。</p>
+<p>其它定製的細節麼就是統一配色風格，修補漏洞錯誤，微調響應式效果而已，這裏不細說。</p>
+</div>
+<div class="section" id="id25">
+<h3><a class="toc-backref" href="#id49">將以上兩者整合在 pelican-bootstrap3 裏</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+Pelican 實現顯示源代碼按鈕</div>
+<div class="panel-body">
+<p>顯示源代碼按鈕借用了 Pelican 配置中自帶的 <code class="code">
+OUTPUT_SOURCES</code>
+ 選項將源文件複製到輸出文件夾：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">OUTPUT_SOURCES</span> <span class="o">=</span> <span class="bp">True</span></span>
+<span class="code-line"><span class="n">OUTPUT_SOURCES_EXTENSION</span> <span class="o">=</span> <span class="s1">'.rst'</span></span>
+</pre></div>
+<p>然後在 Makefile 裏用 pygmentize 把所有源代碼文件着色：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>find -iname <span class="s2">"*.rst"</span> <span class="p">|</span> parallel -I@  pygmentize -f html -o @.html @</span>
+</pre></div>
+<p>最後在按鈕按下的時候用 jQuery 載入源代碼：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">&lt;</span><span class="nt">a</span> <span class="na">onclick</span><span class="o">=</span><span class="s">"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"</span><span class="p">&gt;</span></span>
+</pre></div>
+<p>雖然難看的 hack 比較多，但是能用！</p>
+</div>
+</div>
+<p>雖說 pelican-bootstrap3 是我 fork 出來的，不過由於我修改的地方實在太多，代碼看來基本上
+接近重寫了一份。好在之前有給 pelican 寫 bootstrap 2 主題的經驗，這次修改算得上駕輕就熟。
+可以對比一下 <a class="reference external" href="http://dandydev.net/">上游作者的博客</a> 和這裏的樣子體會一下感覺。
+具體修改過的地方包括：</p>
+<ol class="arabic simple">
+<li>套用 bootstrap-material-design 的各個元素樣式。</li>
+<li>在文章列表模板應用上面提到的 Bootstrap 3 的柵格佈局和瀑布式佈局。</li>
+<li>翻譯到多個語言，這裏在後面的 i18n-subsite 插件裏詳述。</li>
+<li>套用後面會介紹到的各種插件。</li>
+<li>統一側邊欄的樣式到一個模板裏。</li>
+<li>添加 Atom 訂閱按鈕和 breadcrumb 條。</li>
+<li>對正文中出現的插圖，添加點擊放大的功能，通過 Bootstrap 的 <code class="code">
+modal</code>
+ 實現。</li>
+<li>上面提到的用 <a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/">這個bootstrap插件</a>
+讓導航欄自動隱藏。</li>
+<li><strong>顯示源代碼按鈕</strong> ，也就是每篇文章信息欄中的
+<button class="btn btn-primary"><i class="fa fa-code"></i></button> 按鈕。</li>
+</ol>
+</div>
+</div>
+<div class="section" id="pelican-restructuredtext">
+<h2><a class="toc-backref" href="#id50">插件: 發揮 Pelican 和 reStructuredText 的優勢</a></h2>
+<p>先列舉一下我目前用到的所有插件：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i18n_subsites"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"plantuml"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"youku"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"youtube"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'tipue_search'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'neighbors'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'series'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'bootstrapify'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'twitter_bootstrap_rst_directives'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s2">"render_math"</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'extract_toc'</span><span class="p">,</span></span>
+<span class="code-line">           <span class="s1">'summary'</span><span class="p">]</span></span>
+</pre></div>
+<p>嗯其實不算多。接下來逐一介紹一下這些各具特色的插件。</p>
+<div class="section" id="i18n-subsites">
+<h3><a class="toc-backref" href="#id51">i18n-subsites</a></h3>
+<p>這個插件的目的是創建 <ruby><rb>國際化</rb><rp>(</rp><rt>internationalization</rt><rp>)</rp></ruby>
+<ruby><rb>子站</rb><rp>(</rp><rt>subsite</rt><rp>)</rp></ruby> 。</p>
+<p>之前介紹 Pelican 配置的時候就提到過，
+原本的 Pelican 就支持一篇文章用多種語言書寫，有 <code class="code">
+lang</code>
+ 屬性註明這篇文章使用的
+語言，以及 <code class="code">
+slug</code>
+ 屬性註明多語言的翻譯之間的關聯，換句話說同一篇文章的多個語言
+版本應該有相同的 <code class="code">
+slug</code>
+ 和不同的 <code class="code">
+lang</code>
+。然後原本 Pelican 裏對多語言的
+實現方式是，首先有一個 <strong>主語言</strong> 是模板和大部分文章採用的語言，文章列表中會優先列出
+用 <strong>主語言</strong> 撰寫的文章，然後從 <strong>主語言</strong> 的文章鏈接到別的翻譯版本。
+很多博客系統和CMS對多語言的支持都是這樣的，這種處理方式的缺點也顯而易見：作爲 <strong>主語言</strong>
+的語言必須足夠通用，纔能讓進來的人找到合適的翻譯版本，所以通常 <strong>主語言</strong> 都是英語。</p>
+<p>而這個插件做的事情描述起來很簡單：將文章按語言屬性分到多個子站，每個子站獨立放在各自的文件夾。
+比如主站是 <a class="reference external" href="https://farseerfc.github.io/">https://farseerfc.github.io/</a> 的話，那麼英語的子站就可以是
+<a class="reference external" href="https://farseerfc.github.io/en/">https://farseerfc.github.io/en/</a> 。
+然後分別對多個子站生成靜態頁面。具體的實現方式是對 pelican 的頁面生成步驟做了拆分：</p>
+<ol class="arabic simple">
+<li>pelican 按正常情況讀入文章，生成元信息。</li>
+<li>i18n-subsites 針對每個語言，覆蓋掉 pelican 的一些選項設置比如路徑和 URL ，
+分別調用 pelican 的頁面生成器按模板生成文章。</li>
+<li>對共用的靜態內容比如模板的 js 和 css 文件，只在主站中生成，子站中的相應鏈接全部鏈回主站。</li>
+</ol>
+<p>雖然描述起來簡單，但是這個插件可以說最大化利用了 Pelican 的插件系統，實現細節相對比較
+複雜，大概是我用的這些插件裏面最複雜的了。不誇張的說 Pelican 3.4 支持的新插件 API 和
+站內鏈接功能基本上就是爲了配合這個插件的。至於具體它會覆蓋哪些 Pelican 的配置，請參閱它的
+<a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/README.rst">README.md文件</a> 。</p>
+<p>按內容拆分多語言子站的做法只解決了問題的一半，還留下另一半的問題，也即對模板的翻譯。
+對這個問題， i18n-subsites 提供了兩套方案供選擇：</p>
+<ol class="arabic simple">
+<li>用覆蓋配置路徑的方式讓每個子站套用不同的模板。這配置起來簡單，但是對模板維護起來有點困難。</li>
+<li>用 jinja2 的 i18n 插件，配合 Python 的 gettext 庫實現內容翻譯。這個方案
+<a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/localizing_using_jinja2.rst">配置起來比較複雜</a> ，但是配置好之後用起來就很方便了。
+只是要記得每次修改了模板都要更新翻譯，處理 *.po 和 *.mo 文件等等瑣碎事宜。</li>
+</ol>
+<p>這裏我用 jinja2 的 i18n 插件的方式實現了模板的翻譯，
+<a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/translations">各個語言的翻譯在這裏</a> ，
+然後用 <a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/SConstruct">這裏的 SCons 腳本</a>
+根據內容是否變化自動更新 po 和 mo 文件。</p>
+<p>配置好這一套方案之後，還要注意在模板和文章中處理好鏈接。用 Pelican 3.4 之後推薦的
+新的文章間鏈接的寫法以及將 <code class="code">
+SITEURL</code>
+ 設置爲實際 URL 並且關閉 <code class="code">
+RELATIVE_URLS</code>
+
+之後，應該就不會出沒什麼問題了（可能還要考慮使用的模板和插件的兼容性，大部分都是寫死了 URL 的問題）。</p>
+</div>
+<div class="section" id="plantuml">
+<h3><a class="toc-backref" href="#id52">plantuml</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+嵌入 PlantUML 的示例</div>
+<div class="panel-body">
+<img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/>
+</div>
+</div>
+<p><a class="reference external" href="http://plantuml.sourceforge.net/">PlantUML</a> 是一個Java實現的，
+用接近文字描述的語言繪製 UML 圖或者 GUI 界面圖的工具，非常適合嵌入在
+Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
+然後麼這個 plantuml 插件就是定義了一個新的 reStructuredText
+<ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> <code class="code">
+.. uml::</code>
+，把嵌入的內容提取出來調用 plantuml 命令處理
+成圖像然後再插入到文章中。</p>
+<p>比如示例裏的這個 UML 圖就是用這樣一段簡單的文字描述生成的：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">..</span> <span class="ow">uml</span><span class="p">::</span></span>
+<span class="code-line"></span>
+<span class="code-line">    Object &lt;|-- ArrayList</span>
+<span class="code-line"></span>
+<span class="code-line">    Object : equals()</span>
+<span class="code-line">    ArrayList : Object[] elementData</span>
+<span class="code-line">    ArrayList : size()</span>
+</pre></div>
+<p>實際用起來這個插件實現上稍微有點小問題：首先它只支持 python2，所以我把它改寫成了 python
+2 和 3 都通用的語法；其次它原本輸出的文件夾似乎會被 pelican 刪掉，所以把它改了個位置；
+然後它輸出的 URL 也和 i18n-subsites 插件間有不兼容的問題，也順帶修掉了。
+<a class="reference external" href="https://github.com/farseerfc/pelican-plugins/tree/master/plantuml">修改之後的代碼在這裏</a> 。</p>
+<div class="label label-warning">
+<strong>2015年1月30日更新</strong></div>
+<div class="panel panel-default">
+<div class="panel-heading">
+嵌入 Ditaa 的示例</div>
+<div class="panel-body">
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/>
+</div>
+</div>
+<p>plantuml 是繪製UML的，除此之外還有一個類似的工具是繪製一般的 <ruby><rb>流程圖</rb><rp>(</rp><rt>diagram</rt><rp>)</rp></ruby>
+的，叫 <a class="reference external" href="http://ditaa.sourceforge.net/">ditaa</a> ，和 plantuml 非常像，也比較像
+reStructuredText 的表格。
+於是我也照貓畫虎實現了一個 ditaa 的 <ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> ，用起來類似這樣：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="p">..</span> <span class="ow">ditaa</span><span class="p">::</span></span>
+<span class="code-line"></span>
+<span class="code-line">                       +-------------+</span>
+<span class="code-line">                       <span class="o">|</span>   ditaa     |-------+</span>
+<span class="code-line">                       <span class="o">|</span>  Diagram    |       |</span>
+<span class="code-line">                       +-------------+       | PNG out</span>
+<span class="code-line">                           ^                 |</span>
+<span class="code-line">                           <span class="o">|</span> ditaa in        |</span>
+<span class="code-line">                           <span class="o">|</span>                 v</span>
+<span class="code-line">     +--------+   +--------+----+    /----------------\</span>
+<span class="code-line">     <span class="o">|</span>        | --+   Pelican   +--&gt; |                |</span>
+<span class="code-line">     <span class="o">|</span>  Text  |   +-------------+    | Beautiful Blog |</span>
+<span class="code-line">     |Document|   |   !magic!   |    |                |</span>
+<span class="code-line">     <span class="o">|</span>     {d}|   |             |    |                |</span>
+<span class="code-line">     +---+----+   +-------------+    \----------------/</span>
+<span class="code-line">         :                                   ^</span>
+<span class="code-line">         <span class="o">|</span>          Lots of work             |</span>
+<span class="code-line">         +-----------------------------------+</span>
+</pre></div>
+</div>
+<div class="section" id="render-math">
+<h3><a class="toc-backref" href="#id53">render-math</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+嵌入公式的示例</div>
+<div class="panel-body">
+<p>示範行內公式 <span class="math">\(A_\text{c} = (\pi/4) d^2\)</span>.</p>
+<p>整行公式</p>
+<div class="math">
+\begin{equation*}
+\alpha{}_t(i) = P(O_1, O_2, \ldots  O_t, q_t = S_i \lambda{})
+\end{equation*}
+</div>
+</div>
+</div>
+<p>這個插件提供在 reStructuredText 中用 LaTeX 語法插入數學公式的能力，定義了
+<code class="code">
+:math:</code>
+<ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> 和 <code class="code">
+.. math::</code>
+<ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> 。
+實際工作的渲染庫當然是大名鼎鼎的 <a class="reference external" href="http://www.mathjax.org/">MathJax</a> ，這個插件
+會用 MathJax 的 CDN 載入，所以也沒有額外的依賴文件。（只是不知道是否會被國內牆掉，
+如果公式顯示不正常請 <strong>務必</strong> 告訴我。）</p>
+</div>
+<div class="section" id="youtube-youku">
+<h3><a class="toc-backref" href="#id54">youtube 和 youku</a></h3>
+<p>顧名思義，這兩個插件分別實現嵌入 youtube 和 youku 視頻。其中 youtube 是原本就有的插件，
+youku 是我照貓畫虎抄的。
+之前寫了一篇
+<a class="reference external" href="//farseerfc.me/jumping-kde5-plasma-activities-button.html">KDE5 Plasma 之跳動賣萌的活動按鈕</a>
+用到了這兩個插件。</p>
+</div>
+<div class="section" id="tipue-search">
+<h3><a class="toc-backref" href="#id55">tipue_search</a></h3>
+<p><a class="reference external" href="http://www.tipue.com/search/">Tipue search</a> 是一個非常有意思也很強大的搜索工具，
+通過 jQuery 實現靜態博客的站內搜索功能。實現方式是，它需要你寫一個 json 文件，包含
+整個網站的 <strong>全部</strong> 文章的標題和文字內容，然後在搜索的時候讀入這個 json 做搜索（是不是有點耍賴）。
+雖然聽起來會有性能問題，但是應用在小型的靜態博客上效果意外很不錯，比如本站的所有文章內容
+放在一起的 json 也只有 300KiB 左右。</p>
+<p>這個插件就是自動在 pelican 輸出完全部靜態網頁之後，調用 beautifulsoup4 從所有網頁中抽取出
+純文本，產生這個 json 給 Tipue 用。</p>
+</div>
+<div class="section" id="neighbors-series">
+<h3><a class="toc-backref" href="#id56">neighbors 和 series</a></h3>
+<p>這兩個插件比較類似也都比較簡單， neighbors 提供一篇文章的前後文章信息，
+在主題模板裏可以用來製作 <strong>上一篇</strong> 和 <strong>下一篇</strong> 按鈕。
+series 提供將多篇文章歸類爲一個 <strong>系列</strong> 的支持，當然也需要在
+主題模板中定義顯示「文章系列」的列表。這兩個插件的效果都能在本文末尾，評論區上方的部分看到。</p>
+</div>
+<div class="section" id="bootstrapify-twitter-bootstrap-rst-directives">
+<h3><a class="toc-backref" href="#id57">bootstrapify 和 twitter_bootstrap_rst_directives</a></h3>
+<p>這兩個插件讓文章的 <strong>正文</strong> 套用上 Bootstrap 的樣式。</p>
+<p>bootstrapify 這個插件實現得比較簡單，用 beautifulsoup4 在靜態網頁的結果裏面過濾元素，
+對 <code class="code">
+table</code>
+ , <code class="code">
+img</code>
+ , <code class="code">
+embed</code>
+ , <code class="code">
+iframe</code>
+ ,
+<code class="code">
+video</code>
+ , <code class="code">
+object</code>
+ 這幾個標籤套用上
+<a class="reference external" href="http://getbootstrap.com/components/#responsive-embed">響應式嵌入對象的類</a>
+讓他們更美觀。</p>
+<p>twitter_bootstrap_rst_directives 這個插件則是增加了幾個 reStructuredText 的
+<ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> 和 <ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> 。
+它實現的 <ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> 包括：
+用 <code class="code">
+:kbd:</code>
+ 實現如 <kbd class="kbd">
+Ctrl+C</kbd>
+ 這樣的鍵盤快捷鍵，
+用 <code class="code">
+:code:</code>
+ 嵌入代碼片段，用 <code class="code">
+:glyph:</code>
+ 嵌入字符圖標。
+它實現的 <ruby><rb>指示符</rb><rp>(</rp><rt>directive</rt><rp>)</rp></ruby> 包括：
+<a class="reference external" href="http://getbootstrap.com/components/#labels">labels 行內標籤</a> ，
+<a class="reference external" href="http://getbootstrap.com/components/#alerts">alerts 提示段落</a> ，
+<a class="reference external" href="http://getbootstrap.com/components/#panels">panels 嵌入面板</a> ，
+以及還有一個 <a class="reference external" href="http://getbootstrap.com/components/#media">media 混排圖標</a> 。</p>
+<p>對其中的 <code class="code">
+panel</code>
+ 我改寫了它在文章正文中的樣式，在 <code class="code">
+lg</code>
+ 或者 <code class="code">
+xl</code>
+
+的屏幕寬度下，分別用 <span class="math">\(\frac{1}{2}\)</span> 和 <span class="math">\(\frac{1}{3}\)</span> 大小的嵌入面板，
+簡單實現和正文文字的圖文混排。</p>
+<p>除此以外我還在 twitter_bootstrap_rst_directives 這個插件裏套用它的框架實現了兩個額外
+的 <ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> ， 分別是 <code class="code">
+:ruby:</code>
+ ：通過 html5 的 <code class="code">
+&lt;ruby&gt;</code>
+
+標籤實現文字上方的注音（firefox下
+<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=33339">不支持</a>
+，會使用文字後的括號顯示）， 以及 <code class="code">
+:html:</code>
+ ：在
+行內插入 <ruby><rb>裸</rb><rp>(</rp><rt>raw</rt><rp>)</rp></ruby> html 標籤（這屬於 Markdown 的基本功能，在 reStructuredText
+這邊由於要考慮多種輸出格式於是就比較麻煩了）。這兩個 <ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> 的
+<a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/twitter_bootstrap_rst_directives/bootstrap_rst_directives.py#L140">實現代碼在這裏</a> 。</p>
+<div class="label label-warning">
+<strong>2015年2月3日更新</strong></div>
+<p>今天又在 twitter_bootstrap_rst_directives 裏增加了兩個 <ruby><rb>行內角色</rb><rp>(</rp><rt>role</rt><rp>)</rp></ruby> 。
+一個是 <code class="code">
+:twi:</code>
+ 用來寫 twitter 用戶的鏈接，比如 <a class="reference external" href="//twitter.com/farseerfc">@farseerfc</a> ，另一個是
+<code class="code">
+:irc:</code>
+ 用來指向 freenode 的 channel ，比如 <a class="reference external" href="//webchat.freenode.net/?channels=yssyd3">#yssyd3</a> 。</p>
+<div class="label label-warning">
+<strong>2015年2月14日更新</strong></div>
+<p>今天增加了 <code class="code">
+.. friend::</code>
+ 用來寫好友鏈接，以及 <code class="code">
+fref</code>
+ 用來引用好友，
+比如 <a class="reference external" href="/links.html#lqymgt">LQYMGT</a> 這樣。</p>
+</div>
+<div class="section" id="extract-toc-summary">
+<h3><a class="toc-backref" href="#id58">extract_toc 和 summary</a></h3>
+<p>最後是這兩個有點「名不副實」的插件。</p>
+<p>reStructuredText 原本就有自動生成
+<ruby><rb>目錄</rb><rp>(</rp><rt>toc</rt><rp>)</rp></ruby> 的功能，用起來也非常簡單，只需要在想要插入目錄的地方寫一行
+<code class="code">
+.. contents::</code>
+ ，剩下的都由 docutils 自動生成了。
+只是當然這樣生成的目錄肯定會插入在文章的正文裏，而 extract_toc 這個插件的作用就是簡單地
+把這個目錄抽取出來，讓模板能在別的地方放置這個目錄。比如我這裏就把目錄放在了一個
+<code class="code">
+panel</code>
+ 裏。</p>
+<p>然後 Pelican 也原本就有從文章中抽取 <ruby><rb>總結</rb><rp>(</rp><rt>summary</rt><rp>)</rp></ruby> 顯示在文章列表的功能。
+Pelican 原始的實現似乎是按照文字數抽取前半段，不總是適合作爲總結。 於是這個 summary
+插件的作用其實是允許在正文中以特殊的註釋的方式標註哪些部分應該被抽出來作爲總結。
+summary 這個插件原本的實現只允許抽取一段文字，我又對它的實現做了少許擴充，允許標註多段
+文字合併起來作爲總結。</p>
+<div class="label label-warning">
+<strong>2015年1月29日更新</strong></div>
+<p>今天在 extract_toc 插件的幫助下，在側邊欄裏放了一個 Bootstrap affix 的目錄，
+它保持在頁面的右側位置不變，方便導航到文章的各個地方。具體實現方法除了 Bootstrap 3 的
+<a class="reference external" href="http://getbootstrap.com/javascript/#affix">Affix 文檔</a> ，還參考了
+<a class="reference external" href="http://tutsme-webdesign.info/bootstrap-3-affix/">這篇更詳細的說明</a> 。</p>
+</div>
+</div>
+<div class="section" id="id36">
+<h2><a class="toc-backref" href="#id59">結語</a></h2>
+<p>這個博客的配置都可以在
+<a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/pelicanconf.py">github 上找到</a>
+，包括用來
+<a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/Makefile">自動生成整個博客的 Makefile</a>
+，由於比較長，這裏就不再貼了。</p>
+<p>折騰這個主題前後歷時兩個月，期間學會了不少東西，也算是不錯的收穫吧。
+現在既然基礎打好了，接下來就要開始多寫博客了。（希望拖延症不會再犯……）</p>
+<p>最近發現除了我的博客之外還有一個網站
+<a class="reference external" href="http://www.kansaslinuxfest.us/">Kansas Linux Fest</a> fork
+了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
+bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
+以及接下來不能馬馬虎虎地寫 commit 消息了。</p>
+<table class="footnote docutils table-hover table-striped table" frame="void" id="id37" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」</td></tr>
+</tbody>
+</table>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/summarize-material-design-css-framework.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        總結一下 Material Design 的 CSS 框架
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/switch-to-farseerfc-dot-me-domain.html" class="btn btn-default btn-lg" style="float:right;clear:both;background-color:#fff;">
+                        <h4>
+                        換到 farseerfc.me 域名<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+This is part 3 of the "pelican" series:                  </h4>
+                </div>
+                <ul class="list-group">
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/try-pelican.html' style="text-align:left">嘗試一下 Pelican</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/summarize-material-design-css-framework.html' style="text-align:left">總結一下 Material Design 的 CSS 框架</a></li>
+                        <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/redesign-pelican-theme.html' style="text-align:left">重新設計了 Pelican 的主題與插件</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/switch-to-farseerfc-dot-me-domain.html' style="text-align:left">換到 farseerfc.me 域名</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/travis-push-to-github-pages-blog.html' style="text-align:left">用 Travis-CI 生成 Github Pages 博客</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/github-issues-as-comments.html' style="text-align:left">啓用 GitHub Issue 作爲博客留言系統</a></li>
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue comments            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+Leave a comment from <a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/46#new_comment_field" target="_blank"> this post's issue page </a> using your Github account.                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/46#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; left a comment on &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/46/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus comments            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'redesign-pelican-theme';
+                        var disqus_url = 'http://farseerfc.me/redesign-pelican-theme.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/about.html">
+About farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    Linux <sup> 7</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-usd fa-lg"></i><span class="icon-label">Promotions</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <a href="https://www.vultr.com/?ref=6924747-3B">
+<img src="https://www.vultr.com/media/banner_4.png" width="160" height="600">
+</a>
+    </div>
+</div>
+</div>
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+Table of Contents</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id2" id="id38">前言: 新天新地，將一切都更新了 </a><ul>
+<li><a class="reference internal" href="#bootstrap-3" id="id39">Bootstrap 3 的新設計</a></li>
+<li><a class="reference internal" href="#pelican-3-5" id="id40">Pelican 3.5 的新功能</a></li>
+<li><a class="reference internal" href="#id11" id="id41">新的文件夾佈局</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#material-design-bootstrap-3" id="id42">主題： Material Design 風格的 Bootstrap 3</a><ul>
+<li><a class="reference internal" href="#id16" id="id43">對 Bootstrap 3 的定製</a><ul>
+<li><a class="reference internal" href="#id17" id="id44">響應式設備的大小</a></li>
+<li><a class="reference internal" href="#id20" id="id45">根據寬度自動分欄和瀑布式佈局</a></li>
+<li><a class="reference internal" href="#id21" id="id46">正文的樣式</a></li>
+<li><a class="reference internal" href="#id23" id="id47">一些細微的定製</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id24" id="id48">對 bootstrap-material-design 的定製</a></li>
+<li><a class="reference internal" href="#id25" id="id49">將以上兩者整合在 pelican-bootstrap3 裏</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pelican-restructuredtext" id="id50">插件: 發揮 Pelican 和 reStructuredText 的優勢</a><ul>
+<li><a class="reference internal" href="#i18n-subsites" id="id51">i18n-subsites</a></li>
+<li><a class="reference internal" href="#plantuml" id="id52">plantuml</a></li>
+<li><a class="reference internal" href="#render-math" id="id53">render-math</a></li>
+<li><a class="reference internal" href="#youtube-youku" id="id54">youtube 和 youku</a></li>
+<li><a class="reference internal" href="#tipue-search" id="id55">tipue_search</a></li>
+<li><a class="reference internal" href="#neighbors-series" id="id56">neighbors 和 series</a></li>
+<li><a class="reference internal" href="#bootstrapify-twitter-bootstrap-rst-directives" id="id57">bootstrapify 和 twitter_bootstrap_rst_directives</a></li>
+<li><a class="reference internal" href="#extract-toc-summary" id="id58">extract_toc 和 summary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id36" id="id59">結語</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; Powered by            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> generator                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

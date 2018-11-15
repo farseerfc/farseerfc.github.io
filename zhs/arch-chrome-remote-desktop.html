@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-Hans"
+>
+<head>
+    <title>archlinux 上用 chrome 实现 透明计算 远程登录 - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/zhs/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/zhs/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="linux,archlinux,arch,chrome,remote,desktop" />
+        <meta name="description" content="透明计算 具体是什么，因为他们没有公开技术细节所以我并不知道，只是看 公开出来的演示视频 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。 Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到， 直接 ssh X forwarding 效果也不错。只是这些方案的一个 不太易用 的地方在于，需要 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。 于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手） 方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录， 位于远端的登录的计算机必须一直开着 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="archlinux 上用 chrome 实现 透明计算 远程登录"/>
+        <meta property="og:url" content="//farseerfc.me/zhs/arch-chrome-remote-desktop.html"/>
+        <meta property="og:description" content="透明计算 具体是什么，因为他们没有公开技术细节所以我并不知道，只是看 公开出来的演示视频 ，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。 如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。 Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到， 直接 ssh X forwarding 效果也不错。只是这些方案的一个 不太易用 的地方在于，需要 通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。 于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux 上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手） 方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录， 位于远端的登录的计算机必须一直开着 …"/>
+        <meta property="article:published_time" content="2015-02-13" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="archlinux" />
+            <meta property="article:tag" content="arch" />
+            <meta property="article:tag" content="chrome" />
+            <meta property="article:tag" content="remote" />
+            <meta property="article:tag" content="desktop" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/zhs/arch-chrome-remote-desktop.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/zhs/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">archlinux 上用 chrome 实现 透明计算 远程登录 - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                                 About
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                                 友情链接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                         友情链接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.me/zhs/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/zhs/" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/zhs/category/tech.html" title="tech">tech</a></li>
+                <li class="active">archlinux 上用 chrome 实现 <del>透明计算</del> 远程登录</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        archlinux 上用 chrome 实现 <del>透明计算</del> 远程登录
+                        <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to archlinux 上用 chrome 实现 透明计算 远程登录">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2015-02-13T20:39:00+09:00"><i class="fa fa-calendar"></i> 2015年02月13日(周五)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html">简体</a></li><li><a href="//farseerfc.me/zhs/../arch-chrome-remote-desktop.html" class="translate">繁體</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/zhs/arch-chrome-remote-desktop.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page"><i class="fa fa-code"></i></a>
+    <!--<a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.pdf" class="btn btn-primary" title="Show pdf version of this page" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.png" class="btn btn-primary" title="Show captured png of this page" target="_blank""><i class="fa fa-file-photo-o"></i></a>-->
+
+<small><span><a href="//farseerfc.me/zhs/arch-chrome-remote-desktop.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="arch-chrome-remote-desktop" data-disqus-url="http://farseerfc.me/zhs/arch-chrome-remote-desktop.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/zhs/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.me/zhs/tag/archlinux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> archlinux</a>
+	<a href="//farseerfc.me/zhs/tag/arch.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> arch</a>
+	<a href="//farseerfc.me/zhs/tag/chrome.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> chrome</a>
+	<a href="//farseerfc.me/zhs/tag/remote.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> remote</a>
+	<a href="//farseerfc.me/zhs/tag/desktop.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> desktop</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+Table of Contents                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#chrome-remote-desktop" id="id5">Chrome Remote Desktop 的客户端</a></li>
+<li><a class="reference internal" href="#archlinux" id="id6">Archlinux 上设置远程登录的服务器</a></li>
+<li><a class="reference internal" href="#linux-chrome-windows-os-x" id="id7">Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别</a></li>
+<li><a class="reference internal" href="#bonus" id="id8">Bonus： 手机远程登录</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<p><a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm">透明计算</a>
+具体是什么，因为他们没有公开技术细节所以我并不知道，只是看
+<a class="reference external" href="http://v.qq.com/page/h/v/q/h0145ebh1vq.html">公开出来的演示视频</a>
+，感觉似乎只要能从手机上远程登录系统桌面，就能算是透明计算了。
+如果透明计算真是这个意思，那么我似乎已经用着这个技术很多年了嘛。</p>
+<p>Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX的和基于 RDP 协议的都能找到，
+直接 ssh X forwarding 效果也不错。只是这些方案的一个 <strong>不太易用</strong> 的地方在于，需要
+通过 ip 访问到远程的电脑，所以在跨越 NAT 之类的情况下不太容易使用。</p>
+<p>于是今天介绍一个使用方便设置也简单的方法： 通过 chrome-remote-desktop 在 archlinux
+上使用远程桌面。这个方案的优势在于，借助 Google 的云端服务器（内部貌似是XMPP协议下的握手）
+方便地实现了 NAT 穿透，无论什么网络环境基本都能使用。当然，要支持远程登录，
+位于远端的登录的计算机必须一直开着 Chrome Remote Desktop 的后台服务。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+Chrome Remote Desktop 插件</div>
+<div class="panel-body">
+<img alt="Chrome Remote Desktop 插件" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-plugin.png"/>
+</div>
+</div>
+<div class="section" id="chrome-remote-desktop">
+<h2><a class="toc-backref" href="#id5">Chrome Remote Desktop 的客户端</a></h2>
+<p>虽然可能有很多人不知道，不过 Chrome 内包括远程桌面的功能很久了。只是这个功能的界面默认
+没有提供界面，要使用它需要安装 Google 官方出品的
+<a class="reference external" href="https://chrome.google.com/webstore/detail/chrome-remote-desktop/gbchcmhmhahfdphkhkmpfmihenigjmpp">remote-desktop 插件</a> 。
+装好之后远程桌面的客户端就准备好，可以用来远程访问别的计算机桌面了（无论是 Windows/OS X
+还是 Linux 都支持）。并且不光可以自己远程访问自己账户的桌面，还可以远程协助朋友的桌面。</p>
+</div>
+<div class="section" id="archlinux">
+<h2><a class="toc-backref" href="#id6">Archlinux 上设置远程登录的服务器</a></h2>
+<p>有了客户端之后还要设置一下才能让桌面作为远程登录的服务器。Windows 和 OS X 上 Chrome
+会自动下载需要的安装包，无脑下一步就能装好了。Linux上由于发行版众多，桌面配置各异，
+所以需要一点手动配置。官方的设置步骤记载在 <a class="reference external" href="https://support.google.com/chrome/answer/1649523">这里</a>
+其中给出了 debian 用的二进制包和 Ubuntu 12.10 上的设置方式，以下设置是参考官方步骤。</p>
+<p>首先要安装 chrome-remote-desktop 这个包，这个包实际上对应了 Windows/OS X 上用安装程序
+安装的 Remote Desktop Host Controller。 archlinux 上开启了
+<a class="reference external" href="https://github.com/archlinuxcn/repo">[archlinuxcn]</a>
+仓库的话，可以直接安装打好的包。或者可以从
+<a class="reference external" href="https://aur.archlinux.org/packages/chrome-remote-desktop/">AUR</a> 装。</p>
+<pre><span class="code-line">$ pacman -Ss chrome-remote-desktop<br/><span style="color:purple;font-weight:bold;">archlinuxcn/</span><span style="font-weight:bold;">chrome-remote-desktop </span><span style="color:green;font-weight:bold;">40.0.2214.44-1</span><br/>Allows you to securely access your computer over the Internet through Chrome.</span></pre><p>装好之后从会说这么一段话：</p>
+<blockquote>
+<p>groupadd：无效的组 ID “chrome-remote-desktop”</p>
+<p>Please create ~/.config/chrome-remote-desktop folder manually, if it doesn't exist, or else you can't use CRD.
+The needed files are created by the Chrome app, inside the chrome-remote-desktop folder, after Enabling Remote Connections.
+To {enable,start} the service use systemctl --user {enable,start} chrome-remote-desktop</p>
+<p>You may need to create a ~/.chrome-remote-desktop-session file with commands to start your session</p>
+<p>Go to <a class="reference external" href="https://support.google.com/chrome/answer/1649523">https://support.google.com/chrome/answer/1649523</a> for more information.</p>
+</blockquote>
+<p>那句报错是 AUR 里打的包还没跟上上游 Google 的更改导致的错误，
+首先我们需要把远程登录的用户添加入 chrome-remote-desktop 这个用户组里。
+新版本的 chrome remote desktop 提供了一个命令做这个事情，所以执行以下命令就可以了：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> /opt/google/chrome-remote-desktop/chrome-remote-desktop --add-user</span>
+</pre></div>
+<p>然后我们需要手动创建 <code class="code">
+~/.config/chrome-remote-desktop</code>
+ 这个文件夹，内容是空的
+就好了，随后 chrome 会往这里面放 <code class="code">
+host#.json</code>
+ 文件用于身份验证。</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> mkdir ~/.config/chrome-remote-desktop</span>
+</pre></div>
+<p>然后我们要创建一个 shell 脚本 <code class="code">
+~/.chrome-remote-desktop-session</code>
+ ，这是远程
+登录时的 .xinitrc ，内容么就是启动你想在远程登录时用的桌面环境。
+这里可以指定一个和你正在登录的 WM/DE 不同的桌面，比如我启动 xfce4：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> cat ~/.chrome-remote-desktop-session</span>
+<span class="code-line"><span class="gp">#</span>!/bin/bash</span>
+<span class="code-line"><span class="go">startxfce4</span></span>
+<span class="code-line"><span class="gp">$</span> chmod <span class="m">755</span> .chrome-remote-desktop-session</span>
+</pre></div>
+<p>接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
+应该可以看到一个「启用远程链接」的按钮。</p>
+<div class="figure">
+<img alt="Chrome Remote Desktop 插件中「启用远程链接」的按钮" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-enable-button.png"/>
+<p class="caption">Chrome Remote Desktop 插件中「启用远程链接」的按钮</p>
+</div>
+<div class="alert alert-warning compound">
+<p>在撰写本文的时候， Archlinux 官方源里的 chromium 的版本和 aur/google-chrome
+的版本尚且还是 40.0.2214.111 ，而 Chrome Web Store 中提供的 Chrome Remote
+Desktop 的插件的版本是 41.0.2272.41 。虽然通常并不要求两者版本一致，不过貌似最近
+Chrome 内部的 Remoting 功能更改了 API 导致可能出问题。如果你找不到
+「启用远程链接」的按钮，请尝试一下新版本的 Chrome 比如 google-chrome-dev 。
+在这一步启用之后，老版本的 chrome 应该也就能使用远程桌面了。</p>
+</div>
+<div class="alert alert-warning compound">
+<p>在32位的 Linux 版本上，最近更新的 Chrome Remote Desktop 插件可能无法正确识别 Host
+的版本，具体 <a class="alert-link reference external" href="https://code.google.com/p/chromium/issues/detail?id=332930">参考这个 bug</a> 。</p>
+</div>
+<p>点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
+你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。</p>
+<div class="figure">
+<img alt="启用远程链接之后的样子" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-after-enabled.png"/>
+<p class="caption">启用远程链接之后的样子</p>
+</div>
+<p>同时，启用了远程链接之后，可以在刚刚创建的 ~/.config/chrome-remote-desktop
+文件夹中找到记录了验证信息的文件。</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> ls .config/chrome-remote-desktop</span>
+<span class="code-line"><span class="go">chrome-profile  host#8cfe7ecfd6bb17955c1ea22f77d0d800.json  pulseaudio#8cfe7ecfd6</span></span>
+</pre></div>
+<p>然后就可以启动对应的 systemd 用户服务了，如果想自动启动服务要记得 <code class="code">
+systemctl --user enable</code>
+ ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> systemctl --user start chrome-remote-desktop.service</span>
+</pre></div>
+<p>如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
+刚刚指定的桌面环境：</p>
+<div class="figure">
+<img alt="htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-htop.png"/>
+<p class="caption">htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg</p>
+</div>
+<p>然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：</p>
+<div class="figure">
+<img alt="「远程」登录到新的 XFCE4" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-xfce4.png"/>
+<p class="caption">「远程」登录到新的 XFCE4</p>
+</div>
+</div>
+<div class="section" id="linux-chrome-windows-os-x">
+<h2><a class="toc-backref" href="#id7">Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别</a></h2>
+<p>通过上面的设置步骤也可以看出，Linux版本的远程桌面会在后台开一个独立的 X 会话，而不能
+复用现在已有的 X 会话。对远程登录的用法而言这还能接受，对远程协助的功能而言有点问题，
+因为正在使用的人不能观察协助者做了什么，协助者也不能继续请求协助的人的操作。</p>
+<p>当然目前 Chrome 远程桌面的 Linux Host Controller 还只是 beta 版本，官方只测试支持
+Ubuntu 12.04 和 12.10 （14.04之后似乎有
+<a class="reference external" href="https://code.google.com/p/chromium/issues/detail?id=366432">Bug</a>
+），所以不能要求太多。希望以后能改善吧。</p>
+</div>
+<div class="section" id="bonus">
+<h2><a class="toc-backref" href="#id8">Bonus： 手机远程登录</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+手机上的 Chrome 远程桌面 App</div>
+<div class="panel-body">
+<img alt="手机上的 Chrome 远程桌面 App" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-android.png"/>
+</div>
+</div>
+<p>通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
+因为 Chrome 在三大桌面系统 Windows / OS X / Linux 上都有，所以应该能覆盖大多数桌面
+系统了。</p>
+<p>除了桌面的 Chrome 之外还有一个客户端是 Android 上的
+<a class="reference external" href="https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop">Chrome 远程桌面 App</a> 经过上面的设置之后，从这个 App 也能看到并登录：</p>
+<div class="figure">
+<img alt="手机远程登录" class="img-responsive" src="//farseerfc.me/zhs/images/chrome-remote-desktop-android-logined.png"/>
+<p class="caption">手机远程登录</p>
+</div>
+<p>好啦，开始享受国家自然科学一等奖的透明计算技术吧！</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/switch-to-farseerfc-dot-me-domain.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        换到 farseerfc.me 域名
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/weather-forcast-academic-in-japan.html" class="btn btn-default btn-lg" style="float:right;clear:both;background-color:#fff;">
+                        <h4>
+                        从天气预报谈谈日本的学术氛围<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue comments            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+Leave a comment from <a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/33#new_comment_field" target="_blank"> this post's issue page </a> using your Github account.                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/33#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hant", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; left a comment on &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/33/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus comments            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'arch-chrome-remote-desktop';
+                        var disqus_url = 'http://farseerfc.me/zhs/arch-chrome-remote-desktop.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/zhs/about.html">
+About farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/zhs/about.html"><img width="100%" src="//farseerfc.me/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/linux.html">
+                    Linux <sup> 7</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-usd fa-lg"></i><span class="icon-label">Promotions</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <a href="https://www.vultr.com/?ref=6924747-3B">
+<img src="https://www.vultr.com/media/banner_4.png" width="160" height="600">
+</a>
+    </div>
+</div>
+</div>
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+Table of Contents</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#chrome-remote-desktop" id="id5">Chrome Remote Desktop 的客户端</a></li>
+<li><a class="reference internal" href="#archlinux" id="id6">Archlinux 上设置远程登录的服务器</a></li>
+<li><a class="reference internal" href="#linux-chrome-windows-os-x" id="id7">Linux 版本的 Chrome远程桌面 和 Windows/ OS X 上的区别</a></li>
+<li><a class="reference internal" href="#bonus" id="id8">Bonus： 手机远程登录</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; Powered by            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> generator                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

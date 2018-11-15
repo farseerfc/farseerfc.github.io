@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - travis-ci</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-travis-ci.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2015-02-20T11:10:00+09:00</updated><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><published>2015-02-20T11:10:00+09:00</published><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:/zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
+&lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
+Github Pages 原本就有的
+&lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
+&lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows …&lt;/p&gt;</summary><content type="html">
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
+&lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
+Github Pages 原本就有的
+&lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
+&lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows 环境和 Linux/OSX/Unix-like
+环境下还是有
+&lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/settings.html#date-format-and-locale"&gt;些许出入&lt;/a&gt;
+的。还有就是没有像 wordpress 那样的基于 web
+的编辑环境，在手机上就不能随便写一篇博客发表出来（不知道有没有勇士尝试过在
+Android 的 &lt;a class="reference external" href="https://code.google.com/p/android-scripting/"&gt;SL4A&lt;/a&gt; 环境下的 python 中跑 pelican ，还要配合一个
+&lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.romanenco.gitt"&gt;Android 上的 git 客户端&lt;/a&gt; ）。&lt;/p&gt;
+&lt;p&gt;当然并不是因此就束手无策了，感谢 &lt;a class="reference external" href="https://travis-ci.org/"&gt;Travis-CI&lt;/a&gt; 提供了免费的
+&lt;ruby&gt;&lt;rb&gt;持续整合&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Continuous integration&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 虚拟机环境，
+通过它全自动生成静态博客成为了可能。&lt;/p&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;关于 Travis-CI&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
+原本是 &lt;ruby&gt;&lt;rb&gt;敏捷开发&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+或者 &lt;ruby&gt;&lt;rb&gt;极限编程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是说在开发的过程中，
+一旦有微小的变更，就全自动地 &lt;strong&gt;持续&lt;/strong&gt; 合并到主线中， &lt;strong&gt;整合&lt;/strong&gt; 变更的内容到发布版本里。
+这里的 &lt;strong&gt;整合&lt;/strong&gt; 实际上可以理解为 &lt;strong&gt;全自动测试&lt;/strong&gt; 加上 &lt;strong&gt;生成最终产品&lt;/strong&gt; 。
+可以看到 &lt;strong&gt;持续整合&lt;/strong&gt; 实际强调 &lt;strong&gt;全自动&lt;/strong&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。&lt;/p&gt;
+&lt;p&gt;于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
+提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
+为博客生成静态网站。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;启用 Travis-CI 自动编译&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这一步很简单，访问 &lt;a class="reference external" href="https://travis-ci.org/"&gt;https://travis-ci.org/&lt;/a&gt; 并用你的 Github 账户登录，
+授权它访问你的账户信息就可以了。然后在 &lt;a class="reference external" href="https://travis-ci.org/repositories"&gt;https://travis-ci.org/repositories&lt;/a&gt; 里开启
+需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
+每个 push 调用测试了。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="//farseerfc.me/zhs/images/travis-repo-enable.png"/&gt;
+&lt;p class="caption"&gt;在 Travis-CI 中开启对 Github Repo 的持续整合&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;然后在 repo 的根目录放一个 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 文件描述编译的步骤。
+&lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 大概是下面这样。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;"2.7"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;before_install&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-add-repository ppa:chris-lea/node.js -y&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-get update&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-get install nodejs ditaa doxygen parallel&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;install&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install pelican&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install jinja2&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install babel&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install beautifulsoup4&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install markdown&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo npm install -g less&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;wget "http://downloads.sourceforge.net/project/plantuml/plantuml.jar?r=&amp;amp;ts=1424308684&amp;amp;use_mirror=jaist" -O plantuml.jar&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo mkdir -p /opt/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo cp plantuml.jar /opt/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;echo "#! /bin/sh" &amp;gt; plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;echo 'exec java -jar /opt/plantuml/plantuml.jar "$@"' &amp;gt;&amp;gt; plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo install -m 755 -D plantuml /usr/bin/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;wget https://bintray.com/artifact/download/byvoid/opencc/opencc-1.0.2.tar.gz&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;tar xf opencc-1.0.2.tar.gz&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;cd opencc-1.0.2 &amp;amp;&amp;amp; make &amp;amp;&amp;amp; sudo make install &amp;amp;&amp;amp; cd ..&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen zh_CN.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen zh_HK.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen en_US.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen ja_JP.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;mkdir output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;env SITEURL="farseerfc.me" make publish&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Travis-CI 提供的虚拟机是比较标准的 Ubuntu 12.04 LTS ，打上了最新的补丁，并且根据你指定的
+语言选项会把相应的解释器和编译器升级到最新版（或者指定的版本）。这里用 python 语言的配置，
+所以 python 是 2.7 的最新版并且有 pip 可以直接用。
+配置中的 before_install 和 install 的区别其实不大，其中任何一个失败的话算作
+build errored 而不是 build fail ，而如果在 script 里失败的话算作 build fail 。&lt;/p&gt;
+&lt;p&gt;为了编译我的模板，还需要比较新的 less.js ，所以添加了 ppa 装了个最新的 nodejs
+并用它装上了 less 。
+还从源码编译安装上了最新版的 opencc 1.0.2 ，因为 Ubuntu 源里的 opencc 的版本比较老(0.4)，
+然后 doxygen 作为 opencc 的编译依赖也装上了。
+其它安装的东西么，除了 pelican 之外都是插件们需要的。以及我还需要生成 4 个语言的 locale
+所以调用了 4 次 locale-gen 。由于是比较标准的 Ubuntu 环境，所以基本上编译的步骤和在本地
+Linux 环境中是一样的，同样的这套配置应该可以直接用于本地 Ubuntu 下编译我的博客。&lt;/p&gt;
+&lt;p&gt;写好 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 之后把它 push 到 github ，然后 travis 这边就会自动 clone
+下来开始编译。 travis 上能看到编译的完整过程和输出，一切正常的话编译结束之后
+build 的状态就会变成 passing ，比如
+&lt;a class="reference external" href="https://travis-ci.org/farseerfc/farseerfc/builds/51344614"&gt;我的这次的build&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="travis-ci-github"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;从 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上面的测试编译通过了之后，下一步就是让 travis-ci 编译的结果自动推到 Github Pages
+并发布出来。要推往 Github 自然需要设置 Github 用户的身份，在本地设置的时候是把
+ssh key 添加到 github 账户就可以了，在编译细节都通过 github repo 公开了的 travis 上
+当然不能放推送用的私有 key ，所以我们需要另外一种方案传递密码。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Github 上创建 Personal Access Token&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="//farseerfc.me/zhs/images/travis-blog-push.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;好在 Github 支持通过 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
+的方式验证，这个和 App Token 一样可以随时吊销，同时完全是个人创建的。另一方面 Travis-CI
+支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开密码这样的关键数据。&lt;/p&gt;
+&lt;p&gt;首先创建一个 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
+，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
+生成之后会得到一长串 Token 的散列码。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+如果你不能使用 travis 命令&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;使用 &lt;code class="code"&gt;
+travis encrypt&lt;/code&gt;
+ 命令来加密重要数据最方便，不过如果有任何原因，
+比如 ruby 版本太低或者安装不方便之类的，那么不用担心，我们直接通过
+&lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
+也能加密数据。&lt;/p&gt;
+&lt;p&gt;第一步用这个命令得到你的repo的 pubkey ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替换成 github 上的 用户名/repo名， 比如我的是
+farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
+json 模块处理了一下，然后把其中包含 key 的行用 &lt;code class="code"&gt;
+grep&lt;/code&gt;
+ 提取出来，用
+&lt;code class="code"&gt;
+sed&lt;/code&gt;
+ 匹配出 key 的字符串本身，然后 &lt;code class="code"&gt;
+xargs -0 echo -en&lt;/code&gt;
+
+解释掉转义字符，然后删掉其中的 "&amp;lt;空格&amp;gt;RSA" 几个字（否则 openssl 不能读），
+最后保存在名为 travis.pem 的文件里。&lt;/p&gt;
+&lt;p&gt;有了 pubkey 之后用 openssl 加密我们需要加密的东西并用 base64 编码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;替换了相应的身份信息和token之后，这行得到的结果就是 secure 里要写的加密过的内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;然后我们需要 &lt;code class="code"&gt;
+travis&lt;/code&gt;
+ 命令来加密这个 token ， archlinux 用户可以安装
+&lt;code class="code"&gt;
+aur/ruby-travis&lt;/code&gt;
+ ，其它用户可以用 gems 安装：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;装好之后，在设定了 Travis-CI 的 repo 的目录中执行一下 &lt;code class="code"&gt;
+travis status&lt;/code&gt;
+ ，
+命令会指导你登录 Travis-CI 并验证 repo 。正常的话会显示最新的 build 状态。
+然后同样在这个 repo 目录下执行：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;当然上面一行里的相应信息替换为个人的信息，作为这个命令的执行结果会得到另一长串散列码，
+把这串散列写入刚才的 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 文件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;base64&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
+然后在编译脚本中利用这些环境变量来生成博客：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.email "$GIT_EMAIL"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.name "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global push.default simple&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;env SITEURL="farseerfc.me" make publish&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;after_success&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;cd output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git add -A .&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git commit -m "update from travis"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git push --quiet&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="alert alert-warning compound"&gt;
+&lt;p&gt;这里要注意最后 &lt;code class="code"&gt;
+git push&lt;/code&gt;
+ 的时候一定要加上 &lt;code class="code"&gt;
+--quiet&lt;/code&gt;
+，因为默认不加的时候会把
+代入了 &lt;code class="code"&gt;
+$GH_TOKEN&lt;/code&gt;
+ 的 URL 显示出来，从而上面的加密工作就前功尽弃了……&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;根据 &lt;a class="reference external" href="http://docs.travis-ci.com/user/build-lifecycle/"&gt;travis 的文档&lt;/a&gt;
+， after_success 里写的步骤只有在 script 里的全都完全无错执行完之后才会执行，这正是我们
+push 的条件。目前 after_success 的成功与否不会影响到 build 的状态。
+具体我用的配置见
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/.travis.yml"&gt;这里的最新版&lt;/a&gt; 。
+在我的 &lt;code class="code"&gt;
+make github&lt;/code&gt;
+ 中
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/Makefile#L102"&gt;调用了&lt;/a&gt;
+&lt;code class="code"&gt;
+git push&lt;/code&gt;
+ 命令，从而执行了 &lt;code class="code"&gt;
+make github&lt;/code&gt;
+ 之后就会自动部署到 github 上。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="web"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
+拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
+Readme.md&lt;/code&gt;
+
+中显示编译状态。&lt;/p&gt;
+&lt;p&gt;这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
+编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="//farseerfc.me/zhs/images/travis-edit-github-web.png"/&gt;
+&lt;p class="caption"&gt;在 Github 的 Web 界面中直接编辑文章内容&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录
+github 并编辑文章的可用性也还不错，所以同样的方式也可以直接在手机上发布博文了。&lt;/p&gt;
+&lt;p&gt;That is all, happy blogging ~&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry></feed>

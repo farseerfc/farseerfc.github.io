@@ -1,0 +1,385 @@
+<div class="highlight"><pre><span></span><span class="gh">ICSE 2012</span>
+<span class="gh">=======================================================================</span>
+
+<span class="nc">:slug:</span> <span class="nf">icse2012</span>
+<span class="nc">:lang:</span> <span class="nf">zh</span>
+<span class="nc">:date:</span> <span class="nf">2012-06-06 10:42</span>
+<span class="nc">:tags:</span> <span class="nf">icse, software</span>
+<span class="nc">:issueid:</span> <span class="nf">6</span>
+
+<span class="p">..</span> <span class="ow">contents</span><span class="p">::</span>
+
+<span class="gh">June 6</span>
+<span class="gh">-----------------------------------------------------------------------</span>
+
+
+<span class="cp">.. PELICAN_BEGIN_SUMMARY</span>
+
+<span class="gh">Keynote 1</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+沒怎麼聽懂，只記得講到了finance is not money但是沒聽懂這個和軟件有什麼關係。
+
+
+<span class="gh">Cost Estimation for Distributed Software Project</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+講到他們試圖改善現有的模型去更精確地評估軟件開發的開銷。
+
+他們會給PM建議之前的項目的歷史數據，然後對於新項目，他們建議歷史上已有
+的項目的數據，從而幫助PM得到更精確的評估。他們試圖儘量減少項目評估對PM
+的經驗的需求，從而幫助即使經驗很少的PM也能準確評估項目的開銷。
+
+
+<span class="cp">.. PELICAN_END_SUMMARY</span>
+
+他們的觀點：
+
+        Context-specfic solutions needed!
+
+        我們需要更上下文相關的解決方案！
+
+        Early user paticipation is key!
+
+        早期用戶的參與是關鍵
+
+
+<span class="gh">Characterizing Logging Practices in Open-Source Software</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+Common mistakes in logging messages
+
+在日誌記錄中容易犯的錯誤
+
+他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
+中存在的問題。他們首先確定修改是事後修改。
+
+通常的修改的比例（9027個修改）
+
+=== ============================
+45% 靜態文本
+27% 打印出的變量
+26% 調試等級verbosity
+2%  日誌輸出的位置
+=== ============================
+
+他們發現有調試等級的變化，是因爲安全漏洞之類的原因，或者在開銷和數據
+之間的權衡。
+
+大多數對log的變量的修改都是爲了增加一個參數。他們之前的LogEnhancer是爲了
+解決這個問題而提出的，通過靜態檢查，提醒程序員是否忘記了某個參數
+
+對text的修改是因爲要改掉過時的代碼信息，避免誤導用戶。
+
+他們的實驗是採用了基於code clone 的技術，找到所有log語句，然後找不一致
+的clone，然後自動提出建議。
+
+<span class="gh">Combine Functional and Imperative Pgrm for Multicore Sw: Scala &amp; Java</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+趨勢：到處都是多核，但是併發程序呢？
+
+他們研究的對象是Scala和Java，因爲可以編譯後確認JVM字節碼的語義。
+
+<span class="m">-</span> Java:
+      <span class="m">-</span>  共享內存
+      <span class="m">-</span>  顯示創建的線程
+      <span class="m">-</span>  手動同步
+      <span class="m">-</span>  Wait/Notify機制
+
+<span class="m">-</span> Scala:
+      <span class="m">-</span>  高階函數
+      <span class="m">-</span>  Actors, 消息傳遞
+      <span class="m">-</span>  lists, filters, iterators
+      <span class="m">-</span>  while
+      <span class="m">-</span>  共享狀態, OO
+      <span class="m">-</span>  import java.* 能從java導入任何庫
+      <span class="m">-</span>  auto type inferance 自動類型推導
+
+實驗的參與者都經過4周的訓練，實驗項目是工業等級的開發項目 
+
+結果：
+
+scala 的項目平均比java多花38%的時間，主要都是花在Test和debug上的時間。
+
+程序員的經驗和總體時間相關，但是對test和debug沒有顯著影響。
+
+scala的爲了讓編程更有效率的設計，導致debug更困難。比如類型推導，debug
+的時候需要手動推導，來理解正在發生什麼。
+
+scala的程序比java小，中位數2.6%，平均15.2%
+
+<span class="m">-</span> 性能比較： 
+        <span class="m">-</span> 單核：scala的線性程序的性能比java好
+        <span class="m">-</span> 4核： 
+                <span class="m">-</span> scala 7s @ 4 threads 
+                <span class="m">-</span> java 4si @ 8 threads 
+                <span class="m">-</span> median 
+                        <span class="m">-</span> 83s scala 
+                        <span class="m">-</span> 98s java
+        <span class="m">-</span> 32core: best scala 34s @ 64 threads 
+
+<span class="m">-</span> 結論
+        <span class="m">-</span> java有更好的scalability
+
+<span class="m">-</span> scala類型推導
+        <span class="m">-</span> 45%說對攜帶碼有幫助
+        <span class="m">-</span> 85%說導致程序錯誤
+
+<span class="m">-</span> 調試
+        <span class="m">-</span> 23%認爲scala簡單
+        <span class="m">-</span> 77%認爲java簡單
+
+multi-paradigram are better
+
+<span class="gh">Sound Empirical Evidence in Software Testing</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+Test data generation 測試數據自動生成
+
+Large Empirical Studies - not always possible
+
+For open source software - big enough
+
+<span class="gh">Identifing Linux Bug Fixing Patch</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="m">-</span> current practice:
+        <span class="m">-</span> manual
+<span class="m">-</span> Current research:
+        <span class="m">-</span> keywords in commits
+        <span class="m">-</span> link bug reports in bugzilla
+
+Try to solve classification problem
+
+<span class="m">-</span> issue 
+        <span class="m">-</span> pre-identified 
+        <span class="m">-</span> post-identified
+
+<span class="m">-</span> data
+        <span class="m">-</span> from commit log
+<span class="m">-</span> feature extraction
+        <span class="m">-</span> text pre-process stemmed non-stop words
+<span class="m">-</span> model learning
+
+research questions
+
+
+<span class="gh">Active Refinement of Clone Anomaly Reports</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+motivating
+
+<span class="m">-</span> code clones, clone groups
+<span class="m">-</span> clone used to detect bugs
+<span class="m">-</span> anomaly : inconsistent clone group
+  many anomaly clone are note bug, high false positive
+
+approach
+  - reorder by sorted bug reports  
+
+-----------------------------------------------------------------------
+
+<span class="gh">June7</span>
+<span class="gh">-----------------------------------------------------------------------</span>
+
+<span class="gh">Keynotes 2: Sustainability with Software - An Industrial Perspective</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+Sustainability
+
+<span class="m">-</span> Classic View: Idenpendent view with overlap
+        <span class="m">-</span> Social
+        <span class="m">-</span> Environment
+        <span class="m">-</span> Economic
+<span class="m">-</span> Nested viw
+        <span class="m">-</span> Environment
+                <span class="m">-</span> Social
+                        <span class="m">-</span> Economic
+
+Triple bottom line
+  - economic
+        -global business, networks , global econ
+  <span class="m">-</span> env
+        <span class="m">-</span> natural res, climate change, population grow
+  <span class="m">-</span> social
+        <span class="m">-</span> awareness, connectivity, accountability
+
+<span class="gh">Green IT</span>
+<span class="gh">~~~~~~~~</span>
+<span class="m">-</span> reduce IT energy
+        <span class="m">-</span> more than 50% cooling - doing nothing
+<span class="m">-</span> mini e-waste: not properly recycled
+        <span class="m">-</span> 80% in EU
+        <span class="m">-</span> 75% in US
+<span class="m">-</span> foster dematerialization
+
+
+In-Memory Technology: Expected Sustainable Benefits
+
+<span class="gh">What can we do?</span>
+<span class="gh">~~~~~~~~~~~~~~~</span>
+      <span class="m">-</span>  consider all software lifecycle phases in your design
+      <span class="m">-</span>  avoid energy expensive behavior in your codes
+      <span class="m">-</span>  design lean architectures
+
+<span class="gh">Green by IT</span>
+<span class="gh">~~~~~~~~~~~</span>
+        <span class="m">-</span> 2% green IT
+        <span class="m">-</span> 98% green IT
+
+<span class="gh">On How Often code is cloned across repositories</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+Line based hashing code clone detection
+
+never do anything harder than sorting
+
+hashing a window of 5 lines of normalized (tokenized) code, dropping
+3/4 of the hashing
+
+把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。
+
+=== =========================
+14% type1
+16% type2
+17% type3 (not really type2)
+=== =========================
+
+<span class="gh">Graph-based analysis and prediction for sw evolution</span>
+<span class="gh">++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+<span class="gh">graph are everywhere</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="m">-</span> internet topology
+<span class="m">-</span> social net
+<span class="m">-</span> chemistry
+<span class="m">-</span> biology
+
+in sw
+<span class="m">-</span> func call graph
+<span class="m">-</span> module dependency graph
+
+developer interaction graph
+<span class="m">-</span> commit logs
+<span class="m">-</span> bug reports
+
+experiment 11 oss, 27~171 release, &gt; 9 years
+
+<span class="gh">predictors</span>
+<span class="gh">~~~~~~~~~~~</span>
+
+<span class="m">-</span> NodeRank
+        <span class="m">-</span> similar to pagerank of google
+        <span class="m">-</span> measure relative importance of each node
+        <span class="m">-</span> func call graph with noderank
+                <span class="m">-</span> compare rank with severity scale on bugzilla
+        <span class="m">-</span> correlation between noderank and BugSeverity
+                <span class="m">-</span> func level 0.48 ~ 0.86 varies among projects. 
+                <span class="m">-</span> model level &gt; func level
+<span class="m">-</span> ModularityRatio
+        <span class="m">-</span> cohesion/coupling ratio:  IntraDep(M)/InterDep(M)
+        <span class="m">-</span> forecast mantencance effort
+        <span class="m">-</span> use for
+                <span class="m">-</span> identify modules that need redesign or refactoring
+<span class="m">-</span> EditDistance
+        <span class="m">-</span> bug-based developer collaboration graphs
+        <span class="m">-</span> ED(G1,G2)=|V1|+|V2|-2|V1交V2|+|E1|+|E2|-2|E1交E2|
+        <span class="m">-</span> use for
+                <span class="m">-</span> release planning
+                <span class="m">-</span> resource allocation
+
+graph metrics
+
+<span class="m">-</span> graph diameter
+        <span class="m">-</span> average node degree indicates reuse
+<span class="m">-</span> clustering coefficient
+<span class="m">-</span> assortativity
+<span class="m">-</span> num of cycles
+
+<span class="gh">Conclusion</span>
+<span class="gh">~~~~~~~~~~</span>
+
+&quot;Actionable intelligence&quot; from graph evolution
+
+<span class="m">-</span> studie 11 large long-live projs
+<span class="m">-</span> predictors 
+<span class="m">-</span> identify pivotal moments in evolution
+
+<span class="gh">What make long term contributors: willingness and opportunity in OSS</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+OSS don&#39;t work without contributors form community
+
+mozilla (2000-2008)
+
+10^2.2 LTC &lt;- 2 order -&gt; 10^4.2 new contributors &lt;- 3.5 order -&gt; 10^7.7 users 
+
+gnome (1999-2007)
+
+10^2.5 LTC &lt;- 1.5 order -&gt; 10^4.0 new contributors &lt;- 3.5 order -&gt; 10^6.5 users 
+
+<span class="gh">approach</span>
+<span class="gh">~~~~~~~~~</span>
+<span class="m">-</span> read issues of 20 LTC and 20 non-LTC
+<span class="m">-</span> suvery 56 (36 non-LTC and 20 LTC)
+<span class="m">-</span> extract practices published on project web sites
+
+<span class="gh">summeray</span>
+<span class="gh">~~~~~~~~~</span>
+
+<span class="m">-</span> Ability/Willingness distinguishes LTCs
+<span class="m">-</span> Environment 
+        <span class="m">-</span> macro-climate
+                <span class="m">-</span> popularity
+        <span class="m">-</span> micro-climate
+                <span class="m">-</span> attention
+                <span class="m">-</span> bumber of peers
+                <span class="m">-</span> performance of peers
+
+regression model
+
+newcomers to LTC conversion drops
+
+actions in first month predicts LTCs
+        - 24% recall 
+        <span class="m">-</span> 37% precision
+
+<span class="gh">develop of auxiliary functions: should you be agile?</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+a empirial assessment of pair programming and test-first programming
+
+can agile help auxiliary functions?
+
+<span class="gh">experiment</span>
+<span class="gh">~~~~~~~~~~~</span>
+
+<span class="m">-</span> pair vs solo 
+<span class="m">-</span> test-first vs test-last
+<span class="m">-</span> students vs professors
+
+<span class="gh">research questions</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="m">-</span> r1: can pair help obtain more correct impl
+<span class="m">-</span> r2: can test-first 
+<span class="m">-</span> r3: dst test1 encourage the impl or more test cases?
+<span class="m">-</span> r4: does test1 course more coverage
+
+<span class="gh">result</span>
+<span class="gh">~~~~~~~~</span>
+<span class="m">-</span> test-first
+        <span class="m">-</span> higher coverage
+        <span class="m">-</span>  non change with correctness
+<span class="m">-</span> pair
+        <span class="m">-</span> improve on correctness
+        <span class="m">-</span> longer total programming time 
+
+<span class="gh">Static Detection of Resource Contention Problems in Server-side script</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+Addressed the race condition of accessing database or filesystem of PHP
+
+<span class="gh">Amplifying Tests to Validate Exception Handling Code</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+異常處理的代碼不但難寫，而且難以驗證。各種組合情況難以估計，尤其是手機
+系統上。
+
+<span class="gh">A tactic-centric approach automating traceability of quality concerns</span>
+<span class="gh">+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+tactic traceability information models
+</pre></div>

@@ -1,0 +1,1318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - pelican</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-pelican.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2016-08-07T16:28:00+09:00</updated><entry><title>启用 GitHub Issue 作为博客留言系统</title><link href="//farseerfc.me/zhs/github-issues-as-comments.html" rel="alternate"></link><published>2016-08-07T16:28:00+09:00</published><updated>2016-08-07T16:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-08-07:/zhs/github-issues-as-comments.html</id><summary type="html">&lt;p&gt;从今天起本博客将启用 GitHub Issue 作为留言系统。
+原本使用的 Disqus 将继续保留一段时间，目前没有关闭的计划。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 是计划了好久的事情了，最初重做这个主题的时候就有考虑过。
+这个想法的契机是看到了这篇
+&lt;a class="reference external" href="http://ivanzuzak.info/2011/02/18/github-hosted-comments-for-github-hosted-blogs.html"&gt;GitHub hosted comments for GitHub hosted blogs&lt;/a&gt;
+，然后立马觉得这个想法很符合寄宿在 GitHub Pages 上的博客。
+一个限制是要求评论者必须有 GitHub
+账户，考虑到我的博客的受众这个要求估计不算太过分。
+使用 GitHub Issue 的好处么，比如自带的 GFMD
+富文本格式，邮件通知，还有订阅和取消订阅通知，邮件回复，
+这些方面都不比第三方留言系统逊色。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 另一方面原因是最近听说 Disqus
+被部分墙了，想必以后墙也会越来越高。之前曾经试过在这个博客换上多说，
+然而效果我并不喜欢，多说喜欢侵入页面加很多奇怪的东西 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;从今天起本博客将启用 GitHub Issue 作为留言系统。
+原本使用的 Disqus 将继续保留一段时间，目前没有关闭的计划。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 是计划了好久的事情了，最初重做这个主题的时候就有考虑过。
+这个想法的契机是看到了这篇
+&lt;a class="reference external" href="http://ivanzuzak.info/2011/02/18/github-hosted-comments-for-github-hosted-blogs.html"&gt;GitHub hosted comments for GitHub hosted blogs&lt;/a&gt;
+，然后立马觉得这个想法很符合寄宿在 GitHub Pages 上的博客。
+一个限制是要求评论者必须有 GitHub
+账户，考虑到我的博客的受众这个要求估计不算太过分。
+使用 GitHub Issue 的好处么，比如自带的 GFMD
+富文本格式，邮件通知，还有订阅和取消订阅通知，邮件回复，
+这些方面都不比第三方留言系统逊色。&lt;/p&gt;
+&lt;p&gt;换用 GitHub Issue 另一方面原因是最近听说 Disqus
+被部分墙了，想必以后墙也会越来越高。之前曾经试过在这个博客换上多说，
+然而效果我并不喜欢，多说喜欢侵入页面加很多奇怪的东西，比如用户的头像通常是
+http 的……也试过结合新浪微博的评论，而新浪微博越来越封闭，API 也越来越不靠谱。&lt;/p&gt;
+&lt;p&gt;使用 GitHub Issue 作为评论的方式比较简单，上面那篇博客里面提到了，代码量不比
+加载 Disqus 多多少，而且没有了 iframe 的困扰，唯一麻烦的地方就是要稍微设计一下布局方式让它融入
+现有的页面布局。
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/2ea6c9f3227275fe86ddaa75d8fc6496b3b03d8c/templates/includes/comments.html#L32"&gt;我参考上面的实现在这里&lt;/a&gt; 。
+这个加载代码使用两个变量加载 Issue Comments ，一个是在 pelicanconf.py 里的
+&lt;code class="code"&gt;
+GITHUB_REPO&lt;/code&gt;
+ ，可以指向任何 Repo ，我指向 farseerfc/farseerfc.github.io
+的这个 GitHub Page repo ，另一个变量是每篇文章里需要加上 &lt;code class="code"&gt;
+issueid&lt;/code&gt;
+
+的元数据，关连文章到每个 Issue 上。&lt;/p&gt;
+&lt;p&gt;还有一个稍微麻烦的事情是现在每写一篇文章之后都要新建一个 issue 了。
+手动操作有点累人，于是我 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/createissue.py"&gt;写了个脚本&lt;/a&gt;
+自动搜索 pelican 的 content 文件夹里面文章的 slug 并且对没有 issueid 关连的
+文章创建 issue 。&lt;/p&gt;
+&lt;p&gt;好啦新的留言系统的外观样式还在测试中，希望大家多留言帮我测试一下！&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2016年8月7日19:30更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;新增了对 GitHub Issue comments 里面
+&lt;a class="reference external" href="https://developer.github.com/v3/issues/comments/#reactions-summary"&gt;reactions&lt;/a&gt;
+的支持，套用 font-awesome 的图标（似乎没 GitHub 上的图标好看）。这个还属于 GitHub API
+的实验性功能，要加入 &lt;code class="code"&gt;
+Accept: application/vnd.github.squirrel-girl-preview&lt;/code&gt;
+
+HTTP 头才能拿到。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2016年8月7日23:16更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;感谢 @iovxw 的测试让我发现 github 的高亮回复和邮件回复是需要特殊处理的。
+高亮回复用上了 &lt;a class="reference external" href="https://github.com/sindresorhus/github-markdown-css"&gt;这里的 CSS&lt;/a&gt;
+邮件引言的展开事件直接用 jQuery 做了：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;".email-hidden-toggle &amp;gt; a"&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"click"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;preventDefault&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;".email-hidden-reply"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toggle&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;});&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;还得注意邮件的回复需要 CSS 里面 &lt;code class="code"&gt;
+white-space: pre-wrap&lt;/code&gt;
+ 。&lt;/p&gt;
+</content><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="issues"></category></entry><entry><title>用 Travis-CI 生成 Github Pages 博客</title><link href="//farseerfc.me/zhs/travis-push-to-github-pages-blog.html" rel="alternate"></link><published>2015-02-20T11:10:00+09:00</published><updated>2015-02-20T11:10:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-20:/zhs/travis-push-to-github-pages-blog.html</id><summary type="html">
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
+&lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
+Github Pages 原本就有的
+&lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
+&lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows …&lt;/p&gt;</summary><content type="html">
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;上次介绍过 &lt;a class="reference external" href="//farseerfc.me/zhs/redesign-pelican-theme.html"&gt;这个博客改换了主题&lt;/a&gt; ，
+本以为这个话题可以告一段落了，没想到还能继续写呢。&lt;/p&gt;
+&lt;p&gt;寄宿在 Github Pages 上的静态博客通常有两种方案，其一是使用 &lt;a class="reference external" href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; 方式撰写，这可以利用
+Github Pages 原本就有的
+&lt;a class="reference external" href="https://help.github.com/articles/using-jekyll-with-pages/"&gt;Jekyll支持&lt;/a&gt;
+生成静态网站。另一种是在 &lt;strong&gt;本地&lt;/strong&gt; 也就是自己的电脑上生成好，然后把生成的 HTML 网站 push
+到 Github Pages ，这种情况下 Github Pages 就完全只是一个静态页面宿主环境。&lt;/p&gt;
+&lt;p&gt;我用 &lt;a class="reference external" href="http://getpelican.com/"&gt;Pelican&lt;/a&gt; 生成博客，当然就只能选择后一种方式了。这带来一些不便，比如本地配置 pelican
+还是有一点点复杂的，所以不能随便找台电脑就开始写博客。有的时候只是想修正一两个错别字，
+这时候必须打开某台特定的电脑才能编辑博客就显得不太方便了。再比如 pelican 本身虽然是 python
+写的所以跨平台，但是具体到博客的配置方面， Windows 环境和 Linux/OSX/Unix-like
+环境下还是有
+&lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/settings.html#date-format-and-locale"&gt;些许出入&lt;/a&gt;
+的。还有就是没有像 wordpress 那样的基于 web
+的编辑环境，在手机上就不能随便写一篇博客发表出来（不知道有没有勇士尝试过在
+Android 的 &lt;a class="reference external" href="https://code.google.com/p/android-scripting/"&gt;SL4A&lt;/a&gt; 环境下的 python 中跑 pelican ，还要配合一个
+&lt;a class="reference external" href="https://play.google.com/store/apps/details?id=com.romanenco.gitt"&gt;Android 上的 git 客户端&lt;/a&gt; ）。&lt;/p&gt;
+&lt;p&gt;当然并不是因此就束手无策了，感谢 &lt;a class="reference external" href="https://travis-ci.org/"&gt;Travis-CI&lt;/a&gt; 提供了免费的
+&lt;ruby&gt;&lt;rb&gt;持续整合&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Continuous integration&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 虚拟机环境，
+通过它全自动生成静态博客成为了可能。&lt;/p&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;关于 Travis-CI&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://zh.wikipedia.org/wiki/%E6%8C%81%E7%BA%8C%E6%95%B4%E5%90%88"&gt;持续整合&lt;/a&gt;
+原本是 &lt;ruby&gt;&lt;rb&gt;敏捷开发&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Agile Development&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+或者 &lt;ruby&gt;&lt;rb&gt;极限编程&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Extreme Programming&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 中提到的概念，大意就是说在开发的过程中，
+一旦有微小的变更，就全自动地 &lt;strong&gt;持续&lt;/strong&gt; 合并到主线中， &lt;strong&gt;整合&lt;/strong&gt; 变更的内容到发布版本里。
+这里的 &lt;strong&gt;整合&lt;/strong&gt; 实际上可以理解为 &lt;strong&gt;全自动测试&lt;/strong&gt; 加上 &lt;strong&gt;生成最终产品&lt;/strong&gt; 。
+可以看到 &lt;strong&gt;持续整合&lt;/strong&gt; 实际强调 &lt;strong&gt;全自动&lt;/strong&gt; ，于是需要有一个服务器不断地监听主线开发的变更内容，
+一旦有任何变更（可以理解为 git commit ）就自动调用测试和部署脚本。&lt;/p&gt;
+&lt;p&gt;于是要用持续整合就需要一个整合服务器，幸而 Travis-CI 对 github 上的公开 repo
+提供了免费的整合服务器虚拟机服务，和 github 的整合非常自然。所以我们就可以用它提供的虚拟机
+为博客生成静态网站。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;启用 Travis-CI 自动编译&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这一步很简单，访问 &lt;a class="reference external" href="https://travis-ci.org/"&gt;https://travis-ci.org/&lt;/a&gt; 并用你的 Github 账户登录，
+授权它访问你的账户信息就可以了。然后在 &lt;a class="reference external" href="https://travis-ci.org/repositories"&gt;https://travis-ci.org/repositories&lt;/a&gt; 里开启
+需要编译的 repo ，这样 Travis-CI 就会监视对这个 repo 的所有 push 操作，并且对
+每个 push 调用测试了。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="在 Travis-CI 中开启对 Github Repo 的持续整合" class="img-responsive" src="//farseerfc.me/zhs/images/travis-repo-enable.png"/&gt;
+&lt;p class="caption"&gt;在 Travis-CI 中开启对 Github Repo 的持续整合&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;然后在 repo 的根目录放一个 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 文件描述编译的步骤。
+&lt;strong&gt;暂时&lt;/strong&gt; 测试的目的下我写的 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 大概是下面这样。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;language&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;python&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;"2.7"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;before_install&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-add-repository ppa:chris-lea/node.js -y&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-get update&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo apt-get install nodejs ditaa doxygen parallel&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;install&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install pelican&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install jinja2&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install babel&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install beautifulsoup4&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo pip install markdown&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo npm install -g less&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;wget "http://downloads.sourceforge.net/project/plantuml/plantuml.jar?r=&amp;amp;ts=1424308684&amp;amp;use_mirror=jaist" -O plantuml.jar&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo mkdir -p /opt/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo cp plantuml.jar /opt/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;echo "#! /bin/sh" &amp;gt; plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;echo 'exec java -jar /opt/plantuml/plantuml.jar "$@"' &amp;gt;&amp;gt; plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo install -m 755 -D plantuml /usr/bin/plantuml&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;wget https://bintray.com/artifact/download/byvoid/opencc/opencc-1.0.2.tar.gz&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;tar xf opencc-1.0.2.tar.gz&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;cd opencc-1.0.2 &amp;amp;&amp;amp; make &amp;amp;&amp;amp; sudo make install &amp;amp;&amp;amp; cd ..&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen zh_CN.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen zh_HK.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen en_US.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sudo locale-gen ja_JP.UTF-8&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;mkdir output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;env SITEURL="farseerfc.me" make publish&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Travis-CI 提供的虚拟机是比较标准的 Ubuntu 12.04 LTS ，打上了最新的补丁，并且根据你指定的
+语言选项会把相应的解释器和编译器升级到最新版（或者指定的版本）。这里用 python 语言的配置，
+所以 python 是 2.7 的最新版并且有 pip 可以直接用。
+配置中的 before_install 和 install 的区别其实不大，其中任何一个失败的话算作
+build errored 而不是 build fail ，而如果在 script 里失败的话算作 build fail 。&lt;/p&gt;
+&lt;p&gt;为了编译我的模板，还需要比较新的 less.js ，所以添加了 ppa 装了个最新的 nodejs
+并用它装上了 less 。
+还从源码编译安装上了最新版的 opencc 1.0.2 ，因为 Ubuntu 源里的 opencc 的版本比较老(0.4)，
+然后 doxygen 作为 opencc 的编译依赖也装上了。
+其它安装的东西么，除了 pelican 之外都是插件们需要的。以及我还需要生成 4 个语言的 locale
+所以调用了 4 次 locale-gen 。由于是比较标准的 Ubuntu 环境，所以基本上编译的步骤和在本地
+Linux 环境中是一样的，同样的这套配置应该可以直接用于本地 Ubuntu 下编译我的博客。&lt;/p&gt;
+&lt;p&gt;写好 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 之后把它 push 到 github ，然后 travis 这边就会自动 clone
+下来开始编译。 travis 上能看到编译的完整过程和输出，一切正常的话编译结束之后
+build 的状态就会变成 passing ，比如
+&lt;a class="reference external" href="https://travis-ci.org/farseerfc/farseerfc/builds/51344614"&gt;我的这次的build&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="travis-ci-github"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;从 Travis-CI 推往 Github&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上面的测试编译通过了之后，下一步就是让 travis-ci 编译的结果自动推到 Github Pages
+并发布出来。要推往 Github 自然需要设置 Github 用户的身份，在本地设置的时候是把
+ssh key 添加到 github 账户就可以了，在编译细节都通过 github repo 公开了的 travis 上
+当然不能放推送用的私有 key ，所以我们需要另外一种方案传递密码。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Github 上创建 Personal Access Token&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Github 上创建 Personal Access Token" class="img-responsive" src="//farseerfc.me/zhs/images/travis-blog-push.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;好在 Github 支持通过 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
+的方式验证，这个和 App Token 一样可以随时吊销，同时完全是个人创建的。另一方面 Travis-CI
+支持加密一些私密数据，通过环境变量的方式传递给编译脚本，避免公开密码这样的关键数据。&lt;/p&gt;
+&lt;p&gt;首先创建一个 &lt;a class="reference external" href="https://github.com/settings/applications"&gt;Personal Access Token&lt;/a&gt;
+，这里需要勾选一些给这个 Token 的权限，我只给予了最小的 public_repo 权限，如侧边里的图。
+生成之后会得到一长串 Token 的散列码。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+如果你不能使用 travis 命令&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月21日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;使用 &lt;code class="code"&gt;
+travis encrypt&lt;/code&gt;
+ 命令来加密重要数据最方便，不过如果有任何原因，
+比如 ruby 版本太低或者安装不方便之类的，那么不用担心，我们直接通过
+&lt;a class="reference external" href="http://docs.travis-ci.com/api/#repository-keys"&gt;travis api&lt;/a&gt;
+也能加密数据。&lt;/p&gt;
+&lt;p&gt;第一步用这个命令得到你的repo的 pubkey ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;curl -H "Accept: application/vnd.travis-ci.2+json" https://api.travis-ci.org/repos/&amp;lt;github-id/repo&amp;gt;/key | python2 -m json.tool | grep key | sed 's/.*"key": "\(.*\)"/\1/' | xargs -0 echo -en | sed 's/ RSA//' &amp;gt; travis.pem&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;其中的 &amp;lt;github-id/repo&amp;gt; 替换成 github 上的 用户名/repo名， 比如我的是
+farseerfc/farseer 。travis api 获得的结果是一个 json ，所以还用 python 的
+json 模块处理了一下，然后把其中包含 key 的行用 &lt;code class="code"&gt;
+grep&lt;/code&gt;
+ 提取出来，用
+&lt;code class="code"&gt;
+sed&lt;/code&gt;
+ 匹配出 key 的字符串本身，然后 &lt;code class="code"&gt;
+xargs -0 echo -en&lt;/code&gt;
+
+解释掉转义字符，然后删掉其中的 "&amp;lt;空格&amp;gt;RSA" 几个字（否则 openssl 不能读），
+最后保存在名为 travis.pem 的文件里。&lt;/p&gt;
+&lt;p&gt;有了 pubkey 之后用 openssl 加密我们需要加密的东西并用 base64 编码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;echo -n 'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;' | openssl rsautl -encrypt -pubin -inkey travis.pem | base64 -w0&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;替换了相应的身份信息和token之后，这行得到的结果就是 secure 里要写的加密过的内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;然后我们需要 &lt;code class="code"&gt;
+travis&lt;/code&gt;
+ 命令来加密这个 token ， archlinux 用户可以安装
+&lt;code class="code"&gt;
+aur/ruby-travis&lt;/code&gt;
+ ，其它用户可以用 gems 安装：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; gem install travis&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;装好之后，在设定了 Travis-CI 的 repo 的目录中执行一下 &lt;code class="code"&gt;
+travis status&lt;/code&gt;
+ ，
+命令会指导你登录 Travis-CI 并验证 repo 。正常的话会显示最新的 build 状态。
+然后同样在这个 repo 目录下执行：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; travis encrypt &lt;span class="s1"&gt;'GIT_NAME="Jiachen Yang" GIT_EMAIL=farseerfc@gmail.com GH_TOKEN=&amp;lt;Personal Access Token&amp;gt;'&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;当然上面一行里的相应信息替换为个人的信息，作为这个命令的执行结果会得到另一长串散列码，
+把这串散列写入刚才的 &lt;code class="code"&gt;
+.travis.yml&lt;/code&gt;
+ 文件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;env&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;secure&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;"long&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;secure&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;base64&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;string"&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
+然后在编译脚本中利用这些环境变量来生成博客：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;script&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.email "$GIT_EMAIL"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global user.name "$GIT_NAME"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git config --global push.default simple&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;env SITEURL="farseerfc.me" make publish&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="l l-Scalar l-Scalar-Plain"&gt;after_success&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;cd output&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git add -A .&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git commit -m "update from travis"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;git push --quiet&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="alert alert-warning compound"&gt;
+&lt;p&gt;这里要注意最后 &lt;code class="code"&gt;
+git push&lt;/code&gt;
+ 的时候一定要加上 &lt;code class="code"&gt;
+--quiet&lt;/code&gt;
+，因为默认不加的时候会把
+代入了 &lt;code class="code"&gt;
+$GH_TOKEN&lt;/code&gt;
+ 的 URL 显示出来，从而上面的加密工作就前功尽弃了……&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;根据 &lt;a class="reference external" href="http://docs.travis-ci.com/user/build-lifecycle/"&gt;travis 的文档&lt;/a&gt;
+， after_success 里写的步骤只有在 script 里的全都完全无错执行完之后才会执行，这正是我们
+push 的条件。目前 after_success 的成功与否不会影响到 build 的状态。
+具体我用的配置见
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/.travis.yml"&gt;这里的最新版&lt;/a&gt; 。
+在我的 &lt;code class="code"&gt;
+make github&lt;/code&gt;
+ 中
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/Makefile#L102"&gt;调用了&lt;/a&gt;
+&lt;code class="code"&gt;
+git push&lt;/code&gt;
+ 命令，从而执行了 &lt;code class="code"&gt;
+make github&lt;/code&gt;
+ 之后就会自动部署到 github 上。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="web"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
+拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
+Readme.md&lt;/code&gt;
+
+中显示编译状态。&lt;/p&gt;
+&lt;p&gt;这样设置之后的另一个好处就在于可以利用 Github 的 Web 界面编辑文章内容。在 Github 里
+编辑和保存之后会自动作为一个 commit 提交，所以也会触发 Travis-CI 的自动编译。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="在 Github 的 Web 界面中直接编辑文章内容" class="img-responsive" src="//farseerfc.me/zhs/images/travis-edit-github-web.png"/&gt;
+&lt;p class="caption"&gt;在 Github 的 Web 界面中直接编辑文章内容&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;以及虽然目前还没有好用的 Github 的手机客户端，不过直接用 Android/iPhone 的浏览器登录
+github 并编辑文章的可用性也还不错，所以同样的方式也可以直接在手机上发布博文了。&lt;/p&gt;
+&lt;p&gt;That is all, happy blogging ~&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="pelican"></category><category term="github"></category><category term="pages"></category><category term="travis"></category><category term="travis-ci"></category><category term="ubuntu"></category></entry><entry><title>换到 farseerfc.me 域名</title><link href="//farseerfc.me/zhs/switch-to-farseerfc-dot-me-domain.html" rel="alternate"></link><published>2015-01-26T23:32:00+09:00</published><updated>2015-01-26T23:32:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-26:/zhs/switch-to-farseerfc-dot-me-domain.html</id><summary type="html">&lt;p&gt;上个月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上买了个自己的域名 &lt;code class="code"&gt;
+farseerfc.me&lt;/code&gt;
+ 准备用在这个
+博客上，当时试着转到过这个域名，发现 &lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+只支持 http 不支持 https ，想着还要买自己的证书，于是就扔在了一旁。不用自定义域名的话，
+放在 github.io 上是可以用 HTTPS 的。
+今天在 &lt;a class="reference external" href="//webchat.freenode.net/?channels=archlinux-cn"&gt;#archlinux-cn&lt;/a&gt; 上受大牛 &lt;a class="reference external" href="/links.html#quininer"&gt;quininer&lt;/a&gt; 和 &lt;a class="reference external" href="/links.html#lilydjwg"&gt;lilydjwg&lt;/a&gt; 点播，
+发现 cloudflare 有提供
+&lt;a class="reference external" href="https://blog.cloudflare.com/introducing-universal-ssl/"&gt;免费的支持 SSL 的 CDN 服务&lt;/a&gt;
+赶快去申请了一个，感觉非常赞，于是就换过来了。&lt;/p&gt;
+&lt;p&gt;设置的方法按照 &lt;a class="reference external" href="https://me.net.nz/blog/github-pages-secure-with-cloudflare/"&gt;这篇博文&lt;/a&gt;
+说的一步步做下来，如它所述，用 CloudFlare …&lt;/p&gt;</summary><content type="html">&lt;p&gt;上个月就在 &lt;ruby&gt;&lt;rb&gt;狗爹&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;godaddy&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 上买了个自己的域名 &lt;code class="code"&gt;
+farseerfc.me&lt;/code&gt;
+ 准备用在这个
+博客上，当时试着转到过这个域名，发现 &lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+只支持 http 不支持 https ，想着还要买自己的证书，于是就扔在了一旁。不用自定义域名的话，
+放在 github.io 上是可以用 HTTPS 的。
+今天在 &lt;a class="reference external" href="//webchat.freenode.net/?channels=archlinux-cn"&gt;#archlinux-cn&lt;/a&gt; 上受大牛 &lt;a class="reference external" href="/links.html#quininer"&gt;quininer&lt;/a&gt; 和 &lt;a class="reference external" href="/links.html#lilydjwg"&gt;lilydjwg&lt;/a&gt; 点播，
+发现 cloudflare 有提供
+&lt;a class="reference external" href="https://blog.cloudflare.com/introducing-universal-ssl/"&gt;免费的支持 SSL 的 CDN 服务&lt;/a&gt;
+赶快去申请了一个，感觉非常赞，于是就换过来了。&lt;/p&gt;
+&lt;p&gt;设置的方法按照 &lt;a class="reference external" href="https://me.net.nz/blog/github-pages-secure-with-cloudflare/"&gt;这篇博文&lt;/a&gt;
+说的一步步做下来，如它所述，用 CloudFlare 的优点如下：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;CDN 加速&lt;/li&gt;
+&lt;li&gt;SSL (HTTPS) 加密&lt;/li&gt;
+&lt;li&gt;支持 SPDY 协议&lt;/li&gt;
+&lt;li&gt;支持 IPv6&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年12月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;现在不光支持 SPDY 而且支持 HTTP/2 了。&lt;/p&gt;
+&lt;p&gt;然后 &lt;strong&gt;免费账户&lt;/strong&gt; 的一些缺点有：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;CloudFlare 和 github.io 之间的数据不是加密的，因为 github
+&lt;ruby&gt;&lt;rb&gt;自定义域名&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;custom domain&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 还不支持使用自己的证书。这也是一开始我没用
+自定义域名的原因嘛，这没有办法……&lt;/li&gt;
+&lt;li&gt;CloudFlare 给免费账户签名的 SSL 证书比较新，不支持一些老的设备和浏览器，比如不支持
+老的 XP 系统的 IE 或者 2.x 的 Android。这种情况下没办法只能用没有加密的 HTTP 了。&lt;/li&gt;
+&lt;li&gt;不支持 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security"&gt;HSTS 头&lt;/a&gt;
+，所以不能从服务器这边强制浏览器用 HTTPS。当然可以放个 javascript 跳转，
+也可以用 &lt;a class="reference external" href="https://www.eff.org/https-everywhere"&gt;HTTPSEverywhere&lt;/a&gt; 这种方案。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年12月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;如评论中 &lt;a class="reference external" href="http://farseerfc.me/switch-to-farseerfc-dot-me-domain.html#comment-2015037231"&gt;提到的&lt;/a&gt;
+现在支持 HSTS 了。&lt;/p&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;设置步骤&lt;/h2&gt;
+&lt;p&gt;基本按照默认的选项下一步就可以了。&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;和那个博主一样我把 &lt;ruby&gt;&lt;rb&gt;安全级别&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Security profile&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 降到了 Low ，即使是可疑流量也
+不会要求输入 CAPTCHA 。&lt;/li&gt;
+&lt;li&gt;把 SSL 方式开在 Flexible SSL，访客到 CloudFlare 是加密的，而 CloudFlare 到
+github.io 是不加密的。&lt;/li&gt;
+&lt;li&gt;把 CDN 开到了 CDT+Full Optimization ，可以对访问加速。由于是完全静态的博客，没有
+动态变化的内容，所以应该比较安全。&lt;/li&gt;
+&lt;li&gt;服务器设置的一步需要将 &lt;ruby&gt;&lt;rb&gt;域名解析服务器&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;DNS nameservers&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 从狗爹的服务器改到
+CloudFlare 的，如下图：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="更改狗爹的域名服务器" class="img-responsive" src="//farseerfc.me/zhs/images/godaddy.png"/&gt;
+&lt;p class="caption"&gt;更改狗爹的域名服务器&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;申请好之后就由 CloudFlare 接管域名解析了，接下来在 CloudFlare 的 DNS 设置添加一条
+&lt;a class="reference external" href="https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/"&gt;A 类规则指向 github pages 的 IP&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="更改CloudFlare的DNS规则" class="img-responsive" src="//farseerfc.me/zhs/images/cloudflaredns.png"/&gt;
+&lt;p class="caption"&gt;更改CloudFlare的DNS规则&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;等一切都反映到 DNS 服务器上就设置完成了，接下来给
+&lt;a class="reference external" href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/"&gt;farseerfc.github.io push 一个 CNAME 文件&lt;/a&gt;
+写上我的域名就可以了。我用 Makefile 配合我的 pelican 配置做这个：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;publish&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rmdrafts&lt;/span&gt; &lt;span class="n"&gt;cc&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="n"&gt;theme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; find &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -mindepth &lt;span class="m"&gt;1&lt;/span&gt; -not -wholename &lt;span class="s2"&gt;"*/.git*"&lt;/span&gt; -delete&lt;/span&gt;
+&lt;span class="code-line"&gt;  rm -rf cache&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;SITEURL&lt;span class="k"&gt;)&lt;/span&gt; &amp;gt; content/static/CNAME&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;$(&lt;/span&gt;PELICAN&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;INPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -o &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; -s &lt;span class="k"&gt;$(&lt;/span&gt;PUBLISHCONF&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;PELICANOPTS&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; rsthtml&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nf"&gt;github&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout master&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  env &lt;span class="nv"&gt;SITEURL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"farseerfc.me"&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;MAKE&lt;span class="k"&gt;)&lt;/span&gt; publish&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;OUTPUTDIR&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;"update"&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'//'&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"SITEURL"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'localhost:8000'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;STATIC_PATHS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'static'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'images'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'uml'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;EXTRA_PATH_METADATA&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'images/favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;'favicon.ico'&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'static/CNAME'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;'path'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;'CNAME'&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后把生成的静态网站 push 到 github 之后可以从项目设置里看到域名的变化：&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="Github 配置好自定义域名之后的变化" class="img-responsive" src="//farseerfc.me/zhs/images/githubdomain.png"/&gt;
+&lt;p class="caption"&gt;Github 配置好自定义域名之后的变化&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;最后把Disqus的评论也迁移到新的域名，disqus有方便的迁移向导，一直下一步就可以了。&lt;/p&gt;
+&lt;p&gt;这样就一切都设置妥当了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;致谢&lt;/h2&gt;
+&lt;p&gt;最后要感谢提供消息的 &lt;a class="reference external" href="/links.html#quininer"&gt;quininer&lt;/a&gt; 和 &lt;a class="reference external" href="/links.html#lilydjwg"&gt;lilydjwg&lt;/a&gt; ，感谢撰写设置步骤的
+&lt;em&gt;Jonathan J Hunt&lt;/em&gt; ， 感谢 CloudFlare 提供免费 SSL CDN 服务，感谢 Github 提供
+方便免费的 Pages 托管。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="pelican"></category><category term="domain"></category><category term="cloudflare"></category><category term="github"></category></entry><entry><title>重新设计了 Pelican 的主题与插件</title><link href="//farseerfc.me/zhs/redesign-pelican-theme.html" rel="alternate"></link><published>2015-01-25T22:45:00+09:00</published><updated>2015-01-25T22:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-01-25:/zhs/redesign-pelican-theme.html</id><summary type="html">
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，将一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;不知不觉间放任这边长草很久了，从上次
+&lt;a class="reference external" href="//farseerfc.me/zhs/try-pelican.html"&gt;折腾主题&lt;/a&gt; 到现在都快三年了，
+而从上次 &lt;a class="reference external" href="//farseerfc.me/zhs/marry-me.html"&gt;写了篇告白信&lt;/a&gt; 到现在也有快两年了。
+这期间曾经把主题配色从 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默认的
+白底黑字改成了让眼睛更舒适的黑底白字，也不过是用 drop-in 的配色方案而已，没有本质上的改进。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千载，两年里 Bootstrap 已经升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 则已经升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。&lt;/p&gt;
+&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;strong&gt;两个月&lt;/strong&gt; 的时间重新设计了一遍
+Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
+（以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id38"&gt;前言: 新天新地，将一切都更新了 &lt;a class="footnote-reference" href="#id37" id="id1"&gt;[1]&lt;/a&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;不知不觉间放任这边长草很久了，从上次
+&lt;a class="reference external" href="//farseerfc.me/zhs/try-pelican.html"&gt;折腾主题&lt;/a&gt; 到现在都快三年了，
+而从上次 &lt;a class="reference external" href="//farseerfc.me/zhs/marry-me.html"&gt;写了篇告白信&lt;/a&gt; 到现在也有快两年了。
+这期间曾经把主题配色从 &lt;a class="reference external" href="http://getbootstrap.com/2.3.2/"&gt;Bootstrap 2&lt;/a&gt; 默认的
+白底黑字改成了让眼睛更舒适的黑底白字，也不过是用 drop-in 的配色方案而已，没有本质上的改进。&lt;/p&gt;
+&lt;p&gt;洞中一日世上千载，两年里 Bootstrap 已经升上 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;v3.3&lt;/a&gt; ,
+而 Pelican 则已经升到 &lt;a class="reference external" href="https://github.com/getpelican/pelican/releases/tag/3.5.0"&gt;3.5&lt;/a&gt; 了。
+早就眼馋 Bootstrap 和 Pelican 中的诸多新功能新设计，不过无奈于时间有限只能饱饱眼福。&lt;/p&gt;
+&lt;p&gt;近日想写的东西越积越多，终于下定决心花了前前后后 &lt;strong&gt;两个月&lt;/strong&gt; 的时间重新设计了一遍
+Pelican 的主题，配合一些我觉得有用的插件。于是本博客就变成你们现在看到的样子了。
+（以及本篇博文也用了两个月的时间写完，其间还发了几篇别的短文，算是恢复写博客的尝试吧。）&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+在迈阿密参加 &lt;a class="reference external" href="http://icsr2015.ipd.kit.edu/"&gt;ICSR 2015&lt;/a&gt; 的时候
+拍到的街边一家叫 Pelican 的旅馆&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Pelican Hotel" class="img-responsive" src="//farseerfc.me/zhs/images/pelican.jpg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bootstrap-3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id39"&gt;Bootstrap 3 的新设计&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;全新的 &lt;ruby&gt;&lt;rb&gt;优先移动设备&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mobile-first&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;响应式&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;responsive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 设计。
+原本Bootstrap 2虽然有响应式设计，
+不过诸多细节不能符合我的需求，最终还是得手工 hack &lt;code class="code"&gt;
+@media&lt;/code&gt;
+ 查询去微调。
+现在的 &lt;ruby&gt;&lt;rb&gt;优先移动设备&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;mobile-first&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;ruby&gt;&lt;rb&gt;响应式&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;responsive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+&lt;ruby&gt;&lt;rb&gt;栅格系统&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;grid system&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 则相对显得科学很多了，也终于能在手持
+设备上看起来舒服一些。诸位可以尝试改变窗口宽度，或者在不同的手持设备上打开这个
+blog ，体验一下这个页面在不同显示器大小中的效果。如果仍有问题欢迎
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/issues"&gt;发 Issue 给我&lt;/a&gt;  。&lt;/li&gt;
+&lt;li&gt;科学的 &lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+比 Bootstrap 2 那个科学很多了。无论是 &lt;ruby&gt;&lt;rb&gt;保持&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sticky&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 在上端还是跟着浮动，
+或者像这边这样 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;自动隐藏&lt;/a&gt; 都很简单。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;更多细节参考 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3 主页&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pelican-3-5"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id40"&gt;Pelican 3.5 的新功能&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Python 2 和 Python 3 统一代码：
+再没有恼人的 unicode 相关的问题了。这对 blog 系统来说相当重要啊。
+而且还能方便切换 pypy 等不同的解释器。&lt;/li&gt;
+&lt;li&gt;全新的插件系统：非常多功能强大的 &lt;a class="reference external" href="https://github.com/getpelican/pelican-plugins"&gt;插件&lt;/a&gt; 等着你。&lt;/li&gt;
+&lt;li&gt;增强了导入系统：嗯总算可以导入我的中文的 wordpress 博客了。（虽然那边长草更久了……）&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/content.html#linking-to-internal-content"&gt;站内链接&lt;/a&gt;
+：不用 &lt;ruby&gt;&lt;rb&gt;硬编码&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;hard code&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 目标页面的链接了，可以直接写源文件的位置然后让 pelican
+处理，这样能简化各种 &lt;ruby&gt;&lt;rb&gt;插件&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;plugin&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;ruby&gt;&lt;rb&gt;主题&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;theme&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的实现。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;更多细节参考 &lt;a class="reference external" href="http://pelican.readthedocs.org/en/latest/"&gt;Pelican 文档&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id41"&gt;新的文件夹布局&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Pelican 的新文件夹布局&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span style="color:blue;font-weight:bold;"&gt;.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;cache&lt;/span&gt;             生成页面的 pickle 缓存&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;content&lt;/span&gt;           读取的全部内容&lt;/span&gt;
+&lt;span class="code-line"&gt;│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;&amp;lt;categories&amp;gt;&lt;/span&gt;      按分类存放的文章&lt;/span&gt;
+&lt;span class="code-line"&gt;│   ├── &lt;span style="color:blue;font-weight:bold;"&gt;pages&lt;/span&gt;             像 About 这样的固定页面&lt;/span&gt;
+&lt;span class="code-line"&gt;│   └── &lt;span style="color:blue;font-weight:bold;"&gt;static&lt;/span&gt;            文章内用到的静态内容&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:blue;font-weight:bold;"&gt;drafts&lt;/span&gt;            文章的草稿箱&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;Makefile&lt;/span&gt;          生成用的 makefile&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;pelicanconf.py&lt;/span&gt;    测试时用的快速 Pelican 配置&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:green;font-weight:bold;"&gt;publishconf.py&lt;/span&gt;    部署时用的耗时 Pelican 配置&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:teal;font-weight:bold;"&gt;output&lt;/span&gt;          -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../farseerfc.github.io&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;├── &lt;span style="color:teal;font-weight:bold;"&gt;plugins&lt;/span&gt;         -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-plugins&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;└── &lt;span style="color:teal;font-weight:bold;"&gt;theme&lt;/span&gt;           -&amp;gt; &lt;span style="color:blue;font-weight:bold;"&gt;../pelican-bootstrap3&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.com"&gt;之前的博客&lt;/a&gt; 仍然留在
+github 上，其中的内容完全搬过来了。开始写老博客的时候 Pelican 版本较早，没有形成好的
+文件夹布局，导致生成的文章、使用的模板和撰写的内容全都混在一起，非常难以管理，
+于是趁改版之际用了新的文件夹布局方式，并分为 4 个 git repo 分别管理历史。&lt;/p&gt;
+&lt;p&gt;首先是存放 &lt;a class="reference external" href="https://github.com/farseerfc/farseerfc"&gt;总的博客内容的 repo&lt;/a&gt; ，
+其布局是如图那样的。这样将生成的静态网站和生成网站用的配置啦内容啦分开之后，顿时清晰了很多。&lt;/p&gt;
+&lt;p&gt;然后这个内容 repo 中的三个符号链接分别指向三个子 repo（没用 &lt;code class="code"&gt;
+git submodule&lt;/code&gt;
+
+管理纯粹是因为偷懒）。 theme 指向
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt;pelican-bootstrap3&lt;/a&gt;
+，是我修改过的 pelican 主题。
+plugins 指向 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins"&gt;pelican-plugins&lt;/a&gt;
+，由于 plugins 的质量有些参差不齐，其中不少 plugin
+都按我的需要做了些许修改，一些是功能改进，另一些则是修bug（比如不少plugin只支持 python 2）。
+最后 output 指向
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc.github.io"&gt;farseerfc.github.io&lt;/a&gt;
+也就是发布的静态网站啦。&lt;/p&gt;
+&lt;p&gt;接下来从 &lt;strong&gt;主题&lt;/strong&gt; 和 &lt;strong&gt;插件&lt;/strong&gt; 两个方面介绍一下改版的细节。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="material-design-bootstrap-3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id42"&gt;主题： Material Design 风格的 Bootstrap 3&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/zhs/summarize-material-design-css-framework.html"&gt;博文&lt;/a&gt;
+就总结了我为了这个博客寻找了一堆 CSS 框架，并且最终决定用
+&lt;a class="reference external" href="http://fezvrasta.github.io/bootstrap-material-design/"&gt;bootstrap-material-design&lt;/a&gt;
+, &lt;a class="reference external" href="https://github.com/DandyDev/pelican-bootstrap3"&gt;DandyDev/pelican-bootstrap3&lt;/a&gt;
+和 &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap 3&lt;/a&gt; 这三个项目结合的方式实现这个模板的主题。
+这三个项目都或多或少经过了我的修改，修改后的项目以 pelican-bootstrap3 为基础放在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3"&gt;这里&lt;/a&gt; ，包括 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/bootstrap"&gt;Bootstrap3 样式&lt;/a&gt;
+和 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/static/material"&gt;Material 样式&lt;/a&gt;。&lt;/p&gt;
+&lt;div class="section" id="id16"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id43"&gt;对 Bootstrap 3 的定制&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;由于架构完善，修改 Bootstrap 3 感觉非常简单。另一方面我在 Web 前端技术上的技能点也不多，
+所以修改的地方非常有限，只能按我自己的需求定制而已。&lt;/p&gt;
+&lt;div class="section" id="id17"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id44"&gt;响应式设备的大小&lt;/a&gt;&lt;/h4&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+修改了 Bootstrap 3 响应式设备的大小&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;screen-xs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;screen-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;598px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  768px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;screen-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;     &lt;span class="nt"&gt;952px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  992px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;screen-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;1350px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1200px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;screen-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;    &lt;span class="nt"&gt;2030px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;container-sm&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;582px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  750px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;container-md&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="nt"&gt;930px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/*  970px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;container-lg&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1320px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c"&gt;/* 1170px; */&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="k"&gt;container-xl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nt"&gt;1990px&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;首先把 Bootstrap 3 默认适配的几个 &lt;a class="reference external" href="http://getbootstrap.com/css/#grid"&gt;响应式设备的大小&lt;/a&gt;
+改成了我需要的大小。 &lt;code class="code"&gt;
+xs&lt;/code&gt;
+ 和 &lt;code class="code"&gt;
+sm&lt;/code&gt;
+ 的大小分别按照我的手机屏幕 &lt;strong&gt;竖屏&lt;/strong&gt; 和
+&lt;strong&gt;横屏&lt;/strong&gt; 时候的浏览器页面宽度来算， &lt;code class="code"&gt;
+md&lt;/code&gt;
+ 是想兼容 Nexus 7 横屏 960 的宽度以及
+一个常见上网本 1024 的宽度。 &lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 的大小则按照常见的笔记本 1366 宽的屏幕来适配。&lt;/p&gt;
+&lt;p&gt;这里 Bootstrap 3 支持的设备大小的一个问题是，它最多考虑到 1200 像素宽的显示器，而更宽的
+比如 1600、 2048 甚至 2560 像素宽的显示器现在也并不少见，其结果就是页面中左右两侧
+有很大的空间被浪费掉了。作为深受这一问题困扰的用户之一，我用
+&lt;a class="reference external" href="http://stackoverflow.com/a/25644266"&gt;这里介绍的方法&lt;/a&gt;
+给 bootstrap 增加了一类「 &lt;ruby&gt;&lt;rb&gt;比大更大&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;bigger than bigger&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 」的
+&lt;code class="code"&gt;
+xl&lt;/code&gt;
+ 响应式设备尺寸，宽度设为支持 2048 像素宽的显示器，具体的修改反映在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/variables.less"&gt;variables.less&lt;/a&gt;
+文件里。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id20"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
+显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
+&lt;table border="1" class=" table-striped docutils table-hover table"&gt;
+&lt;colgroup&gt;
+&lt;col width="26%"/&gt;
+&lt;col width="17%"/&gt;
+&lt;col width="18%"/&gt;
+&lt;col width="39%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code class="code"&gt;
+xs&lt;/code&gt;
+ 用单栏 &lt;ruby&gt;&lt;rb&gt;流动&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;fluid&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 布局&lt;/td&gt;
+&lt;td colspan="2"&gt;&lt;code class="code"&gt;
+sm&lt;/code&gt;
+ 用上方单栏文章列表、下方双栏 &lt;ruby&gt;&lt;rb&gt;侧边栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sidebar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 固定布局&lt;/td&gt;
+&lt;td&gt;&lt;code class="code"&gt;
+md&lt;/code&gt;
+ 用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="100%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;ruby&gt;&lt;rb&gt;导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;侧边栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;底栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="53%"/&gt;
+&lt;col width="47%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;导航栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;文章&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;td&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="53%"/&gt;
+&lt;col width="47%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;导航栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 用双栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
+&lt;td colspan="2"&gt;&lt;code class="code"&gt;
+xl&lt;/code&gt;
+ 用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="35%"/&gt;
+&lt;col width="35%"/&gt;
+&lt;col width="31%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="3"&gt;导航栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;文章 3&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;文章 4&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;td colspan="2"&gt;&lt;table border="1" class="table-hover last docutils table-striped table first"&gt;
+&lt;colgroup&gt;
+&lt;col width="26%"/&gt;
+&lt;col width="26%"/&gt;
+&lt;col width="26%"/&gt;
+&lt;col width="23%"/&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td colspan="4"&gt;导航栏&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 1&lt;/td&gt;
+&lt;td&gt;文章 3&lt;/td&gt;
+&lt;td&gt;文章 5&lt;/td&gt;
+&lt;td&gt;侧边栏 1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;文章 2&lt;/td&gt;
+&lt;td&gt;文章 4&lt;/td&gt;
+&lt;td&gt;文章 6&lt;/td&gt;
+&lt;td&gt;侧边栏 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4"&gt;&lt;ruby&gt;&lt;rb&gt;底栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;footer&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;一开始纯粹用 Bootstrap3 的响应式栅格实现这个分栏布局，结果发现效果不太理想，
+因为文章列表和侧边栏的高度是变化的，会导致栅格间留下大片空白。后来改用
+&lt;a class="reference external" href="http://cssdeck.com/labs/pinterest-like-waterfall-design-purely-css"&gt;这里示范的纯CSS瀑布式布局&lt;/a&gt;
+实现文章和侧边栏的布局，具体的实现代码在
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/waterfall.less"&gt;waterfall.less&lt;/a&gt;
+，总算达到了想要的布局了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id21"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id46"&gt;正文的样式&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;最最重要的是文章正文的样式。这里我想要达到的效果是，在大屏幕上用更大的字号，让读者
+看起来更舒适，同时在小屏幕上用比较小的字号，最终保证基本上「一行」的文字数接近。这个修改
+主要针对 &lt;code class="code"&gt;
+.jumbotron&lt;/code&gt;
+，
+用了 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/static/bootstrap/jumbotron.less"&gt;不太科学的方式&lt;/a&gt;
+代码太长就不贴全了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id23"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id47"&gt;一些细微的定制&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;把主题配色改成了现在这样的淡紫色
+&lt;code class="code"&gt;
+@brand-primary: darken(#6B5594, 6.5%);&lt;/code&gt;
+
+，配合我的头像风格， 这个修改只需要一行。
+接着删掉了 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 的 &lt;code class="code"&gt;
+white-space: nowrap;&lt;/code&gt;
+ 让按钮的文字可以换行，
+这也只是一行修改。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;另外我也不太喜欢 Bootstrap 3 默认在手机上的 &lt;ruby&gt;&lt;rb&gt;折叠导航栏&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;collapsed navbar&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，
+折叠之后的操作不够直观方便而且依赖 javascript 所以有 bug …… 于是我把它关掉了，
+具体方式是在 variables.less 把 &lt;code class="code"&gt;
+@grid-float-breakpoint&lt;/code&gt;
+ 和
+&lt;code class="code"&gt;
+@grid-float-breakpoint-max&lt;/code&gt;
+ 都设为0就可以了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id24"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id48"&gt;对 bootstrap-material-design 的定制&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这里定制的地方不多。原样式中一个不太科学的做法是所有 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 都强制加上了阴影
+效果，这在已经有阴影的环境里用的话非常碍眼，像是 Win9x 风格的厚重睫毛膏。既然可以单独
+给每个样式加阴影，于是就把 &lt;code class="code"&gt;
+.btn&lt;/code&gt;
+ 强制的阴影去掉了，只保留鼠标悬停之后强调的阴影。&lt;/p&gt;
+&lt;p&gt;其它定制的细节么就是统一配色风格，修补漏洞错误，微调响应式效果而已，这里不细说。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id25"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id49"&gt;将以上两者整合在 pelican-bootstrap3 里&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Pelican 实现显示源代码按钮&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;显示源代码按钮借用了 Pelican 配置中自带的 &lt;code class="code"&gt;
+OUTPUT_SOURCES&lt;/code&gt;
+ 选项将源文件复制到输出文件夹：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;OUTPUT_SOURCES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_SOURCES_EXTENSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'.rst'&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后在 Makefile 里用 pygmentize 把所有源代码文件着色：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;find -iname &lt;span class="s2"&gt;"*.rst"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; parallel -I@  pygmentize -f html -o @.html @&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;最后在按钮按下的时候用 jQuery 载入源代码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt; &lt;span class="na"&gt;onclick&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;"$.get('{{SITEURL}}/{{article.slug}}.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();"&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;虽然难看的 hack 比较多，但是能用！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;虽说 pelican-bootstrap3 是我 fork 出来的，不过由于我修改的地方实在太多，代码看来基本上
+接近重写了一份。好在之前有给 pelican 写 bootstrap 2 主题的经验，这次修改算得上驾轻就熟。
+可以对比一下 &lt;a class="reference external" href="http://dandydev.net/"&gt;上游作者的博客&lt;/a&gt; 和这里的样子体会一下感觉。
+具体修改过的地方包括：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;套用 bootstrap-material-design 的各个元素样式。&lt;/li&gt;
+&lt;li&gt;在文章列表模板应用上面提到的 Bootstrap 3 的栅格布局和瀑布式布局。&lt;/li&gt;
+&lt;li&gt;翻译到多个语言，这里在后面的 i18n-subsite 插件里详述。&lt;/li&gt;
+&lt;li&gt;套用后面会介绍到的各种插件。&lt;/li&gt;
+&lt;li&gt;统一侧边栏的样式到一个模板里。&lt;/li&gt;
+&lt;li&gt;添加 Atom 订阅按钮和 breadcrumb 条。&lt;/li&gt;
+&lt;li&gt;对正文中出现的插图，添加点击放大的功能，通过 Bootstrap 的 &lt;code class="code"&gt;
+modal&lt;/code&gt;
+ 实现。&lt;/li&gt;
+&lt;li&gt;上面提到的用 &lt;a class="reference external" href="http://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/"&gt;这个bootstrap插件&lt;/a&gt;
+让导航栏自动隐藏。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;显示源代码按钮&lt;/strong&gt; ，也就是每篇文章信息栏中的
+&lt;button class="btn btn-primary"&gt;&lt;i class="fa fa-code"&gt;&lt;/i&gt;&lt;/button&gt; 按钮。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pelican-restructuredtext"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id50"&gt;插件: 发挥 Pelican 和 reStructuredText 的优势&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;先列举一下我目前用到的所有插件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;"i18n_subsites"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"plantuml"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"youku"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"youtube"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'tipue_search'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'neighbors'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'series'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'bootstrapify'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'twitter_bootstrap_rst_directives'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s2"&gt;"render_math"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'extract_toc'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;           &lt;span class="s1"&gt;'summary'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;嗯其实不算多。接下来逐一介绍一下这些各具特色的插件。&lt;/p&gt;
+&lt;div class="section" id="i18n-subsites"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id51"&gt;i18n-subsites&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这个插件的目的是创建 &lt;ruby&gt;&lt;rb&gt;国际化&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;internationalization&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+&lt;ruby&gt;&lt;rb&gt;子站&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;subsite&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。&lt;/p&gt;
+&lt;p&gt;之前介绍 Pelican 配置的时候就提到过，
+原本的 Pelican 就支持一篇文章用多种语言书写，有 &lt;code class="code"&gt;
+lang&lt;/code&gt;
+ 属性注明这篇文章使用的
+语言，以及 &lt;code class="code"&gt;
+slug&lt;/code&gt;
+ 属性注明多语言的翻译之间的关联，换句话说同一篇文章的多个语言
+版本应该有相同的 &lt;code class="code"&gt;
+slug&lt;/code&gt;
+ 和不同的 &lt;code class="code"&gt;
+lang&lt;/code&gt;
+。然后原本 Pelican 里对多语言的
+实现方式是，首先有一个 &lt;strong&gt;主语言&lt;/strong&gt; 是模板和大部分文章采用的语言，文章列表中会优先列出
+用 &lt;strong&gt;主语言&lt;/strong&gt; 撰写的文章，然后从 &lt;strong&gt;主语言&lt;/strong&gt; 的文章链接到别的翻译版本。
+很多博客系统和CMS对多语言的支持都是这样的，这种处理方式的缺点也显而易见：作为 &lt;strong&gt;主语言&lt;/strong&gt;
+的语言必须足够通用，才能让进来的人找到合适的翻译版本，所以通常 &lt;strong&gt;主语言&lt;/strong&gt; 都是英语。&lt;/p&gt;
+&lt;p&gt;而这个插件做的事情描述起来很简单：将文章按语言属性分到多个子站，每个子站独立放在各自的文件夹。
+比如主站是 &lt;a class="reference external" href="https://farseerfc.github.io/"&gt;https://farseerfc.github.io/&lt;/a&gt; 的话，那么英语的子站就可以是
+&lt;a class="reference external" href="https://farseerfc.github.io/en/"&gt;https://farseerfc.github.io/en/&lt;/a&gt; 。
+然后分别对多个子站生成静态页面。具体的实现方式是对 pelican 的页面生成步骤做了拆分：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pelican 按正常情况读入文章，生成元信息。&lt;/li&gt;
+&lt;li&gt;i18n-subsites 针对每个语言，覆盖掉 pelican 的一些选项设置比如路径和 URL ，
+分别调用 pelican 的页面生成器按模板生成文章。&lt;/li&gt;
+&lt;li&gt;对共用的静态内容比如模板的 js 和 css 文件，只在主站中生成，子站中的相应链接全部链回主站。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;虽然描述起来简单，但是这个插件可以说最大化利用了 Pelican 的插件系统，实现细节相对比较
+复杂，大概是我用的这些插件里面最复杂的了。不夸张的说 Pelican 3.4 支持的新插件 API 和
+站内链接功能基本上就是为了配合这个插件的。至于具体它会覆盖哪些 Pelican 的配置，请参阅它的
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/README.rst"&gt;README.md文件&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;按内容拆分多语言子站的做法只解决了问题的一半，还留下另一半的问题，也即对模板的翻译。
+对这个问题， i18n-subsites 提供了两套方案供选择：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;用覆盖配置路径的方式让每个子站套用不同的模板。这配置起来简单，但是对模板维护起来有点困难。&lt;/li&gt;
+&lt;li&gt;用 jinja2 的 i18n 插件，配合 Python 的 gettext 库实现内容翻译。这个方案
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/i18n_subsites/localizing_using_jinja2.rst"&gt;配置起来比较复杂&lt;/a&gt; ，但是配置好之后用起来就很方便了。
+只是要记得每次修改了模板都要更新翻译，处理 *.po 和 *.mo 文件等等琐碎事宜。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这里我用 jinja2 的 i18n 插件的方式实现了模板的翻译，
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/tree/master/translations"&gt;各个语言的翻译在这里&lt;/a&gt; ，
+然后用 &lt;a class="reference external" href="https://github.com/farseerfc/pelican-bootstrap3/blob/master/SConstruct"&gt;这里的 SCons 脚本&lt;/a&gt;
+根据内容是否变化自动更新 po 和 mo 文件。&lt;/p&gt;
+&lt;p&gt;配置好这一套方案之后，还要注意在模板和文章中处理好链接。用 Pelican 3.4 之后推荐的
+新的文章间链接的写法以及将 &lt;code class="code"&gt;
+SITEURL&lt;/code&gt;
+ 设置为实际 URL 并且关闭 &lt;code class="code"&gt;
+RELATIVE_URLS&lt;/code&gt;
+
+之后，应该就不会出没什么问题了（可能还要考虑使用的模板和插件的兼容性，大部分都是写死了 URL 的问题）。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="plantuml"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id52"&gt;plantuml&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+嵌入 PlantUML 的示例&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一个Java实现的，
+用接近文字描述的语言绘制 UML 图或者 GUI 界面图的工具，非常适合嵌入在
+Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
+然后么这个 plantuml 插件就是定义了一个新的 reStructuredText
+&lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; &lt;code class="code"&gt;
+.. uml::&lt;/code&gt;
+，把嵌入的内容提取出来调用 plantuml 命令处理
+成图像然后再插入到文章中。&lt;/p&gt;
+&lt;p&gt;比如示例里的这个 UML 图就是用这样一段简单的文字描述生成的：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;uml&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    Object &amp;lt;|-- ArrayList&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    Object : equals()&lt;/span&gt;
+&lt;span class="code-line"&gt;    ArrayList : Object[] elementData&lt;/span&gt;
+&lt;span class="code-line"&gt;    ArrayList : size()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;实际用起来这个插件实现上稍微有点小问题：首先它只支持 python2，所以我把它改写成了 python
+2 和 3 都通用的语法；其次它原本输出的文件夹似乎会被 pelican 删掉，所以把它改了个位置；
+然后它输出的 URL 也和 i18n-subsites 插件间有不兼容的问题，也顺带修掉了。
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/tree/master/plantuml"&gt;修改之后的代码在这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年1月30日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+嵌入 Ditaa 的示例&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;plantuml 是绘制UML的，除此之外还有一个类似的工具是绘制一般的 &lt;ruby&gt;&lt;rb&gt;流程图&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+的，叫 &lt;a class="reference external" href="http://ditaa.sourceforge.net/"&gt;ditaa&lt;/a&gt; ，和 plantuml 非常像，也比较像
+reStructuredText 的表格。
+于是我也照猫画虎实现了一个 ditaa 的 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ，用起来类似这样：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;ditaa&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;                       +-------------+&lt;/span&gt;
+&lt;span class="code-line"&gt;                       &lt;span class="o"&gt;|&lt;/span&gt;   ditaa     |-------+&lt;/span&gt;
+&lt;span class="code-line"&gt;                       &lt;span class="o"&gt;|&lt;/span&gt;  Diagram    |       |&lt;/span&gt;
+&lt;span class="code-line"&gt;                       +-------------+       | PNG out&lt;/span&gt;
+&lt;span class="code-line"&gt;                           ^                 |&lt;/span&gt;
+&lt;span class="code-line"&gt;                           &lt;span class="o"&gt;|&lt;/span&gt; ditaa in        |&lt;/span&gt;
+&lt;span class="code-line"&gt;                           &lt;span class="o"&gt;|&lt;/span&gt;                 v&lt;/span&gt;
+&lt;span class="code-line"&gt;     +--------+   +--------+----+    /----------------\&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;        | --+   Pelican   +--&amp;gt; |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;  Text  |   +-------------+    | Beautiful Blog |&lt;/span&gt;
+&lt;span class="code-line"&gt;     |Document|   |   !magic!   |    |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     &lt;span class="o"&gt;|&lt;/span&gt;     {d}|   |             |    |                |&lt;/span&gt;
+&lt;span class="code-line"&gt;     +---+----+   +-------------+    \----------------/&lt;/span&gt;
+&lt;span class="code-line"&gt;         :                                   ^&lt;/span&gt;
+&lt;span class="code-line"&gt;         &lt;span class="o"&gt;|&lt;/span&gt;          Lots of work             |&lt;/span&gt;
+&lt;span class="code-line"&gt;         +-----------------------------------+&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="render-math"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id53"&gt;render-math&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+嵌入公式的示例&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;示范行内公式 &lt;span class="math"&gt;\(A_\text{c} = (\pi/4) d^2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;整行公式&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+\alpha{}_t(i) = P(O_1, O_2, \ldots  O_t, q_t = S_i \lambda{})
+\end{equation*}
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这个插件提供在 reStructuredText 中用 LaTeX 语法插入数学公式的能力，定义了
+&lt;code class="code"&gt;
+:math:&lt;/code&gt;
+&lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;code class="code"&gt;
+.. math::&lt;/code&gt;
+&lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+实际工作的渲染库当然是大名鼎鼎的 &lt;a class="reference external" href="http://www.mathjax.org/"&gt;MathJax&lt;/a&gt; ，这个插件
+会用 MathJax 的 CDN 载入，所以也没有额外的依赖文件。（只是不知道是否会被国内墙掉，
+如果公式显示不正常请 &lt;strong&gt;务必&lt;/strong&gt; 告诉我。）&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="youtube-youku"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id54"&gt;youtube 和 youku&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;顾名思义，这两个插件分别实现嵌入 youtube 和 youku 视频。其中 youtube 是原本就有的插件，
+youku 是我照猫画虎抄的。
+之前写了一篇
+&lt;a class="reference external" href="//farseerfc.me/zhs/jumping-kde5-plasma-activities-button.html"&gt;KDE5 Plasma 之跳动卖萌的活动按钮&lt;/a&gt;
+用到了这两个插件。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tipue-search"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id55"&gt;tipue_search&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.tipue.com/search/"&gt;Tipue search&lt;/a&gt; 是一个非常有意思也很强大的搜索工具，
+通过 jQuery 实现静态博客的站内搜索功能。实现方式是，它需要你写一个 json 文件，包含
+整个网站的 &lt;strong&gt;全部&lt;/strong&gt; 文章的标题和文字内容，然后在搜索的时候读入这个 json 做搜索（是不是有点耍赖）。
+虽然听起来会有性能问题，但是应用在小型的静态博客上效果意外很不错，比如本站的所有文章内容
+放在一起的 json 也只有 300KiB 左右。&lt;/p&gt;
+&lt;p&gt;这个插件就是自动在 pelican 输出完全部静态网页之后，调用 beautifulsoup4 从所有网页中抽取出
+纯文本，产生这个 json 给 Tipue 用。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="neighbors-series"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id56"&gt;neighbors 和 series&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这两个插件比较类似也都比较简单， neighbors 提供一篇文章的前后文章信息，
+在主题模板里可以用来制作 &lt;strong&gt;上一篇&lt;/strong&gt; 和 &lt;strong&gt;下一篇&lt;/strong&gt; 按钮。
+series 提供将多篇文章归类为一个 &lt;strong&gt;系列&lt;/strong&gt; 的支持，当然也需要在
+主题模板中定义显示「文章系列」的列表。这两个插件的效果都能在本文末尾，评论区上方的部分看到。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bootstrapify-twitter-bootstrap-rst-directives"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id57"&gt;bootstrapify 和 twitter_bootstrap_rst_directives&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;这两个插件让文章的 &lt;strong&gt;正文&lt;/strong&gt; 套用上 Bootstrap 的样式。&lt;/p&gt;
+&lt;p&gt;bootstrapify 这个插件实现得比较简单，用 beautifulsoup4 在静态网页的结果里面过滤元素，
+对 &lt;code class="code"&gt;
+table&lt;/code&gt;
+ , &lt;code class="code"&gt;
+img&lt;/code&gt;
+ , &lt;code class="code"&gt;
+embed&lt;/code&gt;
+ , &lt;code class="code"&gt;
+iframe&lt;/code&gt;
+ ,
+&lt;code class="code"&gt;
+video&lt;/code&gt;
+ , &lt;code class="code"&gt;
+object&lt;/code&gt;
+ 这几个标签套用上
+&lt;a class="reference external" href="http://getbootstrap.com/components/#responsive-embed"&gt;响应式嵌入对象的类&lt;/a&gt;
+让他们更美观。&lt;/p&gt;
+&lt;p&gt;twitter_bootstrap_rst_directives 这个插件则是增加了几个 reStructuredText 的
+&lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 和 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+它实现的 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 包括：
+用 &lt;code class="code"&gt;
+:kbd:&lt;/code&gt;
+ 实现如 &lt;kbd class="kbd"&gt;
+Ctrl+C&lt;/kbd&gt;
+ 这样的键盘快捷键，
+用 &lt;code class="code"&gt;
+:code:&lt;/code&gt;
+ 嵌入代码片段，用 &lt;code class="code"&gt;
+:glyph:&lt;/code&gt;
+ 嵌入字符图标。
+它实现的 &lt;ruby&gt;&lt;rb&gt;指示符&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;directive&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 包括：
+&lt;a class="reference external" href="http://getbootstrap.com/components/#labels"&gt;labels 行内标签&lt;/a&gt; ，
+&lt;a class="reference external" href="http://getbootstrap.com/components/#alerts"&gt;alerts 提示段落&lt;/a&gt; ，
+&lt;a class="reference external" href="http://getbootstrap.com/components/#panels"&gt;panels 嵌入面板&lt;/a&gt; ，
+以及还有一个 &lt;a class="reference external" href="http://getbootstrap.com/components/#media"&gt;media 混排图标&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;对其中的 &lt;code class="code"&gt;
+panel&lt;/code&gt;
+ 我改写了它在文章正文中的样式，在 &lt;code class="code"&gt;
+lg&lt;/code&gt;
+ 或者 &lt;code class="code"&gt;
+xl&lt;/code&gt;
+
+的屏幕宽度下，分别用 &lt;span class="math"&gt;\(\frac{1}{2}\)&lt;/span&gt; 和 &lt;span class="math"&gt;\(\frac{1}{3}\)&lt;/span&gt; 大小的嵌入面板，
+简单实现和正文文字的图文混排。&lt;/p&gt;
+&lt;p&gt;除此以外我还在 twitter_bootstrap_rst_directives 这个插件里套用它的框架实现了两个额外
+的 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; ， 分别是 &lt;code class="code"&gt;
+:ruby:&lt;/code&gt;
+ ：通过 html5 的 &lt;code class="code"&gt;
+&amp;lt;ruby&amp;gt;&lt;/code&gt;
+
+标签实现文字上方的注音（firefox下
+&lt;a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=33339"&gt;不支持&lt;/a&gt;
+，会使用文字后的括号显示）， 以及 &lt;code class="code"&gt;
+:html:&lt;/code&gt;
+ ：在
+行内插入 &lt;ruby&gt;&lt;rb&gt;裸&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;raw&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; html 标签（这属于 Markdown 的基本功能，在 reStructuredText
+这边由于要考虑多种输出格式于是就比较麻烦了）。这两个 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的
+&lt;a class="reference external" href="https://github.com/farseerfc/pelican-plugins/blob/master/twitter_bootstrap_rst_directives/bootstrap_rst_directives.py#L140"&gt;实现代码在这里&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月3日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;今天又在 twitter_bootstrap_rst_directives 里增加了两个 &lt;ruby&gt;&lt;rb&gt;行内角色&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;role&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 。
+一个是 &lt;code class="code"&gt;
+:twi:&lt;/code&gt;
+ 用来写 twitter 用户的链接，比如 &lt;a class="reference external" href="//twitter.com/farseerfc"&gt;@farseerfc&lt;/a&gt; ，另一个是
+&lt;code class="code"&gt;
+:irc:&lt;/code&gt;
+ 用来指向 freenode 的 channel ，比如 &lt;a class="reference external" href="//webchat.freenode.net/?channels=yssyd3"&gt;#yssyd3&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年2月14日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;今天增加了 &lt;code class="code"&gt;
+.. friend::&lt;/code&gt;
+ 用来写好友链接，以及 &lt;code class="code"&gt;
+fref&lt;/code&gt;
+ 用来引用好友，
+比如 &lt;a class="reference external" href="/links.html#lqymgt"&gt;LQYMGT&lt;/a&gt; 这样。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="extract-toc-summary"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id58"&gt;extract_toc 和 summary&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;最后是这两个有点「名不副实」的插件。&lt;/p&gt;
+&lt;p&gt;reStructuredText 原本就有自动生成
+&lt;ruby&gt;&lt;rb&gt;目录&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;toc&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 的功能，用起来也非常简单，只需要在想要插入目录的地方写一行
+&lt;code class="code"&gt;
+.. contents::&lt;/code&gt;
+ ，剩下的都由 docutils 自动生成了。
+只是当然这样生成的目录肯定会插入在文章的正文里，而 extract_toc 这个插件的作用就是简单地
+把这个目录抽取出来，让模板能在别的地方放置这个目录。比如我这里就把目录放在了一个
+&lt;code class="code"&gt;
+panel&lt;/code&gt;
+ 里。&lt;/p&gt;
+&lt;p&gt;然后 Pelican 也原本就有从文章中抽取 &lt;ruby&gt;&lt;rb&gt;总结&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;summary&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt; 显示在文章列表的功能。
+Pelican 原始的实现似乎是按照文字数抽取前半段，不总是适合作为总结。 于是这个 summary
+插件的作用其实是允许在正文中以特殊的注释的方式标注哪些部分应该被抽出来作为总结。
+summary 这个插件原本的实现只允许抽取一段文字，我又对它的实现做了少许扩充，允许标注多段
+文字合并起来作为总结。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2015年1月29日更新&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;今天在 extract_toc 插件的帮助下，在侧边栏里放了一个 Bootstrap affix 的目录，
+它保持在页面的右侧位置不变，方便导航到文章的各个地方。具体实现方法除了 Bootstrap 3 的
+&lt;a class="reference external" href="http://getbootstrap.com/javascript/#affix"&gt;Affix 文档&lt;/a&gt; ，还参考了
+&lt;a class="reference external" href="http://tutsme-webdesign.info/bootstrap-3-affix/"&gt;这篇更详细的说明&lt;/a&gt; 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id36"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id59"&gt;结语&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这个博客的配置都可以在
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/pelicanconf.py"&gt;github 上找到&lt;/a&gt;
+，包括用来
+&lt;a class="reference external" href="https://github.com/farseerfc/farseerfc/blob/master/Makefile"&gt;自动生成整个博客的 Makefile&lt;/a&gt;
+，由于比较长，这里就不再贴了。&lt;/p&gt;
+&lt;p&gt;折腾这个主题前后历时两个月，期间学会了不少东西，也算是不错的收获吧。
+现在既然基础打好了，接下来就要开始多写博客了。（希望拖延症不会再犯……）&lt;/p&gt;
+&lt;p&gt;最近发现除了我的博客之外还有一个网站
+&lt;a class="reference external" href="http://www.kansaslinuxfest.us/"&gt;Kansas Linux Fest&lt;/a&gt; fork
+了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
+bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
+以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
+&lt;table class="footnote docutils table-hover table-striped table" frame="void" id="id37" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdnjscn.b0.upaiyun.com/libs/mathjax/2.4.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="python"></category><category term="pelican"></category><category term="bootstrap"></category><category term="material"></category><category term="subsite"></category></entry><entry><title>尝试一下 Pelican</title><link href="//farseerfc.me/zhs/try-pelican.html" rel="alternate"></link><published>2012-02-24T17:33:00+09:00</published><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-24:/zhs/try-pelican.html</id><summary type="html">&lt;p&gt;似乎一夜之间所有的
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;极客们&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;都&lt;/a&gt;
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;有了&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;自己&lt;/a&gt;
+的 &lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github主页&lt;/a&gt;
+和 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 博客。就像所有人在他们的博客中指出的，静态博客的确比传统的WordPress方式具有更多优势。 自从看到这些
+我就一直在想着自己搭一个 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;但是似乎 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 不适合我&lt;/h2&gt;
+&lt;p&gt;一上手就被 &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Octopress的搭建步骤&lt;/a&gt; 烦到了。 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 是什么？ &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 又是什么？
+看来 Ruby 社区的快节奏发展已经超过了我的想象，他们似乎需要一套发行版管理器来调和不同版本之间的 Ruby 的兼容性问题。
+虽然同样的兼容性问题在 Python 社区也有 &lt;a class="footnote-reference" href="#id10" id="id8"&gt;[1]&lt;/a&gt; ，不过总觉得 Python 至少还没到需要一个发行版管理器的程度 &lt;a class="footnote-reference" href="#id11" id="id9"&gt;[2]&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;真正的问题是我手上还没有一个可以让我随便玩的 Linux 环境（真的想要……）。 而无论是 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 还是 &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 似乎都只支持 Unix/Linux …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;似乎一夜之间所有的
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;极客们&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;都&lt;/a&gt;
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;有了&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;自己&lt;/a&gt;
+的 &lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github主页&lt;/a&gt;
+和 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 博客。就像所有人在他们的博客中指出的，静态博客的确比传统的WordPress方式具有更多优势。 自从看到这些
+我就一直在想着自己搭一个 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;但是似乎 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 不适合我&lt;/h2&gt;
+&lt;p&gt;一上手就被 &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Octopress的搭建步骤&lt;/a&gt; 烦到了。 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 是什么？ &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 又是什么？
+看来 Ruby 社区的快节奏发展已经超过了我的想象，他们似乎需要一套发行版管理器来调和不同版本之间的 Ruby 的兼容性问题。
+虽然同样的兼容性问题在 Python 社区也有 &lt;a class="footnote-reference" href="#id10" id="id8"&gt;[1]&lt;/a&gt; ，不过总觉得 Python 至少还没到需要一个发行版管理器的程度 &lt;a class="footnote-reference" href="#id11" id="id9"&gt;[2]&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;真正的问题是我手上还没有一个可以让我随便玩的 Linux 环境（真的想要……）。 而无论是 &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; 还是 &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 似乎都只支持 Unix/Linux/MacOSX 。 身为极客就注定不能用 Windows 么？（或许是的……）。&lt;/p&gt;
+&lt;p&gt;剩下的问题就是 Ruby 和 Python 两大阵营的对立问题了。我不熟悉 &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; ， 相对来说比较喜欢 &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; 。 似乎无论哪边都要
+依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
+的纯 Python 实现。&lt;/p&gt;
+&lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id10" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id11" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id12"&gt;
+&lt;h2&gt;那么就 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 吧&lt;/h2&gt;
+&lt;p&gt;对我而言， &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 相比于 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 有几个好处：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;纯 Python 实现。 这意味着我可以换用任何 Python 解释器而不必担心兼容性问题。比如我就换成了 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;多语言支持。因为 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 的作者似乎是个法国人。不过这个似乎大部分人不需要…… 我是想尽量把一篇博客写成三种语言作为锻炼吧。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; 。这样我就可以用 &lt;a class="reference external" href="http://webpages.charter.net/edreamleo/front.html"&gt;Leo&lt;/a&gt; 的 @auto-rst 直接写 ReST了。简单方便快捷有效。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;不过似乎 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 的关注度不如 &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; 那么高，现在一些部分还有细微的问题：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;pelican-import 从 WordPress 导入的时候对中文、日文的支持似乎很成问题。&lt;/li&gt;
+&lt;li&gt;日期格式、时区、字符集、和多语言功能的结合度还不够。  &lt;strong&gt;我在尝试改善它。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;模板还不够丰富。&lt;/li&gt;
+&lt;li&gt;插件也不够多……&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;希望这么优秀的工具能够受到更多关注，以上这些问题都是增加关注度之后很快就能解决的问题。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="settings-py"&gt;
+&lt;h2&gt;我的设置 settings.py&lt;/h2&gt;
+&lt;p&gt;安装 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 很容易，一句话就够了：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后把文章写成ReST的格式，放在`pages`文件夹里面。(重新)生成只要：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;上传到 Github:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git push&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;就这么简单。附上我的配置文件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Asia/Tokyo'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DATE_FORMATS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'en'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%a, &lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt; %b %Y'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'zh'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt;, %a'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'jp'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%Y/%m/&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt; (%a)'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="c1"&gt;# windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;LOCALE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;        &lt;span class="c1"&gt;# windows&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="s1"&gt;'en_US'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'zh_CN'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'ja_JP'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  &lt;span class="c1"&gt;# Unix/Linux&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_LANG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'zh'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Farseerfc Blog'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;AUTHOR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Jiachen Yang'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DISQUS_SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'farseerfcgithub'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;GITHUB_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'http://farseerfc.github.com'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TAG_FEED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'feeds/&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;.atom.xml'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SOCIAL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s1"&gt;'twitter'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://twitter.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'github'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'facebook'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://www.facebook.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'weibo'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://weibo.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'renren'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://www.renren.com/farseer'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TWITTER_USERNAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;THEME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'notmyidea'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;CSS_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"wide.css"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_CATEGORY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'Others'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'.'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'posts'&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="pelican"></category></entry></feed>

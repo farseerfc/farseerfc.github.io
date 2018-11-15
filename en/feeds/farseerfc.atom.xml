@@ -1,0 +1,1190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc's Nest - farseerfc</title><link href="//farseerfc.me/en/" rel="alternate"></link><link href="//farseerfc.me/feeds/farseerfc.atom.xml" rel="self"></link><id>//farseerfc.me/en/</id><updated>2016-07-31T03:52:00+09:00</updated><entry><title>PacVis: visualize pacman local database</title><link href="//farseerfc.me/en/pacvis.html" rel="alternate"></link><published>2016-07-31T03:52:00+09:00</published><updated>2016-07-31T03:52:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-07-31:/en/pacvis.html</id><summary type="html">
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Demo of PacVis" class="img-responsive" src="//farseerfc.me/en/images/pacvis-first.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="motivation-for-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Motivation for PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I must admit that I love Arch Linux, largely because Arch Linux made me feel
+like I really &lt;strong&gt;own&lt;/strong&gt; the whole system. In my Arch Linux system, I know clearly
+every package I have installed and why I installed it. I can find which
+package brings …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="Demo of PacVis" class="img-responsive" src="//farseerfc.me/en/images/pacvis-first.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="motivation-for-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Motivation for PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I must admit that I love Arch Linux, largely because Arch Linux made me feel
+like I really &lt;strong&gt;own&lt;/strong&gt; the whole system. In my Arch Linux system, I know clearly
+every package I have installed and why I installed it. I can find which
+package brings in a give file. A Debian/Fedora/openSUSE user with enough experience
+may achieve this with their favorite package manager too, but they must overcome
+a much higher complexity with their distro's fine-grinding packaging strategy.
+Usually they have 3 to 10 times more packages than Arch Linux on a
+similar setup. And with regard to packaging system, they must work with much more
+details than Arch's simple PKGBUILD based packaging.&lt;/p&gt;
+&lt;p&gt;Every user who successfully installed Arch Linux should have learned that, after
+the initial installation, you will only get a minimum setup. The most important
+step in the installation guide on ArchWiki is a command
+&lt;code class="code"&gt;
+pactrap /mnt base&lt;/code&gt;
+ , which will use &lt;code class="code"&gt;
+/mnt&lt;/code&gt;
+ as the filesystem root
+and call &lt;code class="code"&gt;
+pacman -S base&lt;/code&gt;
+ inside that root to install the whole base
+group. And that's basically all you will get after the install. The initial
+system has nearly nothing. Everything you need will be installed afterwards,
+manually by using &lt;code class="code"&gt;
+pacman&lt;/code&gt;
+. It is nothing unnecessary, only for
+&lt;strong&gt;your&lt;/strong&gt; own need.&lt;/p&gt;
+&lt;p&gt;But after using the system for a long time, there are unavoidably some packages
+inside the system which are installed and used for awhile and abandoned.
+They are like the old furnitures inside your house, taking space and covered by
+dusts. We have &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ to help you find all orphan packages, namely
+those &lt;strong&gt;installed as dependency for other packages once but not needed for now&lt;/strong&gt;
+, but for manually installed packages, we have no good tool but manually
+checking them one by one.&lt;/p&gt;
+&lt;p&gt;So I was looking for a tool to help me understand the relations in my system.
+In particular, I want a tool to help me do these things:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Find packages that I installed manually but not needed now&lt;/li&gt;
+&lt;li&gt;Find those large and space-consuming packages&lt;/li&gt;
+&lt;li&gt;Understand the relationships between packages&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="Android System Architecture" class="img-responsive" src="//farseerfc.me/en/images/Android-System-Architecture.jpg"/&gt;
+&lt;p class="caption"&gt;&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Android_(operating_system)"&gt;Android System Architecture&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;About the last thing "relations between packages", I once saw the diagram of
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Architecture_of_OS_X"&gt;macOS Architecture&lt;/a&gt;
+and Android System Architecture, and I was impressed by the layered hierarchy
+in these diagrams. I was wondering since then, &lt;em&gt;is it possible to draw a
+similar layered architecture diagram for modern Linux desktop&lt;/em&gt; ?
+Or &lt;em&gt;will a Linux desktop be much different&lt;/em&gt;?
+I can find out hierarchy diagrams for Linux kernel or
+Xorg graphic stack on Wikipedia or other sites, but I don't know such diagrams
+for the whole distribution. And further I thought, can I &lt;em&gt;draw such diagram from
+the dependency relationships between packages automatically&lt;/em&gt;?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="predecessors-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Predecessors of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before working on PacVis, I have tried several similar tools. Some of them meet
+some of my needs, but they all lack certain features that I considered important.
+These tools became the prototype of PacVis, as they enlightened me of how PacVis
+should be.&lt;/p&gt;
+&lt;div class="section" id="pactree"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;pactree&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;pactree started as an &lt;a class="reference external" href="https://bbs.archlinux.org/viewtopic.php?id=51795"&gt;individual project&lt;/a&gt;
+, but now it is &lt;a class="reference external" href="https://www.archlinux.org/pacman/pactree.8.html"&gt;part of pacman&lt;/a&gt;.
+From its manpage we can see that the output of pactree is a dependency tree
+starting from a given package. By appending &lt;code class="code"&gt;
+--graph&lt;/code&gt;
+ parameter, pactree
+can also output a diagram in &lt;a class="reference external" href="http://www.graphviz.org/"&gt;dot&lt;/a&gt; format,
+then we can render this diagram using dot command:&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;code class="code"&gt;
+pactree pacvis-git -d3 --graph | dot -Tpng &amp;gt;pacvis-pactree.png&lt;/code&gt;
+&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="pactree --graph" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pactree.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pactree pacvis-git -d3&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;pacvis-git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;├─python-tornado&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ └─python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─expat&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─bzip2&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─gdbm&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─openssl&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─libffi&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   └─zlib&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;├─pyalpm&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ ├─python&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│ └─pacman&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─bash&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─glibc&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─libarchive&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─curl&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─gpgme&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   ├─pacman-mirrorlist&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;│   └─archlinux-keyring&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;└─python-setuptools&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;  └─python-packaging&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;    ├─python-pyparsing&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;    └─python-six&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt; $&lt;/span&gt; pactree pacvis-git -d3 --graph &lt;span class="p"&gt;|&lt;/span&gt; dot -Tpng &amp;gt;pacvis-pactree.png&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;From the rendered diagram we can see that, because some packages may share
+common dependencies, the whole diagram is no longer a
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tree_structure"&gt;tree in  graph theory&lt;/a&gt; .
+During the initial prototyping of PacVis, I tried to parse the output of pactree
+and pacman using bash/python scripts, to draw a single diagram for the whole
+system. However the rendered picture is so large that it takes hours for
+dot to layout them, and the result is barely viewable in an image viewer or a
+browser.&lt;/p&gt;
+&lt;p&gt;I need to say that there will be no PacVis if there is no pactree.
+Even the pyalpm library that I used in PacVis is a python binding for alpm,
+which is born during the rewrite of pactree in C language.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pacgraph"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;pacgraph&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+The output of pacgraph&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="pacgraph" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pacgraph.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://kmkeen.com/pacgraph/index.html"&gt;pacgraph&lt;/a&gt; is developped by a
+Arch Linux Trusted User &lt;a class="reference external" href="http://kmkeen.com/"&gt;keenerd&lt;/a&gt; . It is written
+in Python, as is PacVis. Comparing with pactree, pacgraph is definitely more
+suitable for my needs. It will draw a diagram for all the packages in the
+system, using a clever layout algorithm that surpass the performance of
+dot's layout.&lt;/p&gt;
+&lt;p&gt;The output of pacgraph is an artistic diagram with different font size of
+package names showing their disk usage. By viewing pacgraph's output, we can
+determine the overall system structure, e.g. whether the system is a desktop
+system or a server. We can easily find large packages and consider remove them.&lt;/p&gt;
+&lt;p&gt;There's more. pacgraph provided an interactive GUI called pacgraph-tk, written
+clearly in tk. You can zoom in to see details or zoom out to see the whole
+graph in GUI, and you can highlight one package to see its relations to others.&lt;/p&gt;
+&lt;p&gt;And pacgraph support to render the dependencies of a selected group of packages,
+not all, like pactree does.&lt;/p&gt;
+&lt;p&gt;But pacgraph does not meet all my needs. I want a diagram to show the
+architecture of the system, but pacgraph don't differ
+"the packages that this package depend on" and
+"the packages that depends on this package". In other words, pacgraph draws a
+&lt;strong&gt;undirected graph&lt;/strong&gt;, but I want a &lt;strong&gt;directed graph&lt;/strong&gt;, that reflects the
+&lt;strong&gt;layered hierarchy of dependency relationship&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="so-here-is-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;So here is PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis on startup&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on startup" class="img-responsive" src="//farseerfc.me/en/images/pacvis-second.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;With these predecessors, I started working on PacVis. The development takes
+me 2 month, and largely break into 2 stages. In the first stage I wrote basic
+logics and a prototype of the UI. In the second stage I applied the templates
+from &lt;a class="reference external" href="https://getmdl.io/"&gt;https://getmdl.io/&lt;/a&gt; . Now finally it is usable for others.&lt;/p&gt;
+&lt;p&gt;So several days ago I made a PKGBUILD for pacvis on AUR:
+&lt;a class="reference external" href="https://aur.archlinux.org/packages/pacvis-git/"&gt;pacvis-git&lt;/a&gt;.
+Now it's fairly easy to run pacvis locally on a Arch Linux system.
+You can use any aurhelper you familiar with, or build it directly from AUR:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;~$ git clone aur@aur.archlinux.org:pacvis-git.git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~$ cd pacvis-git&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~/pacvis-git$ makepkg -si&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;~/pacvis-git$ pacvis&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="go"&gt;Start PacVis at http://localhost:8888/&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Following the instruction, open &lt;a class="reference external" href="http://localhost:8888/"&gt;http://localhost:8888/&lt;/a&gt; in a browser then you can
+see PacVis's result of your own system. As a demonstration you can also visit
+PacVis on my Arch Linux server :
+&lt;a class="reference external" href="https://pacvis.farseerfc.me/"&gt;https://pacvis.farseerfc.me/&lt;/a&gt; . It is showing a minimal server setup, that might
+load and layout faster than a normal desktop system.&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+PacVis on Windows msys2&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="PacVis on Windows msys2" class="img-responsive" src="//farseerfc.me/en/images/pacvis-msys2.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;As a side note, pacvis only depends on pyalpm and tornado, so there should be
+no problem running it on other pacman-based systems, including
+&lt;a class="reference external" href="https://msys2.github.io/"&gt;msys2 on Windows&lt;/a&gt; (altough building a msys2
+python-tornado may take some non-trival effort).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-legend-and-usage-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;The legend and usage of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;PacVis resembles the UI of a map app such as Google Maps. You can use
+wheel of mouse to zoom and drag to move, or pinch gestures on a touch screen.
+There is a side panel on the right top corner and you can hide it when you don't
+need it. There are some zoom buttons on the right bottom corner.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="PacVis showing pacvis-git" class="img-responsive" src="//farseerfc.me/en/images/pacvis-pacvis-git.png"/&gt;
+&lt;p class="caption"&gt;The dependencies of pacvis-git package&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The whole diagram is made up of small circles and arrows in between circles.
+A circle represent a package, while an arrow represents a dependency
+relationship. If you zoom into details, you can see text under the circles
+showing their package names. Hover on packages will also give you infos
+about the package. You can select a package, and in the side panel there will be
+more detailed infomation about that package.&lt;/p&gt;
+&lt;p&gt;The above picture is showing the dependencies of pacvis-git package itself.
+It dependes on pyalpm, python-tornado and python-setuptools, while pyalpm
+is in-turn depend on pacman.
+A package in &lt;span class="label label-primary"&gt;purple&lt;/span&gt; means it is
+installed manually, while a package in
+&lt;span class="label label-warning"&gt;orange&lt;/span&gt; means it is installed
+as a dependency for other packages. The color of arrows usually follow their
+origin package's color.&lt;/p&gt;
+&lt;p&gt;Note that most arrows in the diagram are pointing bottom-up, this is because
+PacVis will do a topology sort based on the dependencies of packages.
+From the topology sort, PacVis assigned a &lt;em&gt;topology level&lt;/em&gt; to each package,
+e.g. pacvis-git has a topo-level of 39, its dependency pyalpm has a topo-level
+of 38, and pacman is sat on the topo-level 37.
+Layering packages with their topo-level is the main difference of PacVis with
+pacgraph.&lt;/p&gt;
+&lt;p&gt;Besides manually zoom-in to look around, you can also use PacVis's search box
+to locate a particular package by its name. And when you select a package,
+the related package names will be shown in the Dep and Req-By tabs in the
+sidebar. These package names are made as buttons so you can click them to
+browse the whole dependency graph.&lt;/p&gt;
+&lt;p&gt;Let me describe some arguments related to the implementation:&lt;/p&gt;
+&lt;div class="label label-info"&gt;
+Max Level&lt;/div&gt;
+&lt;p&gt;This will limit the max topo-level that PacVis renders.
+When there are too many packages, the layout algorithm will take a lot of time.
+Limiting this is very useful during debug of PacVis.&lt;/p&gt;
+&lt;div class="label label-info"&gt;
+Max Required-By&lt;/div&gt;
+&lt;p&gt;This will limit the max required-by-relationship that PacVis renders.
+If you play around in PacVis, you will soon find that most packages in the
+system directly depends on glibc or gcc-libs. Rendering these &lt;em&gt;well-known&lt;/em&gt;
+dependency may result in a lot of long arrows, that reduce the readability of
+the whole diagram. You can limit this to a lower number so that PacVis will
+not render these &lt;em&gt;well-known&lt;/em&gt; dependencies.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-facts-you-can-learn-from-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Some facts you can learn from PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+A normal KDE desktop &lt;a class="reference external" href="//farseerfc.me/en/images/pacvis-16384.png"&gt;Full image（17M）&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="A normal KDE desktop in PacVis" class="img-responsive" src="//farseerfc.me/en/images/pacvis-4096-anno.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;You may find many facts by playing around in PacVis. An example will be the
+aforementioned "most packages depends on glibc".
+Besides that, I will give some more examples below.&lt;/p&gt;
+&lt;div class="section" id="dependency-hierachy"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;Dependency hierachy&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The packages in the system is clearly divided into several layers:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;glibc, etc. C runtime&lt;/li&gt;
+&lt;li&gt;Bash/Perl/Python etc. script languages&lt;/li&gt;
+&lt;li&gt;coreutils/gcc/binutils etc. core binary utilities&lt;/li&gt;
+&lt;li&gt;pacman/systemd etc. large system utilities&lt;/li&gt;
+&lt;li&gt;gtk{2,3}/qt{4,5} etc. GUI toolkit&lt;/li&gt;
+&lt;li&gt;chromium etc. GUI Applications&lt;/li&gt;
+&lt;li&gt;Plasma/Gnome etc. Desktop environments&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This largely meet my overall understanding, but some details are interesting to
+me. For example, zsh dependes on gdbm which in-turn depends on bash, which means
+that you can not get rid of bash even if you only use zsh.
+For another example, python package (which is python3 in Arch Linux) and
+python2 and pypy sit roughly on the same topo-level in the diagram.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="zsh indirectly depends on bash because of gdbm" class="img-responsive" src="//farseerfc.me/en/images/pacvis-zsh-bash.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;zsh indirectly depends on bash because of gdbm&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;However there are some facts beyond common knowledge, e.g.
+qt5-base &amp;lt; qt4 &amp;lt; gtk2 &amp;lt; gtk3 with regard to topo-level.
+Qt5 was split into several packages therefore it is understandable that
+qt5-base is lower than qt4. The fact that gtk is more high level than qt
+may beyond most expectations (including mine).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="circular-dependencies"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;Circular dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There are some packages that have circular dependencies in between.
+An example will be freetype2 and harfbuzz. freetype2 is a library for font
+rendering, and harfbuzz is a library to deal with OpenType font shapes.
+They depend on each other. Another example is kio and kinit of KDE.
+kio provides VFS-like and FUSE-like resource abstraction for KDE applications,
+while kinit is in charge of initializing KDE desktop environment.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="freetype2 harfbuzz" class="img-responsive" src="//farseerfc.me/en/images/pacvis-freetype2-harfbuzz.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;Circular dependency between freetype2 and harfbuzz&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Because of these circular dependencies, PacVis cannot simply apply topology sort
+directly. Before that, PacVis will firstly find all circles in the dependency
+graph to break these circles. It renders the relationship that will cause a
+circle as red arrows in the diagram.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-packages-don-t-have-dependency-relationship"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;Some packages don't have dependency relationship&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="PacVis Level 0" class="img-responsive" src="//farseerfc.me/en/images/pacvis-level0.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;man-pages and licenses don't have dependencies&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;There are some packages that don't depend on others, and don't depended
+by others. They are isolated in the whole diagram, e.g. man-pages and licenses.
+These packages sit on the most top level of the diagram, with a topo-level of 0.
+PacVis will render them as &lt;span class="label label-info"&gt;blue&lt;/span&gt;
+squares specially.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="linux-the-kernel-is-unimportant-if-we-only-look-at-dependencies"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;Linux (the kernel) is unimportant, if we only look at dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All userspace program depend on glibc, which calls the kernel using well-defined
+syscalls. As a result, if we only look at userspace dependencies, glibc and
+other GNU components are the center of the GNU/Linux distribution, while
+Linux the kernel is just located in a random place deeply blew the dependency
+graph. On my demo server the Linux package is even located on the most bottom
+level because it depends on mkinitcpio which in-turn depend on many components
+in the system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pacman-qtd-cannot-find-orphan-packages-with-circle-dependency"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id13"&gt;pacman -Qtd cannot find orphan packages with circle dependency&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="pacman -Qtd cannot find packages with circle dependency" class="img-responsive" src="//farseerfc.me/en/images/pacvis-circledeps-Qtd.png" style="width: 45%;"/&gt;
+&lt;p class="caption"&gt;msys2 packages with circle dependency&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;I saw an archipelago of packages from mingw repo when testing PacVis on msys2.
+To my surprise, they don't connected to any manually installed packages,
+something strange as I routinely run &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ and remove the results on
+all my systems. After zoomed in I found that they contained a circle dependency
+which indicated &lt;code class="code"&gt;
+pacman -Qtd&lt;/code&gt;
+ cannot find these orphan packages,
+not like a GC algorithm.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-future-of-pacvis"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;The future of PacVis&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Currently PacVis is what I planned to make, with some features added during
+the development. Some of these added features are related to the poor
+performance of the layout algorithm (e.g. limiting the max level).&lt;/p&gt;
+&lt;p&gt;In the future I planned to add more features:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;More reasonable behavior for optdeps. Currently PacVis draw optdeps but do
+not consider it during the topology sort.&lt;/li&gt;
+&lt;li&gt;More reasonable &lt;strong&gt;dependency resolution&lt;/strong&gt;. Sometimes the dependency is not
+written directly as package names, instead they appear in &lt;code class="code"&gt;
+provides&lt;/code&gt;
+
+array in the metadata. Currently PacVis resolve all dependencies using
+alpm directly, which will lose these information.&lt;/li&gt;
+&lt;li&gt;Currently PacVis did not consider the repository (core/extra/community) and
+package group that a package belongs to. In the future PacVis may consider
+these infomation to render a clearer hierarchy.&lt;/li&gt;
+&lt;li&gt;Currently PacVis cannot show only part of the packages. In the future we may
+provide the ability to draw only a part of all the installed packages like
+pactree/pacgraph does.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you want some features in PacVis, please
+&lt;a class="reference external" href="https://github.com/farseerfc/pacvis/issues"&gt;leave me an issue&lt;/a&gt; .&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="pacvis"></category><category term="pacman"></category><category term="arch"></category><category term="linux"></category><category term="pacgraph"></category></entry><entry><title>Jumping KDE5 Plasma Activities Button</title><link href="//farseerfc.me/en/jumping-kde5-plasma-activities-button.html" rel="alternate"></link><published>2014-12-09T01:54:00+09:00</published><updated>2014-12-09T01:54:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2014-12-09:/en/jumping-kde5-plasma-activities-button.html</id><summary type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;I found this when using activities under KDE5 today.
+One can drag the activities button out of the edge of the screen,
+then it will jump back and forth at the edge.
+Here is a video:&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Of course you can drag it back, so it is not a …&lt;/p&gt;</summary><content type="html">&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;I found this when using activities under KDE5 today.
+One can drag the activities button out of the edge of the screen,
+then it will jump back and forth at the edge.
+Here is a video:&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_SSbf97jGSpI"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/SSbf97jGSpI"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XODQ0NjM2MzQ4"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XODQ0NjM2MzQ4/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_SSbf97jGSpI"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XODQ0NjM2MzQ4"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;Of course you can drag it back, so it is not a serious problem.
+It is just so cute that I had to note this.&lt;/p&gt;
+&lt;p&gt;By comparison, the jumping window in Gnome3 is far worse than this:&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;div class="well" style="padding: 0"&gt;
+&lt;div class="tab-content" id="youtubeku"&gt;
+&lt;div class="tab-pane fade active in" id="youtube_TRQJdRHYwrw"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt; &lt;iframe class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/TRQJdRHYwrw"&gt;&lt;/iframe&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tab-pane fade" id="youku_XNjc4MjQ5NjE2"&gt;
+&lt;div align="left" class="youku embed-responsive embed-responsive-16by9"&gt; &lt;embed align="middle" allowfullscreen="true" allowscriptaccess="always" class="embed-responsive-item" quality="high" src="http://player.youku.com/player.php/sid/XNjc4MjQ5NjE2/v.swf" type="application/x-shockwave-flash"/&gt; &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;ul class="nav nav-tabs"&gt;
+&lt;li class="active"&gt;&lt;a data-toggle="tab" href="#youtube_TRQJdRHYwrw"&gt;Youtube&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-toggle="tab" href="#youku_XNjc4MjQ5NjE2"&gt;Youku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;p&gt;BTW, I saw another cute translation error of mute screen in KDE5:&lt;/p&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;blockquote class="twitter-tweet" lang="zh-tw"&gt;&lt;p&gt;KDE5のミュート画面の中国語翻訳、「静音」のはずだが「镜音」になっている。Vocaloidファンのネタだか、単なる入力ミスだか分からない。 &lt;a href="http://t.co/ipyHjXMscR"&gt;pic.twitter.com/ipyHjXMscR&lt;/a&gt;&lt;/p&gt;— Jiachen YANG (@farseerfc) &lt;a href="https://twitter.com/farseerfc/status/541944351270518784"&gt;2014 12月 8日&lt;/a&gt;&lt;/blockquote&gt;</content><category term="kde5"></category><category term="plasma"></category><category term="linux"></category><category term="gnome3"></category></entry><entry><title>Will You Marry Me?</title><link href="//farseerfc.me/en/marry-me.html" rel="alternate"></link><published>2013-02-20T20:42:00+09:00</published><updated>2013-02-20T20:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2013-02-20:/en/marry-me.html</id><summary type="html">&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+After rendering&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;blockquote&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;img alt="will you marry me" class="img-responsive" src="/images/marry-me.png"/&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Above is a image, the playable version is below:&lt;/p&gt;
+&lt;script src="/static/three.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/FirstPersonControls.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/helvetiker_regular.typeface.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/214game.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;div id="game_area" style="width: 600px; height: 450px; margin-left: 10px;clear:both"&gt;
+&lt;/div&gt;
+&lt;p style="margin-left: 100px; margin-top: 10px; "&gt;* Use WASD←→ to move，need WebGL support&lt;/p&gt;</summary><content type="html">&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+After rendering&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;blockquote&gt;
+&lt;!-- PELICAN_BEGIN_SUMMARY --&gt;
+&lt;img alt="will you marry me" class="img-responsive" src="/images/marry-me.png"/&gt;
+&lt;!-- PELICAN_END_SUMMARY --&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Above is a image, the playable version is below:&lt;/p&gt;
+&lt;script src="/static/three.min.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/FirstPersonControls.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/helvetiker_regular.typeface.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="/static/214game.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;div id="game_area" style="width: 600px; height: 450px; margin-left: 10px;clear:both"&gt;
+&lt;/div&gt;
+&lt;p style="margin-left: 100px; margin-top: 10px; "&gt;* Use WASD←→ to move，need WebGL support&lt;/p&gt;</content><category term="will"></category><category term="you"></category><category term="marry"></category><category term="me"></category></entry><entry><title>MSR 2012 @ ICSE</title><link href="//farseerfc.me/en/msr2012.html" rel="alternate"></link><published>2012-06-02T10:42:00+09:00</published><updated>2012-06-02T10:42:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-06-02:/en/msr2012.html</id><summary type="html">
+&lt;div class="section" id="mining-software-repository-2012-icse"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Mining Software Repository 2012 @ ICSE&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I participated MSR of this year. We came to University of Zurich early
+in the morning. The registration got something wrong when it seems that
+Swisses cannot tell the difference among Asians so that name cards of
+3 Chinese with family name of Yang are …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;div class="section" id="mining-software-repository-2012-icse"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Mining Software Repository 2012 @ ICSE&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I participated MSR of this year. We came to University of Zurich early
+in the morning. The registration got something wrong when it seems that
+Swisses cannot tell the difference among Asians so that name cards of
+3 Chinese with family name of Yang are misplaced. And also the
+organization field of Hotta was "Japan, Japan", as if he represented
+the Japan.&lt;/p&gt;
+&lt;div class="section" id="msr-microsoft-research-talk-msr-mining-software-repositories"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id2"&gt;MSR(MicroSoft Research) talk @ MSR(Mining Software Repositories)&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The first talk was the keynote given by Mrs Zhang from MSR(MicroSoft
+Research @ Asia), so it turned out to be MSR gave keynote of MSR.
+The talk was about Software Analysis and their clone detection tool
+called XIAO. XIAO was a clone detector developed by MSRA which can be
+used as a plugin for Microsoft Visual Studio. XIAO has two part, or
+system state: the statics state analysis all the clones which didn't
+consider the running time, while the dynamic state need real time response.
+The thing I need to develop for Samsung is something like dynamic mode.
+I wanted to know more about the internal details about XIAO but the talk
+was finished there.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="towards-improving-bts-with-game-mechanisms"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id3"&gt;Towards Improving BTS with Game Mechanisms&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The contents of this talk is very much like this blog:&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://www.joelonsoftware.com/items/2008/09/15.html"&gt;http://www.joelonsoftware.com/items/2008/09/15.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The talk discussed whether the same game mechanism can be applied to
+the things like issue tracking or similar. From my point of view, it
+is useless to use game mechanism in this situation. The reason that
+stackoverflow can success lies on that they just captured the  use of
+fade system in opensource community, as all hackers like to be approved
+as great hacker, as what is happening in Wikipedia. Whether the same
+theory can be applied in issue tracking systems inside a internal
+company is questionable. Although MSDN has basic the same structure
+as Wikipedia, the content of MSDN and Wikipedia have different
+involvement of users. So I myself didn't approve this research.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ghtorrent"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;GHTorrent&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;They slide of this talk can be found from here:
+&lt;a class="reference external" href="http://www.slideshare.net/gousiosg/ghtorrent-githubs-data-from-a-firehose-13184524"&gt;http://www.slideshare.net/gousiosg/ghtorrent-githubs-data-from-a-firehose-13184524&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Data exporter for github. Main part of data of Github, namely the hosted
+code, are already exposed as git repos, and wiki of repos are stored in
+git repo. So the aim of this project is to expose other data such as
+issues, code comments, etc. The project access github api and fetch the
+needed data as distributed system in order to overcome the limitations
+of the github api. The project will provide download history as torrents.
+The json data from github api is stored as bson in MongoDB and the parsed
+data is stored in MySQL with schema.&lt;/p&gt;
+&lt;p&gt;From my point of view, it will be better if the format of data can be
+uniformed and all data are stored in the git repo as wiki pages.
+As the history stored in git repo is more nature, and using &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;git blame&lt;/span&gt;&lt;/pre&gt;
+
+to trace author of code comments should also be more useful. Of course
+it is harder to read and write the raw data of git as we need more
+understanding of the internal format of git. Maybe only people from
+github can do this.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="topic-mining"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;Topic Mining&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I can not understand the two parameters, DE, AIC, used in this research,
+study this later. The experiment target of this research are Firefox,
+Mylyn and Eclipse. They are trying to analysis the identifiers and
+comments from source codes in software repos and find the relationship
+between topics and bugs, like what kind of topics are more likely to
+contain buggy codes.&lt;/p&gt;
+&lt;p&gt;The result of this research is not so clear. Such as it said that the
+core functions of Firefox have more bug reports, but it said no reason
+about this. Maybe this only means that the core features are well
+tested, rather than that the core features are more buggy.&lt;/p&gt;
+&lt;p&gt;But the slides showed by author are pretty and easy to understand.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-evolution-of-software"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;The evolution of software&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The keynote talk of the second day. It is about how should we combine
+the social media with software development. Maybe this is the reason
+why Github succeeded. In the talk she told about accessing tags,
+uBlogs, blogs etc. directly from Integrated Development Environments,
+or should we need cloud IDE such as Cloud9.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="do-faster-releases-improve-software-quality"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;Do Faster Releases Improve Software Quality?&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Used Firefox as example.&lt;/p&gt;
+&lt;p&gt;The conclusion is that faster releases will lead to more bugs and more
+frequent crash, but bugs are get fixed more quickly and user will switch
+to new released more quickly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="security-vs-performance-bugs-in-firefox"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;Security vs Performance Bugs in Firefox&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Performance bugs are regression, blocks release.&lt;/p&gt;
+&lt;/div&gt;
+&lt;hr class="docutils"/&gt;
+&lt;div class="section" id="some-of-my-thoughts"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;Some of my thoughts&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="separation-of-commits-based-on-semantic-analysis"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id10"&gt;Separation of commits based on Semantic analysis&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The user of some tools (such as git) are not following the design
+purposes of these tools which brings some difficulty to MSR. For example
+git has a prefect branch system, so it is desired for users of git to
+commit per topic. Commit per topic means that user send a commit for a
+single implementation of a feature or a bug fix, etc. If it is difficult
+to contain all modifications in a commit, then it should be in a
+separate branch and merged into master branch. But actually
+user tends to send very large commits, that contains many logical
+features, and they can not predict to open a new branch until a few
+commits.&lt;/p&gt;
+&lt;p&gt;Maybe this is not the fault of the user of tools, this is the tools
+that are not smart enough. We should separate the commits according
+to the semantic topics inside a commit.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="about-the-slide-systems-used-today"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id11"&gt;About the slide systems used today&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The study with title &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Incorporating Version Histories in Information&lt;/span&gt;
+&lt;span class="code-line"&gt;Retrieval Based Bug Localization&lt;/span&gt;&lt;/pre&gt;
+ used the slides made by beamer. It
+contains many equations, used many overlays are iterations, with few
+figures, is a typical beamer slide. It also used mindmap very well.&lt;/p&gt;
+&lt;p&gt;There are at least 3 slides that are made by beamer today.&lt;/p&gt;
+&lt;p&gt;The study with title &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Towards Improving Bug Tracking Systems with&lt;/span&gt;
+&lt;span class="code-line"&gt;Game Mechanisms&lt;/span&gt;&lt;/pre&gt;
+ presented with prezi. It have many pictures and many
+transitions. But because of it is made by prezi, there are no headers
+and footers so no page numbers and section titles etc. This is not
+so convenient in such a official occasions because people need to
+refer to the page number in question session.&lt;/p&gt;
+&lt;p&gt;There are at lease 6 presents used Apple Keynote. It is really
+difficult to tell the difference between slides made by PowerPoint
+and Keynote. 2 of them used the default theme of keynote.&lt;/p&gt;
+&lt;p&gt;The rest are using PowerPoint. Mrs Zhang from Microsoft used PowerPoint
+but her slides looks like beamer very much such as the usage of footer
+and header and overlays. If these are made by PowerPoint that will
+involve many manually operations.&lt;/p&gt;
+&lt;p&gt;It is worth to mention that the slides of a study with title &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Green&lt;/span&gt;
+&lt;span class="code-line"&gt;Mining: A Methodology of Relating Software Change to Power Consumption&lt;/span&gt;&lt;/pre&gt;
+
+are all &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;badly&lt;/span&gt;&lt;/pre&gt;
+ drawn hand paintings. The effect of these slide are
+well received, they are green and clean and cute. You can refer to the
+following animation for the effect but it is not exactly the same version
+with what we saw :&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://softwareprocess.es/a/greenmining-presentatation-at-queens-20120522.ogv"&gt;http://softwareprocess.es/a/greenmining-presentatation-at-queens-20120522.ogv&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="microsoft-is-meaning"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;Microsoft is MEANING&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;It is not a news. But Microsoft is the sponsor of Mining Challenge, and
+the prize of this challenge will be Xbox and Kinect and the topic of
+this year is:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+Mining Android Bug
+&lt;/pre&gt;
+&lt;p&gt;I see what you are doing there Microsoft ......&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="msr"></category><category term="icse"></category><category term="mining"></category><category term="software"></category><category term="repository"></category></entry><entry><title>PyRuby</title><link href="//farseerfc.me/en/mix-ruby.html" rel="alternate"></link><published>2012-03-02T23:09:00+09:00</published><updated>2012-03-02T23:09:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-03-02:/en/mix-ruby.html</id><summary type="html">&lt;p&gt;Today I saw a package called &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; in Github. The readme says:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+PyRuby - Some Ruby for your Python!
+PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.
+
+Usage
+All you have to do is import the ruby module:
+
+import …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;Today I saw a package called &lt;a class="reference external" href="https://github.com/danielfm/pyruby"&gt;PyRuby&lt;/a&gt; in Github. The readme says:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+PyRuby - Some Ruby for your Python!
+PyRuby is a simple way to leverage the power of Ruby to make your Python code more readable and beautiful.
+
+Usage
+All you have to do is import the ruby module:
+
+import ruby
+From now on you should be able to write Ruby code within a regular Python module. An example:
+
+1.upto(10) { |n| puts n }
+&lt;/pre&gt;
+&lt;p&gt;Even &lt;a class="reference external" href="http://pypi.python.org/pypi/pyruby/1.0.0"&gt;PyPI&lt;/a&gt; has listed this as a package.&lt;/p&gt;
+&lt;p&gt;In the beginning I thought this was again a Ruby implementation by PyPy project. Or at least it use some magic trick to write ruby code directly in Python.&lt;/p&gt;
+&lt;div class="section" id="then-i-browse-into-the-source-code-of-it"&gt;
+&lt;h2&gt;Then I browse into the source code of it.&lt;/h2&gt;
+&lt;p&gt;It contains only one file: ruby.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"""&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;                              `.-:/+ossyhhddmmmmNNNNNNNmmmmmdddddhhhyyyyhhhyo:`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;                       .:+sydNNNmmdhhysso++/+++++++////::::::-.```......--/oymms.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;                  `:ohmdys+//::/::--::::////:-.```......`````.://:-`         `/dNs.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;               .+hNds:`-:-:///::------::///++///:--....--::///::-`.///.        `oMm/&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;             /hNmo.`   ``    `....```````````      ...------:::-:/+/-.:/:`       /NMs&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;            oMd/`      `::::--.---://+`           //`     `````-:::::+/-`::.`     :NM+&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;            yN`       -+.`         `/`           o.               ``::.-:. ``      :NN:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;           :Nm        -             ./           :    `.-://///:-.   `-` ``         :NN-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;          /NM/           .-:::-.`   `/            `:sdmdhyMMMMMMNNmy/`               :mNo`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        :hMd:          /dmddddNNmdy+-.          `smmy/-```hMMMMMMMhydm/ `-.``     `...:mMm+.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;      -hNd/-/o/-..-::`.ydmmmmNMMMMMMNh:/+-      dMN-`-+hmmmmdhhhhdddmMN-`-/o:    .-::::/oydms-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;     oNMo:+/::.         ``...--:/+ohNMNhs-      :hNmmdyo:..``yo-```.--. `-`-+shdddhs+-` `.//yms.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;    .MMo:/`o:.:+sso+:-`             sM+           ./-`       /mNh+-....-/ymNNdo::--/shd+`  -`:mm:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;    /MM-o ./ ohhsooohNmy::sh.      `yM/                       `:oyyyyyyhys+:.` hy    `/Nh`  : -NN.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;    -MM// -: ``   y: odddhh+     -omNh-          `--.` ``          ````    .:ohMMs.    +Ms  /  yMo&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;     hMoo .+.    :Mh  ````    `/hNd/.`           ohdddy::...`..`      `-/sdmdyo+NMNh+- :Mh  /  sMs&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;     .mmh:..:.  :NMm       `-/dMNM+         ./+++/:`.hM:`.````.` `-/shmNmh+-`  /Mmooso.hM/ .: `mM/&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;      .mNs://: .NMNMs-   -:-.`/+-sms.   `  `shyyyhy`sNd`   `.:+sdmmmdMM-.    .oNM+    :m/ `s``yMh&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;       -mMo  . sMNdMNNh+-.        .ydyoyy`        ``+o::+shdddhs+:-.:MM.`.-+hNMMh-    `.`-/::dNs`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        -NM-   mMMMh:MMdNmhs+:-..```-ohs-`...-:/+syhddmMMs:-.`    `/mMMdmmddNMm+`      ..-/hNh-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         sMy   NMMM`:Mh`-/mMmmmdddddddddhhhdNNdhyo+:--.yMs  `..:+ymMMMMd+--yNh.        `+hNh:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         -Mm   NMMM/yMh  -NM-`..--:NMo:--.`+My         :MNoydmNMMNmhdMh` -dNs`        `yMd:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         `MN   mMMMMMMMyshMN+:---.-MN-.....+My...-:/oyhdMMMMNmdy+-` +Mh:sNm/          yMy`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;          MN   yMMMMMMMMMMMMMMMMMNMMMMNNNNNMMMNNNMMMMMNmhMM/-.      `yMMNs.          /My&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         `MN   :MMmMMMMMMMMMMMMMMMMMMMMMMMMMMMMNmmdy+:-``NM-      ./hNNy-           /Nd`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         -Mh    dMydMmsNMNdNNMMmmmNMMMdddhys+yMo``       /Nm:  `:yNNdo.           .sNd.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         +Ms    .mMsMN::NN:.:MN: `.+NM.      +Mo          +Mm+ymNdo-            .omm+`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         yM:     .hNMd+:sMN. oMm.   oMo      +Mh   ```.:+shMNmy+-``.-:-..-//-`:yNmo`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         mM.       :ohmNNMMdhyMMdo//+Mm//////sMNhyhhdmNNmhs/-``./+/:--+so/-:smNy/`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        .Mm        ``  .-:/+osyyhhddddddddddhhyysoo+/:-.  `./+//--+oo/--+ymmy/.&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        :Mh   .:   `+:`        `.------------`      ```-////:/++/:../ydNdo:`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        +Ms   `/`    :+o+:-```              ``..-::///++///:-.`-+ydNdo:`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        oMs     :/:.``  `..---.``` ````````..-:/:::---.`  `-ohmmh+:`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;        /Mh       .://///:::-----.-----.......`       `-+hmmy+-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;         sMy`                                ``````-+ydmy+-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;          /mNs-`                        `./ohmNMNNNmy+-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;            /yNmho/:.``````````.-:/+syhdNmdyso+/-.`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;              `:+ydmNMNNNNNNNNNmdhys+/:.`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;                     ``.....`&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;    LOL U MAD?&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="s2"&gt;"""&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Yes, indead. The idea of using Ruby in Python is totally mad.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="ruby"></category></entry><entry><title>Discuss C++ Template Downcast</title><link href="//farseerfc.me/en/discuss-cpp-template-downcast.html" rel="alternate"></link><published>2012-02-26T05:54:57+09:00</published><updated>2012-02-26T05:54:57+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-26:/en/discuss-cpp-template-downcast.html</id><summary type="html">
+&lt;p&gt;This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.&lt;/p&gt;
+&lt;div class="section" id="original-discuss"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Original Discuss&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html"&gt;http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-problem"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;The problem&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Today I read a book about we can do cast-down in template, so …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;p&gt;This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.&lt;/p&gt;
+&lt;div class="section" id="original-discuss"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Original Discuss&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html"&gt;http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-problem"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;The problem&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Today I read a book about we can do cast-down in template, so I write this to test:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BB&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DD&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;B&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="c1"&gt;//f(b);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It is strange when &lt;code class="code"&gt;
+f&lt;/code&gt;
+ it don't allow my specified &lt;code class="code"&gt;
+f&amp;lt;A&amp;gt;`&lt;/code&gt;
+.&lt;/p&gt;
+&lt;p&gt;But in &lt;code class="code"&gt;
+ff&lt;/code&gt;
+ it allowed &lt;code class="code"&gt;
+ff&amp;lt;BB&amp;lt;long&amp;gt;&amp;gt;`&lt;/code&gt;
+.&lt;/p&gt;
+&lt;p&gt;Tested under VC10 and GCC3.4&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="my-answer-to-the-problem"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;My answer to the problem&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let's think ourself as compiler to see what happened there.&lt;/p&gt;
+&lt;p&gt;Define mark &lt;code class="code"&gt;
+#&lt;/code&gt;
+ : &lt;code class="code"&gt;
+A#B&lt;/code&gt;
+ is the instantiated result when we put &lt;code class="code"&gt;
+B&lt;/code&gt;
+ into the parameter &lt;code class="code"&gt;
+T&lt;/code&gt;
+ of &lt;code class="code"&gt;
+A&amp;lt;T&amp;gt;&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;div class="section" id="first-we-discuss-ff"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;First we discuss ff&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;DD&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After this sentense, the compiler saw the instantiation of &lt;code class="code"&gt;
+DD&amp;lt;long&amp;gt;&lt;/code&gt;
+ , so it instantiate &lt;code class="code"&gt;
+DD#long&lt;/code&gt;
+ , and also &lt;code class="code"&gt;
+BB#long&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This sentense required the compiler to calculate set of overloading functions.&lt;/p&gt;
+&lt;p&gt;Step 1 we need to infer &lt;code class="code"&gt;
+T&lt;/code&gt;
+ of &lt;code class="code"&gt;
+ff&amp;lt;T&amp;gt;&lt;/code&gt;
+ from argument &lt;code class="code"&gt;
+DD#long -&amp;gt; BB&amp;lt;T&amp;gt;&lt;/code&gt;
+ . Based on the inference rule:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+Argument with type :code:`class_template_name&amp;lt;T&amp;gt;` can be use to infer :code:`T``.
+&lt;/pre&gt;
+&lt;p&gt;So compiler inferred &lt;code class="code"&gt;
+T&lt;/code&gt;
+ as &lt;code class="code"&gt;
+long&lt;/code&gt;
+ . Here if it is not &lt;code class="code"&gt;
+BB&lt;/code&gt;
+ but &lt;code class="code"&gt;
+CC&lt;/code&gt;
+ which is complete un-related, we can also infer, as long as &lt;code class="code"&gt;
+CC&lt;/code&gt;
+ is a template like &lt;code class="code"&gt;
+CC&amp;lt;T&amp;gt;&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;p&gt;Step 2 Template Specialization Resolution. There is only one template here so we matched &lt;code class="code"&gt;
+ff&amp;lt;T&amp;gt;&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;p&gt;Step 3 Template Instantiation&lt;/p&gt;
+&lt;p&gt;After inferred &lt;code class="code"&gt;
+long -&amp;gt; T&lt;/code&gt;
+ , compiler instantiated &lt;code class="code"&gt;
+ff#long&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;p&gt;Set of available overloading functions : &lt;code class="code"&gt;
+{ff#long}&lt;/code&gt;
+&lt;/p&gt;
+&lt;p&gt;Then overloading resolution found the only match &lt;code class="code"&gt;
+ff#long`&lt;/code&gt;
+, checked its real parameter &lt;code class="code"&gt;
+DD#long&lt;/code&gt;
+ can be down-cast to formal parameter &lt;code class="code"&gt;
+BB#long&lt;/code&gt;
+ .&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="then-we-discuss-f"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;Then we discuss f&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Calculate set of overloading functions.&lt;/p&gt;
+&lt;p&gt;Step 1 infer all template parameters for template &lt;code class="code"&gt;
+f&lt;/code&gt;
+ . According to inference rule:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+Parameter with type T can be used to infer T 。
+&lt;/pre&gt;
+&lt;p&gt;So &lt;code class="code"&gt;
+B -&amp;gt; T&lt;/code&gt;
+ is inferred.&lt;/p&gt;
+&lt;p&gt;Step 2 Template Specialization Resolution.&lt;/p&gt;
+&lt;p&gt;Here &lt;code class="code"&gt;
+B&lt;/code&gt;
+ is not &lt;code class="code"&gt;
+A&lt;/code&gt;
+ so we can not apply specialization of &lt;code class="code"&gt;
+f&amp;lt;A&amp;gt;&lt;/code&gt;
+ , remaining &lt;code class="code"&gt;
+f&amp;lt;T&amp;gt;&lt;/code&gt;
+ as the only alternative.&lt;/p&gt;
+&lt;p&gt;Step 3 Template Instantiation.&lt;/p&gt;
+&lt;p&gt;When we put &lt;code class="code"&gt;
+B&lt;/code&gt;
+ into &lt;code class="code"&gt;
+f&amp;lt;T&amp;gt;&lt;/code&gt;
+ to instantiate as &lt;code class="code"&gt;
+f#B&lt;/code&gt;
+ , we need to instantiate &lt;code class="code"&gt;
+traits#B`&lt;/code&gt;
+.&lt;/p&gt;
+&lt;p&gt;There is no specialization for &lt;code class="code"&gt;
+B&lt;/code&gt;
+ so we use template &lt;code class="code"&gt;
+traits&amp;lt;T&amp;gt;&lt;/code&gt;
+ , &lt;code class="code"&gt;
+traits#B::value=false&lt;/code&gt;
+ , so &lt;code class="code"&gt;
+enable_if#false&lt;/code&gt;
+ didn't contains a &lt;code class="code"&gt;
+type&lt;/code&gt;
+ , an error occurred.&lt;/p&gt;
+&lt;p&gt;The only template is mismatch, available overloading functions is empty set. So we got an error.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="template"></category><category term="C"></category></entry><entry><title>Give a try to Pelican</title><link href="//farseerfc.me/en/try-pelican.html" rel="alternate"></link><published>2012-02-24T17:33:00+09:00</published><updated>2012-02-24T17:33:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2012-02-24:/en/try-pelican.html</id><summary type="html">&lt;p&gt;It seems in one night
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;all&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;geeks&lt;/a&gt;
+have
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;their&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;own&lt;/a&gt;
+&lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github User Page&lt;/a&gt;
+and &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; Blog.
+Like everyone posted in their blogs, Static Blog is indeed more convenient than traditional
+Blog systems such as WordPress. I have been wanting my own &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; since then.&lt;/p&gt;
+&lt;div class="section" id="but-it-seems-that-octopress-isn-t-for-me"&gt;
+&lt;h2&gt;But it seems that &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; isn't …&lt;/h2&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;It seems in one night
+&lt;a class="reference external" href="http://blog.yxwang.me/2011/11/migrated-to-octopress/"&gt;all&lt;/a&gt;
+&lt;a class="reference external" href="http://xoyo.name/2012/02/migrate-to-octopress/"&gt;geeks&lt;/a&gt;
+have
+&lt;a class="reference external" href="http://blog.xdite.net/posts/2011/10/07/what-is-octopress/"&gt;their&lt;/a&gt;
+&lt;a class="reference external" href="http://www.yangzhiping.com/tech/octopress.html"&gt;own&lt;/a&gt;
+&lt;a class="reference external" href="http://pages.github.com/#user__organization_pages"&gt;Github User Page&lt;/a&gt;
+and &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; Blog.
+Like everyone posted in their blogs, Static Blog is indeed more convenient than traditional
+Blog systems such as WordPress. I have been wanting my own &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; since then.&lt;/p&gt;
+&lt;div class="section" id="but-it-seems-that-octopress-isn-t-for-me"&gt;
+&lt;h2&gt;But it seems that &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; isn't for me&lt;/h2&gt;
+&lt;p&gt;At first I was confused  by &lt;a class="reference external" href="http://octopress.org/docs/setup/"&gt;Setup Steps of Octopress&lt;/a&gt; .  What is this &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; thing?
+And what is that &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; thing? It seems  the high pace of Ruby community has beyond my imagination to a degree that
+they need a version manager to ensure the compatibility of different versions of Ruby. Althrough the same compatibility
+issue also troubles Python community &lt;a class="footnote-reference" href="#id3" id="id1"&gt;[1]&lt;/a&gt; , but at least Python don't need a version manager (yet) to control this mass &lt;a class="footnote-reference" href="#id4" id="id2"&gt;[2]&lt;/a&gt; .&lt;/p&gt;
+&lt;p&gt;Real problem for me is that I haven't yet a Linux box that I can play around freely. (I really want one ... ) Both &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; and
+&lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; needs to run on Unix/Linux/MacOSX. One can not be a geek if he use Windows ? (Maybe it's true...)&lt;/p&gt;
+&lt;p&gt;Remaining problem is the battle between Ruby and Python campaign.  I haven't tried &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; , and I rather like &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; .
+It seems that both sides depend on &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; as code block highlighter so  Rubyists need Python environment anyway.
+I simply don't want to depend on any Ruby component. It is better when it is in pure Python, no C extensions so that I can
+debug into it and make minor modifications.&lt;/p&gt;
+&lt;p&gt;So I started searching for Static Blog Engine in Python on Github. The author of the great framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; , &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; ,
+wrote a &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; , but it's not well developed. &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; seems to be complete enough, but it use &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;MarkDown&lt;/a&gt; as its default markup
+language, and the design of its homepage is too fashion to be used as blog. Finally I found &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; .&lt;/p&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Such as the difference between Python 2.x and 3.x , and also difference in C-API of implementations of &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; , &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; , &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; , &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; .&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="footnote docutils table-hover  table-striped table" frame="void" id="id4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Yes, we have &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; and &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; , but all these are package manager, running in a perticular Python implementation. Python implementation itself don't need a manager. Version issue of Python largely have been solved by lightweight converters such as &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; and &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; , you don't need to store multiple implementations of Python in your disk for different packages. Yes you can use  &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; if you need to preserve stablility but this is another story.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class="section" id="let-it-be-pelican"&gt;
+&lt;h2&gt;Let it be &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;For my own use, &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; offers me some advantages over &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Implemented in &lt;strong&gt;pure Python&lt;/strong&gt;. This means that I can use different implementation of Python other than CPython easily. I use &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; myself.&lt;/li&gt;
+&lt;li&gt;Translation of multi-languages. The original author of &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; is a France. This is unnecessory for most people, but I will post my blog mainly in three languages: English, Japanese and Chinese.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; . So that I can use the @auto-rst feature of &lt;a class="reference external" href="http://webpages.charter.net/edreamleo/front.html"&gt;Leo&lt;/a&gt; . And also I don't need to switch between my blog and documentation of my projects.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;But it seems that &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; was less contributed than &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; . Some minor issues remains in latest version:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Support of pelican-import from WordPress for Chinese and Japanese articles are buggy.&lt;/li&gt;
+&lt;li&gt;Datetime format, timezone, and locale support for multi-language blogs are not so natural. &lt;strong&gt;I will work on this in these days&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;There are not so many templates compared to &lt;a class="reference external" href="http://octopress.org/"&gt;Octopress&lt;/a&gt; .&lt;/li&gt;
+&lt;li&gt;And less plugins .&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I hope more people from Python community can contribute to this excellent project, then all these issues will be fixed soon.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="my-settings"&gt;
+&lt;h2&gt;My settings&lt;/h2&gt;
+&lt;p&gt;To install &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; is simple:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pip install pelican&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Write posts in &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; , with &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;rst&lt;/span&gt;&lt;/pre&gt;
+ extensions, and put them in &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;pages&lt;/span&gt;&lt;/pre&gt;
+ folder. (Re)Build all pages is simply:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pelican -s settings.py&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Push to Github:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git commit -am &lt;span class="s2"&gt;"Commit message"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; git push&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And following is my &lt;pre&gt;&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;settings.py&lt;/span&gt;&lt;/pre&gt;
+:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TIMEZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Asia/Tokyo'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DATE_FORMATS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'en'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%a, &lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt; %b %Y'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'zh'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%Y-%m-&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt;, %a'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="s1"&gt;'jp'&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="s1"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;'%Y/%m/&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt; (%a)'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="c1"&gt;# windows locale: http://msdn.microsoft.com/en-us/library/cdax410z%28VS.71%29.aspx&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;LOCALE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'usa'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'chs'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'jpn'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;        &lt;span class="c1"&gt;# windows&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="s1"&gt;'en_US'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'zh_CN'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'ja_JP'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  &lt;span class="c1"&gt;# Unix/Linux&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_LANG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'zh'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Farseerfc Blog'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;AUTHOR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'Jiachen Yang'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DISQUS_SITENAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'farseerfcgithub'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;GITHUB_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SITEURL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'http://farseerfc.github.com'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TAG_FEED&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'feeds/&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;.atom.xml'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;SOCIAL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s1"&gt;'twitter'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://twitter.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'github'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'https://github.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'facebook'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://www.facebook.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'weibo'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://weibo.com/farseerfc'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'renren'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'http://www.renren.com/farseer'&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;          &lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;TWITTER_USERNAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'farseerfc'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;THEME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'notmyidea'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;CSS_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"wide.css"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;DEFAULT_CATEGORY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'Others'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;OUTPUT_PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'.'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="n"&gt;PATH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'posts'&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="pelican"></category></entry><entry><title>“…if we do this work … ” --Bill Gates</title><link href="//farseerfc.me/en/if-we-do-this-work.html" rel="alternate"></link><published>2011-03-14T20:34:00+09:00</published><updated>2011-03-14T20:34:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2011-03-14:/en/if-we-do-this-work.html</id><summary type="html">&lt;p&gt;Imported from
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/716517729"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;div class="section" id="if-we-do-this-work-and-the-result-is-that-linux-works-great-bill-gates"&gt;
+&lt;h2&gt;“…if we do this work … and the result is that Linux works great …” --Bill Gates&lt;/h2&gt;
+&lt;p&gt;From: Bill Gates&lt;/p&gt;
+&lt;p&gt;’-- Sent: Sunday, January 24, 1999 8:41 AM&lt;/p&gt;
+&lt;p&gt;Jeff Westorinon; Ben Fathi ;&lt;/p&gt;
+&lt;p&gt;TO: Carl Stork (Exchange); Nathan Myhrvofd; Eric Rudder&lt;/p&gt;
+&lt;p&gt;Subject: ACPI extensions&lt;/p&gt;
+&lt;p&gt;One thing I find myself wondering …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Imported from
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/716517729"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;div class="section" id="if-we-do-this-work-and-the-result-is-that-linux-works-great-bill-gates"&gt;
+&lt;h2&gt;“…if we do this work … and the result is that Linux works great …” --Bill Gates&lt;/h2&gt;
+&lt;p&gt;From: Bill Gates&lt;/p&gt;
+&lt;p&gt;’-- Sent: Sunday, January 24, 1999 8:41 AM&lt;/p&gt;
+&lt;p&gt;Jeff Westorinon; Ben Fathi ;&lt;/p&gt;
+&lt;p&gt;TO: Carl Stork (Exchange); Nathan Myhrvofd; Eric Rudder&lt;/p&gt;
+&lt;p&gt;Subject: ACPI extensions&lt;/p&gt;
+&lt;p&gt;One thing I find myself wondering about is whether we shouldn’t try and
+make the "ACPI" extensions somehow Windows specific.&lt;/p&gt;
+&lt;p&gt;It seems unfortunate if we do this work and get our partners to do the
+work and the result is that &lt;strong&gt;Linux works great without having to do the work&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Maybe there is no way to avoid this problem but it does bother me.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Maybe we could define the APIs so that they work well with NT and not
+the others even if they are open.&lt;/p&gt;
+&lt;p&gt;Or maybe we could patent something relaled to this.&lt;/p&gt;
+&lt;p&gt;From:&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://antitrust.slated.org/www.iowaconsumercase.org/011607/3000/PX03020.pdf"&gt;http://antitrust.slated.org/www.iowaconsumercase.org/011607/3000/PX03020.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If this is the reason that Xen 4.0 is still not fully support ACPI 3.0, then f*ck
+you Bill Gates!&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="microsoft"></category><category term="linux"></category><category term="acpi"></category></entry><entry><title>Write a program to keep CPU usage as sin funcion</title><link href="//farseerfc.me/en/sine-cpu.html" rel="alternate"></link><published>2008-06-02T23:27:00+09:00</published><updated>2008-06-02T23:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-06-02:/en/sine-cpu.html</id><summary type="html">&lt;p&gt;Imported from:
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It is said that this is a problem from interview of Microsoft. Write a program, which makes the CPU usage curve in Windows Task Manager shows a Sin function.&lt;/p&gt;
+&lt;img alt="Sine function 1" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="Sine function 2" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;p&gt;The program below is written in java:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256 …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Imported from:
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It is said that this is a problem from interview of Microsoft. Write a program, which makes the CPU usage curve in Windows Task Manager shows a Sin function.&lt;/p&gt;
+&lt;img alt="Sine function 1" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="Sine function 2" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;p&gt;The program below is written in java:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;;&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;work&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;calcNextSleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;)(&lt;/span&gt;&lt;span class="n"&gt;Math&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sin&lt;/span&gt;&lt;span class="o"&gt;((&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Math&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;PI&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;tick&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;sleep&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;sleepTime&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sleepTime&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;yield&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;else&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sleepTime&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;work&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;period&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentTimeMillis&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="o"&gt;(;;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;Math&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sin&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentTimeMillis&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;period&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;                &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="o"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Be careful you need to turn off other cores if you have multi-core CPU.&lt;/p&gt;
+&lt;img alt="multi-core CPU" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
+</content><category term="java"></category><category term="microsoft"></category></entry><entry><title>EVA-Komm,susser Tod</title><link href="//farseerfc.me/en/EVA-Komm-susser-Tod.html" rel="alternate"></link><published>2008-04-10T03:28:00+09:00</published><updated>2008-04-10T03:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-04-10:/en/EVA-Komm-susser-Tod.html</id><summary type="html">&lt;p&gt;Imported from
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/282668291"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I know, I know I''ve let you down&lt;/p&gt;
+&lt;p&gt;I''ve been a fool to myself&lt;/p&gt;
+&lt;p&gt;I thought that I could live for no one else&lt;/p&gt;
+&lt;p&gt;But now through all the hurt and pain&lt;/p&gt;
+&lt;p&gt;It''s time for me to respect&lt;/p&gt;
+&lt;p&gt;The ones you love mean more than anything&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;So …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Imported from
+&lt;a class="reference external" href="http://blog.renren.com/blog/230263946/282668291"&gt;renren&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I know, I know I''ve let you down&lt;/p&gt;
+&lt;p&gt;I''ve been a fool to myself&lt;/p&gt;
+&lt;p&gt;I thought that I could live for no one else&lt;/p&gt;
+&lt;p&gt;But now through all the hurt and pain&lt;/p&gt;
+&lt;p&gt;It''s time for me to respect&lt;/p&gt;
+&lt;p&gt;The ones you love mean more than anything&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;So with sadness in my heart&lt;/p&gt;
+&lt;p&gt;Feel the best thing I could do&lt;/p&gt;
+&lt;p&gt;It''s end it all&lt;/p&gt;
+&lt;p&gt;And leave forever&lt;/p&gt;
+&lt;p&gt;What''s done is done it feel so bad&lt;/p&gt;
+&lt;p&gt;What once was happy now is sad&lt;/p&gt;
+&lt;p&gt;I''ll never love again&lt;/p&gt;
+&lt;p&gt;My world is ending&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;I wish that I could turn back time&lt;/p&gt;
+&lt;p&gt;Cause now the guilt is all mine&lt;/p&gt;
+&lt;p&gt;Can''t live without the trust from those you love&lt;/p&gt;
+&lt;p&gt;I know we can''t forget the past&lt;/p&gt;
+&lt;p&gt;You can''t forget love and pride&lt;/p&gt;
+&lt;p&gt;Because that it''s killing me inside&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;It all returns to nothing&lt;/p&gt;
+&lt;p&gt;It all comes tumbling down tumbling down tumbling down&lt;/p&gt;
+&lt;p&gt;It all returns to nothing&lt;/p&gt;
+&lt;p&gt;I just keep letting me down letting me down letting me down&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;In my heart of hearts&lt;/p&gt;
+&lt;p&gt;I know I could never love again&lt;/p&gt;
+&lt;p&gt;I''ve lost everything everything&lt;/p&gt;
+&lt;p&gt;Everything that matters to me matters in this world&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;I wish that I could turn back time&lt;/p&gt;
+&lt;p&gt;Cause now the guilt is all mine&lt;/p&gt;
+&lt;p&gt;Can''t live without the trust from those you love&lt;/p&gt;
+&lt;p&gt;I know we can''t forget the past&lt;/p&gt;
+&lt;p&gt;You can''t forget love and pride&lt;/p&gt;
+&lt;p&gt;Because that it''s killing me inside&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;It all returns to nothing&lt;/p&gt;
+&lt;p&gt;It just keeps tumbling down tumbling down tumbling down&lt;/p&gt;
+&lt;p&gt;It all returns to nothing&lt;/p&gt;
+&lt;p&gt;I just keep letting me down letting me down letting me down&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;Up up up up up&lt;/p&gt;
+&lt;p&gt;Tumbling down tumbling down tumbling down&lt;/p&gt;
+&lt;p&gt;Up up up up up&lt;/p&gt;
+&lt;p&gt;Letting me down letting me down letting me down&lt;/p&gt;
+&lt;p&gt;Up up up up up&lt;/p&gt;
+&lt;p&gt;Tumbling down tumbling down tumbling down&lt;/p&gt;
+&lt;p&gt;Up up up up up&lt;/p&gt;
+&lt;p&gt;Letting me down letting me down letting me down&lt;/p&gt;
+</content><category term="music"></category></entry></feed>
