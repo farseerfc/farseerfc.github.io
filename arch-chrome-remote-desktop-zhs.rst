@@ -27,7 +27,7 @@ Xorg 上常用的远程桌面工具有很多，基于 VNC 协议的、基于NX�
 .. panel-default:: 
 	:title: Chrome Remote Desktop 插件
 
-	.. image:: {filename}/images/chrome-remote-desktop-plugin.png
+	.. image:: {static}/images/chrome-remote-desktop-plugin.png
 	  :alt: Chrome Remote Desktop 插件
 
 Chrome Remote Desktop 的客户端
@@ -100,7 +100,7 @@ Archlinux 上设置远程登录的服务器
 接下来需要从 Chrome 的插件里启用远程桌面。打开 Chrome 的 Remote Desktop 插件，这时
 应该可以看到一个「启用远程链接」的按钮。
 
-.. figure:: {filename}/images/chrome-remote-desktop-enable-button.png
+.. figure:: {static}/images/chrome-remote-desktop-enable-button.png
   :alt: Chrome Remote Desktop 插件中「启用远程链接」的按钮
 
   Chrome Remote Desktop 插件中「启用远程链接」的按钮
@@ -123,7 +123,7 @@ Archlinux 上设置远程登录的服务器
 点击「启用远程链接」，设定一个 PIN 密码（不需要很复杂，这里首先有 Google 帐号验证保证只有
 你才能访问），然后就能看到这套电脑的 hostname 出现在「我的电脑」列表里。
 
-.. figure:: {filename}/images/chrome-remote-desktop-after-enabled.png
+.. figure:: {static}/images/chrome-remote-desktop-after-enabled.png
   :alt: 启用远程链接之后的样子
 
   启用远程链接之后的样子
@@ -146,14 +146,14 @@ Archlinux 上设置远程登录的服务器
 如果上面的设置一切正常，就可以看到 chrome-remote-desktop 启动了另外一个 Xorg 执行你
 刚刚指定的桌面环境：
 
-.. figure:: {filename}/images/chrome-remote-desktop-htop.png
+.. figure:: {static}/images/chrome-remote-desktop-htop.png
   :alt: htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg
 
   htop 中看到的 chrome-remote-desktop 启动的另外一个 Xorg
 
 然后就可以试着通过 Remote Desktop 插件登录到这个新开的 Xorg 了：
 
-.. figure:: {filename}/images/chrome-remote-desktop-xfce4.png
+.. figure:: {static}/images/chrome-remote-desktop-xfce4.png
   :alt: 「远程」登录到新的 XFCE4
 
   「远程」登录到新的 XFCE4
@@ -179,7 +179,7 @@ Bonus： 手机远程登录
 .. panel-default:: 
 	:title: 手机上的 Chrome 远程桌面 App
 
-	.. image:: {filename}/images/chrome-remote-desktop-android.png
+	.. image:: {static}/images/chrome-remote-desktop-android.png
 	  :alt: 手机上的 Chrome 远程桌面 App
 
 通过上面的设置就可以从任何一个 Chrome 远程桌面客户端登录刚刚设置的这台电脑了。
@@ -189,7 +189,7 @@ Bonus： 手机远程登录
 除了桌面的 Chrome 之外还有一个客户端是 Android 上的
 `Chrome 远程桌面 App <https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop>`_ 经过上面的设置之后，从这个 App 也能看到并登录： 
 
-.. figure:: {filename}/images/chrome-remote-desktop-android-logined.png
+.. figure:: {static}/images/chrome-remote-desktop-android-logined.png
   :alt: 手机远程登录
 
   手机远程登录

@@ -64,7 +64,7 @@
 #. 服务器设置的一步需要将 :ruby:`域名解析服务器|DNS nameservers` 从狗爹的服务器改到
    CloudFlare 的，如下图：
 
-.. figure:: {filename}/images/godaddy.png
+.. figure:: {static}/images/godaddy.png
     :alt: 更改狗爹的域名服务器
 
     更改狗爹的域名服务器
@@ -72,7 +72,7 @@
 申请好之后就由 CloudFlare 接管域名解析了，接下来在 CloudFlare 的 DNS 设置添加一条
 `A 类规则指向 github pages 的 IP <https://help.github.com/articles/tips-for-configuring-an-a-record-with-your-dns-provider/>`_ 。
 
-.. figure:: {filename}/images/cloudflaredns.png
+.. figure:: {static}/images/cloudflaredns.png
     :alt: 更改CloudFlare的DNS规则
 
     更改CloudFlare的DNS规则
@@ -106,7 +106,7 @@
 
 然后把生成的静态网站 push 到 github 之后可以从项目设置里看到域名的变化：
 
-.. figure:: {filename}/images/githubdomain.png
+.. figure:: {static}/images/githubdomain.png
     :alt: Github 配置好自定义域名之后的变化
 
     Github 配置好自定义域名之后的变化
