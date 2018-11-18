@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant"
+<html lang=""
 >
 <head>
     <title>import - Farseerfc的小窩</title>
@@ -92,20 +92,20 @@ Farseerfc的小窩            </a>
                             <i class="fa fa-user"></i><span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                             <li class=""><a href="//farseerfc.me/aboutzh.html"><i class="fa fa-user"></i>
                                  About
                               </a></li>
-                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                             <li class=""><a href="//farseerfc.me/linkszh.html"><i class="fa fa-user"></i>
                                  友情鏈接
                               </a></li>
                         </ul>
                     </li>
 
                   <ul class="nav navbar-nav hidden-xs hidden-sm">
-                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                     <li class=""><a href="//farseerfc.me/aboutzh.html"><i class="fa fa-user"></i>
                          About
                       </a></li>
-                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                     <li class=""><a href="//farseerfc.me/linkszh.html"><i class="fa fa-user"></i>
                          友情鏈接
                       </a></li>
                   </ul>
@@ -193,18 +193,175 @@ Farseerfc的小窩            </a>
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks.html" class="btn btn-primary btn-lg"><h2>C++ Tricks
+                            <a href="//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functionszh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.3 I386平臺C函數內部的棧分配
                             </h2></a>
                         </div>
                         <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks.html" class="translate">简体</a></li></ul>
-</div>
-
+                            
                             <div>
-<small><span><a href="//farseerfc.me/c-tricks.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks" data-disqus-url="http://farseerfc.me/c-tricks.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+<small><span><a href="//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functionszh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-3-i386-stack-allocation-in-c-functionszh" data-disqus-url="http://farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functionszh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="i386c">
+<h2>2.3 I386平臺C函數內部的棧分配</h2>
+<p>函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將esp減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將esp加上相應字節數，歸還棧空間。</p>
+<p>爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂esp的位置在進入函數體時就已確定，但是由於esp會在函數執行期變動，所以將esp的值保存在ebp中，並事先將ebp的值壓棧。隨後，在函數體中通過ebp減去偏移量來訪問變量。以一個最簡單的函數爲例：</p>
+<p>void f()</p>
+<p>{</p>
+<p>int a=0; //a的地址被分配爲ebp-4</p>
+<p>char c=1; //c的地址被分配爲ebp-8</p>
+<p>}</p>
+<p>產生的彙編代碼爲：</p>
+<p>push ebp ;將ebp壓棧</p>
+<p>mov ebp,esp ;ebp=esp 用棧底備份棧頂指針</p>
+<p>sub …</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocationzh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            
+                            <div>
+<small><span><a href="//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocationzh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-4-i386-stack-allocation-accross-function-invocationzh" data-disqus-url="http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocationzh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="i386c">
+<h2>2.4 I386平臺C函數調用邊界的棧分配</h2>
+<p>當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。</p>
+<p>函數的返回值不同於函數參數，通過寄存器傳遞。如果返回值類型可以放入32位變量，比如int、short、char、指針等類型，通過eax寄存器傳遞。如果返回值類型是64位變量，如_int64，同過edx+eax傳遞，edx存儲高32位，eax存儲低32位。如果返回值是浮點類型，如float和double，通過專用的浮點數寄存器棧的棧頂返回。如果返回值類型是用戶自定義結構，或C++類類型，通過修改函數簽名，以引用型參數的形式傳回。</p>
+<p>同樣以最簡單的函數爲例：</p>
+<p>void f(){</p>
+<p>int i …</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/c-tricks-2-5-address-alignmentzh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.5 I386平臺的邊界對齊(Align)
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            
+                            <div>
+<small><span><a href="//farseerfc.me/c-tricks-2-5-address-alignmentzh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-5-address-alignmentzh" data-disqus-url="http://farseerfc.me/c-tricks-2-5-address-alignmentzh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="i386-align">
+<h2>2.5 I386平臺的邊界對齊(Align)</h2>
+<p>首先提問，既然I386上sizeof(int)==4、sizeof(char)==1，那麼如下結構(struct)A的sizeof是多少？</p>
+<p>struct A{int i;char c;};</p>
+<p>答案是sizeof(A)==8……1+5=8？</p>
+<p>呵呵，這就是I386上的邊界對齊問題。我們知道，I386上有整整4GB的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於I386平臺而言，類型爲T的變量必須放置在sizeof(T)的整數倍的地址上，char可以隨便放置，short必須放在2的整數倍的地址上，int必須放在4的整數倍的地址上，double必須放在8的整數倍的地址上。如果違反邊界對齊要求 …</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/c-tricks-2-6-i386-variable-argumentszh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable Arguments)
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            
+                            <div>
+<small><span><a href="//farseerfc.me/c-tricks-2-6-i386-variable-argumentszh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-6-i386-variable-argumentszh" data-disqus-url="http://farseerfc.me/c-tricks-2-6-i386-variable-argumentszh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="i386c-variable-arguments">
+<h2>2.6 I386平臺C函數的可變參數表(Variable Arguments)</h2>
+<p>基於前文(2.4節)分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式，C語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號“...”：</p>
+<p>void g(int a,char* c,...);</p>
+<p>省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數g可以接受2個或2個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞：</p>
+<p>g(3,”Hello”,2,4,5);//調用g並傳遞5個參數，其中後3個爲可變參數。</p>
+<p>在函數的實現代碼中，可以通過2.4節敘述的 …</p></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventionszh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.7 I386平臺的其它函數調用模型
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            
+                            <div>
+<small><span><a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventionszh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-7-i386-calling-conventionszh" data-disqus-url="http://farseerfc.me/c-tricks-2-7-i386-calling-conventionszh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
+<div class="section" id="i386">
+<h2>2.7 I386平臺的其它函數調用模型</h2>
+<div class="line-block">
+<div class="line">上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同：</div>
+</div>
+<div class="section" id="cdecl">
+<h3>1 __cdecl</h3>
+<p>參數壓棧順序：逆序(從右至左)</p>
+<p>參數堆棧恢復者：主調函數(caller)</p>
+<div class="line-block">
+<div class="line">__cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。</div>
+</div>
+</div>
+<div class="section" id="stdcall">
+<h3>2 __stdcall</h3>
+<p>參數壓棧順序：逆序(從右至左)</p>
+<p>參數堆棧恢復者：被調函數(callee)</p>
+<div class="line-block">
+<div class="line">__stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 …</div></div></div></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="article-item">
+            <article class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
+                            <a href="//farseerfc.me/c-trickszh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
+                            
+                            <div>
+<small><span><a href="//farseerfc.me/c-trickszh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-trickszh" data-disqus-url="http://farseerfc.me/c-trickszh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
                         </div>
                     </div>
 
@@ -246,205 +403,13 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.3 I386平臺C函數內部的棧分配
+                            <a href="//farseerfc.me/c-tricks-2-1-x86-architecturezh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.1 X86概述
                             </h2></a>
                         </div>
                         <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functions.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html" class="translate">简体</a></li></ul>
-</div>
-
+                            
                             <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functions.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-3-i386-stack-allocation-in-c-functions" data-disqus-url="http://farseerfc.me/c-tricks-2-3-i386-stack-allocation-in-c-functions.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
-<div class="section" id="i386c">
-<h2>2.3 I386平臺C函數內部的棧分配</h2>
-<p>函數使用棧來保存局部變量，傳遞函數參數。進入函數時，函數在棧上爲函數中的變量統一預留棧空間，將esp減去相應字節數。當函數執行流程途徑變量聲明語句時，如有需要就調用相應構造函數將變量初始化。當執行流程即將離開聲明所在代碼塊時，以初始化的順序的相反順序逐一調用析構函數。當執行流程離開函數體時，將esp加上相應字節數，歸還棧空間。</p>
-<p>爲了訪問函數變量，必須有方法定位每一個變量。變量相對於棧頂esp的位置在進入函數體時就已確定，但是由於esp會在函數執行期變動，所以將esp的值保存在ebp中，並事先將ebp的值壓棧。隨後，在函數體中通過ebp減去偏移量來訪問變量。以一個最簡單的函數爲例：</p>
-<p>void f()</p>
-<p>{</p>
-<p>int a=0; //a的地址被分配爲ebp-4</p>
-<p>char c=1; //c的地址被分配爲ebp-8</p>
-<p>}</p>
-<p>產生的彙編代碼爲：</p>
-<p>push ebp ;將ebp壓棧</p>
-<p>mov ebp,esp ;ebp=esp 用棧底備份棧頂指針</p>
-<p>sub …</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.4 I386平臺C函數調用邊界的棧分配
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-4-i386-stack-allocation-accross-function-invocation" data-disqus-url="http://farseerfc.me/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
-<div class="section" id="i386c">
-<h2>2.4 I386平臺C函數調用邊界的棧分配</h2>
-<p>當調用一個函數時，主調函數將參數以聲明中相反的順序壓棧，然後將當前的代碼執行指針(eip)壓棧，然後跳轉到被調函數的入口點。在被調函數中，通過將ebp加上一個偏移量來訪問函數參數，以聲明中的順序(即壓棧的相反順序)來確定參數偏移量。被調函數返回時，彈出主調函數壓在棧中的代碼執行指針，跳回主調函數。再由主調函數恢復到調用前的棧。</p>
-<p>函數的返回值不同於函數參數，通過寄存器傳遞。如果返回值類型可以放入32位變量，比如int、short、char、指針等類型，通過eax寄存器傳遞。如果返回值類型是64位變量，如_int64，同過edx+eax傳遞，edx存儲高32位，eax存儲低32位。如果返回值是浮點類型，如float和double，通過專用的浮點數寄存器棧的棧頂返回。如果返回值類型是用戶自定義結構，或C++類類型，通過修改函數簽名，以引用型參數的形式傳回。</p>
-<p>同樣以最簡單的函數爲例：</p>
-<p>void f(){</p>
-<p>int i …</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-5-address-alignment.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.5 I386平臺的邊界對齊(Align)
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-5-address-alignment.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-5-address-alignment.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-5-address-alignment" data-disqus-url="http://farseerfc.me/c-tricks-2-5-address-alignment.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
-<div class="section" id="i386-align">
-<h2>2.5 I386平臺的邊界對齊(Align)</h2>
-<p>首先提問，既然I386上sizeof(int)==4、sizeof(char)==1，那麼如下結構(struct)A的sizeof是多少？</p>
-<p>struct A{int i;char c;};</p>
-<p>答案是sizeof(A)==8……1+5=8？</p>
-<p>呵呵，這就是I386上的邊界對齊問題。我們知道，I386上有整整4GB的地址空間，不過並不是每一個字節上都可以放置任何東西的。由於內存總線帶寬等等的技術原因，很多體系結構都要求內存中的變量被放置於某一個邊界的地址上。如果違反這個要求，重則導致停機出錯，輕則減慢運行速度。對於I386平臺而言，類型爲T的變量必須放置在sizeof(T)的整數倍的地址上，char可以隨便放置，short必須放在2的整數倍的地址上，int必須放在4的整數倍的地址上，double必須放在8的整數倍的地址上。如果違反邊界對齊要求 …</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-6-i386-variable-arguments.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.6 I386平臺C函數的可變參數表(Variable Arguments)
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-6-i386-variable-arguments.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-6-i386-variable-arguments.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-6-i386-variable-arguments" data-disqus-url="http://farseerfc.me/c-tricks-2-6-i386-variable-arguments.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
-<div class="section" id="i386c-variable-arguments">
-<h2>2.6 I386平臺C函數的可變參數表(Variable Arguments)</h2>
-<p>基於前文(2.4節)分析，我們可以不通過函數簽名，直接通過指針運算，來得到函數的參數。由於參數的壓棧和彈出操作都由主調函數進行，所以被調函數對於參數的真實數量不需要知曉。因此，函數簽名中的變量聲明不是必需的。爲了支持這種參數使用形式，C語言提供可變參數表。可變參數表的語法形式是在參數表末尾添加三個句點形成的省略號“...”：</p>
-<p>void g(int a,char* c,...);</p>
-<p>省略號之前的逗號是可選的，並不影響詞法語法分析。上面的函數g可以接受2個或2個以上的參數，前兩個參數的類型固定，其後的參數類型未知，參數的個數也未知。爲了知道參數個數，我們必須通過其他方法，比如通過第一個參數傳遞：</p>
-<p>g(3,”Hello”,2,4,5);//調用g並傳遞5個參數，其中後3個爲可變參數。</p>
-<p>在函數的實現代碼中，可以通過2.4節敘述的 …</p></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.7 I386平臺的其它函數調用模型
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-7-i386-calling-conventions.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-7-i386-calling-conventions" data-disqus-url="http://farseerfc.me/c-tricks-2-7-i386-calling-conventions.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="panel-body">
-                    <div class="summary"><p>從 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 導入</p>
-<div class="section" id="i386">
-<h2>2.7 I386平臺的其它函數調用模型</h2>
-<div class="line-block">
-<div class="line">上文介紹的只是I386平臺上C函數調用的標準模型，被稱作__cdecl。事實上，Microsoft Visual C++編譯器還支持其它一些函數調用模型，所有調用模型名稱皆以雙下劃線開頭，下面列出所有函數調用模型的異同：</div>
-</div>
-<div class="section" id="cdecl">
-<h3>1 __cdecl</h3>
-<p>參數壓棧順序：逆序(從右至左)</p>
-<p>參數堆棧恢復者：主調函數(caller)</p>
-<div class="line-block">
-<div class="line">__cdecl明確地指出函數使用C函數調用模型，這是默認的調用模型。</div>
-</div>
-</div>
-<div class="section" id="stdcall">
-<h3>2 __stdcall</h3>
-<p>參數壓棧順序：逆序(從右至左)</p>
-<p>參數堆棧恢復者：被調函數(callee)</p>
-<div class="line-block">
-<div class="line">__stdcall是微軟所謂的標準調用模型。可惜的是它與__cdecl不兼容。幾乎所有的Win32API函數使用這種函數調用模型，希望在DLL之間，或者在程序和WinNT操作系統之間傳遞函數指針的函數也應該使用這種模型。與__cdecl模型的不同之處在於，__stdcall模型下由被調函數恢復堆棧。主調函數在call語句之後，不需要再加上add語句。而被調函數的ret語句則被添加一個參數，代表函數參數堆棧的長度。因此，被調函數需要明確的知曉函數參數的數量和類型，所以在__stdcall模型下不支持可變參數表，所有參數必須寫明 …</div></div></div></div>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="article-item">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-2-1-x86-architecture.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 2.1 X86概述
-                            </h2></a>
-                        </div>
-                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-2-1-x86-architecture.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html" class="translate">简体</a></li></ul>
-</div>
-
-                            <div>
-<small><span><a href="//farseerfc.me/c-tricks-2-1-x86-architecture.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-1-x86-architecture" data-disqus-url="http://farseerfc.me/c-tricks-2-1-x86-architecture.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+<small><span><a href="//farseerfc.me/c-tricks-2-1-x86-architecturezh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-2-1-x86-architecturezh" data-disqus-url="http://farseerfc.me/c-tricks-2-1-x86-architecturezh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
                         </div>
                     </div>
 
@@ -467,18 +432,13 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operator.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱
+                            <a href="//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operatorzh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.2 逗號運算符(,)、邏輯運算符(&amp;&amp;,||)與運算符重載的陷阱
                             </h2></a>
                         </div>
                         <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operator.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html" class="translate">简体</a></li></ul>
-</div>
-
+                            
                             <div>
-<small><span><a href="//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operator" data-disqus-url="http://farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operator.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+<small><span><a href="//farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operatorzh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operatorzh" data-disqus-url="http://farseerfc.me/c-tricks-1-2-trap-in-comma-logical-operatorzh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
                         </div>
                     </div>
 
@@ -499,18 +459,13 @@ Space</a>和<a class="reference external" href="http://76635424.qzone.qq.com/">Q
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/c-tricks-1-1-conditional-operator.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.1  條件運算符(?:)
+                            <a href="//farseerfc.me/c-tricks-1-1-conditional-operatorzh.html" class="btn btn-primary btn-lg"><h2>C++ Tricks 1.1  條件運算符(?:)
                             </h2></a>
                         </div>
                         <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/c-tricks-1-1-conditional-operator.html">繁體</a></li><li><a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html" class="translate">简体</a></li></ul>
-</div>
-
+                            
                             <div>
-<small><span><a href="//farseerfc.me/c-tricks-1-1-conditional-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-1-conditional-operator" data-disqus-url="http://farseerfc.me/c-tricks-1-1-conditional-operator.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+<small><span><a href="//farseerfc.me/c-tricks-1-1-conditional-operatorzh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-1-conditional-operatorzh" data-disqus-url="http://farseerfc.me/c-tricks-1-1-conditional-operatorzh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
                         </div>
                     </div>
 
@@ -537,18 +492,13 @@ Basic中的iif函數、Excel中的if函數有同樣的作用。語法形式如�
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xl-19 col-lg-19 col-md-20 col-sm-19 col-xs-24">
-                            <a href="//farseerfc.me/filling-believings-calling-conscience.html" class="btn btn-primary btn-lg"><h2>填補信仰、喚醒良知
+                            <a href="//farseerfc.me/filling-believings-calling-consciencezh.html" class="btn btn-primary btn-lg"><h2>填補信仰、喚醒良知
                             </h2></a>
                         </div>
                         <div class="col-xl-5 col-lg-5 col-md-4 col-sm-5 hidden-xs">
-                            <div class="btn-group translations">
-<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
-<ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/filling-believings-calling-conscience.html">繁體</a></li><li><a href="//farseerfc.me/zhs/filling-believings-calling-conscience.html" class="translate">简体</a></li></ul>
-</div>
-
+                            
                             <div>
-<small><span><a href="//farseerfc.me/filling-believings-calling-conscience.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="filling-believings-calling-conscience" data-disqus-url="http://farseerfc.me/filling-believings-calling-conscience.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
+<small><span><a href="//farseerfc.me/filling-believings-calling-consciencezh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="filling-believings-calling-consciencezh" data-disqus-url="http://farseerfc.me/filling-believings-calling-consciencezh.html"><i class="fa fa-comments-o"></i></a></span></small>                            </div>
                         </div>
                     </div>
 

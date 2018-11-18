@@ -1,0 +1,142 @@
+<div class="highlight"><pre><span></span><span class="gh">Discuss C++ Template Downcast</span>
+<span class="gh">=============================</span>
+
+<span class="nc">:id:</span> <span class="nf">discuss-cpp-template-downcast</span>
+<span class="nc">:lang:</span> <span class="nf">en</span>
+<span class="nc">:date:</span> <span class="nf">2012-02-26 05:54:57</span>
+<span class="nc">:tags:</span> <span class="nf">template, C</span>
+<span class="nc">:series:</span> <span class="nf">YSSY_C</span>
+<span class="nc">:issueid:</span> <span class="nf">36</span>
+
+<span class="p">..</span> <span class="ow">contents</span><span class="p">::</span>
+
+This is a discuss in C board in bbs.sjtu.edu.cn, about type down-cast in C++ template.
+
+<span class="gh">Original Discuss</span>
+<span class="gh">++++++++++++++++</span>
+
+http://bbs.sjtu.edu.cn/bbstcon,board,C,reid,1330078933,file,M.1330078933.A.html
+
+<span class="gh">The problem</span>
+<span class="gh">+++++++++++</span>
+
+Today I read a book about we can do cast-down in template, so I write this to test:
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
+    
+    <span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">_Type</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="n">_Type</span><span class="o">&gt;</span> <span class="p">{</span>
+        <span class="k">typedef</span> <span class="n">_Type</span> <span class="n">type</span><span class="p">;</span>
+    <span class="p">};</span>
+    
+    <span class="k">class</span> <span class="nc">A</span> <span class="p">{</span> <span class="p">};</span>
+    <span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A</span> <span class="p">{</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="n">traits</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;&gt;</span>
+    <span class="k">struct</span> <span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="kt">void</span> <span class="n">f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+    
+    <span class="k">template</span> <span class="o">&lt;&gt;</span>
+    <span class="kt">void</span> <span class="n">f</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+    
+    
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">class</span> <span class="nc">BB</span> <span class="p">{};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">class</span> <span class="nc">DD</span> <span class="o">:</span> <span class="k">public</span> <span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{};</span>
+    
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">ff</span><span class="p">(</span><span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{};</span>
+    
+    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+    <span class="p">{</span>
+        <span class="n">A</span> <span class="n">a</span><span class="p">;</span> <span class="n">B</span> <span class="n">b</span><span class="p">;</span>
+        <span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
+        <span class="c1">//f(b);</span>
+        <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
+    <span class="p">}</span>
+
+It is strange when <span class="na">:code:</span><span class="nv">`f`</span> it don&#39;t allow my specified <span class="na">:code:</span><span class="nv">`f&lt;A&gt;`</span>`.
+
+But in <span class="na">:code:</span><span class="nv">`ff`</span> it allowed <span class="na">:code:</span><span class="nv">`ff&lt;BB&lt;long&gt;&gt;`</span>`.
+
+Tested under VC10 and GCC3.4
+
+<span class="gh">My answer to the problem</span>
+<span class="gh">++++++++++++++++++++++++</span>
+
+Let&#39;s think ourself as compiler to see what happened there.
+
+Define mark <span class="na">:code:</span><span class="nv">`#`</span> : <span class="na">:code:</span><span class="nv">`A#B`</span> is the instantiated result when we put <span class="na">:code:</span><span class="nv">`B`</span> into the parameter <span class="na">:code:</span><span class="nv">`T`</span> of <span class="na">:code:</span><span class="nv">`A&lt;T&gt;`</span> .
+
+<span class="gh">First we discuss ff</span>
+<span class="gh">*******************</span>
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">DD</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;</span> <span class="n">dd</span><span class="p">;</span>
+
+After this sentense, the compiler saw the instantiation of <span class="na">:code:</span><span class="nv">`DD&lt;long&gt;`</span> , so it instantiate <span class="na">:code:</span><span class="nv">`DD#long`</span> , and also <span class="na">:code:</span><span class="nv">`BB#long`</span> .
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">ff</span><span class="p">(</span><span class="n">dd</span><span class="p">);</span>
+
+This sentense required the compiler to calculate set of overloading functions.
+
+Step 1 we need to infer <span class="na">:code:</span><span class="nv">`T`</span> of <span class="na">:code:</span><span class="nv">`ff&lt;T&gt;`</span> from argument <span class="na">:code:</span><span class="nv">`DD#long -&gt; BB&lt;T&gt;`</span> . Based on the inference rule:
+
+<span class="se">::</span>
+
+<span class="s">    Argument with type :code:`class_template_name&lt;T&gt;` can be use to infer :code:`T``.</span>
+
+So compiler inferred <span class="na">:code:</span><span class="nv">`T`</span> as <span class="na">:code:</span><span class="nv">`long`</span> . Here if it is not <span class="na">:code:</span><span class="nv">`BB`</span> but <span class="na">:code:</span><span class="nv">`CC`</span> which is complete un-related, we can also infer, as long as <span class="na">:code:</span><span class="nv">`CC`</span> is a template like <span class="na">:code:</span><span class="nv">`CC&lt;T&gt;`</span> .
+
+Step 2 Template Specialization Resolution. There is only one template here so we matched <span class="na">:code:</span><span class="nv">`ff&lt;T&gt;`</span> .
+
+Step 3 Template Instantiation
+
+After inferred <span class="na">:code:</span><span class="nv">`long -&gt; T`</span> , compiler instantiated <span class="na">:code:</span><span class="nv">`ff#long`</span> .
+
+Set of available overloading functions : <span class="na">:code:</span><span class="nv">`{ff#long}`</span> 
+
+Then overloading resolution found the only match <span class="na">:code:</span><span class="nv">`ff#long``, checked its real parameter :code:`</span>DD#long<span class="nv">` can be down-cast to formal parameter :code:`</span>BB#long` .
+
+<span class="gh">Then we discuss f</span>
+<span class="gh">*****************</span>
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
+
+    <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+
+Calculate set of overloading functions.
+
+Step 1 infer all template parameters for template <span class="na">:code:</span><span class="nv">`f`</span> . According to inference rule:
+
+<span class="se">::</span>
+
+<span class="s">    Parameter with type T can be used to infer T 。</span>
+
+So <span class="na">:code:</span><span class="nv">`B -&gt; T`</span> is inferred.
+
+Step 2 Template Specialization Resolution.
+
+Here <span class="na">:code:</span><span class="nv">`B`</span> is not <span class="na">:code:</span><span class="nv">`A`</span> so we can not apply specialization of <span class="na">:code:</span><span class="nv">`f&lt;A&gt;`</span> , remaining <span class="na">:code:</span><span class="nv">`f&lt;T&gt;`</span> as the only alternative.
+
+Step 3 Template Instantiation.
+
+When we put <span class="na">:code:</span><span class="nv">`B`</span> into <span class="na">:code:</span><span class="nv">`f&lt;T&gt;`</span> to instantiate as <span class="na">:code:</span><span class="nv">`f#B`</span> , we need to instantiate <span class="na">:code:</span><span class="nv">`traits#B`</span>`. 
+
+There is no specialization for <span class="na">:code:</span><span class="nv">`B`</span> so we use template <span class="na">:code:</span><span class="nv">`traits&lt;T&gt;`</span> , <span class="na">:code:</span><span class="nv">`traits#B::value=false`</span> , so <span class="na">:code:</span><span class="nv">`enable_if#false`</span> didn&#39;t contains a <span class="na">:code:</span><span class="nv">`type`</span> , an error occurred.
+
+The only template is mismatch, available overloading functions is empty set. So we got an error.
+</pre></div>
