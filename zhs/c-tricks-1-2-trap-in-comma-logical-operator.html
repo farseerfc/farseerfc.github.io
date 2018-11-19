@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-Hans"
+>
+<head>
+    <title>C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&&,||)与运算符重载的陷阱 - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/zhs/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/zhs/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="C++" />
+        <meta name="description" content="从 farseerfc.wordpress.com 导入 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱 很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如： for(inti=0,j=9;i&lt;10;++i,--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”; 在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱"/>
+        <meta property="og:url" content="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html"/>
+        <meta property="og:description" content="从 farseerfc.wordpress.com 导入 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱 很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如： for(inti=0,j=9;i&lt;10;++i,--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”; 在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求 …"/>
+        <meta property="article:published_time" content="2007-08-22" />
+            <meta property="article:section" content="import" />
+            <meta property="article:tag" content="C++" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operatorzhs.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/zhs/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&&,||)与运算符重载的陷阱 - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                                 关于
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                                 友情链接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/zhs/about.html"><i class="fa fa-user"></i>
+                         关于
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/zhs/links.html"><i class="fa fa-user"></i>
+                         友情链接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active">
+                                <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li class="active">
+                            <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
+              <li><a href="//farseerfc.me/zhs/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/zhs/" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/zhs/category/import.html" title="import">import</a></li>
+                <li class="active">C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱
+                        <a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&&,||)与运算符重载的陷阱 的永久链接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2007-08-22T18:06:00+09:00"><i class="fa fa-calendar"></i> 2007年08月22日(周三)</time>
+    </span>
+
+
+
+
+    <a onclick="$.get('//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operatorzhs.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
+    <!--<a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operatorzhs.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operatorzhs.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>-->
+
+<small><span><a href="//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="c-tricks-1-2-trap-in-comma-logical-operatorzhs" data-disqus-url="http://farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/zhs/tag/c.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> C++</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <p>从 <a class="reference external" href="http://farseerfc.wordpress.com/">farseerfc.wordpress.com</a> 导入</p>
+<div class="section" id="id1">
+<h2>1.2   逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</h2>
+<p>很多人甚至不知道逗号(,)也是个C++运算符。与语法上要求出现的逗号(比如分隔函数参数的逗号)不同的是，出现在表达式中的逗号运算符在语义上表示多个表达式操作的连续执行，类似于分隔多语句的分号。比如：</p>
+<p><strong>for</strong>(<strong>int</strong>i=0,j=9;i&lt;10;++i<strong>,</strong>--j)std::cout&lt;&lt;i&lt;&lt;”+”&lt;&lt;j&lt;&lt;”=9\n”;</p>
+<p>在这句语句中，出现了两个逗号，其中前者是语法上用来分隔声明的变量的，并非逗号运算符，而后者则是一个逗号运算符。根据C++标准，逗号运算符的执行顺序为从左到右依次执行，返回最后一个子表达式的结果。由于只有最后一个表达式返回结果，所以对于一个语义正常的逗号表达式而言，前几个子表达式必须具有副作用。同时，从语言的定义中也可以看出，逗号表达式对求值的顺序有严格要求。</p>
+<p>对求值顺序有要求的，除了逗号表达式和条件表达式(参见1.1)，在C++中还有逻辑运算符(&amp;&amp;和||)。逻辑运算相较于数学运算和位运算而言，有个显著的不同点：逻辑运算在计算到一半时，就有可能已经得到结果，这样继续运算另一半就不是必需的。对于A&amp;&amp;B，如果A=false，那么无论B为何值，整个的结果都是false；同样的A||B，如果A=true，那么不考虑B，结果一定是true。</p>
+<p>C++标准规定，如果逻辑运算到一半(算出A)时，就已经可以确定运算的结果，那么就不运算剩下的另一半(B)。这种执行语义被称作“短路”。在其它一些编程语言中，短路语义是可以选择的：在Ada里非短路的逻辑运算符为and和or，短路的逻辑运算符为and_then和or_else。但是在C++中，逻辑运算符的短路语义是语法上强制的，我们没有非短路版本的运算符。如果确实需要非短路语义，我们总是可以通过增加一个bool中间变量加以解决。有时，短路对于保证正确执行是必须的，比如：</p>
+<p><strong>char</strong>*p=getString();</p>
+<p><strong>if</strong>(p<strong>&amp;&amp;</strong>*p)std::cout&lt;&lt;p;</p>
+<p>这段代码在得到了一个字符串后，在字符串不为空时输出它。在C++中判断一个字符串不为空需要两个步骤：判断指针是否为0，以及指针不为0时判断指针指向的内容是否为’’。就像条件表达式中讨论到的(参见1.1)，在p为空时提领p是个极其危险的操作。逻辑运算符的短路语义则避免了这种危险。</p>
+<p>以上对逗号运算符与逻辑运算符的讨论，仅限于C++标准所定义的运算符语义。为什么这样说呢？这是因为在C++中，运算符的语义是可以由程序员自行定义的，这种机制叫做运算符重载(operator
+overload)。运算符重载可以将人们熟悉的运算符表达式转换成函数调用，使编程灵活而直观，是个方便的语言特性。不过有时运算符重载也会使人困扰，那就是当运算符重载遇到求值顺序问题时。</p>
+<p>C++中，并不是所有合法运算符都可以被合法地重载。条件运算符虽然对求值顺序有要求，但它并不在可重载运算符之列，所以运算符重载机制对它没有影响。问题在于，逗号运算符和逻辑运算符都可以被合法地重载：</p>
+<p><strong>class</strong> BadThing{/* Some Bad and Stupid Thing*/};</p>
+<p>BadThing&amp; <strong>operator</strong>,(BadThing&amp;, BadThing&amp;);//重载了逗号运算符</p>
+<p><strong>bool</strong> <strong>operator</strong>&amp;&amp;(BadThing&amp;, BadThing&amp;);//重载了&amp;&amp;</p>
+<p>BadThing b1,b2;</p>
+<p><strong>if</strong>(b1&amp;&amp;b2)b1,b2;//被替换成如下形式：</p>
+<p><strong>if</strong>(<strong>operator</strong>&amp;&amp;(b1,b2))<strong>operator</strong>,(b1,b2);</p>
+<p>可以看到，重载了运算符之后，对运算符的使用被替换为相应的函数调用形式。因此，旧有的运算符的执行顺序不再适用，取而代之的是函数参数的压栈顺序。</p>
+<p>根据C++标准规定，任何参数必须在进入函数之前压栈，所以在进入<strong>operator</strong>&amp;&amp;之前，b1、b2就会被求值，这里不再有短路规则，任何依赖于短路语义的不知不觉间操作BadThing的代码(可能通过模板)都会混乱。</p>
+<p>短路语义只是一个方面，更重要的在于压栈顺序。鉴于执行效率和旧代码兼容性等细节问题，C++标准在压栈顺序上给编译器的开发者留有很大自主性。标准的说辞是，编译器可能以任何它觉得方便的顺序将参数压栈，从左到右，从右到左，甚至从中间到两边，在这一点上我们不能安全地做任何假设。在上面的例子中，编译器生成的代码可能先计算b1再计算b2，也可能是相反的顺序。再看看编译器的实际情况，在我试过的所有基于X86体系结构的编译器中，参数都是以逆向压栈，即从右到左，有悖于大多数人的阅读习惯和直觉(别说你是来自伊斯兰的……)。</p>
+<p>在C时代使用函数调用时，压栈顺序并不是什么大问题，毕竟大多数人会在函数调用的边界稍稍小心一些。但是到了C++中，事情变得有些复杂，因为简单如a+b的使用，就有可能被运算符重载机制替换为函数调用。更何况有模板参与之后，我们写代码时不能确定对象的真实类型，也就无法预知一个运算符是否真的被重载过，唯一稳妥的方法是，假定任何有可能被重载的运算符的使用都是函数调用。</p>
+<blockquote>
+&lt;p style="margin:0;"&gt;</blockquote>
+<p>回到上文的示例中，由于,和&amp;&amp;都被替换为函数调用，程序的执行顺序将成为压栈顺序，在X86上很有可能是从右到左，与标准定义的运算符的顺序正好相反。逗号运算符原本就含有“先…后…”的语义，这种颠倒的执行顺序势必造成程序和程序员的混乱。以我的经验而言，含有<strong>operator</strong>,的类，完全没有办法和STL或者iostream相互协作，反而会导致巨量的错误报告(什么叫巨量的错误报告有概念么？如果没有，那说明你还没玩过范式编程(GP,
+Generic
+Programming)。去玩玩GP吧，看看你的编译器对巨量的定义。在我手头，针对3.5KB的代码文件倾泻出3.8<strong>MB</strong>的错误信息的编译器不在少数……)。有鉴于此，我的结论是，除非你有充足的依据支持你这么做(比如你的粗暴上司的键盘上只剩下逗号能用)，并且你清楚的了解这么做的后果的严重性(比如至少要看过此文)，否则我奉劝你，永远不要碰<strong>operator</strong>,、<strong>operator</strong>&amp;&amp;以及<strong>operator</strong>||！</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        C++ Tricks 1.1  条件运算符(?:)
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html" class="btn btn-default btn-lg" style="float:right;clear:both;background-color:#fff;">
+                        <h4>
+                        C++ Tricks 2.1 X86概述<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+这篇文章是 "CPP_Tricks" 系列文章的第 3 篇：                  </h4>
+                </div>
+                <ul class="list-group">
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks.html' style="text-align:left">C++ Tricks</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-1-1-conditional-operator.html' style="text-align:left">C++ Tricks 1.1  条件运算符(?:)</a></li>
+                        <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html' style="text-align:left">C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&amp;&amp;,||)与运算符重载的陷阱</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-1-x86-architecture.html' style="text-align:left">C++ Tricks 2.1 X86概述</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-2-i386-memory-layout.html' style="text-align:left">C++ Tricks 2.2 I386平台的内存布局</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-3-i386-stack-allocation-in-c-functions.html' style="text-align:left">C++ Tricks 2.3 I386平台C函数内部的栈分配</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-4-i386-stack-allocation-accross-function-invocation.html' style="text-align:left">C++ Tricks 2.4 I386平台C函数调用边界的栈分配</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-5-address-alignment.html' style="text-align:left">C++ Tricks 2.5 I386平台的边界对齐(Align)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-6-i386-variable-arguments.html' style="text-align:left">C++ Tricks 2.6 I386平台C函数的可变参数表(Variable Arguments)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-2-7-i386-calling-conventions.html' style="text-align:left">C++ Tricks 2.7 I386平台的其它函数调用模型</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-3-1-lvalue-rvalue-constant.html' style="text-align:left">C++ Tricks 3.1 左值右值与常量性(lvalue，rvalue &amp; constant)</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/c-tricks-3-2-label-goto-and-implementation-of-switch.html' style="text-align:left">C++ Tricks 3.2 标号、goto，以及switch的实现</a></li>
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+请用你的 GitHub 账户登录并在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/16#new_comment_field" target="_blank">这篇文章的 Issue 页下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/16#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hant", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言于 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/16/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'c-tricks-1-2-trap-in-comma-logical-operatorzhs';
+                        var disqus_url = 'http://farseerfc.me/zhs/c-tricks-1-2-trap-in-comma-logical-operator.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/zhs/about.html">
+关于 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/zhs/about.html"><img width="100%" src="//farseerfc.me/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">标签云</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/linux.html">
+                    Linux <sup> 7</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/archlinux.html">
+                    archlinux <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub仓库</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-usd fa-lg"></i><span class="icon-label">Promotions</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <a href="https://www.vultr.com/?ref=6924747-3B">
+<img src="https://www.vultr.com/media/banner_4.png" width="160" height="600">
+</a>
+    </div>
+</div>
+</div>
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; 通过            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

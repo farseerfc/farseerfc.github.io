@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>我看 Linux 發行版：碎片化？這是自由 - Farseerfc's Nest</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/en/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/en/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/en/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/en/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="linux,distributions,freedom" />
+        <meta name="description" content="從不少 Linux 用戶，尤其是 Ubuntu 用戶口中，我聽到過 「碎片化」 這個詞，用來描述 Linux 發行版衆多的現象和（他們覺得）所導致的問題。 碎片化 對大家而言應該並不陌生，經常用來形容 Android 系統的現狀，表示廠商衆多的 Android 手機出現的諸多兼容性問題。大概由於 Android 系統也同樣用 Linux 內核並且開源，從而有不少人覺得 Android 上的碎片化現象是因爲 Linux 和開源的問題， 並且 GNU/Linux 的諸多發行版們也有同樣的問題，甚至百度百科也這麼說 [1] : ……而由于 Android 完全免费以及完全开源 的性质，最终导致 Android 设备的软件兼容性变差，间接加大了软件开发的难度 (主要难度是让软件在更多的设备上运行)，最终会导致一个结果：由于开发难度高， 开发成本增大 …" />
+
+        <meta property="og:site_name" content="Farseerfc's Nest" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="我看 Linux 發行版：碎片化？這是自由"/>
+        <meta property="og:url" content="//farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html"/>
+        <meta property="og:description" content="從不少 Linux 用戶，尤其是 Ubuntu 用戶口中，我聽到過 「碎片化」 這個詞，用來描述 Linux 發行版衆多的現象和（他們覺得）所導致的問題。 碎片化 對大家而言應該並不陌生，經常用來形容 Android 系統的現狀，表示廠商衆多的 Android 手機出現的諸多兼容性問題。大概由於 Android 系統也同樣用 Linux 內核並且開源，從而有不少人覺得 Android 上的碎片化現象是因爲 Linux 和開源的問題， 並且 GNU/Linux 的諸多發行版們也有同樣的問題，甚至百度百科也這麼說 [1] : ……而由于 Android 完全免费以及完全开源 的性质，最终导致 Android 设备的软件兼容性变差，间接加大了软件开发的难度 (主要难度是让软件在更多的设备上运行)，最终会导致一个结果：由于开发难度高， 开发成本增大 …"/>
+        <meta property="article:published_time" content="2016-08-26" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="distributions" />
+            <meta property="article:tag" content="freedom" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/en/how-i-view-linux-distributions-fragmentation-freedomzh.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/en/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/en/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/en/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/en/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/en/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/en/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/en/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc's Nest ATOM Feed"/>
+
+        <link href="//farseerfc.me/en/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/en/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/en/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">我看 Linux 發行版：碎片化？這是自由 - Farseerfc's Nest</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/en/" class="navbar-brand">
+Farseerfc's Nest            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li class="active"><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li class="active"><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/en/about.html"><i class="fa fa-user"></i>
+                                 About
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/en/about.html"><i class="fa fa-user"></i>
+                         About
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/en/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/en/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/en/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/en/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/en/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/en/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/en/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">All</span></a></li>
+              <li><a href="//farseerfc.me/en/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/en/" title="Farseerfc's Nest"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/en/category/tech.html" title="tech">tech</a></li>
+                <li class="active">我看 Linux 發行版：碎片化？這是自由</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        我看 Linux 發行版：碎片化？這是自由
+                        <a href="//farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Permalink to 我看 Linux 發行版：碎片化？這是自由">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2016-08-26T22:45:00+09:00"><i class="fa fa-calendar"></i> 2016年08月26日(週五)</time>
+    </span>
+
+
+
+
+    <a onclick="$.get('//farseerfc.me/en/how-i-view-linux-distributions-fragmentation-freedomzh.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="Show source code of this page"><i class="fa fa-code"></i></a>
+    <!--<a href="//farseerfc.me/en/how-i-view-linux-distributions-fragmentation-freedomzh.pdf" class="btn btn-primary" title="Show pdf version of this page" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/en/how-i-view-linux-distributions-fragmentation-freedomzh.png" class="btn btn-primary" title="Show captured png of this page" target="_blank""><i class="fa fa-file-photo-o"></i></a>-->
+
+<small><span><a href="//farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="how-i-view-linux-distributions-fragmentation-freedomzh" data-disqus-url="http://farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/en/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.me/en/tag/distributions.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> distributions</a>
+	<a href="//farseerfc.me/en/tag/freedom.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> freedom</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+Table of Contents                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id4" id="id12">Linux 發行版衆多，該選擇的是社區</a></li>
+<li><a class="reference internal" href="#id8" id="id13">一個 Linux 發行版代表了一個政治理念</a></li>
+<li><a class="reference internal" href="#arch-linux" id="id14">就從以我比較熟悉的 Arch Linux 舉例說說</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<p>從不少 Linux 用戶，尤其是 Ubuntu 用戶口中，我聽到過 <strong>「碎片化」</strong>
+這個詞，用來描述 Linux 發行版衆多的現象和（他們覺得）所導致的問題。 <strong>碎片化</strong>
+對大家而言應該並不陌生，經常用來形容 Android 系統的現狀，表示廠商衆多的
+Android 手機出現的諸多兼容性問題。大概由於 Android 系統也同樣用 Linux
+內核並且開源，從而有不少人覺得 Android 上的碎片化現象是因爲 Linux 和開源的問題，
+並且 GNU/Linux 的諸多發行版們也有同樣的問題，甚至百度百科也這麼說 <a class="footnote-reference" href="#id2" id="id1">[1]</a> :</p>
+<blockquote>
+……而由于 Android <strong>完全免费以及完全开源</strong>
+的性质，最终导致 Android 设备的软件兼容性变差，间接加大了软件开发的难度
+(主要难度是让软件在更多的设备上运行)，最终会导致一个结果：由于开发难度高，
+开发成本增大，软件开发商和软件开发者们会放弃开发……</blockquote>
+<table class="footnote docutils table-hover table-striped table" frame="void" id="id2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://baike.baidu.com/view/9632689.htm#1">百度百科-安卓碎片化</a></td></tr>
+</tbody>
+</table>
+<p>但是 <strong>本質上</strong> ，Android 上出現的 <strong>碎片化問題是 Linux 和開源所導致的麼</strong> ，
+<strong>GNU/Linux 諸多發行版的現象也是同樣的問題麼</strong> ？我想在這篇文章中聊聊這個。
+考慮到 Android 用戶明顯比 GNU/Linux 發行版用戶要多，各大媒體也覆蓋得更廣，
+本文不想再複述 Android 上的碎片化問題是什麼，而想關注於
+<strong>GNU/Linux 發行版的衆多的現象該如何看待</strong>。
+此外本文也不想討論 GNU/Linux 和 Linux 這兩個稱呼的區別，下面爲了方便就直接稱呼爲
+Linux 發行版了，大家請默認我在說的都是 GNU/Linux 發行版（或者可能不用 Linux
+內核而用別的內核的 GNU 系統比如 Debian 的 kfreebsd 和 Hurd
+分支這樣的自由軟件發行版）。
+同樣我也無意討論 Android 到底是不是 Linux 發行版的問題，以及 Android
+到底算不算開源軟件平臺的問題，大家應該能從上下文中看出我想說什麼 😂 。</p>
+<div class="section" id="id4">
+<h2><a class="toc-backref" href="#id12">Linux 發行版衆多，該選擇的是社區</a></h2>
+<p>Linux 確有很多發行版， 寫這篇的時候
+<a class="reference external" href="https://distrowatch.com/search.php?status=All">DistroWatch 上列出 895 個之多</a>
+，必然還有很多是他們沒能跟蹤到的。單看數字的確是有很多，但是考慮到大部分發行版
+其實是別的發行版的衍生，看獨立活躍的發行版就
+<a class="reference external" href="https://distrowatch.com/search.php?ostype=All&amp;category=All&amp;origin=All&amp;basedon=Independent&amp;notbasedon=None&amp;desktop=All&amp;architecture=All&amp;package=All&amp;rolling=All&amp;isosize=All&amp;netinstall=All&amp;status=Active">只有 65 個了</a>
+，其中還包括 FreeBSD 和 ReactOS 這些不知是否該被列入發行版的行列。</p>
+<div class="panel panel-warning">
+<div class="panel-heading">
+這些「經驗」不是我的觀點</div>
+<div class="panel-body">
+不要根據這些片面之詞選擇你的第一個發行版</div>
+</div>
+<p>「這麼多發行版之間的區別是什麼呢？」這或許是每個 Linux 剛入門的新人都想問的問題。
+有這麼多發行版，要用一個的話必然想問他們之間的區別何在，該如何選擇。
+於是會有諸多老手們會開始給新手介紹 <em>「經驗」</em>：</p>
+<table class=" table-striped docutils table-hover field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">Ubuntu:</th><td class="field-body">對新手友好，社區龐大，軟件豐富，界面美觀易用……</td>
+</tr>
+<tr class="field"><th class="field-name">Debian:</th><td class="field-body">穩定，安心，是每個 Linux 用戶折騰久了之後的最終歸宿……</td>
+</tr>
+<tr class="field"><th class="field-name">RedHat:</th><td class="field-body">穩定，安全，企業級……</td>
+</tr>
+<tr class="field"><th class="field-name">CentOS:</th><td class="field-body">我就是 RedHat……</td>
+</tr>
+<tr class="field"><th class="field-name">Mint:</th><td class="field-body">我比 Ubuntu 更友好，用戶更多，排名更高……</td>
+</tr>
+<tr class="field"><th class="field-name">Arch Linux:</th><td class="field-body">更新快，但是不穩定，而且安裝麻煩，需要「折騰」……</td>
+</tr>
+<tr class="field"><th class="field-name">Gentoo:</th><td class="field-body">不自己編譯就不舒服……</td>
+</tr>
+</tbody>
+</table>
+<div class="panel panel-default">
+<div class="panel-heading">
+Linux 發行版雷達圖，<a class="reference external" href="http://tuxradar.com/content/best-distro-2011">來自這裏</a></div>
+<div class="panel-body">
+<img alt="Linux 發行版雷達圖" class="img-responsive" src="//farseerfc.me/en/images/distro_stats_lg.png"/>
+</div>
+</div>
+<p>這些經驗試圖從穩定性、易用性等各方面對這些發行版下個定論，就好像 RPG
+遊戲一開始創建角色的界面，每個角色的區別就是力量、敏捷、智力等或高或低的數值，
+甚至還真的有人給發行版們畫出了雷達圖比較各項屬性在數值上的優劣。
+就好像如果新人選擇了那個攻高血厚的發行版就能輕易上陣，
+而如果想領略遊戲的精髓和趣味，務必打穿一週目之後去選那個一開始
+看起來攻低血薄超高難度的 Arch Linux 或者全數值爲 0 的噩夢難度的 Gentoo 。
+這些經驗或許是反映了高手們的個人感受，或許是來自前人代代相傳的耳濡目染。
+我以前也經常這樣向詢問我的人們介紹發行版們的優劣，或者反駁別人這樣的介紹中
+不符合我的感受的部分。這樣的數值評價通常適用於產品的宣傳，
+每個發行版的自豪的用戶們都像是傳銷組織培訓出來的傳銷員，
+努力向新手兜售自己所用發行版的優勢，抨擊別的發行版的不足。
+而從剛入門的新人的角度來看，這些宣傳員們的互相抨擊只會讓他們更加困惑，
+使他們覺得整個 Linux 用戶羣就像一個教派衆多的邪教組織，肆意發展新的信徒。</p>
+<p>而這種對發行版的評價偏偏忽略了衡量一個 <strong>發行版最重要的部分，也就是人</strong>
+。 <strong>Linux 發行版並不是一個產品</strong> （就算是 Red Hat 這樣的商業發行版，
+其出售的產品也不是軟件本身），而是由 <strong>一羣人組成的社區</strong>
+，其餘的都是這羣人產生的結果：</p>
+<table class=" table-striped docutils table-hover field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">軟件包的多寡:</th><td class="field-body">是這個社區 <strong>打包</strong> 工作的結果</td>
+</tr>
+<tr class="field"><th class="field-name">軟件包的穩定性:</th><td class="field-body">是這個社區 <strong>測試</strong> 工作的結果</td>
+</tr>
+<tr class="field"><th class="field-name">文檔的優劣:</th><td class="field-body">是這個社區 <strong>文檔編撰</strong> 工作的結果</td>
+</tr>
+<tr class="field"><th class="field-name">安裝的難易:</th><td class="field-body">是這個社區 <strong>安裝嚮導</strong> 工作的結果</td>
+</tr>
+</tbody>
+</table>
+<p>那些通常認爲的衡量發行版優劣的指標，大多數都是對社區的間接評價，
+還有少數只是人云亦云的謠傳。比如 <strong>硬件支持</strong> 這個指標，大家都是用同樣的內核樹，
+同樣的內核版本硬件支持方面理應是一樣的，區別只在於有些發行版有提供工具自動偵測加載驅動，
+另一些發行版可能需要用戶手動安裝。如果說有些商業發行版比如 RedHat 和 SUSE 有硬件廠商
+（亦或發行版的內核組）直接提供的二進制驅動支持這還稍顯可信
+（而這種情況通常發生在預期使用 Linux 的服務器上），而說 Ubuntu
+因爲在安裝嚮導裏加入了對顯卡閉源驅動的自動檢測和支持就說它的硬件支持遠好於別的
+發行版，這完全就是混淆視聽了。</p>
+<p>因爲對 Linux 發行版而言最重要的是社區，所以 <strong>如何選擇 Linux 發行版</strong>
+這個問題歸根結底其實是 <strong>如何選擇 Linux 社區</strong> 的問題。這本應該是一個顯而易見
+衆所周知的事情，但是大部分人（包括我以前）在給人們推薦發行版的時候都忽略了
+這一點。或許這是因爲我們日常評價別的「商品」的時候習慣了用這種性能指標衡量，
+從而我們也遵循着慣性用同樣的性能指標去衡量我們的 Linux 發行版。
+然而用性能指標評價 Linux 發行版是個嚴重的錯誤，甚至連
+<a class="reference external" href="https://youtu.be/Bs7a2DrWTmk?list=PLWs4_NfqMtoyppPlVydopdpz_FnnK4tuY">Windows</a>
+和 <a class="reference external" href="https://youtu.be/DZSBWbnmGrE">macOS</a>
+的廣告都知道，宣傳的時候不應該聚焦在功能指標上，
+而更應該着重於傳達「我們的用戶是怎樣的人」。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+我眼中的各 Linux 發行版用戶，<a class="reference external" href="https://www.zhihu.com/question/22605825">來自知乎提問</a></div>
+<div class="panel-body">
+<img alt="我眼中的各 Linux 發行版用戶" class="img-responsive" src="//farseerfc.me/en/images/how-i-view-linux-users.jpg"/>
+</div>
+</div>
+<p>我們傾向於用這些指標評價 Linux 發行版的另一個原因，或許是因爲很多 Linux
+用戶們覺得，「選擇 Linux 發行版」和「我是怎樣的人」並沒有直接關係，
+而這又是一個嚴重的錯誤。閉上眼睛想想各個 Linux 發行版，大概你腦中很快會浮現出各種
+Linux 發行版用戶的樣子，網上也流傳着各種版本的「我眼中的各 Linux 發行版用戶」的圖。
+不少 Linux 用戶或許覺得，他們在同時使用着數個不同的發行版，是跨發行版用戶，
+從而他們是怎樣的人不能決定他們對發行版的選擇。但是時間長了， Linux
+用戶就會發現他們常用的發行版中更喜歡某個發行版的做事方式。
+由於日常系統上切換發行版的成本相對很低，從而自然而然得，「我喜歡怎樣的做事方式」
+就會漸漸影響到「選擇怎樣的 Linux 發行版」。</p>
+<p>各個 Linux 發行版有其關於「Linux 應該如何」的 <strong>理念</strong> ，這樣的理念下聚集了持有同樣
+理念的一羣人，這羣人在這 <strong>同樣的理念下共同努力</strong> 形成穩定的社區，開發更多社區項目
+達成和完善發行版的理念，而社區運作的結果，就是這種理念在這個發行版中被加強，
+形成良性循環，吸引更多持有同樣理念的人前來逗留。</p>
+<p>我想了很久該如何描述這一現象，後來我發現，現代社會有一個詞完全符合這樣的描述，也就是
+<strong>「政治」</strong> ： 一個 Linux 發行版代表了一個 <strong>政治理念</strong> 。
+這句話最近被我在很多不同的地方重複過很多次，因爲我覺得它非常重要，
+請允許我再重複一次：</p>
+<p><strong>一個 Linux 發行版代表了一個政治理念。</strong></p>
+<p>好像還不夠強調，那麼再強調一次：</p>
+</div>
+<div class="section" id="id8">
+<h2><a class="toc-backref" href="#id13">一個 Linux 發行版代表了一個政治理念</a></h2>
+<p>或許很多人會反感在 <strong>「技術」</strong> 領域談到 <strong>「政治」</strong> 這個詞，尤其是在中國大陸的政治環境中
+成長起來的技術者們眼中，「政治」這個詞或多或少帶有某種「非我族類」的貶義。
+但是請不要害怕「政治」這個詞，尤其讓我們來看看這個詞本來的意思：</p>
+<blockquote>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Politics">Politics</a> is the process of making decisions applying to all members of a group.</p>
+<p><a class="reference external" href="https://zh.wikipedia.org/wiki/%E6%94%BF%E6%B2%BB">政治</a> 是各種團體進行集體決策的一個過程……</p>
+</blockquote>
+<p><strong>「集體決策」</strong> 非常適合於用來描述 Linux 發行版是什麼。一個 Linux
+發行版就是 <strong>一羣 Linux 用戶共同做出的集體決策</strong> 。衆所周知， Linux
+發行版本質就是一堆軟件包，而要讓這些軟件包集合在一起協同工作，必須做一些決策。
+這些決策包括並不限於：</p>
+<ol class="arabic simple">
+<li>我們該用什麼包管理器和包格式？</li>
+<li>我們該用什麼 init 系統？</li>
+<li>我們該如何配置我們的系統？</li>
+<li>我們該支持幾種體系架構？</li>
+<li>我們該以何種態度對待私有閉源軟件？</li>
+<li>我們該用何種桌面環境？是我們強制一種還是允許用戶選擇一種？</li>
+</ol>
+<p>這些決策涉及發行版的方方面面，並且這些決策並沒有一個標準答案，對每一個決策做出的
+回答都會影響到整個發行版的使用體驗。在理想情況下，一個發行版應該兼顧用戶的所有
+需求，提供最優的方案，而現實是發行版們的精力有限，努力的方向只能朝着一個方向。
+從而所有這些決策都需要有個具體的答案，整個發行版社區朝着這些答案的方向努力。
+<strong>一個發行版，就像現實社會中的一個政黨</strong> ，其販賣的是決策的指導方針，
+宣傳的是選擇這個羣體之後享受的好處。
+當新的疑問凸顯出來需要決策的時候，通常上游發行版都有一個明確的 <strong>政治理念</strong>
+指導人們做出合適的選擇，而這就是該發行版的「原則」：</p>
+<table class=" table-striped docutils table-hover field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arch Linux:</th><td class="field-body"><p class="first"><a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Linux">簡潔(Simplicity)、現代(Modernity)、實用(Pragmatism)、用戶中心(User centrality)、可定製(Versatility)</a></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Gentoo:</th><td class="field-body"><p class="first"><a class="reference external" href="https://wiki.gentoo.org/wiki/Benefits_of_Gentoo">社區驅動(Community)、高效(Efficiency)、靈活(Flexibility)、可伸縮(Scalability)、安全(Security)</a></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Fedora:</th><td class="field-body"><p class="first"><a class="reference external" href="https://fedoraproject.org/wiki/Foundations">自由(Freedom)、友愛(Friends)、功能(Features)、領先（First）</a></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Debian:</th><td class="field-body"><p class="first"><a href="#id10"><span class="problematic" id="id11">`</span></a>理念與社區(Philosophy and Community)、實用與可用性(Utility and usability)、實現品質(Quality of implementation)、</p>
+<div class="last system-message" id="id10">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/how-i-view-linux-distributions-fragmentation-freedom.zh.rst</tt>, line 180); <em><a href="#id11">backlink</a></em></p>
+<p>Inline interpreted text or phrase reference start-string without end-string.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/how-i-view-linux-distributions-fragmentation-freedom.zh.rst</tt>, line 181)</p>
+Field list ends without a blank line; unexpected unindent.</div>
+<p>功能與軟件選擇(Feature set and Selection of Software)、內核與用戶空間(Kernels and User Land)、維護與管理(Maintenance and administration)、
+可移植性與硬件支持(Portability and Hardware Support)、源碼構建(Source Builds)、安全性和可靠性(Security and Reliability)、
+可擴展性與性能(Scalability and Performance) &lt;<a class="reference external" href="https://wiki.debian.org/WhyDebian">https://wiki.debian.org/WhyDebian</a>&gt;`_</p>
+<p>乍看起來每個發行版在說的貌似都差不多，都是些廣告用語，就像單從詞義理解的話美國民主黨和共和黨聽起來也是差不多的意思，
+但是當你細看這些原則的細節，就能看出每個發行版在上述關鍵問題上所做的抉擇。</p>
+<p>具體理念如何影響抉擇，抉擇如何塑造社區，社區又如何提供發行版的……</p>
+</div>
+<div class="section" id="arch-linux">
+<h2><a class="toc-backref" href="#id14">就從以我比較熟悉的 Arch Linux 舉例說說</a></h2>
+<p>比如說 Arch Linux 崇尚簡潔，這可不是一句空頭支票， Arch Linux 崇尚不多做無謂的事情。</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus comments            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'how-i-view-linux-distributions-fragmentation-freedomzh';
+                        var disqus_url = 'http://farseerfc.me/en/drafts/how-i-view-linux-distributions-fragmentation-freedomzh-zh.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/en/about.html">
+About farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/en/about.html"><img width="100%" src="//farseerfc.me/en/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/en/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/en/tag/linux.html">
+                    linux <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/arch.html">
+                    arch <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/music.html">
+                    music <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/en/tag/python.html">
+                    python <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/java.html">
+                    java <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/c.html">
+                    C <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/en/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/en/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-usd fa-lg"></i><span class="icon-label">Promotions</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <a href="https://www.vultr.com/?ref=6924747-3B">
+<img src="https://www.vultr.com/media/banner_4.png" width="160" height="600">
+</a>
+    </div>
+</div>
+</div>
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+Table of Contents</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id4" id="id12">Linux 發行版衆多，該選擇的是社區</a></li>
+<li><a class="reference internal" href="#id8" id="id13">一個 Linux 發行版代表了一個政治理念</a></li>
+<li><a class="reference internal" href="#arch-linux" id="id14">就從以我比較熟悉的 Arch Linux 舉例說說</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2016 farseerfc
+            &middot; Powered by            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> generator                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/en/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/en/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/en/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/en/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/en/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/en/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/en/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/en/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
