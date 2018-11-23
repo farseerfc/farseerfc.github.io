@@ -2,6 +2,7 @@ C++ Tricks 2.7 I386平台的其它函数调用模型
 ##################################################################################
 :date: 2007-08-28 14:28
 :id: c-tricks-2-7-i386-calling-conventions
+:translation_id: c-tricks-2-7-i386-calling-conventions
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks

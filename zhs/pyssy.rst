@@ -2,6 +2,7 @@ Pyssy 项目
 ============
 
 :id: pyssy
+:translation_id: pyssy
 :lang: zhs
 :date: 2012-04-02 12:42
 :tags: python, sjtu, yssy

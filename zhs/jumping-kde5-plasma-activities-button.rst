@@ -2,6 +2,7 @@ KDE5 Plasma 之跳动卖萌的活动按钮
 ==========================================================
 
 :id: jumping-kde5-plasma-activities-button
+:translation_id: jumping-kde5-plasma-activities-button
 :lang: zhs
 :date: 2014-12-09 01:54
 :tags: kde5, plasma, linux, gnome3

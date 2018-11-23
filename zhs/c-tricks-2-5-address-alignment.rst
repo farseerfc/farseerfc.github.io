@@ -2,6 +2,7 @@ C++ Tricks 2.5 I386平台的边界对齐(Align)
 ################################################################################
 :date: 2007-08-28 14:28
 :id: c-tricks-2-5-address-alignment
+:translation_id: c-tricks-2-5-address-alignment
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks

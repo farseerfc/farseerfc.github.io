@@ -2,6 +2,7 @@ C++ Tricks 1.1	条件运算符(?:)
 ##########################################################
 :date: 2007-08-22 18:05
 :id: c-tricks-1-1-conditional-operator
+:translation_id: c-tricks-1-1-conditional-operator
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks

@@ -2,6 +2,7 @@ C++ Tricks 1.2 逗号运算符(,)、逻辑运算符(&&,||)与运算符重载的�
 #################################################################
 :date: 2007-08-22 18:06
 :id: c-tricks-1-2-trap-in-comma-logical-operator
+:translation_id: c-tricks-1-2-trap-in-comma-logical-operator
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks

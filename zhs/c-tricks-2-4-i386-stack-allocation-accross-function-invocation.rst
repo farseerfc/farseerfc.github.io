@@ -2,6 +2,7 @@ C++ Tricks 2.4 I386平台C函数调用边界的栈分配
 ########################################################################################
 :date: 2007-08-28 14:28
 :id: c-tricks-2-4-i386-stack-allocation-accross-function-invocation
+:translation_id: c-tricks-2-4-i386-stack-allocation-accross-function-invocation
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks

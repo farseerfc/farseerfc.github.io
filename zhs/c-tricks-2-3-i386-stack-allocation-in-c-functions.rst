@@ -2,6 +2,7 @@ C++ Tricks 2.3 I386平台C函数内部的栈分配
 ############################################################################
 :date: 2007-08-28 14:28
 :id: c-tricks-2-3-i386-stack-allocation-in-c-functions
+:translation_id: c-tricks-2-3-i386-stack-allocation-in-c-functions
 :lang: zhs
 :tags: C++
 :series: CPP_Tricks
