@@ -104,30 +104,53 @@
 .. friend:: void001
 	:nick: `VOID 001 <https://voidisprogramer.com/>`_
 	:gravatar: zhangjianqiu13@gmail.com
-	
-	头像是夏娜，/dev/horo 绝赞开发中。	
+
+	头像是夏娜，/dev/horo 绝赞开发中。
 
 .. friend:: poi
-	:nick: `PoiScript <https://poi.works/>`_
+	:nick: `PoiScript <https://blog.poi.cat/>`_
 	:gravatar: poiscript@gmail.com
-	
-	萌萌哒 Poi ，博客引擎是自己写的 `Solomon <https://github.com/PoiScript/Solomon>`_ :del:`和我的博客是情侣色`。:del:`不过不用 Arch` 用 openSUSE。 
 
-.. friend:: amamiya
-	:nick: `雨宫千鹤 宫水三叶 <https://bismarck.moe/>`_
-	:logo: https://avatars3.githubusercontent.com/u/9009218
-	
-	:ruby:`暱称|老婆` 有点多，最近是宫水三叶，医学菊苣， :del:`白帽子` 。相当 :del:`黏人` 可爱。
+	萌萌哒 Poi ，博客引擎是自己写的 `Solomon <https://github.com/PoiScript/Solomon>`_ :del:`和我的博客是情侣色`。:del:`不过不用 Arch` 用 openSUSE。
+
+.. .. friend:: amamiya
+.. 	:nick: `雨宫千鹤 宫水三叶 <https://bismarck.moe/>`_
+.. 	:logo: https://avatars3.githubusercontent.com/u/9009218
+
+.. 	:ruby:`暱称|老婆` 有点多，最近是宫水三叶，医学菊苣， :del:`白帽子` 。相当 :del:`黏人` 可爱。
 
 .. friend:: nanpuyue
 	:nick: `南浦月 <https://blog.nanpuyue.com/links.html/>`_
 	:logo: https://avatars2.githubusercontent.com/u/1524609
-	
+
 	南老师，在线直播，声音甜美。アスナ粉，自称装机民工的 linux 桌面环境开发者。修了 powerline 的 `fontpatcher <https://github.com/nanpuyue/fontpatcher>`_ 。
 
 .. friend:: xuanwo
-	:nick: `Xuanwo <https://xuanwo.org/>`_
+	:nick: `Xuanwo <https://xuanwo.io/>`_
 	:logo: https://avatars1.githubusercontent.com/u/5351546
-	
-	漩涡的 Hugo 博客很干净也很技术，厉害的后端工程师！
 
+	漩涡的 Hugo 博客很干净也很技术，厉害的后端工程师！:del:`老婆是路人`。
+
+.. friend:: axionl
+	:nick: `艾雨寒 | 艾颖初 初等记忆体 <https://axionl.me/>`_
+	:logo: https://avatars1.githubusercontent.com/u/8396456
+
+	:ruby:`文艺的工科生|技术过硬的文科生`，萌妹体质，温柔体贴会做饭，和很多来自 AOSC 的成员一样对 Arch Linux CN 社区贡献卓著。 :ruby:`告诉|喂给` 我 :ruby:`很多人和事|成吨的狗粮`， `令人羡慕 <#amane>`_。
+
+.. friend:: amane
+	:nick: :ruby:`桜庭|さくらば`:ruby:`雨音|あまね` | :ruby:`鸢一|とびいち`:ruby:`雨音|あまね` `余忆留声机 <https://amane.live/>`_
+	:logo: https://avatars3.githubusercontent.com/u/14824064
+
+	中文说得比日文溜的日本土著，灵梦厨，日共党员毛派，军武知识丰富。被 `雨寒 <#axionl>`_ 拉入社区前是单兵游勇的 Arch 用户，霊梦式 :ruby:`シェル使い|shell编程师` 。:del:`还有很多不符年龄迷之属性不过这里写不下了`， `有归宿 <#axionl>`_ 。
+
+.. friend:: a-wing
+	:nick: `新一 metal A-wing <https://a-wing.top/>`_
+	:logo: https://avatars3.githubusercontent.com/u/18189138
+
+	:del:`前端` :del:`后端` 全栈工程师！ :del:`又是` 一个夏娜厨，亲手打造了 lilac 的打包状态页 `KISS2UI <https://build.archlinuxcn.org/packages/>`_ 。
+
+.. friend:: alynx
+	:nick: `AlynxZhou <https://sh.alynx.xyz/>`_
+	:logo: https://avatars0.githubusercontent.com/u/8444615
+
+	电磁炮厨，Hexo 的博客也很漂亮，Arch Linux CN 社区中珍贵的 Gnome 用户。喜欢 C 语言甚至在 B站 直播教学。CS:GO 玩家。
