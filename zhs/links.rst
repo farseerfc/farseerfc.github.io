@@ -161,3 +161,9 @@
 	:logo: https://avatars3.githubusercontent.com/u/23432548
 
 	深藏不露的 USTC 菊苣，似乎玩了很多 :del:`gal` game，博客更新很勤奋并且双语。萌。
+
+.. friend:: megumifox
+	:nick: `Megumi Fox 恵狐 <https://blog.megumifox.com/>`_
+	:logo: https://avatars3.githubusercontent.com/u/23371099
+
+	强调自己是新人却很快就融入了社区的恵狐酱，新搭的博客要多写内容 :del:`才不至于像我这儿这么荒废` 呀。说起来社区里有百合狐可以结伴呢。
