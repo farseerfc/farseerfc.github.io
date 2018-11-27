@@ -2,7 +2,7 @@
 <html lang="zh-Hans"
 >
 <head>
-    <title>由浅入深讲 PKGBUILD 打包 - Farseerfc的小窩</title>
+    <title>由浅入深说 PKGBUILD 打包 - Farseerfc的小窩</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,archlinux,pkgbuild,pacman" />
-        <meta name="description" content="即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能过活的用户，或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。 成为 Arch Linux 可信用户(Trusted User) 也有三个年头了，作为 TU 的日常工作，就是审阅 AUR 上用户提交的软件包，迁移优秀的包进入 community 官方源， 自然积累了些许处理 PKGBUILD 打包的经验。于是想起由浅入深介绍一下 PKGBUILD 打包过程中，我所了解到的方方面面，算对正在用和即将用 Arch Linux 的人的见面礼吧。" />
+        <meta name="description" content="包到用时方恨少，码非写过不知难 即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能存活的， 或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。 最近发现一个非常有意思的项目 Repology ， 横向对比诸多自由开源软件发行版们软件库中软件包，其中还有一张总结性的图示， 横总对比各个软件源的包数量和新旧程度。 Repology 软件源对比图 （放大） （来源） Repology 软件源对比图 可以在 Repology 的软件源对比图中找找代表 Arch Linux 和 AUR 的两个 Arch 蓝小圆点 。 Arch Linux 的小圆点 位于斜对角线左侧， AUR 的小圆点 则远居于整张图的最右侧。 从中可以看出 Arch Linux 官方源的包数量相对较少（部分是因为粗放打包策略）而更新相对及时， 另一边 AUR 的包数量就非常丰富，但更新却不那么及时了。 官方软件源提供了一个更新及时并且足够稳定的基础，在此之上利用 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
-        <meta property="og:title" content="由浅入深讲 PKGBUILD 打包"/>
+        <meta property="og:title" content="由浅入深说 PKGBUILD 打包"/>
         <meta property="og:url" content="//farseerfc.me/drafts/dissecting-pkgbuild-packagingzhs-zhs.html"/>
-        <meta property="og:description" content="即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能过活的用户，或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。 成为 Arch Linux 可信用户(Trusted User) 也有三个年头了，作为 TU 的日常工作，就是审阅 AUR 上用户提交的软件包，迁移优秀的包进入 community 官方源， 自然积累了些许处理 PKGBUILD 打包的经验。于是想起由浅入深介绍一下 PKGBUILD 打包过程中，我所了解到的方方面面，算对正在用和即将用 Arch Linux 的人的见面礼吧。"/>
+        <meta property="og:description" content="包到用时方恨少，码非写过不知难 即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能存活的， 或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。 最近发现一个非常有意思的项目 Repology ， 横向对比诸多自由开源软件发行版们软件库中软件包，其中还有一张总结性的图示， 横总对比各个软件源的包数量和新旧程度。 Repology 软件源对比图 （放大） （来源） Repology 软件源对比图 可以在 Repology 的软件源对比图中找找代表 Arch Linux 和 AUR 的两个 Arch 蓝小圆点 。 Arch Linux 的小圆点 位于斜对角线左侧， AUR 的小圆点 则远居于整张图的最右侧。 从中可以看出 Arch Linux 官方源的包数量相对较少（部分是因为粗放打包策略）而更新相对及时， 另一边 AUR 的包数量就非常丰富，但更新却不那么及时了。 官方软件源提供了一个更新及时并且足够稳定的基础，在此之上利用 …"/>
         <meta property="article:published_time" content="2018-11-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -61,7 +61,7 @@
     <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">由浅入深讲 PKGBUILD 打包 - Farseerfc的小窩</div>
+<div style="display:none" id="title">由浅入深说 PKGBUILD 打包 - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -194,18 +194,18 @@ Farseerfc的小窩            </a>
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
                 <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
-                <li class="active">由浅入深讲 PKGBUILD 打包</li>
+                <li class="active">由浅入深说 PKGBUILD 打包</li>
             </ol>
     <section id="content" class="article-content">
         <article>
             <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
                 <div class="panel-heading">
                     <h1>
-                        由浅入深讲 PKGBUILD 打包
+                        由浅入深说 PKGBUILD 打包
                         <a href="//farseerfc.me/drafts/dissecting-pkgbuild-packagingzhs-zhs.html"
                            rel="bookmark"
                            class="btn btn-primary btn-lg"
-                           title="到 由浅入深讲 PKGBUILD 打包 的永久鏈接">
+                           title="到 由浅入深说 PKGBUILD 打包 的永久鏈接">
                            <i class="mdi-action-launch"></i>
                         </a>
                     </h1>
@@ -236,9 +236,190 @@ Farseerfc的小窩            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <p>即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能过活的用户，或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。
-成为 Arch Linux 可信用户(Trusted User) 也有三个年头了，作为 TU 的日常工作，就是审阅 AUR 上用户提交的软件包，迁移优秀的包进入 community 官方源，
-自然积累了些许处理 PKGBUILD 打包的经验。于是想起由浅入深介绍一下 PKGBUILD 打包过程中，我所了解到的方方面面，算对正在用和即将用 Arch Linux 的人的见面礼吧。</p>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目錄                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id10">包到用时方恨少，码非写过不知难</a></li>
+<li><a class="reference internal" href="#easy" id="id11">EASY: 入门</a><ul>
+<li><a class="reference internal" href="#id5" id="id12">PKGBUILD 的构成要素</a></li>
+<li><a class="reference internal" href="#id8" id="id13">包的命名</a></li>
+<li><a class="reference internal" href="#id9" id="id14">包版本号</a></li>
+</ul>
+</li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<div class="section" id="id1">
+<h2><a class="toc-backref" href="#id10">包到用时方恨少，码非写过不知难</a></h2>
+<p>即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能存活的，
+或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。
+最近发现一个非常有意思的项目 <a class="reference external" href="https://repology.org/">Repology</a> ，
+横向对比诸多自由开源软件发行版们软件库中软件包，其中还有一张总结性的图示，
+横总对比各个软件源的包数量和新旧程度。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+Repology 软件源对比图 <a class="reference external" href="//farseerfc.me/images/map_repo_size_fresh.svg">（放大）</a> <a class="reference external" href="https://repology.org/repositories/graphs">（来源）</a></div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/images/map_repo_size_fresh.svg" type="image/svg+xml">
+Repology 软件源对比图</object>
+</div>
+</div>
+<p>可以在 Repology 的软件源对比图中找找代表 Arch Linux 和 AUR 的两个 Arch 蓝小圆点 <svg height="15px" viewbox="0 0 2 2" width="15px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 。
+Arch Linux 的小圆点 <svg height="15px" viewbox="0 0 2 2" width="15px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 位于斜对角线左侧， AUR 的小圆点 <svg height="15px" viewbox="0 0 2 2" width="15px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 则远居于整张图的最右侧。
+从中可以看出 Arch Linux 官方源的包数量相对较少（部分是因为粗放打包策略）而更新相对及时，
+另一边 AUR 的包数量就非常丰富，但更新却不那么及时了。
+官方软件源提供了一个更新及时并且足够稳定的基础，在此之上利用 AUR 补充可用软件包，这对于
+Arch Linux 用户来说也即是常态。</p>
+<p>AUR 不同于二进制软件源的是，它只是一个提供 PKGBUILD 脚本的共享网站。
+对于二进制软件源而言，可以直接在 <code class="code">
+/etc/pacman.conf</code>
+ 中添加，然后就可安装其中的软件，
+而对于 AUR 中的软件包，需要自行下载 PKGBUILD 并将之编译成二进制包。
+由于 AUR 上软件包维护者众多，于是打包质量也参差不齐，难免遇到一些包需要使用者手动修改
+PKGBUILD 才可正常打包。于是对于 AUR 用户而言， <strong>理解并可修改</strong> PKGBUILD
+以定制打包过程非常重要。即便使用 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR Helper</a>
+帮助自动完成打包工作，对 PKGBUILD 的理解也不可或缺。</p>
+<p>是可谓： <strong>包到用时方恨少，码非写过不知难</strong></p>
+<table class=" table-striped docutils table-hover field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">包到用时方恨少:</th><td class="field-body">很多时候想要用的包不在官方源，去 AUR 一搜虽有，却不知其打包的质量如何，更新的频度又怎样。</td>
+</tr>
+<tr class="field"><th class="field-name">码非写过不知难:</th><td class="field-body">于是从 AUR 下载下来的 PKGBUILD ，用编辑器打开，却不知从何看起，如何定制。</td>
+</tr>
+</tbody>
+</table>
+<!-- PELICAN_BEGIN_SUMMARY -->
+<p>经常有人让我写写关于 Arch Linux 中打包的经验和技巧，因此本文就旨在由浅入深地梳理一下我个人对
+PKGBUILD 打包系统的理解和体会。社区中有如 <a class="reference external" href="/links.html#felixonmars">felixonmars</a>
+这样掌管 Arch Linux 软件包近半壁江山的老前辈，有如 <a class="reference external" href="/links.html#lilydjwg">lilydjwg</a> 这样创建出 lilac
+自动打包机器人并统领 <code class="code">
+[archlinuxcn]</code>
+ 软件源的掌门人，
+也有各编程语言各编译环境专精的行家里手，
+说起打包的经验实在不敢班门弄斧地宣称涵盖打包细节的方方面面，只能说是我个人的理解和体会。</p>
+<!-- PELICAN_END_SUMMARY -->
+<p>再者， Arch Linux 的打包系统也是时时刻刻在不断变化、不断发展的，本文发布时所写的内容，
+在数月乃至数年之后可能不再适用。任何具体的打包细节都请参阅
+<a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">PKGBUILD</a> 和
+<a class="reference external" href="https://www.archlinux.org/pacman/makepkg.8.html">makepkg</a> 的相关手册页，以及
+archwiki 上相应的 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">Wiki页面</a> 。
+本文的目的仅限于对上述官方文档提供一条易于入门的脉络，不能作为技术性参考或补充。</p>
+<p>好，废话码了一屏，尚未见半句干货，就跟我一起从最基础的部分开始吧。</p>
+</div>
+<div class="section" id="easy">
+<h2><a class="toc-backref" href="#id11">EASY: 入门</a></h2>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id12">PKGBUILD 的构成要素</a></h3>
+<p>太抽象的说明不易理解，先看一段相对简单的 PKGBUILD 吧：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># Maintainer: Jiachen Yang &lt;farseerfc@archlinux.org&gt;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">pkgname</span><span class="o">=</span>pdfpc</span>
+<span class="code-line"><span class="nv">pkgver</span><span class="o">=</span><span class="m">4</span>.2.1</span>
+<span class="code-line"><span class="nv">pkgrel</span><span class="o">=</span><span class="m">1</span></span>
+<span class="code-line"><span class="nv">pkgdesc</span><span class="o">=</span><span class="s1">'A presenter console with multi-monitor support for PDF files'</span></span>
+<span class="code-line"><span class="nv">arch</span><span class="o">=(</span><span class="s1">'x86_64'</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">url</span><span class="o">=</span><span class="s1">'https://pdfpc.github.io/'</span></span>
+<span class="code-line"><span class="nv">license</span><span class="o">=(</span><span class="s1">'GPL'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">depends</span><span class="o">=(</span><span class="s1">'gtk3'</span> <span class="s1">'poppler-glib'</span> <span class="s1">'libgee'</span> <span class="s1">'gstreamer'</span> <span class="s1">'gst-plugins-base'</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">makedepends</span><span class="o">=(</span><span class="s1">'cmake'</span> <span class="s1">'vala'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">source</span><span class="o">=(</span><span class="s2">"</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">.tar.gz::https://github.com/pdfpc/pdfpc/archive/v</span><span class="nv">$pkgver</span><span class="s2">.tar.gz"</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">sha256sums</span><span class="o">=(</span><span class="s1">'f67eedf092a9bc275dde312f3166063a2e88569f030839efc211127245be6df8'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line">build<span class="o">()</span> <span class="o">{</span></span>
+<span class="code-line">    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$srcdir</span><span class="s2">/</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">"</span></span>
+<span class="code-line">    cmake  -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="s2">"/usr/"</span> -DSYSCONFDIR<span class="o">=</span><span class="s2">"/etc"</span> .</span>
+<span class="code-line">    make</span>
+<span class="code-line"><span class="o">}</span></span>
+<span class="code-line"></span>
+<span class="code-line">package<span class="o">()</span> <span class="o">{</span></span>
+<span class="code-line">    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$srcdir</span><span class="s2">/</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">"</span></span>
+<span class="code-line">    make <span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$pkgdir</span><span class="s2">/"</span> install</span>
+<span class="code-line"><span class="o">}</span></span>
+</pre></div>
+<p>以上是我对 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a>
+这个软件打包的 PKGBUILD 稍作简化，拿来作为最开始的例子。 PKGBUILD
+文件的格式本质上是 bash 脚本，语法遵从 bash 语言，只不过有些预先确定好的内容需要撰写。
+粗看上面的 PKGBUILD 大体可以分为两半，前一半 3~15 行定义了很多变量和数组，后一半 17~26
+行定义了一些函数。这也即是说， PKGBUILD 包含两大块内容：</p>
+<ol class="arabic simple">
+<li>该包是什么，也即包的元数据(metadata）</li>
+<li>当如何打包，也即打包的过程</li>
+</ol>
+<p>其中包的元数据又可大体分为三段：</p>
+<ol class="arabic simple">
+<li>对包的描述性数据。对应上面 3~9 行的内容。这里写这个包叫什么名字，版本是什么，协议用什么……</li>
+<li>这个包与其它包的关系。对应上面 11,12 行。这里写这个包依赖哪些包，提供哪些虚包……</li>
+<li>包的源代码位置。对应上面 14,15 行。这里描述这个包从什么地方下载，下载到的文件校验，上游签名……</li>
+</ol>
+<p>这些元数据以 bash 脚本中定义的 变量(variable) 和 数组(array) 的方式描述。应当定义哪些，
+每个数据的含义，在 <a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">手册页</a>
+和 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">Wiki页</a> 都有详尽介绍，
+下文要具体说明的内容也会相应补充。</p>
+<p>随后打包过程则是以确定名称的 bash 函数(function) 的形式描述。在函数体内直接书写脚本。
+一个包至少需要定义 <code class="code">
+package()</code>
+ 函数，它用来写「安装」文件的步骤。
+如果是用编译型语言编写的软件，那么也应该有 <code class="code">
+build()</code>
+ 函数，用来写 配置(configure)
+和编译的步骤。</p>
+<p>PKGBUILD 一开始有一行注释以 <code class="code">
+Maintainer:</code>
+ 开头，这里描述这个 PKGBUILD
+的维护者信息，算作是记录对打包贡献，同时也在打包出问题时留下联络方式。如果 PKGBUILD
+经手多人，通常当前的维护者写在 <code class="code">
+Maintainer:</code>
+ 中，其余的贡献者写作
+<code class="code">
+Contributor:</code>
+ 。这些信息虽然在 AUR 网页界面中也有所记录，不过留下注释也可算作补充。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id13">包的命名</a></h3>
+<p>第3行 <code class="code">
+pkgname</code>
+ 定义了包的名字，这个变量的值应当和 AUR 上提交的软件包相同，
+也应尽量符合上游对项目的命名。定义包名同时也应尽量符合 Arch Linux 中现有软件包的命名方式，
+并且在 AUR 上提交的软件包名还有些额外约定俗成的规则：</p>
+<ul class="simple">
+<li>如果是编译自版本控制系统(VCS, Version Control System)中检出的最新源代码，
+应该在上游项目名后添加 <code class="code">
+-vcs</code>
+ 后缀。比如由 <code class="code">
+git clone</code>
+ 得到的 GitHub
+上寄宿的上游软件通常会有 <code class="code">
+-git</code>
+ 这样的后缀。</li>
+<li>如果是对现有二进制做重新打包，应该在上游项目名后添加 <code class="code">
+-bin</code>
+ 后缀。比如上游发布了用于
+Debian 系统的二进制包，想要重新打包成可用于 Arch Linux 的包，则要加 <code class="code">
+-bin</code>
+ 后缀。</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id14">包版本号</a></h3>
+<p>版本号由3个变量描述 <code class="code">
+epoch</code>
+, <code class="code">
+pkgver</code>
+, <code class="code">
+pkgrel</code>
+。</p>
+</div>
+</div>
 
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
@@ -758,6 +939,25 @@ Farseerfc的小窩            </a>
 </div>
     </div>
 </section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目錄</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id10">包到用时方恨少，码非写过不知难</a></li>
+<li><a class="reference internal" href="#easy" id="id11">EASY: 入门</a><ul>
+<li><a class="reference internal" href="#id5" id="id12">PKGBUILD 的构成要素</a></li>
+<li><a class="reference internal" href="#id8" id="id13">包的命名</a></li>
+<li><a class="reference internal" href="#id9" id="id14">包版本号</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            </div>
+        </div>
             </aside>
         </div>
     </div>
