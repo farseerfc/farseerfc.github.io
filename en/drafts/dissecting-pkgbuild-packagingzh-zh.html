@@ -2,7 +2,7 @@
 <html lang="zh-Hant"
 >
 <head>
-    <title>深入淺出講 PKGBUILD 打包 - Farseerfc's Nest</title>
+    <title>由淺入深講 PKGBUILD 打包 - Farseerfc's Nest</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,archlinux,pkgbuild,pacman" />
-        <meta name="description" content="即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能過活的用戶，或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 成爲 Arch Linux 可信用戶(Trusted User) 也有三個年頭了，作爲 TU 的日常工作，就是審閱 AUR 上用戶提交的軟件包，遷移優秀的包進入 community 官方源， 自然積累了些許處理 PKGBUILD 打包的經驗。" />
+        <meta name="description" content="即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能過活的用戶，或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 成爲 Arch Linux 可信用戶(Trusted User) 也有三個年頭了，作爲 TU 的日常工作，就是審閱 AUR 上用戶提交的軟件包，遷移優秀的包進入 community 官方源， 自然積累了些許處理 PKGBUILD 打包的經驗。於是想起由淺入深介紹一下 PKGBUILD 打包過程中，我所瞭解到的方方面面，算對正在用和即將用 Arch Linux 的人的見面禮吧。" />
 
         <meta property="og:site_name" content="Farseerfc's Nest" />
         <meta property="og:type" content="article"/>
-        <meta property="og:title" content="深入淺出講 PKGBUILD 打包"/>
+        <meta property="og:title" content="由淺入深講 PKGBUILD 打包"/>
         <meta property="og:url" content="//farseerfc.me/en/drafts/dissecting-pkgbuild-packagingzh-zh.html"/>
-        <meta property="og:description" content="即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能過活的用戶，或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 成爲 Arch Linux 可信用戶(Trusted User) 也有三個年頭了，作爲 TU 的日常工作，就是審閱 AUR 上用戶提交的軟件包，遷移優秀的包進入 community 官方源， 自然積累了些許處理 PKGBUILD 打包的經驗。"/>
+        <meta property="og:description" content="即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能過活的用戶，或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 成爲 Arch Linux 可信用戶(Trusted User) 也有三個年頭了，作爲 TU 的日常工作，就是審閱 AUR 上用戶提交的軟件包，遷移優秀的包進入 community 官方源， 自然積累了些許處理 PKGBUILD 打包的經驗。於是想起由淺入深介紹一下 PKGBUILD 打包過程中，我所瞭解到的方方面面，算對正在用和即將用 Arch Linux 的人的見面禮吧。"/>
         <meta property="article:published_time" content="2018-11-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -61,7 +61,7 @@
     <link href="//farseerfc.me/en/../theme/css/github-markdown.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">深入淺出講 PKGBUILD 打包 - Farseerfc's Nest</div>
+<div style="display:none" id="title">由淺入深講 PKGBUILD 打包 - Farseerfc's Nest</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -188,18 +188,18 @@ Farseerfc's Nest            </a>
             <ol class="breadcrumb">
                 <li><a href="//farseerfc.me/en/" title="Farseerfc's Nest"><i class="fa fa-home fa-lg"></i></a></li>
                 <li><a href="//farseerfc.me/en/category/tech.html" title="tech">tech</a></li>
-                <li class="active">深入淺出講 PKGBUILD 打包</li>
+                <li class="active">由淺入深講 PKGBUILD 打包</li>
             </ol>
     <section id="content" class="article-content">
         <article>
             <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
                 <div class="panel-heading">
                     <h1>
-                        深入淺出講 PKGBUILD 打包
+                        由淺入深講 PKGBUILD 打包
                         <a href="//farseerfc.me/en/drafts/dissecting-pkgbuild-packagingzh-zh.html"
                            rel="bookmark"
                            class="btn btn-primary btn-lg"
-                           title="Permalink to 深入淺出講 PKGBUILD 打包">
+                           title="Permalink to 由淺入深講 PKGBUILD 打包">
                            <i class="mdi-action-launch"></i>
                         </a>
                     </h1>
@@ -232,7 +232,7 @@ Farseerfc's Nest            </a>
             <div class="entry-content jumbotron" id="article-content">
                 <p>即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能過活的用戶，或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。
 成爲 Arch Linux 可信用戶(Trusted User) 也有三個年頭了，作爲 TU 的日常工作，就是審閱 AUR 上用戶提交的軟件包，遷移優秀的包進入 community 官方源，
-自然積累了些許處理 PKGBUILD 打包的經驗。</p>
+自然積累了些許處理 PKGBUILD 打包的經驗。於是想起由淺入深介紹一下 PKGBUILD 打包過程中，我所瞭解到的方方面面，算對正在用和即將用 Arch Linux 的人的見面禮吧。</p>
 
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
