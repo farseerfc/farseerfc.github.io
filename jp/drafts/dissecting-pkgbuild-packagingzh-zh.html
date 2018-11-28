@@ -237,11 +237,12 @@ Farseerfcの巣            </a>
                         <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id10">包到用時方恨少，碼非寫過不知難</a></li>
-<li><a class="reference internal" href="#easy" id="id11">EASY: 入門</a><ul>
-<li><a class="reference internal" href="#id5" id="id12">PKGBUILD 的構成要素</a></li>
-<li><a class="reference internal" href="#id8" id="id13">包的命名</a></li>
-<li><a class="reference internal" href="#id9" id="id14">包版本號</a></li>
+<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY: 獲取、審閱、使用</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id8" id="id16">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id11" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id12" id="id18">包版本號</a></li>
 </ul>
 </li>
 </ul>
@@ -250,7 +251,7 @@ Farseerfcの巣            </a>
                     </div>
                 
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id10">包到用時方恨少，碼非寫過不知難</a></h2>
+<h2><a class="toc-backref" href="#id13">包到用時方恨少，碼非寫過不知難</a></h2>
 <p>即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的，
 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。
 最近發現一個非常有意思的項目 <a class="reference external" href="https://repology.org/">Repology</a> ，
@@ -309,10 +310,70 @@ archwiki 上相應的 <a class="reference external" href="https://wiki.archlinux
 <p>好，廢話碼了一屏，尚未見半句乾貨，就跟我一起從最基礎的部分開始吧。</p>
 </div>
 <div class="section" id="easy">
-<h2><a class="toc-backref" href="#id11">EASY: 入門</a></h2>
+<h2><a class="toc-backref" href="#id14">EASY: 獲取、審閱、使用</a></h2>
+<p>講解 PKGBUILD 之前，想先大概看看 PKGBUILD 長什麼樣子。 AUR 上有大量 PKGBUILD
+可以下載， Arch Linux 官方源中打包的官方包也有提供公開渠道下載打包時採用的 PKGBUILD
+，這些都可以拿來作爲參考。</p>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id12">PKGBUILD 的構成要素</a></h3>
-<p>太抽象的說明不易理解，先看一段相對簡單的 PKGBUILD 吧：</p>
+<h3><a class="toc-backref" href="#id15">獲取現有的 PKGBUILD</a></h3>
+<p>於是第一步，如何獲取 AUR 或者官方源中包的 PKGBUID 呢？或許 Arch Linux 老用戶們已經很熟悉
+<a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helper</a> 和
+<a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Build_System">Arch Build System</a>
+那一套了，每個人可能都有兩三個自己趁手的常用工具。不過其實，大概從3年前
+<a class="reference external" href="https://github.com/lfos/aurweb/releases/tag/v4.0.0">AUR web v4</a>
+發佈開始，已經不需要專用工具，直接用 <code class="code">
+git</code>
+ 就可以很方便地下載到
+官方源和 AUR 中的 PKGBUILD 。</p>
+<p>對於 Arch Linux 官方源中的軟件包，根據它是來自 [core]/[extra] 還是來自 [community]
+我們可以用以下方式獲取對應的 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 獲取 core/extra 中包名爲 glibc 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone https://git.archlinux.org/svntogit/packages.git/ -b packages/glibc --single-branch glibc</span>
+<span class="code-line"><span class="c1"># 獲取 community 中包名爲 pdfpc 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone https://git.archlinux.org/svntogit/community.git/ -b packages/pdfpc --single-branch pdfpc</span>
+</pre></div>
+<p>對於官方源中的包，以上方式 clone 到的目錄結構是這樣：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>pdfpc</span>
+<span class="code-line">├── repos</span>
+<span class="code-line">│   └── community-x86_64</span>
+<span class="code-line">│       └── PKGBUILD</span>
+<span class="code-line">└── trunk</span>
+<span class="code-line">    └── PKGBUILD</span>
+</pre></div>
+<p>其中 trunk 文件夾用於時機打包， repos 文件夾則用於跟蹤這個包發佈在哪些具體倉庫中。
+由於區分倉庫狀態和架構，以前還在支持 i686 的時候，打出的包可能位於
+<code class="code">
+community-testing-i686</code>
+ 或者 <code class="code">
+community-staging-x86_64</code>
+
+這樣的文件夾中。這些細節不需要關心，我們只需要 <code class="code">
+trunk</code>
+ 中的文件就可以打包了。</p>
+<p>對於 AUR 中的軟件包，可以直接用以下方式獲取 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 獲取 AUR 中包名爲 pdfpc-git 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone aur@aur.archlinux.org:pdfpc-git.git</span>
+</pre></div>
+<p>不同於官方源， AUR 中包沒有深層的目錄結構，直接在文件夾中放有 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>pdfpc-git</span>
+<span class="code-line">└── PKGBUILD</span>
+</pre></div>
+<p>爲了方便鍵入， 在我的 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.bashrc#L72-L105">bash/zsh 配置中</a>
+提供了幾個函數 <code class="code">
+Ge</code>
+<code class="code">
+Gc</code>
+<code class="code">
+Ga</code>
+ 分別用於獲取 [core]/[extra]，
+[community] 或是 AUR 中的 PKGBUILD ，需要的可以自己取用，對於 zsh 用戶還有這些命令的
+<a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.zshrc#L36-L38">自動補全包名</a> 。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id16">PKGBUILD 的構成要素</a></h3>
+<p>拿到了 PKGBUILD ，就先用文本編輯器打開它看一眼吧，以
+<a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a> 的
+PKGBUILD 爲例：</p>
 <div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># Maintainer: Jiachen Yang &lt;farseerfc@archlinux.org&gt;</span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="nv">pkgname</span><span class="o">=</span>pdfpc</span>
@@ -340,11 +401,9 @@ archwiki 上相應的 <a class="reference external" href="https://wiki.archlinux
 <span class="code-line">    make <span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$pkgdir</span><span class="s2">/"</span> install</span>
 <span class="code-line"><span class="o">}</span></span>
 </pre></div>
-<p>以上是我對 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a>
-這個軟件打包的 PKGBUILD 稍作簡化，拿來作爲最開始的例子。 PKGBUILD
-文件的格式本質上是 bash 腳本，語法遵從 bash 語言，只不過有些預先確定好的內容需要撰寫。
+<p>PKGBUILD 文件的格式本質上是 bash 腳本，語法遵從 bash 腳本語言，只不過有些預先確定好的內容需要撰寫。
 粗看上面的 PKGBUILD 大體可以分爲兩半，前一半 3~15 行定義了很多變量和數組，後一半 17~26
-行定義了一些函數。這也即是說， PKGBUILD 包含兩大塊內容：</p>
+行定義了一些函數。也即是說， PKGBUILD 包含兩大塊內容：</p>
 <ol class="arabic simple">
 <li>該包是什麼，也即包的元數據(metadata）</li>
 <li>當如何打包，也即打包的過程</li>
@@ -378,8 +437,8 @@ Maintainer:</code>
 Contributor:</code>
  。這些信息雖然在 AUR 網頁界面中也有所記錄，不過留下註釋也可算作補充。</p>
 </div>
-<div class="section" id="id8">
-<h3><a class="toc-backref" href="#id13">包的命名</a></h3>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id17">包的命名</a></h3>
 <p>第3行 <code class="code">
 pkgname</code>
  定義了包的名字，這個變量的值應當和 AUR 上提交的軟件包相同，
@@ -403,8 +462,8 @@ Debian 系統的二進制包，想要重新打包成可用於 Arch Linux 的包�
  後綴。</li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h3><a class="toc-backref" href="#id14">包版本號</a></h3>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id18">包版本號</a></h3>
 <p>版本號由3個變量描述 <code class="code">
 epoch</code>
 , <code class="code">
@@ -658,11 +717,12 @@ farseerfc に連絡</a>
             <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id10">包到用時方恨少，碼非寫過不知難</a></li>
-<li><a class="reference internal" href="#easy" id="id11">EASY: 入門</a><ul>
-<li><a class="reference internal" href="#id5" id="id12">PKGBUILD 的構成要素</a></li>
-<li><a class="reference internal" href="#id8" id="id13">包的命名</a></li>
-<li><a class="reference internal" href="#id9" id="id14">包版本號</a></li>
+<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY: 獲取、審閱、使用</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id8" id="id16">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id11" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id12" id="id18">包版本號</a></li>
 </ul>
 </li>
 </ul>
