@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="linux,archlinux,pkgbuild,pacman" />
-        <meta name="description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 橫向對比諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …" />
+        <meta name="description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="由淺入深說 PKGBUILD 打包"/>
         <meta property="og:url" content="//farseerfc.me/jp/drafts/dissecting-pkgbuild-packagingzh-zh.html"/>
-        <meta property="og:description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 橫向對比諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …"/>
+        <meta property="og:description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …"/>
         <meta property="article:published_time" content="2018-11-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="linux" />
@@ -237,12 +237,12 @@ Farseerfcの巣            </a>
                         <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
-<li><a class="reference internal" href="#easy" id="id14">EASY: 獲取、審閱、使用</a><ul>
-<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
-<li><a class="reference internal" href="#id8" id="id16">PKGBUILD 的構成要素</a></li>
-<li><a class="reference internal" href="#id11" id="id17">包的命名</a></li>
-<li><a class="reference internal" href="#id12" id="id18">包版本號</a></li>
+<li><a class="reference internal" href="#id1" id="id11">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id12">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id13">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id14">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id15">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id16">包版本號</a></li>
 </ul>
 </li>
 </ul>
@@ -251,11 +251,11 @@ Farseerfcの巣            </a>
                     </div>
                 
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id13">包到用時方恨少，碼非寫過不知難</a></h2>
+<h2><a class="toc-backref" href="#id11">包到用時方恨少，碼非寫過不知難</a></h2>
 <p>即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的，
 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。
 最近發現一個非常有意思的項目 <a class="reference external" href="https://repology.org/">Repology</a> ，
-橫向對比諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示，
+總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示，
 橫總對比各個軟件源的包數量和新舊程度。</p>
 <div class="panel panel-default">
 <div class="panel-heading">
@@ -278,7 +278,7 @@ Arch Linux 用戶來說也即是常態。</p>
 而對於 AUR 中的軟件包，需要自行下載 PKGBUILD 並將之編譯成二進制包。
 由於 AUR 上軟件包維護者衆多，於是打包質量也參差不齊，難免遇到一些包需要使用者手動修改
 PKGBUILD 纔可正常打包。於是對於 AUR 用戶而言， <strong>理解並可修改</strong> PKGBUILD
-以定製打包過程非常重要。即便使用 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR Helper</a>
+以定製打包過程非常重要。即便使用 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_Helpers">AUR Helpers</a>
 幫助自動完成打包工作，對 PKGBUILD 的理解也不可或缺。</p>
 <p>是可謂： <strong>包到用時方恨少，碼非寫過不知難</strong></p>
 <table class=" table-striped docutils table-hover field-list table" frame="void" rules="none">
@@ -305,21 +305,19 @@ PKGBUILD 打包系統的理解和體會。社區中有如 <a class="reference ex
 在數月乃至數年之後可能不再適用。任何具體的打包細節都請參閱
 <a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">PKGBUILD</a> 和
 <a class="reference external" href="https://www.archlinux.org/pacman/makepkg.8.html">makepkg</a> 的相關手冊頁，以及
-archwiki 上相應的 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">Wiki頁面</a> 。
+archwiki 上相應的 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">PKGBUILD</a> 。
 本文的目的僅限於對上述官方文檔提供一條易於入門的脈絡，不能作爲技術性參考或補充。</p>
 <p>好，廢話碼了一屏，尚未見半句乾貨，就跟我一起從最基礎的部分開始吧。</p>
 </div>
 <div class="section" id="easy">
-<h2><a class="toc-backref" href="#id14">EASY: 獲取、審閱、使用</a></h2>
+<h2><a class="toc-backref" href="#id12">EASY</a></h2>
 <p>講解 PKGBUILD 之前，想先大概看看 PKGBUILD 長什麼樣子。 AUR 上有大量 PKGBUILD
 可以下載， Arch Linux 官方源中打包的官方包也有提供公開渠道下載打包時採用的 PKGBUILD
-，這些都可以拿來作爲參考。</p>
+，這些都可以拿來作爲參考。於是作爲第一步，如何獲取 AUR 或者官方源中包的 PKGBUID 呢？</p>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id15">獲取現有的 PKGBUILD</a></h3>
-<p>於是第一步，如何獲取 AUR 或者官方源中包的 PKGBUID 呢？或許 Arch Linux 老用戶們已經很熟悉
-<a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helper</a> 和
-<a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Build_System">Arch Build System</a>
-那一套了，每個人可能都有兩三個自己趁手的常用工具。不過其實，大概從3年前
+<h3><a class="toc-backref" href="#id13">獲取現有的 PKGBUILD</a></h3>
+<p>Arch Linux 老用戶們已經很熟悉 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helpers</a> 和 <a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Build_System&gt;">Arch Build System&gt;</a>
+那一套了，每個人可能都有兩三個自己趁手的常用 AUR helper 自動化打包。不過其實，大概從3年前
 <a class="reference external" href="https://github.com/lfos/aurweb/releases/tag/v4.0.0">AUR web v4</a>
 發佈開始，已經不需要專用工具，直接用 <code class="code">
 git</code>
@@ -369,8 +367,8 @@ Ga</code>
 [community] 或是 AUR 中的 PKGBUILD ，需要的可以自己取用，對於 zsh 用戶還有這些命令的
 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.zshrc#L36-L38">自動補全包名</a> 。</p>
 </div>
-<div class="section" id="id8">
-<h3><a class="toc-backref" href="#id16">PKGBUILD 的構成要素</a></h3>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id14">PKGBUILD 的構成要素</a></h3>
 <p>拿到了 PKGBUILD ，就先用文本編輯器打開它看一眼吧，以
 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a> 的
 PKGBUILD 爲例：</p>
@@ -411,15 +409,14 @@ PKGBUILD 爲例：</p>
 <p>其中包的元數據又可大體分爲三段：</p>
 <ol class="arabic simple">
 <li>對包的描述性數據。對應上面 3~9 行的內容。這裏寫這個包叫什麼名字，版本是什麼，協議用什麼……</li>
-<li>這個包與其它包的關係。對應上面 11,12 行。這裏寫這個包依賴哪些包，提供哪些虛包……</li>
+<li>這個包與其它包的關係。對應上面 11,12 行。這裏寫這個包依賴哪些包，提供哪些虛包，位於什麼包組……</li>
 <li>包的源代碼位置。對應上面 14,15 行。這裏描述這個包從什麼地方下載，下載到的文件校驗，上游簽名……</li>
 </ol>
 <p>這些元數據以 bash 腳本中定義的 變量(variable) 和 數組(array) 的方式描述。應當定義哪些，
 每個數據的含義，在 <a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">手冊頁</a>
-和 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">Wiki頁</a> 都有詳盡介紹，
-下文要具體說明的內容也會相應補充。</p>
+和 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">PKGBUILD</a> 都有詳盡介紹，下文要具體說明的內容也會相應補充。</p>
 <p>隨後打包過程則是以確定名稱的 bash 函數(function) 的形式描述。在函數體內直接書寫腳本。
-一個包至少需要定義 <code class="code">
+一個包至少需要定義一個 <code class="code">
 package()</code>
  函數，它用來寫「安裝」文件的步驟。
 如果是用編譯型語言編寫的軟件，那麼也應該有 <code class="code">
@@ -437,8 +434,8 @@ Maintainer:</code>
 Contributor:</code>
  。這些信息雖然在 AUR 網頁界面中也有所記錄，不過留下註釋也可算作補充。</p>
 </div>
-<div class="section" id="id11">
-<h3><a class="toc-backref" href="#id17">包的命名</a></h3>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id15">包的命名</a></h3>
 <p>第3行 <code class="code">
 pkgname</code>
  定義了包的名字，這個變量的值應當和 AUR 上提交的軟件包相同，
@@ -460,10 +457,46 @@ git clone</code>
 Debian 系統的二進制包，想要重新打包成可用於 Arch Linux 的包，則要加 <code class="code">
 -bin</code>
  後綴。</li>
+<li>對於特定語言需要的庫，通常會有語言名作爲前綴。不過這個規則的特例是，如果這個庫同時也在
+<code class="code">
+/usr/bin</code>
+ 中提供可執行的命令，那麼包名可以沒有前綴，或者對包進行拆包，
+把庫和可執行命令分列在不同的包裏。一個例子是 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/powerline/">powerline</a>
+包提供可執行程序，而它依賴的 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/python-powerline/">python-powerline</a> 則提供 python 的庫。</li>
+<li>對於 Arch Linux 官方源中已經有的軟件包，如果想稍作修改之後將修改版共享在 AUR
+，那麼通常 AUR 上的包名會是在官方源中對應包的包名，加上簡短的單詞描述所做的修改。
+比如 <a class="reference external" href="https://aur.archlinux.org/packages/telegram-desktop-systemqt-notoemoji/">telegram-desktop-systemqt-notoemoji</a> 就是對官方源中
+<a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/telegram-desktop/">telegram-desktop</a> 基礎上換用 NotoEmoji 的修改。
+並且實際上官方源的 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/telegram-desktop/">telegram-desktop</a> 曾經在 AUR 中叫
+<a class="reference external" href="https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=telegram-desktop-systemqt">telegram-desktop-systemqt</a>
+，因爲有來自 Debian 的 SystemQt 補丁。在被移入官方源之後去掉了 <code class="code">
+-systemqt</code>
+ 後綴。</li>
 </ul>
+<div class="panel panel-default">
+<div class="panel-heading">
+一些有趣的包名字符統計</div>
+<div class="panel-body">
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> <span class="c1"># 三個官方源總體包數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Slq core extra community <span class="p">|</span> wc -l</span>
+<span class="code-line"><span class="go">10225</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 有小寫字母、數字、短橫、點之外的包名數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9.]"</span> -c</span>
+<span class="code-line"><span class="go">192</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 有小寫字母、數字、短橫、點、下劃線、加號之外的包名數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9._+]"</span> -c</span>
+<span class="code-line"><span class="go">4</span></span>
+</pre></div>
 </div>
-<div class="section" id="id12">
-<h3><a class="toc-backref" href="#id18">包版本號</a></h3>
+</div>
+<p>另外關於包名中可以使用的字符，從原理上來說只要是 bash 函數名中可以使用的字符，
+都可以在包名中使用。不過一般來說，包名的字符會符合 Arch Linux 官方源中現有的包名的命名風格。
+絕大多數包名是 <strong>純小寫字母</strong> 加上 <strong>數字或者點(.)</strong> ，單詞之間用短橫(-) 分隔。
+另外還有少數包名中出現大寫字母或者下劃線分隔，或者 C++ 相關的包名中出現加號(+)。</p>
+<p>對包命名的基本原則是好記好搜，如果知道上游項目的名字，應該能很方便地搜到包對應的名字。</p>
+</div>
+<div class="section" id="id10">
+<h3><a class="toc-backref" href="#id16">包版本號</a></h3>
 <p>版本號由3個變量描述 <code class="code">
 epoch</code>
 , <code class="code">
@@ -717,12 +750,12 @@ farseerfc に連絡</a>
             <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
-<li><a class="reference internal" href="#easy" id="id14">EASY: 獲取、審閱、使用</a><ul>
-<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
-<li><a class="reference internal" href="#id8" id="id16">PKGBUILD 的構成要素</a></li>
-<li><a class="reference internal" href="#id11" id="id17">包的命名</a></li>
-<li><a class="reference internal" href="#id12" id="id18">包版本號</a></li>
+<li><a class="reference internal" href="#id1" id="id11">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id12">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id13">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id14">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id15">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id16">包版本號</a></li>
 </ul>
 </li>
 </ul>
