@@ -173,3 +173,9 @@
 	:logo: https://avatars3.githubusercontent.com/u/34709816
 
 	说话萌萌哒总觉得是个萌妹子，自称是一位 :ruby:`奥术师|Arcanist` ， :ruby:`精神|神经` Arch 用户， rust 使い。
+
+.. friend:: kiri
+	:nick: `Kiri <https://kirikira.moe/>`_
+	:logo: https://avatars0.githubusercontent.com/u/32393884
+
+	萌到鬼触 :del:`（？）` 的 Kiri ，Python使い， :ruby:`圆角|赚钱钱` 大佬，萌点见博客 Love Kiri 。
