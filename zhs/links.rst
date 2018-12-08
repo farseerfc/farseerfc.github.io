@@ -179,3 +179,9 @@
 	:logo: https://avatars0.githubusercontent.com/u/32393884
 
 	萌到鬼触 :del:`（？）` 的 Kiri ，Python使い， :ruby:`圆角|赚钱钱` 大佬，萌点见博客 Love Kiri 。
+
+.. friend:: saltedfish
+	:nick: `咸鱼大佬 <https://v2bv.net/>`_
+	:logo: https://avatars1.githubusercontent.com/u/16459559
+
+	说是咸鱼，本质非常大佬，混迹 AOSC ，善用 Gentoo 。手持大量稀奇设备。RAmen 教徒 :del:`所以是敌人` 。
