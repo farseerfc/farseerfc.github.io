@@ -307,17 +307,17 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 <strong>暂时</strong> 测试的目的下我写的 <code class="code">
 .travis.yml</code>
  大概是下面这样。</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="l l-Scalar l-Scalar-Plain">python</span><span class="p p-Indicator">:</span></span>
+<span class="code-line"><span class="nt">python</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="s">"2.7"</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="l l-Scalar l-Scalar-Plain">before_install</span><span class="p p-Indicator">:</span></span>
+<span class="code-line"><span class="nt">before_install</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-add-repository ppa:chris-lea/node.js -y</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-get update</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-get install nodejs ditaa doxygen parallel</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="l l-Scalar l-Scalar-Plain">install</span><span class="p p-Indicator">:</span></span>
+<span class="code-line"><span class="nt">install</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install pelican</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install jinja2</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install babel</span></span>
@@ -338,7 +338,7 @@ Android 的 <a class="reference external" href="https://code.google.com/p/androi
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo locale-gen en_US.UTF-8</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo locale-gen ja_JP.UTF-8</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span></span>
+<span class="code-line"><span class="nt">script</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">mkdir output</span></span>
@@ -434,12 +434,12 @@ travis status</code>
 把这串散列写入刚才的 <code class="code">
 .travis.yml</code>
  文件：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span></span>
-<span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secure</span><span class="p p-Indicator">:</span> <span class="s">"long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string"</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nt">env</span><span class="p">:</span></span>
+<span class="code-line">    <span class="p p-Indicator">-</span> <span class="nt">secure</span><span class="p">:</span> <span class="s">"long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string"</span></span>
 </pre></div>
 <p>有了这段声明之后， Travis-CI 就会在每次编译之前，设置上面加密的环境变量。
 然后在编译脚本中利用这些环境变量来生成博客：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="nt">script</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.email "$GIT_EMAIL"</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.name "$GIT_NAME"</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global push.default simple</span></span>
@@ -448,7 +448,7 @@ travis status</code>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">env SITEURL="farseerfc.me" make publish</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="l l-Scalar l-Scalar-Plain">after_success</span><span class="p p-Indicator">:</span></span>
+<span class="code-line"><span class="nt">after_success</span><span class="p">:</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cd output</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git add -A .</span></span>
 <span class="code-line">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git commit -m "update from travis"</span></span>

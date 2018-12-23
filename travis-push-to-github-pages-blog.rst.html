@@ -80,17 +80,17 @@ Android 的 SL4A_ 環境下的 python 中跑 pelican ，還要配合一個
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+	<span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">python</span><span class="p p-Indicator">:</span>
+	<span class="nt">python</span><span class="p">:</span>
 	    <span class="p p-Indicator">-</span> <span class="s">&quot;2.7&quot;</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">before_install</span><span class="p p-Indicator">:</span>
+	<span class="nt">before_install</span><span class="p">:</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-add-repository ppa:chris-lea/node.js -y</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-get update</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo apt-get install nodejs ditaa doxygen parallel</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">install</span><span class="p p-Indicator">:</span>
+	<span class="nt">install</span><span class="p">:</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install pelican</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install jinja2</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo pip install babel</span>
@@ -111,7 +111,7 @@ Android 的 SL4A_ 環境下的 python 中跑 pelican ，還要配合一個
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo locale-gen en_US.UTF-8</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sudo locale-gen ja_JP.UTF-8</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span>
+	<span class="nt">script</span><span class="p">:</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-plugins plugins</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://github.com/farseerfc/pelican-bootstrap3 theme</span>
 	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">mkdir output</span>
@@ -213,15 +213,15 @@ ssh key 添加到 github 賬戶就可以了，在編譯細節都通過 github re
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
 
-	<span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span>
-	    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secure</span><span class="p p-Indicator">:</span> <span class="s">&quot;long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string&quot;</span>
+	<span class="nt">env</span><span class="p">:</span>
+	    <span class="p p-Indicator">-</span> <span class="nt">secure</span><span class="p">:</span> <span class="s">&quot;long</span><span class="nv"> </span><span class="s">secure</span><span class="nv"> </span><span class="s">base64</span><span class="nv"> </span><span class="s">string&quot;</span>
 
 有了這段聲明之後， Travis-CI 就會在每次編譯之前，設置上面加密的環境變量。
 然後在編譯腳本中利用這些環境變量來生成博客：
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">yaml</span>
 
-  <span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span>
+  <span class="nt">script</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.email &quot;$GIT_EMAIL&quot;</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global user.name &quot;$GIT_NAME&quot;</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git config --global push.default simple</span>
@@ -230,7 +230,7 @@ ssh key 添加到 github 賬戶就可以了，在編譯細節都通過 github re
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git clone --depth 1 https://$GH_TOKEN@github.com/farseerfc/farseerfc.github.io output</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">env SITEURL=&quot;farseerfc.me&quot; make publish</span>
 
-  <span class="l l-Scalar l-Scalar-Plain">after_success</span><span class="p p-Indicator">:</span>
+  <span class="nt">after_success</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cd output</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git add -A .</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">git commit -m &quot;update from travis&quot;</span>
