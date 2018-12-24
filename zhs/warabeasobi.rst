@@ -12,7 +12,6 @@
 .. youtube:: 0CbvqJAfCRc
 
 
-
 .. translate-paragraph::
 
     华咲
@@ -123,7 +122,7 @@
 
         花落
 
-    口伝伝承（昔话）を祀れば
+    :ruby:`口伝伝承|昔话` を祀れば
 
         祭念起过往轶事
 
