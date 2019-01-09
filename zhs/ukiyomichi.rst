@@ -975,3 +975,10 @@
 
         第二段「:ruby:`君|きみ` が :ruby:`居|い` る」这里变成了
         「:ruby:`君|きみ` が :ruby:`居|い` た」，过去式，以及没有了第一段的「和你」的意思。
+
+
+
+.. figure:: {static}/images/72485849_p0.jpg
+    :alt: 爱き夜道
+
+    `爱き夜道 (Pixiv 72485849) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72485849>`_
