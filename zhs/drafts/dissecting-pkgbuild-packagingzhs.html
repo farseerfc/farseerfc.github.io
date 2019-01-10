@@ -243,12 +243,14 @@ Farseerfc的小窝            </a>
                         <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id11">包到用时方恨少，码非写过不知难</a></li>
-<li><a class="reference internal" href="#easy" id="id12">EASY</a><ul>
-<li><a class="reference internal" href="#id5" id="id13">获取现有的 PKGBUILD</a></li>
-<li><a class="reference internal" href="#id7" id="id14">PKGBUILD 的构成要素</a></li>
-<li><a class="reference internal" href="#id9" id="id15">包的命名</a></li>
-<li><a class="reference internal" href="#id10" id="id16">包版本号</a></li>
+<li><a class="reference internal" href="#id1" id="id13">包到用时方恨少，码非写过不知难</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">获取现有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id16">PKGBUILD 的构成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id18">包版本号</a></li>
+<li><a class="reference internal" href="#id11" id="id19">包元数据</a></li>
+<li><a class="reference internal" href="#id12" id="id20">包间关系</a></li>
 </ul>
 </li>
 </ul>
@@ -257,7 +259,7 @@ Farseerfc的小窝            </a>
                     </div>
                 
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id11">包到用时方恨少，码非写过不知难</a></h2>
+<h2><a class="toc-backref" href="#id13">包到用时方恨少，码非写过不知难</a></h2>
 <p>即便是 Arch Linux 初学者，也鲜有完全靠官方源中的软件包就能存活的，
 或多或少都得依赖一些第三方源或者 AUR 中的额外软件包补充可用软件库。
 最近发现一个非常有意思的项目 <a class="reference external" href="https://repology.org/">Repology</a> ，
@@ -316,12 +318,12 @@ archwiki 上相应的 <a class="reference external" href="https://wiki.archlinux
 <p>好，废话码了一屏，尚未见半句干货，就跟我一起从最基础的部分开始吧。</p>
 </div>
 <div class="section" id="easy">
-<h2><a class="toc-backref" href="#id12">EASY</a></h2>
+<h2><a class="toc-backref" href="#id14">EASY</a></h2>
 <p>讲解 PKGBUILD 之前，想先大概看看 PKGBUILD 长什么样子。 AUR 上有大量 PKGBUILD
 可以下载， Arch Linux 官方源中打包的官方包也有提供公开渠道下载打包时采用的 PKGBUILD
 ，这些都可以拿来作为参考。于是作为第一步，如何获取 AUR 或者官方源中包的 PKGBUID 呢？</p>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id13">获取现有的 PKGBUILD</a></h3>
+<h3><a class="toc-backref" href="#id15">获取现有的 PKGBUILD</a></h3>
 <p>Arch Linux 老用户们已经很熟悉 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helpers</a> 和 <a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Build_System">Arch Build System</a>
 那一套了，每个人可能都有两三个自己趁手的常用 AUR helper 自动化打包。不过其实，大概从3年前
 <a class="reference external" href="https://github.com/lfos/aurweb/releases/tag/v4.0.0">AUR web v4</a>
@@ -374,7 +376,7 @@ Ga</code>
 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.zshrc#L36-L38">自动补全包名</a> 。</p>
 </div>
 <div class="section" id="id7">
-<h3><a class="toc-backref" href="#id14">PKGBUILD 的构成要素</a></h3>
+<h3><a class="toc-backref" href="#id16">PKGBUILD 的构成要素</a></h3>
 <p>拿到了 PKGBUILD ，就先用文本编辑器打开它看一眼吧，以
 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a> 的
 PKGBUILD 为例：</p>
@@ -459,7 +461,7 @@ pkgname=${_pkgname}-git</code>
 </div>
 </div>
 <div class="section" id="id9">
-<h3><a class="toc-backref" href="#id15">包的命名</a></h3>
+<h3><a class="toc-backref" href="#id17">包的命名</a></h3>
 <p>第3行 <code class="code">
 pkgname</code>
  定义了包的名字，这个变量的值应当和 AUR 上提交的软件包相同，
@@ -504,30 +506,135 @@ Debian 系统的二进制包，想要重新打包成可用于 Arch Linux 的包�
 <div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> <span class="c1"># 三个官方源总体包数量</span></span>
 <span class="code-line"><span class="gp">$</span> pacman -Slq core extra community <span class="p">|</span> wc -l</span>
 <span class="code-line"><span class="go">10225</span></span>
-<span class="code-line"><span class="gp">$</span> <span class="c1"># 有小写字母、数字、短横、点之外的包名数量</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 除了小写字母、数字、短横、点之外有别的字符的包名数量</span></span>
 <span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9.]"</span> -c</span>
 <span class="code-line"><span class="go">192</span></span>
-<span class="code-line"><span class="gp">$</span> <span class="c1"># 有小写字母、数字、短横、点、下划线、加号之外的包名数量</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 除了小写字母、数字、短横、点、下划线、加号之外有别的字符的包名数量</span></span>
 <span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9._+]"</span> -c</span>
 <span class="code-line"><span class="go">4</span></span>
 </pre></div>
 </div>
 </div>
-<p>另外关于包名中可以使用的字符，从原理上来说只要是 bash 函数名中可以使用的字符，
-都可以在包名中使用。不过一般来说，包名的字符会符合 Arch Linux 官方源中现有的包名的命名风格。
+<p>另外关于包名中可以使用的字符，在 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD#pkgname">PKGBUILD#pkgname</a> 有说明可以用：</p>
+<ol class="arabic simple">
+<li>英文大小写字母</li>
+<li>数字</li>
+<li>这些符号： <code class="code">
+@._+-</code>
+</li>
+</ol>
+<p>一般来说，包名的字符会符合 Arch Linux 官方源中现有的包名的命名风格。
 绝大多数包名是 <strong>纯小写字母</strong> 加上 <strong>数字或者点(.)</strong> ，单词之间用短横(-) 分隔。
 另外还有少数包名中出现大写字母或者下划线分隔，或者 C++ 相关的包名中出现加号(+)。</p>
-<p>对包命名的基本原则是好记好搜，如果知道上游项目的名字，应该能很方便地搜到包对应的名字。</p>
+<p>对包命名的基本原则是好记好搜，如果知道上游项目的名字，应该能很方便地搜到包对应的名字。
+不那么好搜的比如如果上游项目叫 <code class="code">
+PyQt</code>
+ 而 pkgname 叫 <code class="code">
+python-qt</code>
+
+那么会让搜索更加困难，所以请不要这样命名。</p>
+<p>另外关于包名中带的版本号或者数字，除了个别情况之外一般而言 Arch Linux 打包不会给包名本身写上
+版本。一种特例是当某个上游库发布了新版本，一部分依赖该库的程序还没有兼容新版，这时通常的做法是
+把老版本的库的包名后面加上版本号，和新版区分，然后让还没有兼容的程序依赖带版本包名的老版，
+其余依赖新版。比如官方源中的 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=lua">lua</a> 和 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=lua51">lua51</a> 就是这样的关系。
+不过这种做法只是过渡，长期来看大部分包名中都不会有版本数字。</p>
 </div>
 <div class="section" id="id10">
-<h3><a class="toc-backref" href="#id16">包版本号</a></h3>
+<h3><a class="toc-backref" href="#id18">包版本号</a></h3>
 <p>版本号由3个变量描述 <code class="code">
 epoch</code>
-, <code class="code">
+ , <code class="code">
 pkgver</code>
-, <code class="code">
+ , <code class="code">
 pkgrel</code>
-。</p>
+。由 pacman 显示时，
+这三者显示为 <code class="code">
+epoch:pkgver-pkgrel</code>
+ 这种样子。比如 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=toxcore">toxcore</a> 的版本号是
+<code class="code">
+1:0.2.8-1</code>
+ 的话，也即是说 <code class="code">
+epoch=1</code>
+ ， <code class="code">
+pkgver=0.2.8</code>
+
+， <code class="code">
+pkgrel=1</code>
+ 。这三者中最重要的是 <code class="code">
+pkgver</code>
+ ，这与上游的版本号相对应，前后的
+<code class="code">
+epoch</code>
+ 和 <code class="code">
+pkgrel</code>
+ 则是下游打包时指定的。</p>
+<p>其中特殊而比较少见的是 <code class="code">
+epoch</code>
+ ，默认不写时值是 0
+，这主要是用来应对上游改变了版本号命名方式的时候用。
+比如一开始上游用日期 20190101 这样的版本号，后来转用 1.0 发布了新版，让 pacman 的 vercmp
+判断的话 <code class="code">
+20190101 &gt; 1.0</code>
+ 会认为 1.0 更老。这时候就需要加上 <code class="code">
+epoch=1</code>
+
+从而 <code class="code">
+20190101 &lt; 1:1.0</code>
+ 。增加 epoch 需要相对谨慎，因为一旦加上去，就很难再减下来了。
+根据 man PKGBUILD , <code class="code">
+epoch</code>
+ 的值应该是一个自然数。</p>
+<p>版本号主要部分 <code class="code">
+pkgver</code>
+ 来自上游，也就是说同样一份源代码，如果打几次不同的包，
+应该有相同的 pkgver 。 pkgver 不由打包者定义，于是可以用的字符比较自由，
+不过一般是点隔开的数字的形式，可能会有字母。数字和字母混杂的版本号之间如何比较大小，在 pacman
+有定义，可以参考 <code class="code">
+man vercmp</code>
+ 。值得注意 pacman 的定义可能和上游社区比如
+<a class="reference external" href="https://pypi.org/">PyPI</a> 之类的地方的定义有所不同。</p>
+<p>最后 <code class="code">
+pkgrel</code>
+ 是同一套源码再次打包时递增的发行版本号，通常是个正整数，可选得可以有小数。</p>
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id19">包元数据</a></h3>
+<p>上面例子中 6 至 9 行定义了一些元数据。</p>
+<table border="0" class="docutils field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">pkgdesc:</th><td class="field-body">通常来自上游项目的一行描述，会在 <code class="code">
+pacman -Ss</code>
+
+时显示，其中出现的词也会作为搜索关键词。</td>
+</tr>
+<tr class="field"><th class="field-name">arch:</th><td class="field-body">是计算机架构的一个数组。常见 <code class="code">
+arch=('any')</code>
+ 表示架构无关的包，
+<code class="code">
+arch=('x86_64')</code>
+ 表示 x86_64 架构下的二进制包。这个后文讲述拆包时详述。</td>
+</tr>
+<tr class="field"><th class="field-name">url:</th><td class="field-body">上游项目的 URL 地址，会在 Arch Linux 包列表的界面上显示一个链接。</td>
+</tr>
+<tr class="field"><th class="field-name">license:</th><td class="field-body">采用的开源协议。协议名不能随便写，常用协议的协议名在
+<code class="code">
+/​usr/​share/​licenses/​common/​</code>
+ 有个完整列表，不在其中的协议就被认为是不常用的协议。
+虽然 MIT 和 BSD 这些开源协议很常见，但是不算在常用协议中。
+不常用的协议 <strong>要求</strong> 在打包时同时安装协议文件到
+<code class="code">
+/​usr/​share/​licenses/​&lt;pkgname&gt;/​</code>
+ 目录中去。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id20">包间关系</a></h3>
+<p>上面例子中 11 和 12 行定义了 depends 和 makedepends 两个数组的包依赖关系。
+包和包之间可以互相依存。</p>
 </div>
 </div>
 
@@ -1174,12 +1281,14 @@ pkgrel</code>
             <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id11">包到用时方恨少，码非写过不知难</a></li>
-<li><a class="reference internal" href="#easy" id="id12">EASY</a><ul>
-<li><a class="reference internal" href="#id5" id="id13">获取现有的 PKGBUILD</a></li>
-<li><a class="reference internal" href="#id7" id="id14">PKGBUILD 的构成要素</a></li>
-<li><a class="reference internal" href="#id9" id="id15">包的命名</a></li>
-<li><a class="reference internal" href="#id10" id="id16">包版本号</a></li>
+<li><a class="reference internal" href="#id1" id="id13">包到用时方恨少，码非写过不知难</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">获取现有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id16">PKGBUILD 的构成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id18">包版本号</a></li>
+<li><a class="reference internal" href="#id11" id="id19">包元数据</a></li>
+<li><a class="reference internal" href="#id12" id="id20">包间关系</a></li>
 </ul>
 </li>
 </ul>
