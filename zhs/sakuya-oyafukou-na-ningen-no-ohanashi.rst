@@ -416,7 +416,7 @@ https://www.pixiv.net/novel/show.php?id=8550966
 
         :ruby:`小望|こもち` の :ruby:`月|つき` ：望月前一夜，农历十四日的月亮。
 
-     :ruby:`満月|まんげつ` の :ruby:`夜|よる` 　 :ruby:`最后|さいご` となる :ruby:`贵女|あなた` の :ruby:`红茶|こうちゃ`
+    :ruby:`満月|まんげつ` の :ruby:`夜|よる` 　 :ruby:`最后|さいご` となる :ruby:`贵女|あなた` の :ruby:`红茶|こうちゃ`
 
         　
 

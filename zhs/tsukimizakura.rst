@@ -5,7 +5,7 @@
 :translation_id: tsukimizakura
 :lang: zhs
 :date: 2019-01-06 03:24
-:tags: translate, chouyaku, tsukimizakura
+:tags: translate, chouyaku, tsukimizakura, saigetsu, 听译, 月见桜, 砕月
 :issueid: 73
 :series: chouyaku
 
