@@ -5,7 +5,7 @@
 :translation_id: takenohana
 :lang: zhs
 :date: 2018-12-24 00:48
-:tags: translate, chouyaku, takenohana
+:tags: translate, chouyaku, takenohana, 听译, 竹ノ花
 :issueid: 67
 :series: chouyaku
 

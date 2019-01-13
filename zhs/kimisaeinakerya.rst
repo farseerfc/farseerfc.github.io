@@ -5,7 +5,7 @@
 :translation_id: kimisaeinakerya
 :lang: zhs
 :date: 2018-12-23 23:04
-:tags: translate, chouyaku, kimi, sae, inakerya
+:tags: translate, chouyaku, kimi, sae, inakerya, 听译
 :issueid: 66
 :series: chouyaku
 

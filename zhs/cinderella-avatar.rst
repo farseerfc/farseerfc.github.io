@@ -5,7 +5,7 @@
 :translation_id: cinderella-avatar
 :lang: zhs
 :date: 2019-01-05 04:05
-:tags: translate, chouyaku, cinderella, avatar
+:tags: translate, chouyaku, cinderella, avatar, 听译, シンデレラ, アバター
 :issueid: 72
 :series: chouyaku
 

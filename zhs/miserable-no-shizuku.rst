@@ -5,7 +5,7 @@
 :translation_id: miserable-no-shizuku
 :lang: zhs
 :date: 2019-01-07 00:24
-:tags: translate, chouyaku, miserable, shizuku
+:tags: translate, chouyaku, miserable, shizuku, 听译, ミゼラブル
 :issueid: 74
 :series: chouyaku
 

@@ -5,7 +5,7 @@
 :translation_id: zankyohanariyamazu
 :lang: zhs
 :date: 2019-01-03 20:50
-:tags: translate, chouyaku, zankyoha, nariyamazu
+:tags: translate, chouyaku, zankyoha, nariyamazu, 听译, 残响は鸣り止まず
 :issueid: 71
 :series: chouyaku
 
