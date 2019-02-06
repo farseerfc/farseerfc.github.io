@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/usbip-forward-raspberrypi.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="linux,archlinux,raspberrypi,usbip,usb,forward" />
+        <meta name="description" content="惠狐 megumifox 寫了篇 用PulseAudio將電腦的聲音用手機放出來 ，文末提到想知道我怎麼用樹莓派轉發 USB 的，於是寫篇文章記錄一下。 起因 家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾插上電更新一下， 不過因爲性能實在不適合做別的事情於是一直在吃灰。某日和老婆看片的時候，鍵盤鼠標被長長的 USB 線扯着感覺很難受，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢， 這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。 上網搜了一下， Linux 環境有個 usbip 工具正好能做到這個。原理也很直觀， usbip 能把 USB 端口上的數據包裝成 IP 協議通過網絡轉發出去，從而兩個網絡間相互聯通的電腦就可以遠程轉發 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC"/>
+        <meta property="og:url" content="//farseerfc.me/usbip-forward-raspberrypi.html"/>
+        <meta property="og:description" content="惠狐 megumifox 寫了篇 用PulseAudio將電腦的聲音用手機放出來 ，文末提到想知道我怎麼用樹莓派轉發 USB 的，於是寫篇文章記錄一下。 起因 家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾插上電更新一下， 不過因爲性能實在不適合做別的事情於是一直在吃灰。某日和老婆看片的時候，鍵盤鼠標被長長的 USB 線扯着感覺很難受，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢， 這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。 上網搜了一下， Linux 環境有個 usbip 工具正好能做到這個。原理也很直觀， usbip 能把 USB 端口上的數據包裝成 IP 協議通過網絡轉發出去，從而兩個網絡間相互聯通的電腦就可以遠程轉發 …"/>
+        <meta property="article:published_time" content="2019-02-07" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="archlinux" />
+            <meta property="article:tag" content="raspberrypi" />
+            <meta property="article:tag" content="usbip" />
+            <meta property="article:tag" content="usb" />
+            <meta property="article:tag" content="forward" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/usbip-forward-raspberrypizh.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切換導航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                                 關於
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/about.html"><i class="fa fa-user"></i>
+                         關於
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">歸檔</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
+                <li class="active">用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC
+                        <a href="//farseerfc.me/usbip-forward-raspberrypi.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 用 usbip 轉發 raspberry pi 的 USB 鍵盤鼠標給 Arch Linux 的 PC 的永久鏈接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2019-02-07T02:14:00+09:00"><i class="fa fa-calendar"></i> 2019年02月07日(週四)</time>
+    </span>
+
+
+
+
+    <a onclick="$.get('//farseerfc.me/usbip-forward-raspberrypi.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/usbip-forward-raspberrypi.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/usbip-forward-raspberrypi.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/usbip-forward-raspberrypi.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="usbip-forward-raspberrypizh" data-disqus-url="http://farseerfc.me/usbip-forward-raspberrypi.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.me/tag/archlinux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> archlinux</a>
+	<a href="//farseerfc.me/tag/raspberrypi.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> raspberrypi</a>
+	<a href="//farseerfc.me/tag/usbip.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> usbip</a>
+	<a href="//farseerfc.me/tag/usb.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> usb</a>
+	<a href="//farseerfc.me/tag/forward.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> forward</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <p>惠狐 <a class="reference external" href="/links.html#megumifox">megumifox</a> 寫了篇 <a class="reference external" href="https://blog.megumifox.com/public/2019/02/06/%E7%94%A8pulseaudio%E5%B0%86%E7%94%B5%E8%84%91%E7%9A%84%E5%A3%B0%E9%9F%B3%E7%94%A8%E6%89%8B%E6%9C%BA%E6%94%BE%E5%87%BA%E6%9D%A5/">用PulseAudio將電腦的聲音用手機放出來</a>
+，文末提到想知道我怎麼用樹莓派轉發 USB 的，於是寫篇文章記錄一下。</p>
+<div class="section" id="id1">
+<h2>起因</h2>
+<p>家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾插上電更新一下，
+不過因爲性能實在不適合做別的事情於是一直在吃灰。某日和老婆看片的時候，鍵盤鼠標被長長的 USB
+線扯着感覺很難受，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢，
+這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。</p>
+<p>上網搜了一下， Linux 環境有個 usbip 工具正好能做到這個。原理也很直觀， usbip 能把 USB
+端口上的數據包裝成 IP 協議通過網絡轉發出去，從而兩個網絡間相互聯通的電腦就可以遠程轉發 USB 了。
+設置好的話，就像是一臺 PC 多了幾個位於樹莓派上的 USB 端口，插上樹莓派的 USB 設備統統作爲 PC
+的設備。</p>
+<p>這篇文章假設有一個裝了 Arch Linux 的 PC ，和一個裝了 Arch Linux ARM 的樹莓派，
+並且兩者間能通過網絡互相訪問到。別的發行版上大概也可以這麼做，只是我沒有試過。 usbip
+工具似乎普遍被發行版打包了，除此之外需要的也只是 Linux 內核提供好的功能而已。</p>
+</div>
+<div class="section" id="arch-linux-arm">
+<h2>設置 Arch Linux ARM 的樹莓派端</h2>
+<p>假設樹莓派上面網絡已經設置妥當，開機插電就能自動聯網。接下來安裝 usbip 工具：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> pacman -Syu usbip</span>
+</pre></div>
+<p>接下來需要記錄一下樹莓派的 IP 地址：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> ip addr</span>
+<span class="code-line"><span class="go">3: wlan0: ......</span></span>
+<span class="code-line"><span class="go">inet 192.168.0.117/24 brd 192.168.0.255 scope global noprefixroute wlan0</span></span>
+<span class="code-line"><span class="go">......</span></span>
+</pre></div>
+<p>接下來，我給 udev 添加了一個規則，當插入 usb 設備的時候，執行我的腳本 usbipall.sh
+把 usb 設備通過 usbip 共享出去：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> cat /etc/udev/rules.d/usbipall.rules</span>
+<span class="code-line"><span class="go">ACTION=="add", SUBSYSTEM=="usb", RUN+="/usr/bin/bash /usr/local/bin/usbipall.sh"</span></span>
+</pre></div>
+<p>這個 rules 文件 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.rules">可以在我的 dotfiles 裏面找到</a> 。</p>
+<p>然後規則調用的 usbipall.sh 我這麼寫的， <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh">文件同樣在我的 dotfiles 裏面</a>：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1">#/bin/sh</span></span>
+<span class="code-line"><span class="o">(</span></span>
+<span class="code-line"><span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -l<span class="k">)</span></span>
+<span class="code-line"><span class="k">for</span> usb in <span class="nv">$allusb</span></span>
+<span class="code-line"><span class="k">do</span></span>
+<span class="code-line">    <span class="nv">busid</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$usb</span> <span class="p">|</span> sed <span class="s2">"s|#.*||g;s|busid=||g"</span><span class="k">)</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]]</span></span>
+<span class="code-line">    <span class="k">then</span></span>
+<span class="code-line">        <span class="c1"># ignoring usb ethernet</span></span>
+<span class="code-line">        <span class="k">continue</span></span>
+<span class="code-line">    <span class="k">fi</span></span>
+<span class="code-line">    <span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date -Iseconds<span class="k">)</span><span class="s2">: Exporting </span><span class="nv">$busid</span><span class="s2">"</span></span>
+<span class="code-line">    usbip <span class="nb">bind</span> --busid<span class="o">=</span><span class="nv">$busid</span></span>
+<span class="code-line"><span class="k">done</span></span>
+<span class="code-line"><span class="o">)</span> &gt;&gt;/var/log/usbipall.log <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span></span>
+</pre></div>
+<p>這個腳本做了這樣幾件事。</p>
+<ol class="arabic simple">
+<li>調用 <code class="code">
+usbip list --local</code>
+ 列出本地所有 usb 設備。</li>
+<li><dl class="first docutils">
+<dt>針對每個設備：</dt>
+<dd><ol class="first last arabic">
+<li>取出它的 busid</li>
+<li>判斷是不是樹莓派的 USB 以太網卡，不是的話繼續</li>
+<li>通過 <code class="code">
+usbip bind --busid=</code>
+ 命令把這個 usb 設備導出到網上</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li>最後把所有輸出記錄到 /var/log/usbipall.log 日誌裏面</li>
+</ol>
+<p>樹莓派這邊設置就完成了。從此之後插入的 usb 設備就會統統導出出去。</p>
+<p>這裏需要注意一下，啓用了 udev 規則之後，就沒法插鍵盤鼠標到樹莓派上控制它了……我都是從另一端 ssh
+上樹莓派操作的。如果有什麼地方設置錯誤，可能需要把樹莓派的 SD 卡拔下來插到電腦上，刪除掉 rules
+文件……</p>
+<p>仔細檢查設置正確了之後，重新載入 udev 規則，或者重啓樹莓派：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">#</span> systemctl restart systemd-udevd</span>
+</pre></div>
+<p>這樣樹莓派這邊就設置好了。</p>
+</div>
+<div class="section" id="arch-linux-pc">
+<h2>設置 Arch Linux 的 PC 端</h2>
+<p>同樣假設 PC 這邊也已經聯網。接下來同樣安裝 usbip 工具：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> pacman -Syu usbip</span>
+</pre></div>
+<p>然後我寫了個小腳本去鏈接樹莓派端， <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbiprpi3.sh">這個文件 usbiprpi3.sh 也在我的 dotfiles</a>：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1">#/bin/sh</span></span>
+<span class="code-line"><span class="nv">rpi3</span><span class="o">=</span><span class="s2">"192.168.0.117"</span></span>
+<span class="code-line"></span>
+<span class="code-line">modprobe vhci-hcd</span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -r <span class="nv">$rpi3</span> <span class="p">|</span> cut -d<span class="s2">":"</span> -f1 -s <span class="p">|</span> sed <span class="s1">'s|^[ \t]*||;/^$/d'</span><span class="k">)</span></span>
+<span class="code-line"><span class="k">for</span> busid in <span class="nv">$allusb</span></span>
+<span class="code-line"><span class="k">do</span></span>
+<span class="code-line">        <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]]</span></span>
+<span class="code-line">        <span class="k">then</span></span>
+<span class="code-line">                <span class="c1"># ignoring usb ethernet</span></span>
+<span class="code-line">                <span class="k">continue</span></span>
+<span class="code-line">        <span class="k">fi</span></span>
+<span class="code-line">        <span class="nb">echo</span> <span class="s2">"Attaching </span><span class="nv">$busid</span><span class="s2">"</span></span>
+<span class="code-line">        usbip attach --remote<span class="o">=</span><span class="nv">$rpi3</span> --busid<span class="o">=</span><span class="nv">$busid</span></span>
+<span class="code-line"><span class="k">done</span></span>
+</pre></div>
+<p>其中腳本第一行填入上面記錄下來的樹莓派的 IP 地址，接下來腳本做了這麼幾件事：</p>
+<ol class="arabic simple">
+<li>用 modprobe 確認加載 vhci-hcd 通用虛擬鍵鼠驅動</li>
+<li>用 <code class="code">
+usbip list --remote=</code>
+ 列出遠程設備上已經導出了的 USB 設備，取出他們的 busid</li>
+<li>對每個設備用 <code class="code">
+usbip attach</code>
+ 接上該設備</li>
+</ol>
+<p>然後就已經準備妥當，接下來是見證奇蹟的時刻：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> sleep <span class="m">10</span><span class="p">;</span> sudo ./usbiprpi3.sh</span>
+<span class="code-line"><span class="go">Attaching 1-1.4.3</span></span>
+<span class="code-line"><span class="go">Attaching 1-1.4.1</span></span>
+</pre></div>
+<p>因爲只有一套鍵盤鼠標，所以先 sleep 個 10 秒，在此期間快速把鍵鼠拔下來插到樹莓派的 USB 口上去。
+如果對自己手速沒自信也可以把時間設長一點。然後用 root 權限執行 usbiprpi3.sh 。</p>
+<p>一切正常的話，先能觀測插上樹莓派的鍵盤鼠標被樹莓派初始化了一下，比如鍵盤燈會亮，
+然後這些設備會被導出出去，從而鍵盤燈滅掉，然後 10 秒等待結束後他們被遠程接到了 PC 端，
+又會被初始化一下，同時 PC 端這邊會有上述 Attaching 的輸出。然後鍵盤鼠標就能像平常一樣用啦。</p>
+</div>
+<div class="section" id="id3">
+<h2>使用體驗</h2>
+<p>因爲就是通過 IP 轉發 USB 嘛，所以就和普通地接 USB 的體驗差不多，當然前提是網絡環境足夠穩定。
+在我家間隔 5 米到無線路由器的環境下，基本感覺不到網絡延遲的影響。
+通過這種方式聊天上網應該和直接接 USB 設備完全一樣。本文就是在通過樹莓派轉發的前提下用鍵盤打字寫的。</p>
+<p>不過如果網絡負載本身就很大的話，可能會一些延遲，比如我開着 OBS 直播打東方的時候，原本就手殘
+的我感覺更加手殘了……</p>
+<p>試過拿着樹莓派在房間到處走，走到無線信號覆蓋不到的地方， usbip 會斷掉，PC 上的現象就像是 USB
+設備被拔下來了……所以如果無線網絡不穩的話，可能需要對上面腳本做個循環？不過那樣可能會用起來很彆扭吧。</p>
+<p>以及，上述操作 usbip 是走 TCP 3240 端口，數據包大概完全沒有加密，所以考慮安全性的話，
+最好還是在內網環境使用。不過轉念一想，萬一有別人接上了我導出出去的 USB ，也就是截獲我的鍵盤，
+PC 這邊沒法 attach 設備了，應該馬上會發現吧，似乎對攻擊者也沒有什麼好處？我能控制他的鍵盤了耶~</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/karakurenawi-no-kage.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        【聽譯】からくれなゐの影
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+請用你的 GitHub 賬戶登錄並在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/80#new_comment_field" target="_blank">這篇文章的 Issue 頁下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/80#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言於 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/80/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'usbip-forward-raspberrypizh';
+                        var disqus_url = 'http://farseerfc.me/usbip-forward-raspberrypi.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/about.html">
+關於 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://weibo.com/farseerfc"                     target="_blank">
+<i class="fa fa-weibo" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>        
+
+
+
+            
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">標籤雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/asobi.html">
+                    asobi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/shinderera.html">
+                    シンデレラ <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/takenohana.html">
+                    takenohana <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/can-xiang-haming-rizhi-mazu.html">
+                    残響は鳴り止まず <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stow.html">
+                    stow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/chouyaku.html">
+                    chouyaku <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yozakurani.html">
+                    yozakurani <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/avatar.html">
+                    avatar <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/bo-li-ling-meng.html">
+                    博麗霊夢 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/ting-yi.html">
+                    聽譯 <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zz.html">
+                    zz <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/miserable.html">
+                    miserable <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wu-nu.html">
+                    巫女 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/creationism.html">
+                    creationism <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/raspberrypi.html">
+                    raspberrypi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ningen.html">
+                    ningen <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wang-kiwang-nu-nowei-noseputetsuto.html">
+                    亡き王女の為のセプテット <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/template.html">
+                    template <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/abata.html">
+                    アバター <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/warabe.html">
+                    warabe <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ohanashi.html">
+                    ohanashi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/shou-ming-lun.html">
+                    寿命論 <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sjtu.html">
+                    sjtu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kimi.html">
+                    kimi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remiriasukaretsuto.html">
+                    レミリア・スカーレット <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/lei-mi-li-ya.html">
+                    蕾米利亞 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/suika.html">
+                    suika <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usbip.html">
+                    usbip <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/opposite-world.html">
+                    opposite-world <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kimiwo.html">
+                    kimiwo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yue-jian-ying.html">
+                    月見桜 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xing-se-ye-kong.html">
+                    星色夜空 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    linux <sup> 9</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ying.html">
+                    影 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb.html">
+                    usb <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cinderella.html">
+                    cinderella <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/inakerya.html">
+                    inakerya <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/hua-niao-feng-yue.html">
+                    華鳥風月 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/forward.html">
+                    forward <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/karakurenawi-no-kage.html">
+                    karakurenawi-no-kage <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/translate.html">
+                    translate <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/sui-yue.html">
+                    砕月 <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/yssy.html">
+                    yssy <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/tsukimizakura.html">
+                    tsukimizakura <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/oop.html">
+                    oop <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kachoufuugetsu.html">
+                    kachoufuugetsu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ye-ying-nijun-woyin-shite.html">
+                    夜桜に君を隠して <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zui-hua.html">
+                    酔花 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/saigetsu.html">
+                    saigetsu <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub倉庫</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2019 farseerfc
+            &middot; 通過            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
