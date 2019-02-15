@@ -205,7 +205,7 @@
     いつか己もその声を
 
         一定到时候让你自己也喊出那句话
-    
+
     天高く挙げて见せようぞ
 
         望着高高的天空无可奈何
@@ -401,14 +401,14 @@
 .. figure:: {static}/images/72415177_p0.png
     :alt: happy new year ! (Pixiv 72415177)
 
-    `happy new year ! (Pixiv 72415177) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72415177>`_
+    :pixiv:`72415177|happy new year !`
 
 ----
 
 
 .. translate-paragraph::
 
-    :ruby:`空|そら` :ruby:`见|み` やればその :ruby:`姿|すがた` 
+    :ruby:`空|そら` :ruby:`见|み` やればその :ruby:`姿|すがた`
 
         　
 
@@ -496,7 +496,7 @@
 
         　
 
-    :ruby:`掲|かか` ぐは :ruby:`何|なに`  :ruby:`符|ふ` 　 :ruby:`讴|うた` うは :ruby:`何|なに`  :ruby:`符|ふ` 
+    :ruby:`掲|かか` ぐは :ruby:`何|なに`  :ruby:`符|ふ` 　 :ruby:`讴|うた` うは :ruby:`何|なに`  :ruby:`符|ふ`
 
         　
 
@@ -537,7 +537,7 @@
 
 .. translate-paragraph::
 
-    |からくれなゐ| の :ruby:`影|かげ` 
+    |からくれなゐ| の :ruby:`影|かげ`
 
         　
 
@@ -605,7 +605,7 @@
     いつか :ruby:`己|おのれ` もその :ruby:`声|こえ` を
 
         　
-    
+
     :ruby:`天|てん`  :ruby:`高|たか` く :ruby:`挙|あ` げて :ruby:`见|み` せようぞ
 
         　
@@ -622,7 +622,7 @@
 
         　
 
-    :ruby:`纺|つむ` ぐは :ruby:`何|なに`  :ruby:`符|ふ` 　 :ruby:`宣|さけ` ぶは :ruby:`何|なに`  :ruby:`符|ふ` 
+    :ruby:`纺|つむ` ぐは :ruby:`何|なに`  :ruby:`符|ふ` 　 :ruby:`宣|さけ` ぶは :ruby:`何|なに`  :ruby:`符|ふ`
 
         　
 
@@ -630,7 +630,7 @@
 
         　
 
-    いざや :ruby:`问|と` わんこの :ruby:`力|ちから` 
+    いざや :ruby:`问|と` わんこの :ruby:`力|ちから`
 
         　
 
@@ -662,7 +662,7 @@
 
 .. translate-paragraph::
 
-    |からくれなゐ| の :ruby:`影|かげ` 
+    |からくれなゐ| の :ruby:`影|かげ`
 
         　
 
@@ -670,7 +670,7 @@
 
         　
 
-    :ruby:`邯郸|かんたん` の :ruby:`梦|ゆめ` 
+    :ruby:`邯郸|かんたん` の :ruby:`梦|ゆめ`
 
         :ruby:`邯郸|かんたん` の :ruby:`梦|ゆめ` ：现代汉语作「黄粱一梦」，典出 `《枕中记》 <https://zh.wikipedia.org/wiki/%E6%9E%95%E4%B8%AD%E8%A8%98>`_
 
@@ -699,7 +699,7 @@
 
 .. translate-paragraph::
 
-    :ruby:`空|そら`  :ruby:`见|み` やればその :ruby:`姿|すがた` 
+    :ruby:`空|そら`  :ruby:`见|み` やればその :ruby:`姿|すがた`
 
         　
 
@@ -748,7 +748,7 @@
 
         　
 
-    :ruby:`永远|えいえん` の :ruby:`梦|ゆめ` 
+    :ruby:`永远|えいえん` の :ruby:`梦|ゆめ`
 
         　
 
@@ -761,28 +761,28 @@
 .. figure:: {static}/images/71671791_p0.png
     :alt: 自由回廊 (Pixiv 71671791)
 
-    `自由回廊 (Pixiv 71671791) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=71671791>`_
+    :pixiv:`71671791|自由回廊`
 
 ----
 
 .. figure:: {static}/images/50981359_p0.jpg
     :alt: 幻想乡见闻录 (Pixiv 50981359)
 
-    `幻想乡见闻录 (Pixiv 50981359) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=50981359>`_
+    :pixiv:`50981359|幻想乡见闻录`
 
 ----
 
 .. figure:: {static}/images/50078986_p0.jpg
     :alt: ひとりの轮舞 (Pixiv 50078986)
 
-    `ひとりの轮舞 (Pixiv 50078986) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=50078986>`_
+    :pixiv:`50078986|ひとりの轮舞`
 
 ----
 
 .. figure:: {static}/images/72764504_p0.png
     :alt: sakura (Pixiv 72764504)
 
-    `sakura (Pixiv 72764504) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72764504>`_
+    :pixiv:`72764504|sakura`
 
 ----
 
@@ -791,4 +791,4 @@
     <img src='/images/67127825_p1_master1200.jpg' onmouseover="this.src='/images/67127825_p0_master1200.jpg';" onmouseout="this.src='/images/67127825_p1_master1200.jpg';" />
 
 
-`幻想の花霞 (Pixiv 67127825) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=67127825>`_
+:pixiv:`67127825|幻想の花霞`

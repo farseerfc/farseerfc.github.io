@@ -71,7 +71,7 @@
 
     そう思いながら
 
-        一边这么想着
+        一边这么想
 
     眠りにつくの
 
@@ -208,10 +208,13 @@
 
     .. youtube:: adikQbVv-IU
 
-《 :ruby:`曰|いわ` くつきの :ruby:`艶|えん`  :ruby:`书|しょ` 》
-，翻译一下的话便是《带着故事的情书》。博丽灵梦还不是博丽霊梦的时候，博丽灵梦的歌。
+.. |灵| replace:: :html:`<span style="color:#ea58ff">灵</span>`
+.. |霊| replace:: :html:`<span style="color:#D93448">霊</span>`
 
-曲调来自东方黑历史（PC98作） TH03 《东方梦时空 〜 Phantasmagoria of Dim.Dream.》中博丽灵梦的主题曲《东方妖恋谈》，
+《 :ruby:`曰|いわ` くつきの :ruby:`艶|えん`  :ruby:`书|しょ` 》
+，翻译一下的话便是《带着故事的情书》。博丽 |灵| 梦还不是博丽 |霊| 梦的时候，博丽 |灵| 梦的歌。
+
+曲调来自东方黑历史（PC98作） TH03 《东方梦时空 〜 Phantasmagoria of Dim.Dream.》中博丽 |灵| 梦的主题曲《东方妖恋谈》，
 和ZUN主笔的东方官方设定集《东方求闻史纪 〜 Perfect Memento in Strict Sense.》附录CD「幺楽団」
 中的《阿礼の子供》。
 
@@ -279,7 +282,7 @@
 
     そう :ruby:`思|おも` いながら
 
-        一边这么想着
+        一边这么想
 
     :ruby:`眠|ねむ` りにつくの
 
@@ -408,3 +411,31 @@
     :ruby:`眠|ねむ` りにつくの
 
         一边要睡着
+
+----
+
+.. figure:: {static}/images/70666458_p0.jpg
+    :alt: 博丽灵梦 (Pixiv 70666458)
+
+    :pixiv:`70666458|博丽灵梦`
+
+
+
+----
+
+.. figure:: {static}/images/32920520_p0.jpg
+    :alt: 博丽灵梦（旧作） (Pixiv 32920520)
+
+    :pixiv:`32920520|博丽灵梦（旧作）`
+
+----
+
+.. raw:: html
+
+    <table><tr><td>
+    <img src='/images/54967865_p0_master1200.jpg' onmouseover="this.src='/images/54967865_p'+~~(Math.random()*22+1)+'_master1200.jpg';" onmouseout="this.src='/images/54967865_p0_master1200.jpg';" />
+    </td><td>
+    <img src='/images/59688700_p0_master1200.jpg' onmouseover="this.src='/images/59688700_p'+~~(Math.random()*15+1)+'_master1200.jpg';" onmouseout="this.src='/images/59688700_p0_master1200.jpg';" />
+    </td></tr></table>
+
+:pixiv:`54967865|灵梦立ち絵 表情差分` 　 :pixiv:`59688700|バトルっぽい灵梦立ち絵 表情差分`

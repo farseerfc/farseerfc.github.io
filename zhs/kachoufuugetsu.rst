@@ -174,7 +174,7 @@
 
 《花鸟风月》，算是比较著名的东方改编曲了，因为作为《幻想万华镜》的片头片尾曲，
 配上了动画的片段，算是对整个东方正作故事中描绘事物的总结。
-就像我第一篇翻译的歌词 `《童游》 <{filename}/warabeasobi.zhs.rst>`_
+就像我第一篇翻译的歌词 `《童游》 <{filename}/life/warabeasobi.zhs.rst>`_
 因为是对神主ZUN自己的主题曲《童祭》的重新谱词而有了总起的性质，
 这篇《花鸟风月》也因为用在《幻想万华镜》而有了总结的性质。
 
@@ -342,4 +342,4 @@
 .. figure:: {static}/images/72616493_p0.png
     :alt: 巡って廻って
 
-    `巡って廻って (Pixiv 72616493) <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72616493>`_
+    :pixiv:`72616493|巡って廻って`
