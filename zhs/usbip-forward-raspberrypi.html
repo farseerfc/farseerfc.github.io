@@ -246,7 +246,7 @@ Farseerfc的小窝            </a>
 <h2>起因</h2>
 <p>家里有个装了 Arch Linux ARM 的树莓派3B 闲置着，装了 Arch Linux ARM 偶尔上电更新一下，
 不过因为性能实在不适合做别的事情于是一直在吃灰。某日 <del>给老婆安利幻想万华镜</del><ins>和老婆看片</ins>
-的时候， <del>老婆不吃安利于是迁怒键盘鼠标</del><ins>键盘鼠标被长长的 USB　线扯着感觉很难受</ins>
+的时候， <del>老婆不吃安利于是迁怒键盘鼠标</del><ins>键盘鼠标被长长的 USB 线扯着感觉很难受</ins>
 ，于是偶发奇想，能不能利用一下树莓派的多达 4 个 USB 2.0 端口接鼠标键盘呢，
 这样鼠标键盘就可以跟着树莓派来回走，不用拖着长长的 USB 线了。</p>
 <p>上网搜了一下， Linux 环境有个 usbip 工具正好能做到这个。原理也很直观， usbip 能把 USB
@@ -260,7 +260,7 @@ Farseerfc的小窝            </a>
 <div class="section" id="arch-linux-arm">
 <h2>设置 Arch Linux ARM 的树莓派端</h2>
 <p>假设树莓派上面网络已经设置妥当，开机插电就能自动联网。接下来安装 usbip 工具：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> pacman -Syu usbip</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> sudo pacman -Syu usbip</span>
 </pre></div>
 <p>然后需要记录一下树莓派的 IP 地址：</p>
 <div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> ip addr</span>
@@ -268,26 +268,26 @@ Farseerfc的小窝            </a>
 <span class="code-line"><span class="go">inet 192.168.0.117/24 brd 192.168.0.255 scope global noprefixroute wlan0</span></span>
 <span class="code-line"><span class="go">......</span></span>
 </pre></div>
-<p>接下来，我给 udev 添加了一个规则，当插入 usb 设备的时候，执行我的脚本 usbipall.sh
+<p>接下来给 udev 添加一个规则，当插入 usb 设备的时候，执行我的脚本 usbipall.sh
 把 usb 设备通过 usbip 共享出去：</p>
 <div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> cat /etc/udev/rules.d/usbipall.rules</span>
 <span class="code-line"><span class="go">ACTION=="add", SUBSYSTEM=="usb", RUN+="/usr/bin/bash /usr/local/bin/usbipall.sh"</span></span>
 </pre></div>
 <p>这个 rules 文件 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.rules">可以在我的 dotfiles 里面找到</a> 。</p>
-<p>然后规则调用的 usbipall.sh 我这么写的， <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh">文件同样在我的 dotfiles 里面</a>：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="c1">#/bin/sh</span></span>
+<p>然后规则调用的 usbipall.sh 我这么写的， <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh">文件同样在我的 dotfiles 里面</a> ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="ch">#!/bin/sh</span></span>
 <span class="code-line"><span class="o">(</span></span>
 <span class="code-line"><span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -l<span class="k">)</span></span>
 <span class="code-line"><span class="k">for</span> usb in <span class="nv">$allusb</span></span>
 <span class="code-line"><span class="k">do</span></span>
-<span class="code-line">    <span class="nv">busid</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$usb</span> <span class="p">|</span> sed <span class="s2">"s|#.*||g;s|busid=||g"</span><span class="k">)</span></span>
-<span class="code-line">    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]]</span></span>
+<span class="code-line">    <span class="nv">busid</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$usb</span><span class="s2">"</span> <span class="p">|</span> sed <span class="s2">"s|#.*||g;s|busid=||g"</span><span class="k">)</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$busid</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]</span></span>
 <span class="code-line">    <span class="k">then</span></span>
 <span class="code-line">        <span class="c1"># ignoring usb ethernet</span></span>
 <span class="code-line">        <span class="k">continue</span></span>
 <span class="code-line">    <span class="k">fi</span></span>
 <span class="code-line">    <span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date -Iseconds<span class="k">)</span><span class="s2">: Exporting </span><span class="nv">$busid</span><span class="s2">"</span></span>
-<span class="code-line">    usbip <span class="nb">bind</span> --busid<span class="o">=</span><span class="nv">$busid</span></span>
+<span class="code-line">    usbip <span class="nb">bind</span> --busid<span class="o">=</span><span class="s2">"</span><span class="nv">$busid</span><span class="s2">"</span></span>
 <span class="code-line"><span class="k">done</span></span>
 <span class="code-line"><span class="o">)</span> &gt;&gt;/var/log/usbipall.log <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span></span>
 </pre></div>
@@ -318,10 +318,10 @@ usbip bind --busid=</code>
 <div class="section" id="arch-linux-pc">
 <h2>设置 Arch Linux 的 PC 端</h2>
 <p>同样假设 PC 这边也已经联网。接下来同样安装 usbip 工具：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> pacman -Syu usbip</span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> sudo pacman -Syu usbip</span>
 </pre></div>
 <p>然后我写了个小脚本去链接树莓派端， <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbiprpi3.sh">这个文件 usbiprpi3.sh 也在我的 dotfiles</a>：</p>
-<div class="highlight"><pre><span class="code-line"><span></span><span class="c1">#/bin/sh</span></span>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="ch">#!/bin/sh</span></span>
 <span class="code-line"><span class="nv">rpi3</span><span class="o">=</span><span class="s2">"192.168.0.117"</span></span>
 <span class="code-line"></span>
 <span class="code-line">modprobe vhci-hcd</span>
@@ -329,13 +329,13 @@ usbip bind --busid=</code>
 <span class="code-line"><span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -r <span class="nv">$rpi3</span> <span class="p">|</span> cut -d<span class="s2">":"</span> -f1 -s <span class="p">|</span> sed <span class="s1">'s|^[ \t]*||;/^$/d'</span><span class="k">)</span></span>
 <span class="code-line"><span class="k">for</span> busid in <span class="nv">$allusb</span></span>
 <span class="code-line"><span class="k">do</span></span>
-<span class="code-line">        <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]]</span></span>
-<span class="code-line">        <span class="k">then</span></span>
-<span class="code-line">                <span class="c1"># ignoring usb ethernet</span></span>
-<span class="code-line">                <span class="k">continue</span></span>
-<span class="code-line">        <span class="k">fi</span></span>
-<span class="code-line">        <span class="nb">echo</span> <span class="s2">"Attaching </span><span class="nv">$busid</span><span class="s2">"</span></span>
-<span class="code-line">        usbip attach --remote<span class="o">=</span><span class="nv">$rpi3</span> --busid<span class="o">=</span><span class="nv">$busid</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="nv">$busid</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1-1.1"</span> <span class="o">]</span></span>
+<span class="code-line">    <span class="k">then</span></span>
+<span class="code-line">        <span class="c1"># ignoring usb ethernet</span></span>
+<span class="code-line">        <span class="k">continue</span></span>
+<span class="code-line">    <span class="k">fi</span></span>
+<span class="code-line">    <span class="nb">echo</span> <span class="s2">"Attaching </span><span class="nv">$busid</span><span class="s2">"</span></span>
+<span class="code-line">    usbip attach --remote<span class="o">=</span><span class="nv">$rpi3</span> --busid<span class="o">=</span><span class="s2">"</span><span class="nv">$busid</span><span class="s2">"</span></span>
 <span class="code-line"><span class="k">done</span></span>
 </pre></div>
 <p>其中脚本第一行填入上面记录下来的树莓派的 IP 地址，接下来脚本做了这么几件事：</p>
@@ -370,7 +370,9 @@ usbip attach</code>
 设备被拔下来了……所以如果无线网络不稳的话，可能需要对上面脚本做个循环？不过那样可能会用起来很别扭吧。</p>
 <p>以及，上述操作 usbip 是走 TCP 3240 端口，数据包大概完全没有加密，所以考虑安全性的话，
 最好还是在内网环境使用。不过转念一想，万一有别人接上了我导出出去的 USB ，也就是截获我的键盘，
-PC 这边没法 attach 设备了，应该马上会发现吧，似乎对攻击者也没有什么好处？我能控制他的键盘了耶~</p>
+PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之类命令的时候 shell 里面没有回显，
+就不会再继续敲密码了。而且似乎对攻击者也没有什么好处？要是他 usb attach 到了我的设备上，
+我就能控制他的键盘了耶~</p>
 </div>
 
             </div>

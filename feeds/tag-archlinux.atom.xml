@@ -5,7 +5,7 @@
 &lt;h2&gt;起因&lt;/h2&gt;
 &lt;p&gt;家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾上電更新一下，
 不過因爲性能實在不適合做別的事情於是一直在吃灰。某日 &lt;del&gt;給老婆安利幻想萬華鏡&lt;/del&gt;&lt;ins&gt;和老婆看片&lt;/ins&gt;
-的時候， &lt;del&gt;老婆不吃安利於是遷怒鍵盤鼠標&lt;/del&gt;&lt;ins&gt;鍵盤鼠標被長長的 USB　線扯着感覺很難受&lt;/ins&gt;
+的時候， &lt;del&gt;老婆不吃安利於是遷怒鍵盤鼠標&lt;/del&gt;&lt;ins&gt;鍵盤鼠標被長長的 USB 線扯着感覺很難受&lt;/ins&gt;
 ，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢，
 這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。&lt;/p&gt;
 &lt;p&gt;上網搜了一下， Linux 環境有個 usbip 工具正好能做到這個。原理也很直觀， usbip 能把 USB …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;惠狐 &lt;a class="reference external" href="/links.html#megumifox"&gt;megumifox&lt;/a&gt; 寫了篇 &lt;a class="reference external" href="https://blog.megumifox.com/public/2019/02/06/%E7%94%A8pulseaudio%E5%B0%86%E7%94%B5%E8%84%91%E7%9A%84%E5%A3%B0%E9%9F%B3%E7%94%A8%E6%89%8B%E6%9C%BA%E6%94%BE%E5%87%BA%E6%9D%A5/"&gt;用PulseAudio將電腦的聲音用手機放出來&lt;/a&gt;
@@ -14,7 +14,7 @@
 &lt;h2&gt;起因&lt;/h2&gt;
 &lt;p&gt;家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾上電更新一下，
 不過因爲性能實在不適合做別的事情於是一直在吃灰。某日 &lt;del&gt;給老婆安利幻想萬華鏡&lt;/del&gt;&lt;ins&gt;和老婆看片&lt;/ins&gt;
-的時候， &lt;del&gt;老婆不吃安利於是遷怒鍵盤鼠標&lt;/del&gt;&lt;ins&gt;鍵盤鼠標被長長的 USB　線扯着感覺很難受&lt;/ins&gt;
+的時候， &lt;del&gt;老婆不吃安利於是遷怒鍵盤鼠標&lt;/del&gt;&lt;ins&gt;鍵盤鼠標被長長的 USB 線扯着感覺很難受&lt;/ins&gt;
 ，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢，
 這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。&lt;/p&gt;
 &lt;p&gt;上網搜了一下， Linux 環境有個 usbip 工具正好能做到這個。原理也很直觀， usbip 能把 USB
@@ -28,7 +28,7 @@
 &lt;div class="section" id="arch-linux-arm"&gt;
 &lt;h2&gt;設置 Arch Linux ARM 的樹莓派端&lt;/h2&gt;
 &lt;p&gt;假設樹莓派上面網絡已經設置妥當，開機插電就能自動聯網。接下來安裝 usbip 工具：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pacman -Syu usbip&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; sudo pacman -Syu usbip&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後需要記錄一下樹莓派的 IP 地址：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; ip addr&lt;/span&gt;
@@ -36,26 +36,26 @@
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;inet 192.168.0.117/24 brd 192.168.0.255 scope global noprefixroute wlan0&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;......&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;接下來，我給 udev 添加了一個規則，當插入 usb 設備的時候，執行我的腳本 usbipall.sh
+&lt;p&gt;接下來給 udev 添加一個規則，當插入 usb 設備的時候，執行我的腳本 usbipall.sh
 把 usb 設備通過 usbip 共享出去：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; cat /etc/udev/rules.d/usbipall.rules&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="go"&gt;ACTION=="add", SUBSYSTEM=="usb", RUN+="/usr/bin/bash /usr/local/bin/usbipall.sh"&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;這個 rules 文件 &lt;a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.rules"&gt;可以在我的 dotfiles 裏面找到&lt;/a&gt; 。&lt;/p&gt;
-&lt;p&gt;然後規則調用的 usbipall.sh 我這麼寫的， &lt;a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh"&gt;文件同樣在我的 dotfiles 裏面&lt;/a&gt;：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;#/bin/sh&lt;/span&gt;&lt;/span&gt;
+&lt;p&gt;然後規則調用的 usbipall.sh 我這麼寫的， &lt;a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh"&gt;文件同樣在我的 dotfiles 裏面&lt;/a&gt; ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="nv"&gt;allusb&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;usbip list -p -l&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;for&lt;/span&gt; usb in &lt;span class="nv"&gt;$allusb&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="nv"&gt;busid&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$usb&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s2"&gt;"s|#.*||g;s|busid=||g"&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$busid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"1-1.1"&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="nv"&gt;busid&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="nv"&gt;$usb&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s2"&gt;"s|#.*||g;s|busid=||g"&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"1-1.1"&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;then&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;        &lt;span class="c1"&gt;# ignoring usb ethernet&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;        &lt;span class="k"&gt;continue&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;fi&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date -Iseconds&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;: Exporting &lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    usbip &lt;span class="nb"&gt;bind&lt;/span&gt; --busid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    usbip &lt;span class="nb"&gt;bind&lt;/span&gt; --busid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;done&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="o"&gt;)&lt;/span&gt; &amp;gt;&amp;gt;/var/log/usbipall.log &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -86,10 +86,10 @@ usbip bind --busid=&lt;/code&gt;
 &lt;div class="section" id="arch-linux-pc"&gt;
 &lt;h2&gt;設置 Arch Linux 的 PC 端&lt;/h2&gt;
 &lt;p&gt;同樣假設 PC 這邊也已經聯網。接下來同樣安裝 usbip 工具：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; pacman -Syu usbip&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; sudo pacman -Syu usbip&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;然後我寫了個小腳本去鏈接樹莓派端， &lt;a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbiprpi3.sh"&gt;這個文件 usbiprpi3.sh 也在我的 dotfiles&lt;/a&gt;：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;#/bin/sh&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="nv"&gt;rpi3&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"192.168.0.117"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;modprobe vhci-hcd&lt;/span&gt;
@@ -97,13 +97,13 @@ usbip bind --busid=&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="nv"&gt;allusb&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;usbip list -p -r &lt;span class="nv"&gt;$rpi3&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; cut -d&lt;span class="s2"&gt;":"&lt;/span&gt; -f1 -s &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s1"&gt;'s|^[ \t]*||;/^$/d'&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;for&lt;/span&gt; busid in &lt;span class="nv"&gt;$allusb&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;do&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$busid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"1-1.1"&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;        &lt;span class="k"&gt;then&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;                &lt;span class="c1"&gt;# ignoring usb ethernet&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;                &lt;span class="k"&gt;continue&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;        &lt;span class="k"&gt;fi&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;"Attaching &lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;        usbip attach --remote&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$rpi3&lt;/span&gt; --busid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"1-1.1"&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;then&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="c1"&gt;# ignoring usb ethernet&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;continue&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;fi&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;"Attaching &lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    usbip attach --remote&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$rpi3&lt;/span&gt; --busid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="nv"&gt;$busid&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;done&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;其中腳本第一行填入上面記錄下來的樹莓派的 IP 地址，接下來腳本做了這麼幾件事：&lt;/p&gt;
@@ -138,7 +138,9 @@ usbip attach&lt;/code&gt;
 設備被拔下來了……所以如果無線網絡不穩的話，可能需要對上面腳本做個循環？不過那樣可能會用起來很彆扭吧。&lt;/p&gt;
 &lt;p&gt;以及，上述操作 usbip 是走 TCP 3240 端口，數據包大概完全沒有加密，所以考慮安全性的話，
 最好還是在內網環境使用。不過轉念一想，萬一有別人接上了我導出出去的 USB ，也就是截獲我的鍵盤，
-PC 這邊沒法 attach 設備了，應該馬上會發現吧，似乎對攻擊者也沒有什麼好處？我能控制他的鍵盤了耶~&lt;/p&gt;
+PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之類命令的時候 shell 裏面沒有回顯，
+就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
+我就能控制他的鍵盤了耶~&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>archlinux 上用 chrome 實現 透明計算 遠程登錄</title><link href="//farseerfc.me/arch-chrome-remote-desktop.html" rel="alternate"></link><published>2015-02-13T20:39:00+09:00</published><updated>2015-02-13T20:39:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2015-02-13:/arch-chrome-remote-desktop.html</id><summary type="html">
 &lt;p&gt;&lt;a class="reference external" href="http://news.sciencenet.cn/htmlnews/2015/1/311393.shtm"&gt;透明計算&lt;/a&gt;

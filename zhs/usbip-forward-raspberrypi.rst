@@ -16,7 +16,7 @@
 
 家里有个装了 Arch Linux ARM 的树莓派3B 闲置着，装了 Arch Linux ARM 偶尔上电更新一下，
 不过因为性能实在不适合做别的事情于是一直在吃灰。某日 :del:`给老婆安利幻想万华镜|和老婆看片`
-的时候， :del:`老婆不吃安利于是迁怒键盘鼠标|键盘鼠标被长长的 USB　线扯着感觉很难受`
+的时候， :del:`老婆不吃安利于是迁怒键盘鼠标|键盘鼠标被长长的 USB 线扯着感觉很难受`
 ，于是偶发奇想，能不能利用一下树莓派的多达 4 个 USB 2.0 端口接鼠标键盘呢，
 这样鼠标键盘就可以跟着树莓派来回走，不用拖着长长的 USB 线了。
 
@@ -36,7 +36,7 @@
 
 .. code-block:: console
 
-    $ pacman -Syu usbip
+    $ sudo pacman -Syu usbip
 
 
 然后需要记录一下树莓派的 IP 地址：
@@ -48,7 +48,7 @@
     inet 192.168.0.117/24 brd 192.168.0.255 scope global noprefixroute wlan0
     ......
 
-接下来，我给 udev 添加了一个规则，当插入 usb 设备的时候，执行我的脚本 usbipall.sh
+接下来给 udev 添加一个规则，当插入 usb 设备的时候，执行我的脚本 usbipall.sh
 把 usb 设备通过 usbip 共享出去：
 
 .. code-block:: console
@@ -58,25 +58,25 @@
 
 这个 rules 文件 `可以在我的 dotfiles 里面找到 <https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.rules>`_ 。
 
-然后规则调用的 usbipall.sh 我这么写的， `文件同样在我的 dotfiles 里面 <https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh>`_：
+然后规则调用的 usbipall.sh 我这么写的， `文件同样在我的 dotfiles 里面 <https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh>`_ ：
 
 .. code-block:: bash
 
-    #/bin/sh
+    #!/bin/sh
     (
     allusb=$(usbip list -p -l)
     for usb in $allusb
     do
-        busid=$(echo $usb | sed "s|#.*||g;s|busid=||g")
-        if [[ $busid = "1-1.1" ]]
+        busid=$(echo "$usb" | sed "s|#.*||g;s|busid=||g")
+        if [ "$busid" = "1-1.1" ]
         then
             # ignoring usb ethernet
             continue
         fi
         echo "$(date -Iseconds): Exporting $busid"
-        usbip bind --busid=$busid
+        usbip bind --busid="$busid"
     done
-    ) >>/var/log/usbipall.log 2>&1
+    ) >>/var/log/usbipall.log 2>&1 
 
 这个脚本做了这样几件事。
 
@@ -111,13 +111,13 @@
 
 .. code-block:: console
 
-    $ pacman -Syu usbip
+    $ sudo pacman -Syu usbip
 
 然后我写了个小脚本去链接树莓派端， `这个文件 usbiprpi3.sh 也在我的 dotfiles <https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbiprpi3.sh>`_：
 
 .. code-block:: bash
 
-    #/bin/sh
+    #!/bin/sh
     rpi3="192.168.0.117"
 
     modprobe vhci-hcd
@@ -125,13 +125,13 @@
     allusb=$(usbip list -p -r $rpi3 | cut -d":" -f1 -s | sed 's|^[ \t]*||;/^$/d')
     for busid in $allusb
     do
-            if [[ $busid = "1-1.1" ]]
-            then
-                    # ignoring usb ethernet
-                    continue
-            fi
-            echo "Attaching $busid"
-            usbip attach --remote=$rpi3 --busid=$busid
+        if [ "$busid" = "1-1.1" ]
+        then
+            # ignoring usb ethernet
+            continue
+        fi
+        echo "Attaching $busid"
+        usbip attach --remote=$rpi3 --busid="$busid"
     done
 
 其中脚本第一行填入上面记录下来的树莓派的 IP 地址，接下来脚本做了这么几件事：
@@ -170,5 +170,7 @@
 
 以及，上述操作 usbip 是走 TCP 3240 端口，数据包大概完全没有加密，所以考虑安全性的话，
 最好还是在内网环境使用。不过转念一想，万一有别人接上了我导出出去的 USB ，也就是截获我的键盘，
-PC 这边没法 attach 设备了，应该马上会发现吧，似乎对攻击者也没有什么好处？我能控制他的键盘了耶~
+PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之类命令的时候 shell 里面没有回显，
+就不会再继续敲密码了。而且似乎对攻击者也没有什么好处？要是他 usb attach 到了我的设备上，
+我就能控制他的键盘了耶~
 

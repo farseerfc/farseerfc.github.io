@@ -16,7 +16,7 @@
 
 家裏有個裝了 Arch Linux ARM 的樹莓派3B 閒置着，裝了 Arch Linux ARM 偶爾上電更新一下，
 不過因爲性能實在不適合做別的事情於是一直在吃灰。某日 <span class="na">:del:</span><span class="nv">`給老婆安利幻想萬華鏡|和老婆看片`</span>
-的時候， <span class="na">:del:</span><span class="nv">`老婆不吃安利於是遷怒鍵盤鼠標|鍵盤鼠標被長長的 USB　線扯着感覺很難受`</span>
+的時候， <span class="na">:del:</span><span class="nv">`老婆不吃安利於是遷怒鍵盤鼠標|鍵盤鼠標被長長的 USB 線扯着感覺很難受`</span>
 ，於是偶發奇想，能不能利用一下樹莓派的多達 4 個 USB 2.0 端口接鼠標鍵盤呢，
 這樣鼠標鍵盤就可以跟着樹莓派來回走，不用拖着長長的 USB 線了。
 
@@ -36,7 +36,7 @@
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-    <span class="gp">$</span> pacman -Syu usbip
+    <span class="gp">$</span> sudo pacman -Syu usbip
 
 
 然後需要記錄一下樹莓派的 IP 地址：
@@ -48,7 +48,7 @@
     <span class="go">inet 192.168.0.117/24 brd 192.168.0.255 scope global noprefixroute wlan0</span>
     <span class="go">......</span>
 
-接下來，我給 udev 添加了一個規則，當插入 usb 設備的時候，執行我的腳本 usbipall.sh
+接下來給 udev 添加一個規則，當插入 usb 設備的時候，執行我的腳本 usbipall.sh
 把 usb 設備通過 usbip 共享出去：
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
@@ -58,25 +58,25 @@
 
 這個 rules 文件 <span class="s">`可以在我的 dotfiles 裏面找到 </span><span class="si">&lt;https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.rules&gt;</span><span class="s">`_</span> 。
 
-然後規則調用的 usbipall.sh 我這麼寫的， <span class="s">`文件同樣在我的 dotfiles 裏面 </span><span class="si">&lt;https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh&gt;</span><span class="s">`_</span>：
+然後規則調用的 usbipall.sh 我這麼寫的， <span class="s">`文件同樣在我的 dotfiles 裏面 </span><span class="si">&lt;https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbipall.sh&gt;</span><span class="s">`_</span> ：
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
 
-    <span class="c1">#/bin/sh</span>
+    <span class="ch">#!/bin/sh</span>
     <span class="o">(</span>
     <span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -l<span class="k">)</span>
     <span class="k">for</span> usb in <span class="nv">$allusb</span>
     <span class="k">do</span>
-        <span class="nv">busid</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$usb</span> <span class="p">|</span> sed <span class="s2">&quot;s|#.*||g;s|busid=||g&quot;</span><span class="k">)</span>
-        <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">&quot;1-1.1&quot;</span> <span class="o">]]</span>
+        <span class="nv">busid</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$usb</span><span class="s2">&quot;</span> <span class="p">|</span> sed <span class="s2">&quot;s|#.*||g;s|busid=||g&quot;</span><span class="k">)</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$busid</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;1-1.1&quot;</span> <span class="o">]</span>
         <span class="k">then</span>
             <span class="c1"># ignoring usb ethernet</span>
             <span class="k">continue</span>
         <span class="k">fi</span>
         <span class="nb">echo</span> <span class="s2">&quot;</span><span class="k">$(</span>date -Iseconds<span class="k">)</span><span class="s2">: Exporting </span><span class="nv">$busid</span><span class="s2">&quot;</span>
-        usbip <span class="nb">bind</span> --busid<span class="o">=</span><span class="nv">$busid</span>
+        usbip <span class="nb">bind</span> --busid<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$busid</span><span class="s2">&quot;</span>
     <span class="k">done</span>
-    <span class="o">)</span> &gt;&gt;/var/log/usbipall.log <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+    <span class="o">)</span> &gt;&gt;/var/log/usbipall.log <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> 
 
 這個腳本做了這樣幾件事。
 
@@ -111,13 +111,13 @@
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
 
-    <span class="gp">$</span> pacman -Syu usbip
+    <span class="gp">$</span> sudo pacman -Syu usbip
 
 然後我寫了個小腳本去鏈接樹莓派端， <span class="s">`這個文件 usbiprpi3.sh 也在我的 dotfiles </span><span class="si">&lt;https://github.com/farseerfc/dotfiles/blob/master/usbiprpi/usbiprpi3.sh&gt;</span><span class="s">`_</span>：
 
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
 
-    <span class="c1">#/bin/sh</span>
+    <span class="ch">#!/bin/sh</span>
     <span class="nv">rpi3</span><span class="o">=</span><span class="s2">&quot;192.168.0.117&quot;</span>
 
     modprobe vhci-hcd
@@ -125,13 +125,13 @@
     <span class="nv">allusb</span><span class="o">=</span><span class="k">$(</span>usbip list -p -r <span class="nv">$rpi3</span> <span class="p">|</span> cut -d<span class="s2">&quot;:&quot;</span> -f1 -s <span class="p">|</span> sed <span class="s1">&#39;s|^[ \t]*||;/^$/d&#39;</span><span class="k">)</span>
     <span class="k">for</span> busid in <span class="nv">$allusb</span>
     <span class="k">do</span>
-            <span class="k">if</span> <span class="o">[[</span> <span class="nv">$busid</span> <span class="o">=</span> <span class="s2">&quot;1-1.1&quot;</span> <span class="o">]]</span>
-            <span class="k">then</span>
-                    <span class="c1"># ignoring usb ethernet</span>
-                    <span class="k">continue</span>
-            <span class="k">fi</span>
-            <span class="nb">echo</span> <span class="s2">&quot;Attaching </span><span class="nv">$busid</span><span class="s2">&quot;</span>
-            usbip attach --remote<span class="o">=</span><span class="nv">$rpi3</span> --busid<span class="o">=</span><span class="nv">$busid</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$busid</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;1-1.1&quot;</span> <span class="o">]</span>
+        <span class="k">then</span>
+            <span class="c1"># ignoring usb ethernet</span>
+            <span class="k">continue</span>
+        <span class="k">fi</span>
+        <span class="nb">echo</span> <span class="s2">&quot;Attaching </span><span class="nv">$busid</span><span class="s2">&quot;</span>
+        usbip attach --remote<span class="o">=</span><span class="nv">$rpi3</span> --busid<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$busid</span><span class="s2">&quot;</span>
     <span class="k">done</span>
 
 其中腳本第一行填入上面記錄下來的樹莓派的 IP 地址，接下來腳本做了這麼幾件事：
@@ -170,5 +170,7 @@
 
 以及，上述操作 usbip 是走 TCP 3240 端口，數據包大概完全沒有加密，所以考慮安全性的話，
 最好還是在內網環境使用。不過轉念一想，萬一有別人接上了我導出出去的 USB ，也就是截獲我的鍵盤，
-PC 這邊沒法 attach 設備了，應該馬上會發現吧，似乎對攻擊者也沒有什麼好處？我能控制他的鍵盤了耶~
+PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之類命令的時候 shell 裏面沒有回顯，
+就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
+我就能控制他的鍵盤了耶~
 </pre></div>
