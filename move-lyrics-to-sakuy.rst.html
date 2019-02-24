@@ -8,9 +8,72 @@
 <span class="nc">:tags:</span> <span class="nf">life</span>
 <span class="nc">:issueid:</span> <span class="nf">82</span>
 
-最近幾個月在這個博客發了不少歌詞翻譯 <span class="na">:del:</span><span class="nv">`似乎有要轉型成音樂博主的趨勢`</span> ，前段時間買了個新域名 sak.uy
-，準備專門用來放這些東方歌曲的歌詞翻譯，於是分設了單獨的博客「 <span class="s">`Sakuya的音樂盒 </span><span class="si">&lt;https://sak.uy/&gt;</span><span class="s">`_</span> 」。
-主博客這邊右側邊欄會有到音樂盒的鏈接。
+最近幾個月在這個博客發了不少歌詞翻譯 <span class="na">:del:</span><span class="nv">`似乎有要轉型成音樂博主的趨勢`</span> ，前段時間買了個新域名
+<span class="s">`sak.uy </span><span class="si">&lt;https://sak.uy/&gt;</span><span class="s">`_</span> ，準備專門用來放這些東方歌曲的歌詞翻譯，於是分設了單獨的博客「
+<span class="s">`Sakuya的音樂盒 </span><span class="si">&lt;https://sak.uy/&gt;</span><span class="s">`_</span> 」。主博客這邊右側邊欄會有到音樂盒的鏈接。
 
-曾經在這邊的那些歌儘量保持 URL 跳轉過去，新的歌詞翻譯會發到那邊去，還想繼續聽歌的話請單獨訂閱那邊的 RSS 呀。
+曾經在這邊的那些歌儘量保持 URL 跳轉過去，新的歌詞翻譯會發到那邊去，還想繼續聽歌的話請繼續訂閱那邊的 RSS 呀。
+
+主博客這邊還是像往常一樣保持記錄生活點滴和技術經驗好了。說道介紹技術，
+有人問過我那些日語歌詞上給漢字標註的假名都是我一個個手輸的麼？
+一開始是手輸的，後來發現了不錯的自動化方案，於是這裏介紹一下。
+
+<span class="gh">首先是　python-furigana</span>
+<span class="gh">----------------------------------------------</span>
+
+這是個 python 寫的小程序（嚴格說是庫），可以把一段日文轉換成標準的 HTML 形式的
+<span class="na">:code:</span><span class="nv">`&lt;ruby&gt;`</span> 標籤的振假名( <span class="na">:ruby:</span><span class="nv">`振|ふ`</span> り <span class="na">:ruby:</span><span class="nv">`仮名|かめい`</span> )。
+它本身只是個方便的格式化庫，實際工作是用 python-mecab 這個 binding 去查詢 mecab
+這個著名的日語語料分析庫。要用它還得配合一些開源的 mecab 詞典，這些在 <span class="na">:code:</span><span class="nv">`[archlinuxcn]`</span>
+都有打好的包了，直接安裝：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+    <span class="gp">$</span> sudo pacman -Syu python-furigana mecab-git python-mecab mecab-ipadic
+
+裝好之後用法也很直接，甚至沒有 binary 直接調用 python 的 module 就可以：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+    <span class="gp">$</span> python -m furigana.furigana <span class="s2">&quot;振り仮名の例&quot;</span>
+    <span class="go">&lt;ruby&gt;&lt;rb&gt;振&lt;/rb&gt;&lt;rt&gt;ふ&lt;/rt&gt;&lt;/ruby&gt;り&lt;ruby&gt;&lt;rb&gt;仮名&lt;/rb&gt;&lt;rt&gt;かめい&lt;/rt&gt;&lt;/ruby&gt;の&lt;ruby&gt;&lt;rb&gt;例&lt;/rb&gt;&lt;rt&gt;れい&lt;/rt&gt;&lt;/ruby&gt;</span>
+
+就是提供日語作爲輸入，然後輸出 HTML 形式的 <span class="na">:code:</span><span class="nv">`&lt;ruby&gt;`</span> 標籤而已。
+像上面的例子中出現的錯誤（「振り仮名」完整的一個詞中「仮名」意思是「平仮名」應該發音「がな」而非意爲「假的人名」的「かめい」）
+可以看出其實標註的準確率還是有些問題的。嘛日語作爲一個非常依賴上下文判斷的語言，
+經常日本人都會搞錯某些漢字的發音，這些也不能強求機械化的算法能 100% 正確實現。
+好在單純的詞典匹配也能滿足大部分標註的需要了，用這個標註總體來說 95%
+以上的情況都是正確的（歌詞的話正確率低一些，畢竟歌詞中古語啦当て字啦訓読み這些情況很常見）。
+
+<span class="gh">把輸出插入我的博客</span>
+<span class="gh">----------------------------------------------</span>
+
+然後我的博客用 reStructuredText 語法寫，不能直接用 HTML 標籤（雖然我加了 <span class="na">:code:</span><span class="nv">`:html:`</span>
+這個 <span class="na">:ruby:</span><span class="nv">`行內角色|inline role`</span> 但是大量用也不方便）。這個博客一開始用 `Pelican
+重寫主題的時候 &lt;{filename}/tech/redesign-pelican-theme.zh.rst&gt;`_
+我就實現了個自己的 <span class="na">:code:</span><span class="nv">`:ruby:`</span> <span class="na">:ruby:</span><span class="nv">`行內角色|inline role`</span> 用來標發音，於是一段
+sed 就能把 python-furigana 的輸出轉換成我用的語法：
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+    <span class="gp">$</span> which clipboard Co Ci Ct
+    <span class="go">clipboard: aliased to xclip -selection clipboard</span>
+    <span class="go">Co: aliased to clipboard -o</span>
+    <span class="go">Ci: aliased to clipboard -i</span>
+    <span class="go">Ct () {</span>
+    <span class="go">    t=$(mktemp /tmp/furigana-XXXX)</span>
+    <span class="go">    python -m furigana.furigana $(Co) | sed &#39;s@&lt;ruby&gt;&lt;rb&gt;@ :ruby:`@g;s@&lt;/rb&gt;&lt;rt&gt;@|@g;s@&lt;/rt&gt;&lt;/ruby&gt;@` @g&#39; | sponge $t</span>
+    <span class="go">    cat $t | tee /dev/tty | perl -pe &#39;chomp if eof&#39; | Ci</span>
+    <span class="go">}</span>
+
+上面這些 alias 在我的 <span class="s">`.bashrc </span><span class="si">&lt;https://git.io/fczsh&gt;</span><span class="s">`_</span> 中。有了這些之後，
+我只要把需要標註的日語文本放入剪切版，執行 Ct ，再粘帖結果就好了。
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">console</span>
+
+    <span class="gp">$</span> <span class="nb">echo</span> <span class="s2">&quot;振り仮名の例&quot;</span> <span class="p">|</span> Ci
+    <span class="gp">$</span> Ct
+    <span class="go">:ruby:`振|ふ` り :ruby:`仮名|かめい` の :ruby:`例|れい`</span>
+
+然後所有那些歌詞上標註的假名都是這樣一句一句標註好之後，再手動校對修改的。
 </pre></div>
