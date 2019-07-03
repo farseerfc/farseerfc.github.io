@@ -145,10 +145,10 @@
 	:del:`前端` :del:`后端` 全栈工程师！ :del:`又是` 一个夏娜厨，亲手打造了 lilac 的打包状态页 `KISS2UI <https://build.archlinuxcn.org/packages/>`_ 。
 
 .. friend:: alynx
-	:nick: `AlynxZhou <https://sh.alynx.xyz/>`_
+	:nick: `AlynxZhou <https://sh.alynx.moe/>`_
 	:logo: https://avatars0.githubusercontent.com/u/8444615
 
-	电磁炮厨，Hexo 的博客也很漂亮，Arch Linux CN 社区中珍贵的 Gnome 用户。喜欢 C 语言甚至在 B站 直播教学。CS:GO 玩家。
+	电磁炮厨， :del:`Hexo 的博客也|换成了自己写的 Hikaru 还是` 很漂亮，Arch Linux CN 社区中珍贵的 Gnome 用户。喜欢 C 语言甚至在 B站 直播教学。CS:GO 玩家。
 
 .. friend:: origincode
 	:nick: `OriginCode <https://origincode.github.io/>`_
@@ -185,3 +185,9 @@
 	:logo: https://avatars1.githubusercontent.com/u/16459559
 
 	说是咸鱼，本质非常大佬，混迹 AOSC ，善用 Gentoo 。手持大量稀奇设备。RAmen 教徒 :del:`所以是敌人` 。
+
+.. friend:: geneLocated
+	:nick: `Zhu Chuang <https://melty.land/>`_
+	:logo: https://avatars3.githubusercontent.com/u/31200881
+
+	把 pacvis 移植到了 Debian 系统上做了 `AptVis <https://melty.land/blog/apt-vis/>`_ ，博客是基于 MDC 的，看起来很漂亮。
