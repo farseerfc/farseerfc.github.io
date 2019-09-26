@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>由淺入深說 PKGBUILD 打包 - Farseerfcの巣</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/jp/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/jp/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="linux,archlinux,pkgbuild,pacman" />
+        <meta name="description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …" />
+
+        <meta property="og:site_name" content="Farseerfcの巣" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="由淺入深說 PKGBUILD 打包"/>
+        <meta property="og:url" content="//farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html"/>
+        <meta property="og:description" content="包到用時方恨少，碼非寫過不知難 即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的， 或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。 最近發現一個非常有意思的項目 Repology ， 總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示， 橫總對比各個軟件源的包數量和新舊程度。 Repology 軟件源對比圖 （放大） （來源） Repology 軟件源對比圖 可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 。 Arch Linux 的小圓點 位於斜對角線左側， AUR 的小圓點 則遠居於整張圖的最右側。 從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時， 另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。 官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 …"/>
+        <meta property="article:published_time" content="2018-11-19" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="archlinux" />
+            <meta property="article:tag" content="pkgbuild" />
+            <meta property="article:tag" content="pacman" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/jp/dissecting-pkgbuild-packaging.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/jp/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの巣 ATOM Feed"/>
+
+        <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">由淺入深說 PKGBUILD 打包 - Farseerfcの巣</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">ナビの切り替え</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/jp/" class="navbar-brand">
+Farseerfcの巣            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li class="active"><a href="//farseerfc.me/jp/">日本語</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li class="active"><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                                 連絡
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                         連絡
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.me/jp/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/jp/" title="Farseerfcの巣"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/jp/category/tech.html" title="tech">tech</a></li>
+                <li class="active">由淺入深說 PKGBUILD 打包</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        由淺入深說 PKGBUILD 打包
+                        <a href="//farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="由淺入深說 PKGBUILD 打包　へのパーマリンク">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2018-11-19T17:15:00+09:00"><i class="fa fa-calendar"></i> 2018年11月19日(週一)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html">繁體</a></li><li><a href="//farseerfc.me/jp/zhs/drafts/dissecting-pkgbuild-packaging.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/jp/.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/jp/.pdf" class="btn btn-primary" title="このページの印刷版PDFファイルを表示する" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/jp/.png" class="btn btn-primary" title="このページのスクリーンショットPNGファイルを表示する" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="dissecting-pkgbuild-packaging" data-disqus-url="http://farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/jp/tag/linux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> linux</a>
+	<a href="//farseerfc.me/jp/tag/archlinux.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> archlinux</a>
+	<a href="//farseerfc.me/jp/tag/pkgbuild.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pkgbuild</a>
+	<a href="//farseerfc.me/jp/tag/pacman.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> pacman</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目次                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id16">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id18">包版本號</a></li>
+<li><a class="reference internal" href="#id11" id="id19">包元數據</a></li>
+<li><a class="reference internal" href="#id12" id="id20">包間關係</a></li>
+</ul>
+</li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<div class="section" id="id1">
+<h2><a class="toc-backref" href="#id13">包到用時方恨少，碼非寫過不知難</a></h2>
+<p>即便是 Arch Linux 初學者，也鮮有完全靠官方源中的軟件包就能存活的，
+或多或少都得依賴一些第三方源或者 AUR 中的額外軟件包補充可用軟件庫。
+最近發現一個非常有意思的項目 <a class="reference external" href="https://repology.org/">Repology</a> ，
+總結了諸多自由開源軟件發行版們軟件庫中軟件包，其中還有一張總結性的圖示，
+橫總對比各個軟件源的包數量和新舊程度。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+Repology 軟件源對比圖 <a class="reference external" href="//farseerfc.me/jp/images/map_repo_size_fresh.svg">（放大）</a> <a class="reference external" href="https://repology.org/repositories/graphs">（來源）</a></div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/jp/images/map_repo_size_fresh.svg" type="image/svg+xml">
+Repology 軟件源對比圖</object>
+</div>
+</div>
+<p>可以在 Repology 的軟件源對比圖中找找代表 Arch Linux 和 AUR 的兩個 Arch 藍小圓點 <svg height="13px" viewbox="0 0 2 2" width="13px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 。
+Arch Linux 的小圓點 <svg height="13px" viewbox="0 0 2 2" width="13px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 位於斜對角線左側， AUR 的小圓點 <svg height="13px" viewbox="0 0 2 2" width="13px"><circle cx="1" cy="1" fill="#0088cc" r="1"></circle></svg> 則遠居於整張圖的最右側。
+從中可以看出 Arch Linux 官方源的包數量相對較少（部分是因爲粗放打包策略）而更新相對及時，
+另一邊 AUR 的包數量就非常豐富，但更新卻不那麼及時了。
+官方軟件源提供了一個更新及時並且足夠穩定的基礎，在此之上利用 AUR 補充可用軟件包，這對於
+Arch Linux 用戶來說也即是常態。</p>
+<p>AUR 不同於二進制軟件源的是，它只是一個提供 PKGBUILD 腳本的共享網站。
+對於二進制軟件源而言，可以直接在 <code class="code">
+/​etc/​pacman.conf</code>
+ 中添加，然後就可安裝其中的軟件，
+而對於 AUR 中的軟件包，需要自行下載 PKGBUILD 並將之編譯成二進制包。
+由於 AUR 上軟件包維護者衆多，於是打包質量也參差不齊，難免遇到一些包需要使用者手動修改
+PKGBUILD 纔可正常打包。於是對於 AUR 用戶而言， <strong>理解並可修改</strong> PKGBUILD
+以定製打包過程非常重要。即便使用 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_Helpers">AUR Helpers</a>
+幫助自動完成打包工作，對 PKGBUILD 的理解也不可或缺。</p>
+<p>是可謂： <strong>包到用時方恨少，碼非寫過不知難</strong></p>
+<table border="0" class="docutils field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">包到用時方恨少:</th><td class="field-body">很多時候想要用的包不在官方源，去 AUR 一搜雖有，卻不知其打包的質量如何，更新的頻度又怎樣。</td>
+</tr>
+<tr class="field"><th class="field-name">碼非寫過不知難:</th><td class="field-body">於是從 AUR 下載下來的 PKGBUILD ，用編輯器打開，卻不知從何看起，如何定製。</td>
+</tr>
+</tbody>
+</table>
+<!-- PELICAN_BEGIN_SUMMARY -->
+<p>經常有人讓我寫寫關於 Arch Linux 中打包的經驗和技巧，因此本文就旨在由淺入深地梳理一下我個人對
+PKGBUILD 打包系統的理解和體會。社區中有如 <a class="reference external" href="/links.html#felixonmars">felixonmars</a>
+這樣掌管 Arch Linux 軟件包近半壁江山的老前輩，有如 <a class="reference external" href="/links.html#lilydjwg">lilydjwg</a> 這樣創建出 lilac
+自動打包機器人並統領 <code class="code">
+[archlinuxcn]</code>
+ 軟件源的掌門人，
+也有各編程語言各編譯環境專精的行家裏手，
+說起打包的經驗實在不敢班門弄斧地宣稱涵蓋打包細節的方方面面，只能說是我個人的理解和體會。</p>
+<!-- PELICAN_END_SUMMARY -->
+<p>再者， Arch Linux 的打包系統也是時時刻刻在不斷變化、不斷發展的，本文發佈時所寫的內容，
+在數月乃至數年之後可能不再適用。任何具體的打包細節都請參閱
+<a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">PKGBUILD</a> 和
+<a class="reference external" href="https://www.archlinux.org/pacman/makepkg.8.html">makepkg</a> 的相關手冊頁，以及
+archwiki 上相應的 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">PKGBUILD</a> 。
+本文的目的僅限於對上述官方文檔提供一條易於入門的脈絡，不能作爲技術性參考或補充。</p>
+<p>好，廢話碼了一屏，尚未見半句乾貨，就跟我一起從最基礎的部分開始吧。</p>
+</div>
+<div class="section" id="easy">
+<h2><a class="toc-backref" href="#id14">EASY</a></h2>
+<p>講解 PKGBUILD 之前，想先大概看看 PKGBUILD 長什麼樣子。 AUR 上有大量 PKGBUILD
+可以下載， Arch Linux 官方源中打包的官方包也有提供公開渠道下載打包時採用的 PKGBUILD
+，這些都可以拿來作爲參考。於是作爲第一步，如何獲取 AUR 或者官方源中包的 PKGBUID 呢？</p>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id15">獲取現有的 PKGBUILD</a></h3>
+<p>Arch Linux 老用戶們已經很熟悉 <a class="reference external" href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helpers</a> 和 <a class="reference external" href="https://wiki.archlinux.org/index.php/Arch_Build_System">Arch Build System</a>
+那一套了，每個人可能都有兩三個自己趁手的常用 AUR helper 自動化打包。不過其實，大概從3年前
+<a class="reference external" href="https://github.com/lfos/aurweb/releases/tag/v4.0.0">AUR web v4</a>
+發佈開始，已經不需要專用工具，直接用 <code class="code">
+git</code>
+ 就可以很方便地下載到
+官方源和 AUR 中的 PKGBUILD 。</p>
+<p>對於 Arch Linux 官方源中的軟件包，根據它是來自 [core]/[extra] 還是來自 [community]
+我們可以用以下方式獲取對應的 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 獲取 core/extra 中包名爲 glibc 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone https://git.archlinux.org/svntogit/packages.git/ -b packages/glibc --single-branch glibc</span>
+<span class="code-line"><span class="c1"># 獲取 community 中包名爲 pdfpc 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone https://git.archlinux.org/svntogit/community.git/ -b packages/pdfpc --single-branch pdfpc</span>
+</pre></div>
+<p>對於官方源中的包，以上方式 clone 到的目錄結構是這樣：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>pdfpc</span>
+<span class="code-line">├── repos</span>
+<span class="code-line">│   └── community-x86_64</span>
+<span class="code-line">│       └── PKGBUILD</span>
+<span class="code-line">└── trunk</span>
+<span class="code-line">    └── PKGBUILD</span>
+</pre></div>
+<p>其中 trunk 文件夾用於時機打包， repos 文件夾則用於跟蹤這個包發佈在哪些具體倉庫中。
+由於區分倉庫狀態和架構，以前還在支持 i686 的時候，打出的包可能位於
+<code class="code">
+community-testing-i686</code>
+ 或者 <code class="code">
+community-staging-x86_64</code>
+
+這樣的文件夾中。這些細節不需要關心，我們只需要 <code class="code">
+trunk</code>
+ 中的文件就可以打包了。</p>
+<p>對於 AUR 中的軟件包，可以直接用以下方式獲取 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># 獲取 AUR 中包名爲 pdfpc-git 的包，寫入同名文件夾</span></span>
+<span class="code-line">git clone aur@aur.archlinux.org:pdfpc-git.git</span>
+</pre></div>
+<p>不同於官方源， AUR 中包沒有深層的目錄結構，直接在文件夾中放有 PKGBUILD ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>pdfpc-git</span>
+<span class="code-line">└── PKGBUILD</span>
+</pre></div>
+<p>爲了方便鍵入， 在我的 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.bashrc#L72-L105">bash/zsh 配置中</a>
+提供了幾個函數 <code class="code">
+Ge</code>
+<code class="code">
+Gc</code>
+<code class="code">
+Ga</code>
+ 分別用於獲取 [core]/[extra]，
+[community] 或是 AUR 中的 PKGBUILD ，需要的可以自己取用，對於 zsh 用戶還有這些命令的
+<a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/201bd4532ea8c7a1d3ace35183858c1554ffb365/zsh/.zshrc#L36-L38">自動補全包名</a> 。</p>
+</div>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id16">PKGBUILD 的構成要素</a></h3>
+<p>拿到了 PKGBUILD ，就先用文本編輯器打開它看一眼吧，以
+<a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/pdfpc/">pdfpc</a> 的
+PKGBUILD 爲例：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># Maintainer: Jiachen Yang &lt;farseerfc@archlinux.org&gt;</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">pkgname</span><span class="o">=</span>pdfpc</span>
+<span class="code-line"><span class="nv">pkgver</span><span class="o">=</span><span class="m">4</span>.2.1</span>
+<span class="code-line"><span class="nv">pkgrel</span><span class="o">=</span><span class="m">1</span></span>
+<span class="code-line"><span class="nv">pkgdesc</span><span class="o">=</span><span class="s1">'A presenter console with multi-monitor support for PDF files'</span></span>
+<span class="code-line"><span class="nv">arch</span><span class="o">=(</span><span class="s1">'x86_64'</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">url</span><span class="o">=</span><span class="s1">'https://pdfpc.github.io/'</span></span>
+<span class="code-line"><span class="nv">license</span><span class="o">=(</span><span class="s1">'GPL'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">depends</span><span class="o">=(</span><span class="s1">'gtk3'</span> <span class="s1">'poppler-glib'</span> <span class="s1">'libgee'</span> <span class="s1">'gstreamer'</span> <span class="s1">'gst-plugins-base'</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">makedepends</span><span class="o">=(</span><span class="s1">'cmake'</span> <span class="s1">'vala'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="nv">source</span><span class="o">=(</span><span class="s2">"</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">.tar.gz::https://github.com/pdfpc/pdfpc/archive/v</span><span class="nv">$pkgver</span><span class="s2">.tar.gz"</span><span class="o">)</span></span>
+<span class="code-line"><span class="nv">sha256sums</span><span class="o">=(</span><span class="s1">'f67eedf092a9bc275dde312f3166063a2e88569f030839efc211127245be6df8'</span><span class="o">)</span></span>
+<span class="code-line"></span>
+<span class="code-line">build<span class="o">()</span> <span class="o">{</span></span>
+<span class="code-line">    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$srcdir</span><span class="s2">/</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">"</span></span>
+<span class="code-line">    cmake  -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="s2">"/usr/"</span> -DSYSCONFDIR<span class="o">=</span><span class="s2">"/etc"</span> .</span>
+<span class="code-line">    make</span>
+<span class="code-line"><span class="o">}</span></span>
+<span class="code-line"></span>
+<span class="code-line">package<span class="o">()</span> <span class="o">{</span></span>
+<span class="code-line">    <span class="nb">cd</span> <span class="s2">"</span><span class="nv">$srcdir</span><span class="s2">/</span><span class="nv">$pkgname</span><span class="s2">-</span><span class="nv">$pkgver</span><span class="s2">"</span></span>
+<span class="code-line">    make <span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$pkgdir</span><span class="s2">/"</span> install</span>
+<span class="code-line"><span class="o">}</span></span>
+</pre></div>
+<p>PKGBUILD 文件的格式本質上是 bash 腳本，語法遵從 bash 腳本語言，只不過有些預先確定好的內容需要撰寫。
+粗看上面的 PKGBUILD 大體可以分爲兩半，前一半 3~15 行定義了很多變量和數組，後一半 17~26
+行定義了一些函數。也即是說， PKGBUILD 包含兩大塊內容：</p>
+<ol class="arabic simple">
+<li>該包是什麼，也即包的元數據(metadata）</li>
+<li>當如何打包，也即打包的過程</li>
+</ol>
+<p>其中包的元數據又可大體分爲三段：</p>
+<ol class="arabic simple">
+<li>對包的描述性數據。對應上面 3~9 行的內容。這裏寫這個包叫什麼名字，版本是什麼，協議用什麼……</li>
+<li>這個包與其它包的關係。對應上面 11,12 行。這裏寫這個包依賴哪些包，提供哪些虛包，位於什麼包組……</li>
+<li>包的源代碼位置。對應上面 14,15 行。這裏描述這個包從什麼地方下載，下載到的文件校驗，上游簽名……</li>
+</ol>
+<p>這些元數據以 bash 腳本中定義的 變量(variable) 和 數組(array) 的方式描述。應當定義哪些，
+每個數據的含義，在 <a class="reference external" href="https://www.archlinux.org/pacman/PKGBUILD.5.html">手冊頁</a>
+和 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD">PKGBUILD</a> 都有詳盡介紹，下文要具體說明的內容也會相應補充。</p>
+<p>隨後打包過程則是以確定名稱的 bash 函數(function) 的形式描述。在函數體內直接書寫腳本。
+一個包至少需要定義一個 <code class="code">
+package()</code>
+ 函數，它用來寫「安裝」文件的步驟。
+如果是用編譯型語言編寫的軟件，那麼也應該有 <code class="code">
+build()</code>
+ 函數，用來寫 配置(configure)
+和編譯的步驟。</p>
+<p>PKGBUILD 一開始有一行註釋以 <code class="code">
+Maintainer:</code>
+ 開頭，這裏描述這個 PKGBUILD
+的維護者信息，算作是記錄對打包貢獻，同時也在打包出問題時留下聯絡方式。如果 PKGBUILD
+經手多人，通常當前的維護者寫在 <code class="code">
+Maintainer:</code>
+ 中，其餘的貢獻者寫作
+<code class="code">
+Contributor:</code>
+ 。這些信息雖然在 AUR 網頁界面中也有所記錄，不過留下註釋也可算作補充。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+關於自定義變量</div>
+<div class="panel-body">
+<p>PKGBUILD 中定義的 bash 變量和函數是導出給 makepkg 負責讀取的，於是這些變量名和函數名
+的具體含義有所規定，不能隨便亂寫。不過如果有重複定義的內容，那麼還是可以自定義變量。
+通常自定義變量名函數名會以下劃線 (_) 開頭，以和 makepkg 需要的變量名函數名區分。</p>
+<p>例如， <code class="code">
+pkgname</code>
+ 需要加前綴後綴的情況下，通常常見的是定義一個
+<code class="code">
+_pkgname</code>
+ 作爲項目上游的名稱，然後讓 <code class="code">
+pkgname=${_pkgname}-git</code>
+ 。
+再如，上游</p>
+</div>
+</div>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id17">包的命名</a></h3>
+<p>第3行 <code class="code">
+pkgname</code>
+ 定義了包的名字，這個變量的值應當和 AUR 上提交的軟件包相同，
+也應儘量符合上游對項目的命名。定義包名同時也應儘量符合 Arch Linux 中現有軟件包的命名方式，
+並且在 AUR 上提交的軟件包名還有些額外約定俗成的規則：</p>
+<ul class="simple">
+<li>如果是編譯自版本控制系統(VCS, Version Control System)中檢出的最新源代碼，
+應該在上游項目名後添加 <code class="code">
+-vcs</code>
+ 後綴。比如由 <code class="code">
+git clone</code>
+ 得到的 GitHub
+上寄宿的上游軟件通常會有 <code class="code">
+-git</code>
+ 這樣的後綴。</li>
+<li>如果是對現有二進制做重新打包，應該在上游項目名後添加 <code class="code">
+-bin</code>
+ 後綴。比如上游發佈了用於
+Debian 系統的二進制包，想要重新打包成可用於 Arch Linux 的包，則要加 <code class="code">
+-bin</code>
+ 後綴。</li>
+<li>對於特定語言需要的庫，通常會有語言名作爲前綴。不過這個規則的特例是，如果這個庫同時也在
+<code class="code">
+/​usr/​bin</code>
+ 中提供可執行的命令，那麼包名可以沒有前綴，或者對包進行拆包，
+把庫和可執行命令分列在不同的包裏。一個例子是 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/powerline/">powerline</a>
+包提供可執行程序，而它依賴的 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/python-powerline/">python-powerline</a> 則提供 python 的庫。</li>
+<li>對於 Arch Linux 官方源中已經有的軟件包，如果想稍作修改之後將修改版共享在 AUR
+，那麼通常 AUR 上的包名會是在官方源中對應包的包名，加上簡短的單詞描述所做的修改。
+比如 <a class="reference external" href="https://aur.archlinux.org/packages/telegram-desktop-systemqt-notoemoji/">telegram-desktop-systemqt-notoemoji</a> 就是對官方源中
+<a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/telegram-desktop/">telegram-desktop</a> 基礎上換用 NotoEmoji 的修改。
+並且實際上官方源的 <a class="reference external" href="https://www.archlinux.org/packages/community/x86_64/telegram-desktop/">telegram-desktop</a> 曾經在 AUR 中叫
+<a class="reference external" href="https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=telegram-desktop-systemqt">telegram-desktop-systemqt</a>
+，因爲有來自 Debian 的 SystemQt 補丁。在被移入官方源之後去掉了 <code class="code">
+-systemqt</code>
+ 後綴。</li>
+</ul>
+<div class="panel panel-default">
+<div class="panel-heading">
+一些有趣的包名字符統計</div>
+<div class="panel-body">
+<div class="highlight"><pre><span class="code-line"><span></span><span class="gp">$</span> <span class="c1"># 三個官方源總體包數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Slq core extra community <span class="p">|</span> wc -l</span>
+<span class="code-line"><span class="go">10225</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 除了小寫字母、數字、短橫、點之外有別的字符的包名數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9.]"</span> -c</span>
+<span class="code-line"><span class="go">192</span></span>
+<span class="code-line"><span class="gp">$</span> <span class="c1"># 除了小寫字母、數字、短橫、點、下劃線、加號之外有別的字符的包名數量</span></span>
+<span class="code-line"><span class="gp">$</span> pacman -Ssq <span class="p">|</span> grep <span class="s2">"[^-a-z0-9._+]"</span> -c</span>
+<span class="code-line"><span class="go">4</span></span>
+</pre></div>
+</div>
+</div>
+<p>另外關於包名中可以使用的字符，在 <a class="reference external" href="https://wiki.archlinux.org/index.php/PKGBUILD#pkgname">PKGBUILD#pkgname</a> 有說明可以用：</p>
+<ol class="arabic simple">
+<li>英文大小寫字母</li>
+<li>數字</li>
+<li>這些符號： <code class="code">
+@._+-</code>
+</li>
+</ol>
+<p>一般來說，包名的字符會符合 Arch Linux 官方源中現有的包名的命名風格。
+絕大多數包名是 <strong>純小寫字母</strong> 加上 <strong>數字或者點(.)</strong> ，單詞之間用短橫(-) 分隔。
+另外還有少數包名中出現大寫字母或者下劃線分隔，或者 C++ 相關的包名中出現加號(+)。</p>
+<p>對包命名的基本原則是好記好搜，如果知道上游項目的名字，應該能很方便地搜到包對應的名字。
+不那麼好搜的比如如果上游項目叫 <code class="code">
+PyQt</code>
+ 而 pkgname 叫 <code class="code">
+python-qt</code>
+
+那麼會讓搜索更加困難，所以請不要這樣命名。</p>
+<p>另外關於包名中帶的版本號或者數字，除了個別情況之外一般而言 Arch Linux 打包不會給包名本身寫上
+版本。一種特例是當某個上游庫發佈了新版本，一部分依賴該庫的程序還沒有兼容新版，這時通常的做法是
+把老版本的庫的包名後面加上版本號，和新版區分，然後讓還沒有兼容的程序依賴帶版本包名的老版，
+其餘依賴新版。比如官方源中的 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=lua">lua</a> 和 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=lua51">lua51</a> 就是這樣的關係。
+不過這種做法只是過渡，長期來看大部分包名中都不會有版本數字。</p>
+</div>
+<div class="section" id="id10">
+<h3><a class="toc-backref" href="#id18">包版本號</a></h3>
+<p>版本號由3個變量描述 <code class="code">
+epoch</code>
+ , <code class="code">
+pkgver</code>
+ , <code class="code">
+pkgrel</code>
+。由 pacman 顯示時，
+這三者顯示爲 <code class="code">
+epoch:pkgver-pkgrel</code>
+ 這種樣子。比如 <a class="reference external" href="https://www.archlinux.org/packages/?sort=&amp;q=toxcore">toxcore</a> 的版本號是
+<code class="code">
+1:0.2.8-1</code>
+ 的話，也即是說 <code class="code">
+epoch=1</code>
+ ， <code class="code">
+pkgver=0.2.8</code>
+
+， <code class="code">
+pkgrel=1</code>
+ 。這三者中最重要的是 <code class="code">
+pkgver</code>
+ ，這與上游的版本號相對應，前後的
+<code class="code">
+epoch</code>
+ 和 <code class="code">
+pkgrel</code>
+ 則是下游打包時指定的。</p>
+<p>其中特殊而比較少見的是 <code class="code">
+epoch</code>
+ ，默認不寫時值是 0
+，這主要是用來應對上游改變了版本號命名方式的時候用。
+比如一開始上游用日期 20190101 這樣的版本號，後來轉用 1.0 發佈了新版，讓 pacman 的 vercmp
+判斷的話 <code class="code">
+20190101 &gt; 1.0</code>
+ 會認爲 1.0 更老。這時候就需要加上 <code class="code">
+epoch=1</code>
+
+從而 <code class="code">
+20190101 &lt; 1:1.0</code>
+ 。增加 epoch 需要相對謹慎，因爲一旦加上去，就很難再減下來了。
+根據 man PKGBUILD , <code class="code">
+epoch</code>
+ 的值應該是一個自然數。</p>
+<p>版本號主要部分 <code class="code">
+pkgver</code>
+ 來自上游，也就是說同樣一份源代碼，如果打幾次不同的包，
+應該有相同的 pkgver 。 pkgver 不由打包者定義，於是可以用的字符比較自由，
+不過一般是點隔開的數字的形式，可能會有字母。數字和字母混雜的版本號之間如何比較大小，在 pacman
+有定義，可以參考 <code class="code">
+man vercmp</code>
+ 。值得注意 pacman 的定義可能和上游社區比如
+<a class="reference external" href="https://pypi.org/">PyPI</a> 之類的地方的定義有所不同。</p>
+<p>最后 <code class="code">
+pkgrel</code>
+ 是同一套源碼再次打包時遞增的發行版本號，通常是個正整數，可選得可以有小數。</p>
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id19">包元數據</a></h3>
+<p>上面例子中 6 至 9 行定義了一些元數據。</p>
+<table border="0" class="docutils field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">pkgdesc:</th><td class="field-body">通常來自上游項目的一行描述，會在 <code class="code">
+pacman -Ss</code>
+
+時顯示，其中出現的詞也會作爲搜索關鍵詞。</td>
+</tr>
+<tr class="field"><th class="field-name">arch:</th><td class="field-body">是計算機架構的一個數組。常見 <code class="code">
+arch=('any')</code>
+ 表示架構無關的包，
+<code class="code">
+arch=('x86_64')</code>
+ 表示 x86_64 架構下的二進制包。這個後文講述拆包時詳述。</td>
+</tr>
+<tr class="field"><th class="field-name">url:</th><td class="field-body">上游項目的 URL 地址，會在 Arch Linux 包列表的界面上顯示一個鏈接。</td>
+</tr>
+<tr class="field"><th class="field-name">license:</th><td class="field-body">採用的開源協議。協議名不能隨便寫，常用協議的協議名在
+<code class="code">
+/​usr/​share/​licenses/​common/​</code>
+ 有個完整列表，不在其中的協議就被認爲是不常用的協議。
+雖然 MIT 和 BSD 這些開源協議很常見，但是不算在常用協議中。
+不常用的協議 <strong>要求</strong> 在打包時同時安裝協議文件到
+<code class="code">
+/​usr/​share/​licenses/​&lt;pkgname&gt;/​</code>
+ 目錄中去。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id20">包間關係</a></h3>
+<p>上面例子中 11 和 12 行定義了 depends 和 makedepends 兩個數組的包依賴關係。
+包和包之間可以互相依存。</p>
+</div>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus コメント            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'dissecting-pkgbuild-packaging';
+                        var disqus_url = 'http://farseerfc.me/jp/../drafts/dissecting-pkgbuild-packaging.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/jp/about.html">
+farseerfc に連絡</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/jp/about.html"><img width="100%" src="//farseerfc.me/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHubのリポ</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目次</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id13">包到用時方恨少，碼非寫過不知難</a></li>
+<li><a class="reference internal" href="#easy" id="id14">EASY</a><ul>
+<li><a class="reference internal" href="#id5" id="id15">獲取現有的 PKGBUILD</a></li>
+<li><a class="reference internal" href="#id7" id="id16">PKGBUILD 的構成要素</a></li>
+<li><a class="reference internal" href="#id9" id="id17">包的命名</a></li>
+<li><a class="reference internal" href="#id10" id="id18">包版本號</a></li>
+<li><a class="reference internal" href="#id11" id="id19">包元數據</a></li>
+<li><a class="reference internal" href="#id12" id="id20">包間關係</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2014 farseerfc
+            &middot; ここは            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> で生成する                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/jp/../theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
