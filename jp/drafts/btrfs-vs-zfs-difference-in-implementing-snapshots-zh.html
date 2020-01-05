@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>Btrfs vs ZFS 實現 snapshot 的差異 - Farseerfcの巣</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/jp/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/jp/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink" />
+        <meta name="description" content="Btrfs 和 ZFS 都是開源的寫時拷貝（Copy on Write, CoW）文件系統，都提供了相似的子卷管理和 快照(snapshot）的功能。網上有不少文章都評價 ZFS 實現 CoW FS 的創新之處，進而想說「 Btrfs 只是 Linux/GPL 陣營對 ZFS 的拙劣抄襲」，或許（在存儲領域人盡皆知而領域外）鮮有人知在 ZFS 之前就有 NetApp 的商業產品 WAFL(Write Anywhere File Layout) 實現了 CoW 語義的文件系統，並且集成了快照和卷管理之類的功能。我一開始也帶着「 Btrfs 和 ZFS 都提供了類似的功能，因此兩者必然有類似的設計」這樣的先入觀念 …" />
+
+        <meta property="og:site_name" content="Farseerfcの巣" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Btrfs vs ZFS 實現 snapshot 的差異"/>
+        <meta property="og:url" content="//farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"/>
+        <meta property="og:description" content="Btrfs 和 ZFS 都是開源的寫時拷貝（Copy on Write, CoW）文件系統，都提供了相似的子卷管理和 快照(snapshot）的功能。網上有不少文章都評價 ZFS 實現 CoW FS 的創新之處，進而想說「 Btrfs 只是 Linux/GPL 陣營對 ZFS 的拙劣抄襲」，或許（在存儲領域人盡皆知而領域外）鮮有人知在 ZFS 之前就有 NetApp 的商業產品 WAFL(Write Anywhere File Layout) 實現了 CoW 語義的文件系統，並且集成了快照和卷管理之類的功能。我一開始也帶着「 Btrfs 和 ZFS 都提供了類似的功能，因此兩者必然有類似的設計」這樣的先入觀念 …"/>
+        <meta property="article:published_time" content="2020-01-01" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="btrfs" />
+            <meta property="article:tag" content="zfs" />
+            <meta property="article:tag" content="cow" />
+            <meta property="article:tag" content="snapshot" />
+            <meta property="article:tag" content="clone" />
+            <meta property="article:tag" content="subvolume" />
+            <meta property="article:tag" content="dedup" />
+            <meta property="article:tag" content="reflink" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/jp/btrfs-vs-zfs-difference-in-implementing-snapshots.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/jp/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの巣 ATOM Feed"/>
+
+        <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">Btrfs vs ZFS 實現 snapshot 的差異 - Farseerfcの巣</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">ナビの切り替え</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/jp/" class="navbar-brand">
+Farseerfcの巣            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                                 連絡
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                         連絡
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.me/jp/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/jp/" title="Farseerfcの巣"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/jp/category/tech.html" title="tech">tech</a></li>
+                <li class="active">Btrfs vs ZFS 實現 snapshot 的差異</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        Btrfs vs ZFS 實現 snapshot 的差異
+                        <a href="//farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="Btrfs vs ZFS 實現 snapshot 的差異　へのパーマリンク">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-01-01T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年01月01日(週三)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html">繁體</a></li><li><a href="//farseerfc.me/jp/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/jp/.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/jp/.pdf" class="btn btn-primary" title="このページの印刷版PDFファイルを表示する" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/jp/.png" class="btn btn-primary" title="このページのスクリーンショットPNGファイルを表示する" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="btrfs-vs-zfs-difference-in-implementing-snapshots" data-disqus-url="http://farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/jp/tag/btrfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> btrfs</a>
+	<a href="//farseerfc.me/jp/tag/zfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> zfs</a>
+	<a href="//farseerfc.me/jp/tag/cow.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> cow</a>
+	<a href="//farseerfc.me/jp/tag/snapshot.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> snapshot</a>
+	<a href="//farseerfc.me/jp/tag/clone.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> clone</a>
+	<a href="//farseerfc.me/jp/tag/subvolume.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> subvolume</a>
+	<a href="//farseerfc.me/jp/tag/dedup.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> dedup</a>
+	<a href="//farseerfc.me/jp/tag/reflink.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> reflink</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目次                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></li>
+<li><a class="reference internal" href="#zfs-dataset-snapshot-clone-bookmark-checkpoint" id="id2">ZFS 的數據集（dataset）、快照（snapshot）、克隆（clone）、書籤（bookmark）和檢查點（checkpoint）</a><ul>
+<li><a class="reference internal" href="#dataset" id="id3">數據集（dataset）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<p>Btrfs 和 ZFS 都是開源的寫時拷貝（Copy on Write, CoW）文件系統，都提供了相似的子卷管理和
+快照(snapshot）的功能。網上有不少文章都評價 ZFS 實現 CoW FS 的創新之處，進而想說「 Btrfs
+只是 Linux/GPL 陣營對 ZFS 的拙劣抄襲」，或許（在存儲領域人盡皆知而領域外）鮮有人知在 ZFS
+之前就有 <a class="reference external" href="https://en.wikipedia.org/wiki/NetApp">NetApp</a> 的商業產品
+<a class="reference external" href="https://en.wikipedia.org/wiki/Write_Anywhere_File_Layout">WAFL(Write Anywhere File Layout)</a>
+實現了 CoW 語義的文件系統，並且集成了快照和卷管理之類的功能。我一開始也帶着「 Btrfs 和 ZFS
+都提供了類似的功能，因此兩者必然有類似的設計」這樣的先入觀念，嘗試去使用這兩個文件系統，
+卻經常撞上兩者細節上的差異，導致使用時需要不盡相同的工作流，
+或者看似相似的用法有不太一樣的性能表現，又或者一邊有的功能（比如 ZFS 的 inband dedup ，
+Btrfs 的 reflink ）在另一邊沒有的情況。</p>
+<p>爲了更好地理解這些差異，我四處查詢這兩個文件系統的實現細節，於是有了這篇筆記，
+記錄一下我查到的種種發現和自己的理解。<del>（或許會寫成一個系列？還是先別亂挖坑不填。）</del>
+只是自己的筆記，所有參閱的資料文檔都是二手資料，沒有深挖過源碼，還參雜了自己的理解，
+於是難免有和事實相違的地方，如有寫錯，還請留言糾正。</p>
+<div class="section" id="btrfs-subvolume-snapshot">
+<h2><a class="toc-backref" href="#id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
+<p>先從兩個文件系統中（表面上看起來）比較簡單的 btrfs 的子卷（subvolume）和快照（snapshot）說起。
+關於子卷和快照的常規用法、推薦佈局之類的話題就不細說了，網上能找到很多不錯的資料，比如
+<a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 頁</a>
+和 Arch wiki 上 <a class="reference external" href="https://wiki.archlinux.org/index.php/Btrfs#Subvolumes">Btrfs#Subvolumes</a> 頁都有不錯的參考價值。</p>
+<p>在 btrfs 中，存在於存儲媒介中的只有「子卷」的概念，「快照」只是個創建「子卷」的方式，
+換句話說在 btrfs 的術語裏，子卷（subvolume）是個名詞，而快照（snapshot）是個動詞。
+如果脫離了 btrfs 術語的上下文，或者不精確地隨口說說的時候，也經常有人把 btrfs
+的快照命令創建出的子卷叫做一個快照。或者我們可以理解爲，
+<strong>互相共享一部分元數據（metadata）的子卷互爲彼此的快照（名詞）</strong> ，
+那麼按照這個定義的話，在 btrfs 中創建快照（名詞）的方式其實有兩種：</p>
+<ol class="arabic simple">
+<li>用 <code class="code">
+btrfs subvolume snapshot</code>
+ 命令創建快照</li>
+<li>用 <code class="code">
+btrfs send</code>
+ 命令並使用 <code class="code">
+-p</code>
+ 參數發送快照，並在管道另一端接收</li>
+</ol>
+<div class="panel panel-default">
+<div class="panel-heading">
+<code class="code">
+btrfs send</code>
+ 命令的 <code class="code">
+-p</code>
+ 與 <code class="code">
+-c</code>
+</div>
+<div class="panel-body">
+<p>這裏也順便提一下 <code class="code">
+btrfs send</code>
+ 命令的 <code class="code">
+-p</code>
+ 參數和 <code class="code">
+-c</code>
+ 參數的差異。
+只看 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-send#DESCRIPTION">btrfs-send(8)</a> 的描述的話：</p>
+<blockquote>
+<div class="line-block">
+<div class="line">-p &lt;parent&gt;</div>
+<div class="line-block">
+<div class="line">send an incremental stream from parent to subvol</div>
+<div class="line"><br/></div>
+</div>
+<div class="line">-c &lt;clone-src&gt;</div>
+<div class="line-block">
+<div class="line">use this snapshot as a clone source for an incremental send (multiple allowed)</div>
+</div>
+</div>
+</blockquote>
+<p>看起來這兩個都可以用來生成兩個快照之間的差分，只不過 -p 只能指定一個「parent」，
+而 -c 能指定多個「clone source」。在
+<a class="reference external" href="https://unix.stackexchange.com/a/490857">unix stackexchange 上有人寫明了這兩個的異同</a>
+。使用 -p 的時候，產生的差分首先讓接收端用 subvolume snapshot 命令對 parent 子卷創建一個快照，
+然後發送指令將這個快照修改成目標子卷的樣子，而使用 -c 的時候，首先在接收端用 subvolume create
+創建一個空的子卷，隨後發送指令在這個子卷中填充內容，其數據塊儘量共享 clone source 已有的數據。
+所以 <code class="code">
+btrfs send -p</code>
+ 在接收端產生是有共享元數據的快照，而 <code class="code">
+btrfs send -c</code>
+
+在接收端產生的是僅僅共享數據而不共享元數據的子卷。</p>
+</div>
+</div>
+<p>定義中「互相共享一部分 <strong>元數據</strong> 」比較重要，因爲除了快照的方式之外， btrfs
+的子卷間也可以通過 reflink 的形式共享數據塊。我們可以對一整個子卷（甚至目錄）執行
+<code class="code">
+cp -r --reflink=always</code>
+ ，創建出一個副本，副本的文件內容通過 reflink
+共享原本的數據，但不共享元數據，這樣創建出的就不是快照。</p>
+<p>說了這麼多，其實關鍵的只是 btrfs 在傳統 Unix 文件系統的「目錄/文件/inode」
+這些東西之外只增加了一個「子卷」的新概念，而子卷間可以共享元數據或者數據，
+用快照命令創建出的子卷就是共享一部分元數據。於是這個子卷在文件系統中具體是如何記錄的呢？
+舉個例子解釋可能比較好理解：</p>
+<p>比如在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Flat">SysadminGuide 這頁的 Flat 佈局</a>
+有個子卷佈局的例子。</p>
+<pre class="code literal-block">
+toplevel         (volume root directory, not to be mounted by default)
+    +-- root       (subvolume root directory, to be mounted at /)
+    +-- home       (subvolume root directory, to be mounted at /home)
+    +-- var        (directory)
+    |   \-- www    (subvolume root directory, to be mounted at /var/www)
+    \-- postgres   (subvolume root directory, to be mounted at /var/lib/postgresql)
+</pre>
+<p>用圓柱體表示子卷的話畫成圖大概是這個樣子：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Flat_layout Pages: 1 -->
+<svg class="svg-responsive" height="206pt" viewbox="0.00 0.00 287.00 206.00" width="287pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 202)">
+<title>Flat_layout</title>
+<polygon fill="white" points="-4,4 -4,-202 283,-202 283,4 -4,4" stroke="none"></polygon>
+<!-- toplevel -->
+<g class="node" id="node1"><title>toplevel</title>
+<polygon fill="none" points="74,-117 0,-117 0,-81 74,-81 74,-117" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="37" y="-95.3">toplevel</text>
+</g>
+<!-- root -->
+<g class="node" id="node2"><title>root</title>
+<polygon fill="none" points="176.5,-198 122.5,-198 122.5,-162 176.5,-162 176.5,-198" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="149.5" y="-176.3">root</text>
+</g>
+<!-- toplevel&#45;&gt;root -->
+<g class="edge" id="edge1"><title>toplevel-&gt;root</title>
+<path d="M61.858,-117.193C75.8106,-127.757 93.8106,-141.257 110,-153 111.363,-153.989 112.756,-154.993 114.166,-156.005" fill="none" stroke="black"></path>
+<polygon fill="black" points="112.149,-158.865 122.326,-161.812 116.208,-153.162 112.149,-158.865" stroke="black"></polygon>
+</g>
+<!-- home -->
+<g class="node" id="node3"><title>home</title>
+<polygon fill="none" points="177.5,-144 121.5,-144 121.5,-108 177.5,-108 177.5,-144" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="149.5" y="-122.3">home</text>
+</g>
+<!-- toplevel&#45;&gt;home -->
+<g class="edge" id="edge2"><title>toplevel-&gt;home</title>
+<path d="M74.1818,-107.841C86.1802,-110.773 99.5461,-114.038 111.598,-116.983" fill="none" stroke="black"></path>
+<polygon fill="black" points="110.809,-120.393 121.354,-119.367 112.47,-113.593 110.809,-120.393" stroke="black"></polygon>
+</g>
+<!-- var -->
+<g class="node" id="node4"><title>var</title>
+<polygon fill="none" points="176.5,-90 173.5,-94 152.5,-94 149.5,-90 122.5,-90 122.5,-54 176.5,-54 176.5,-90" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="149.5" y="-68.3">var</text>
+</g>
+<!-- toplevel&#45;&gt;var -->
+<g class="edge" id="edge3"><title>toplevel-&gt;var</title>
+<path d="M74.1818,-90.1592C86.4753,-87.1554 100.204,-83.8008 112.485,-80.8001" fill="none" stroke="black"></path>
+<polygon fill="black" points="113.513,-84.152 122.396,-78.3783 111.851,-77.352 113.513,-84.152" stroke="black"></polygon>
+</g>
+<!-- postgres -->
+<g class="node" id="node6"><title>postgres</title>
+<polygon fill="none" points="189,-36 110,-36 110,-0 189,-0 189,-36" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="149.5" y="-14.3">postgres</text>
+</g>
+<!-- toplevel&#45;&gt;postgres -->
+<g class="edge" id="edge5"><title>toplevel-&gt;postgres</title>
+<path d="M61.858,-80.8074C75.8106,-70.2433 93.8106,-56.7433 110,-45 111.363,-44.0113 112.756,-43.0067 114.166,-41.9951" fill="none" stroke="black"></path>
+<polygon fill="black" points="116.208,-44.8379 122.326,-36.188 112.149,-39.1347 116.208,-44.8379" stroke="black"></polygon>
+</g>
+<!-- www -->
+<g class="node" id="node5"><title>www</title>
+<polygon fill="none" points="279,-90 225,-90 225,-54 279,-54 279,-90" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="252" y="-68.3">www</text>
+</g>
+<!-- var&#45;&gt;www -->
+<g class="edge" id="edge4"><title>var-&gt;www</title>
+<path d="M176.643,-72C188.275,-72 202.165,-72 214.775,-72" fill="none" stroke="black"></path>
+<polygon fill="black" points="214.988,-75.5001 224.988,-72 214.988,-68.5001 214.988,-75.5001" stroke="black"></polygon>
+</g>
+</g>
+</svg>
+<p>首先要說明， btrfs 中大部分長度可變的數據結構都是
+<a class="reference external" href="https://www.usenix.org/legacy/events/lsf07/tech/rodeh.pdf">CoW B-tree</a>
+，一種經過修改適合寫時拷貝的B樹結構，所以在
+<a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/On-disk_Format">on-disk format</a>
+中提到了很多個樹。這裏的樹不是指文件系統中目錄結構樹，而是 CoW B-tree
+，如果不關心B樹細節的話可以把 btrfs 所說的一棵樹理解爲關係數據庫中的一個表，
+和數據庫的表一樣 btrfs 的樹的長度可變，然後表項內容根據一個 key 排序。
+有這樣的背景之後，上圖例子中的 Flat 佈局在 btrfs 中大概是這樣的數據結構：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Flat_layout_on_disk Pages: 1 -->
+<svg class="svg-responsive" height="453pt" viewbox="0.00 0.00 1122.00 453.00" width="1122pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 449)">
+<title>Flat_layout_on_disk</title>
+<polygon fill="white" points="-4,4 -4,-449 1118,-449 1118,4 -4,4" stroke="none"></polygon>
+<!-- superblock -->
+<g class="node" id="node1"><title>superblock</title>
+<polygon fill="none" points="0,-315.5 0,-407.5 121,-407.5 121,-315.5 0,-315.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-392.3">SUPERBLOCK</text>
+<polyline fill="none" points="0,-384.5 121,-384.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-369.3">...</text>
+<polyline fill="none" points="0,-361.5 121,-361.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-346.3">root_tree</text>
+<polyline fill="none" points="0,-338.5 121,-338.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-323.3">...</text>
+</g>
+<!-- roottree -->
+<g class="node" id="node2"><title>roottree</title>
+<polygon fill="none" points="193,-62 193,-361 500,-361 500,-62 193,-62" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-345.8">ROOT_TREE</text>
+<polyline fill="none" points="193,-338 500,-338 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-322.8">2: extent_tree</text>
+<polyline fill="none" points="193,-315 500,-315 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-299.8">3: chunk_tree</text>
+<polyline fill="none" points="193,-292 500,-292 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-276.8">4: dev_tree</text>
+<polyline fill="none" points="193,-269 500,-269 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-253.8">5: fs_tree</text>
+<polyline fill="none" points="193,-246 500,-246 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-230.8">6: root_dir "default" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="193,-223 500,-223 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-207.8">10: free_space_tree</text>
+<polyline fill="none" points="193,-200 500,-200 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-184.8">256: fs_tree "root"</text>
+<polyline fill="none" points="193,-177 500,-177 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-161.8">257: fs_tree "home"</text>
+<polyline fill="none" points="193,-154 500,-154 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-138.8">258: fs_tree "www"</text>
+<polyline fill="none" points="193,-131 500,-131 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-115.8">259: fs_tree "postgres"</text>
+<polyline fill="none" points="193,-108 500,-108 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-92.8">-7: tree_log_tree</text>
+<polyline fill="none" points="193,-85 500,-85 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-69.8">-5: orphan_root</text>
+</g>
+<!-- superblock&#45;&gt;roottree -->
+<g class="edge" id="edge1"><title>superblock:sn_root-&gt;roottree:label</title>
+<path d="M121,-349.5C149.375,-349.5 158.88,-349.5 182.979,-349.5" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="183,-353 193,-349.5 183,-346 183,-353" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- roottree&#45;&gt;roottree -->
+<g class="edge" id="edge8"><title>roottree:root_dir:e-&gt;roottree:root_sub_root:e</title>
+<path d="M500.5,-234.5C547.667,-243.5 643,-243.5 643,-211.5 643,-181.625 559.908,-179.641 510.492,-186.833" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.788,-183.402 500.5,-188.5 510.94,-190.306 509.788,-183.402" stroke="black"></polygon>
+</g>
+<!-- toplevel -->
+<g class="node" id="node3"><title>toplevel</title>
+<polygon fill="none" points="572,-195.5 572,-379.5 916,-379.5 916,-195.5 572,-195.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-364.3">FS_TREE "toplevel"</text>
+<polyline fill="none" points="572,-356.5 916,-356.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-341.3">256: inode_item DIR</text>
+<polyline fill="none" points="572,-333.5 916,-333.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-318.3">256: dir_item: "root" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="572,-310.5 916,-310.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-295.3">256: dir_item: "home" -&gt; ROOT_ITEM 257</text>
+<polyline fill="none" points="572,-287.5 916,-287.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-272.3">256: dir_item: "var" -&gt; INODE_ITEM 257</text>
+<polyline fill="none" points="572,-264.5 916,-264.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-249.3">256: dir_item: "postgres" -&gt; ROOT_ITEM 259</text>
+<polyline fill="none" points="572,-241.5 916,-241.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-226.3">257: inode_item DIR</text>
+<polyline fill="none" points="572,-218.5 916,-218.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-203.3">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
+</g>
+<!-- roottree&#45;&gt;toplevel -->
+<g class="edge" id="edge7"><title>roottree:root_fs-&gt;toplevel:label</title>
+<path d="M500,-257.5C555.013,-257.5 518.642,-354.653 561.875,-367.176" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="561.631,-370.674 572,-368.5 562.538,-363.733 561.631,-370.674" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- root -->
+<g class="node" id="node4"><title>root</title>
+<polygon fill="none" points="662,-398.5 662,-444.5 826,-444.5 826,-398.5 662,-398.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-429.3">FS_TREE "root"</text>
+<polyline fill="none" points="662,-421.5 826,-421.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-406.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;root -->
+<g class="edge" id="edge9"><title>roottree:root_sub_root-&gt;root:label</title>
+<path d="M500,-188.5C594.473,-188.5 509.414,-317.731 572,-388.5 598.955,-418.979 614.069,-431.42 650.654,-433.257" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="650.92,-436.764 661,-433.5 651.085,-429.766 650.92,-436.764" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- home -->
+<g class="node" id="node5"><title>home</title>
+<polygon fill="none" points="662,-130.5 662,-176.5 826,-176.5 826,-130.5 662,-130.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-161.3">FS_TREE "home"</text>
+<polyline fill="none" points="662,-153.5 826,-153.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-138.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;home -->
+<g class="edge" id="edge10"><title>roottree:root_sub_home-&gt;home:label</title>
+<path d="M500,-165.5C568.062,-165.5 587.57,-165.5 650.89,-165.5" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="651,-169 661,-165.5 651,-162 651,-169" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- www -->
+<g class="node" id="node6"><title>www</title>
+<polygon fill="none" points="662,-65.5 662,-111.5 826,-111.5 826,-65.5 662,-65.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-96.3">FS_TREE "www"</text>
+<polyline fill="none" points="662,-88.5 826,-88.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-73.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;www -->
+<g class="edge" id="edge11"><title>roottree:root_sub_www-&gt;www:label</title>
+<path d="M500,-142.5C533.46,-142.5 539.654,-129.063 572,-120.5 607.671,-111.057 618.551,-102.235 650.786,-100.727" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="651.08,-104.221 661,-100.5 650.925,-97.2228 651.08,-104.221" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- postgres -->
+<g class="node" id="node7"><title>postgres</title>
+<polygon fill="none" points="662,-0.5 662,-46.5 826,-46.5 826,-0.5 662,-0.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-31.3">FS_TREE "postgres"</text>
+<polyline fill="none" points="662,-23.5 826,-23.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="744" y="-8.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;postgres -->
+<g class="edge" id="edge12"><title>roottree:root_sub_postgres-&gt;postgres:label</title>
+<path d="M500,-119.5C542.815,-119.5 533.903,-75.0367 572,-55.5 604.834,-38.6623 618.042,-35.9068 650.717,-35.5476" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="651.016,-39.0463 661,-35.5 650.984,-32.0464 651.016,-39.0463" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge2"><title>toplevel:toplevel_dir_root-&gt;roottree:root_sub_root</title>
+<path d="M572,-322.5C508.089,-322.5 561.085,-202.755 509.961,-189.658" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.337,-186.179 500,-188.5 509.529,-193.132 510.337,-186.179" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge3"><title>toplevel:toplevel_dir_home-&gt;roottree:root_sub_home</title>
+<path d="M572,-299.5C508.089,-299.5 561.085,-179.755 509.961,-166.658" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.337,-163.179 500,-165.5 509.529,-170.132 510.337,-163.179" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge5"><title>toplevel:toplevel_dir_postgres-&gt;roottree:root_sub_postgres</title>
+<path d="M572,-252.5C508.59,-252.5 560.56,-134.14 510.221,-120.732" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.347,-117.222 500,-119.5 509.509,-124.171 510.347,-117.222" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge6"><title>toplevel:toplevel_dir_www-&gt;roottree:root_sub_www</title>
+<path d="M572,-206.5C533.032,-206.5 540.821,-153.483 510.255,-143.957" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.393,-140.442 500,-142.5 509.408,-147.372 510.393,-140.442" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;toplevel -->
+<g class="edge" id="edge4"><title>toplevel:toplevel_dir_var:e-&gt;toplevel:toplevel_inode_var:e</title>
+<path d="M916,-275.5C982,-284.5 1114,-284.5 1114,-252.5 1114,-222.062 994.576,-220.576 926.117,-228.249" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="925.495,-224.799 916,-229.5 926.354,-231.746 925.495,-224.799" stroke="black"></polygon>
+</g>
+</g>
+</svg>
+<p>上圖中已經隱去了很多和本文無關的具體細節，所有這些細節都可以通過
+<a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-inspect-internal">btrfs inspect-internal 的 dump-super 和 dump-tree</a>
+查看到。btrfs 中的每棵樹都可以看作是一個數據庫表，可以包含很多表項，根據 KEY 排序，而 KEY
+是 (object_id, item_type, item_offset) 這樣的三元組。每個 object 在樹中用一個或多個
+item 描述，同 object_id 的 item 共同描述一個對象（object）。B樹中的 key 不必連續，從而
+object_id 也不必連續，只是按大小排序。有一些預留的 object_id 不能用作別的用途，
+他們的編號範圍是 -255ULL 到 255ULL，也就是表中前 255 和最後 255 個編號預留。</p>
+<p>ROOT_TREE 中包含了到別的所有 tree 的定義，像 2 號 extent_tree ，3 號 chunk_tree ，
+4 號 dev_tree ，10 號 free_space_tree ，這些 tree 都是描述文件系統結構非常重要的 tree
+。然後在 5 號對象有一個 fs_tree 它描述了整個 btrfs pool 的頂級子卷，也就是圖中叫
+toplevel 的那個子卷。除了頂級子卷之外，別的所有子卷的 object_id
+在 256ULL 到 -256ULL 的範圍之間，對子卷而言 ROOT_TREE 中的這些 object_id 也同時是它們的
+子卷 id ，在內核掛載文件系統的時候可以用 subvolid 找到它們，別的一些對子卷的操作也可以直接用
+subvolid 表示一個子卷。 ROOT_TREE 的 6 號對象描述的不是一棵樹，而是一個名叫 default
+的特殊目錄，它指向 btrfs pool 的默認掛載子卷。最初 mkfs 的時候，這個目錄指向 ROOT_ITEM 5
+，也就是那個頂級子卷，之後可以通過命令 <code class="code">
+btrfs subvolume set-default</code>
+
+修改它指向別的子卷，這裏它被改爲指向 ROOT_ITEM 256 亦即那個名叫 "root" 的子卷。</p>
+<p>每一個子卷都有一棵自己的 FS_TREE （有的文檔中叫 file tree），一個 FS_TREE 相當於傳統 Unix
+文件系統中的一整個 inode table ，只不過它除了包含 inode 信息之外還包含所有文件夾內容。在
+FS_TREE 中， object_id 同時也是它所描述對象的 inode 號，所以 btrfs
+的子卷有互相獨立的 inode 編號，不同子卷中的文件或目錄可以擁有相同的 inode 。 FS_TREE
+中一個目錄用一個 inode_item 和多個 dir_item 描述， inode_item 是目錄自己的 inode
+，那些 dir_item 是目錄的內容。 dir_item 可以指向別的 inode_item ，描述普通文件和子目錄，
+也可以指向 root_item ，描述這個目錄指向一個子卷。</p>
+<p>比如上圖 FS_TREE toplevel 中，有兩個對象，第一個 256 是（子卷的）根目錄，第二個 257
+是 "var" 目錄，256 有4個子目錄，其中 "root" "home" "postgres" 這三個指向了 ROOT_TREE
+中的對應子卷，而 "var" 指向了 inode 257 。然後 257 有一個子目錄叫 "www" 它指向了
+ROOT_TREE 中 object_id 爲 258 的子卷。</p>
+<p>以上是子卷、目錄、 inode 在 btrfs 中的記錄方式，你可能想知道，如何記錄一個快照呢？
+如果我們在上面的佈局基礎上執行：</p>
+<pre class="code bash literal-block">
+btrfs subvolume snapshot toplevel toplevel/toplevel@s1
+</pre>
+<p>那麼產生的數據結構大概如下所示：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Flat_layout_on_disk Pages: 1 -->
+<svg class="svg-responsive" height="680pt" viewbox="0.00 0.00 1155.00 680.00" width="1155pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 676)">
+<title>Flat_layout_on_disk</title>
+<polygon fill="white" points="-4,4 -4,-676 1151,-676 1151,4 -4,4" stroke="none"></polygon>
+<!-- superblock -->
+<g class="node" id="node1"><title>superblock</title>
+<polygon fill="none" points="0,-523.5 0,-615.5 121,-615.5 121,-523.5 0,-523.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-600.3">SUPERBLOCK</text>
+<polyline fill="none" points="0,-592.5 121,-592.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-577.3">...</text>
+<polyline fill="none" points="0,-569.5 121,-569.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-554.3">root_tree</text>
+<polyline fill="none" points="0,-546.5 121,-546.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-531.3">...</text>
+</g>
+<!-- roottree -->
+<g class="node" id="node2"><title>roottree</title>
+<polygon fill="none" points="193,-246.5 193,-568.5 500,-568.5 500,-246.5 193,-246.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-553.3">ROOT_TREE</text>
+<polyline fill="none" points="193,-545.5 500,-545.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-530.3">2: extent_tree</text>
+<polyline fill="none" points="193,-522.5 500,-522.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-507.3">3: chunk_tree</text>
+<polyline fill="none" points="193,-499.5 500,-499.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-484.3">4: dev_tree</text>
+<polyline fill="none" points="193,-476.5 500,-476.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-461.3">5: fs_tree</text>
+<polyline fill="none" points="193,-453.5 500,-453.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-438.3">6: root_dir "default" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="193,-430.5 500,-430.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-415.3">10: free_space_tree</text>
+<polyline fill="none" points="193,-407.5 500,-407.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-392.3">256: fs_tree "root"</text>
+<polyline fill="none" points="193,-384.5 500,-384.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-369.3">257: fs_tree "home"</text>
+<polyline fill="none" points="193,-361.5 500,-361.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-346.3">258: fs_tree "www"</text>
+<polyline fill="none" points="193,-338.5 500,-338.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-323.3">259: fs_tree "postgres"</text>
+<polyline fill="none" points="193,-315.5 500,-315.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-300.3">260: fs_tree "toplevel@s1"</text>
+<polyline fill="none" points="193,-292.5 500,-292.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-277.3">-7: tree_log_tree</text>
+<polyline fill="none" points="193,-269.5 500,-269.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-254.3">-5: orphan_root</text>
+</g>
+<!-- superblock&#45;&gt;roottree -->
+<g class="edge" id="edge1"><title>superblock:sn_root-&gt;roottree:label</title>
+<path d="M121,-557.5C149.375,-557.5 158.88,-557.5 182.979,-557.5" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="183,-561 193,-557.5 183,-554 183,-561" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- roottree&#45;&gt;roottree -->
+<g class="edge" id="edge15"><title>roottree:root_dir:e-&gt;roottree:root_sub_root:e</title>
+<path d="M500.5,-442.5C547.667,-451.5 643,-451.5 643,-419 643,-388.658 559.908,-386.643 510.492,-393.833" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.788,-390.402 500.5,-395.5 510.94,-397.307 509.788,-390.402" stroke="black"></polygon>
+</g>
+<!-- toplevel -->
+<g class="node" id="node3"><title>toplevel</title>
+<polygon fill="none" points="572,-334 572,-541 942,-541 942,-334 572,-334" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-525.8">FS_TREE "toplevel"</text>
+<polyline fill="none" points="572,-518 942,-518 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-502.8">256: inode_item DIR</text>
+<polyline fill="none" points="572,-495 942,-495 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-479.8">256: dir_item: "root" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="572,-472 942,-472 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-456.8">256: dir_item: "home" -&gt; ROOT_ITEM 257</text>
+<polyline fill="none" points="572,-449 942,-449 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-433.8">256: dir_item: "var" -&gt; INODE_ITEM 257</text>
+<polyline fill="none" points="572,-426 942,-426 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-410.8">256: dir_item: "postgres" -&gt; ROOT_ITEM 259</text>
+<polyline fill="none" points="572,-403 942,-403 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-387.8">256: dir_item: "toplevel@s1" -&gt; ROOT_ITEM 260</text>
+<polyline fill="none" points="572,-380 942,-380 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-364.8">257: inode_item DIR</text>
+<polyline fill="none" points="572,-357 942,-357 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-341.8">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
+</g>
+<!-- roottree&#45;&gt;toplevel -->
+<g class="edge" id="edge13"><title>roottree:root_fs-&gt;toplevel:label</title>
+<path d="M500,-465.5C538.968,-465.5 531.179,-518.517 561.745,-528.043" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="561.607,-531.558 572,-529.5 562.592,-524.628 561.607,-531.558" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- toplevels1 -->
+<g class="node" id="node4"><title>toplevels1</title>
+<polygon fill="none" points="585,-130.5 585,-314.5 929,-314.5 929,-130.5 585,-130.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-299.3">FS_TREE "toplevel@s1"</text>
+<polyline fill="none" points="585,-291.5 929,-291.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-276.3">256: inode_item DIR</text>
+<polyline fill="none" points="585,-268.5 929,-268.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-253.3">256: dir_item: "root" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="585,-245.5 929,-245.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-230.3">256: dir_item: "home" -&gt; ROOT_ITEM 257</text>
+<polyline fill="none" points="585,-222.5 929,-222.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-207.3">256: dir_item: "var" -&gt; INODE_ITEM 257</text>
+<polyline fill="none" points="585,-199.5 929,-199.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-184.3">256: dir_item: "postgres" -&gt; ROOT_ITEM 259</text>
+<polyline fill="none" points="585,-176.5 929,-176.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-161.3">257: inode_item DIR</text>
+<polyline fill="none" points="585,-153.5 929,-153.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-138.3">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
+</g>
+<!-- roottree&#45;&gt;toplevels1 -->
+<g class="edge" id="edge14"><title>roottree:root_sub_s1-&gt;toplevels1:label</title>
+<path d="M500,-303.5C533.688,-303.5 544.577,-303.5 573.811,-303.5" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="574,-307 584,-303.5 574,-300 574,-307" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- root -->
+<g class="node" id="node5"><title>root</title>
+<polygon fill="none" points="675,-625.5 675,-671.5 839,-671.5 839,-625.5 675,-625.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-656.3">FS_TREE "root"</text>
+<polyline fill="none" points="675,-648.5 839,-648.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-633.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;root -->
+<g class="edge" id="edge16"><title>roottree:root_sub_root-&gt;root:label</title>
+<path d="M500,-395.5C603.303,-395.5 502.401,-540.161 572,-616.5 602.859,-650.348 621.757,-659.262 663.75,-660.374" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.958,-663.877 674,-660.5 664.044,-656.877 663.958,-663.877" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- home -->
+<g class="node" id="node6"><title>home</title>
+<polygon fill="none" points="675,-560.5 675,-606.5 839,-606.5 839,-560.5 675,-560.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-591.3">FS_TREE "home"</text>
+<polyline fill="none" points="675,-583.5 839,-583.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-568.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;home -->
+<g class="edge" id="edge17"><title>roottree:root_sub_home-&gt;home:label</title>
+<path d="M500,-372.5C585.338,-372.5 512.603,-489.225 572,-550.5 604.062,-583.576 621.843,-594.046 664,-595.354" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.95,-598.854 674,-595.5 664.052,-591.855 663.95,-598.854" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- www -->
+<g class="node" id="node7"><title>www</title>
+<polygon fill="none" points="675,-65.5 675,-111.5 839,-111.5 839,-65.5 675,-65.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-96.3">FS_TREE "www"</text>
+<polyline fill="none" points="675,-88.5 839,-88.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-73.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;www -->
+<g class="edge" id="edge18"><title>roottree:root_sub_www-&gt;www:label</title>
+<path d="M500,-349.5C606.69,-349.5 492.49,-191.64 572,-120.5 603.805,-92.0428 624.471,-99.0956 663.859,-100.335" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.944,-103.837 674,-100.5 664.058,-96.8378 663.944,-103.837" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- postgres -->
+<g class="node" id="node8"><title>postgres</title>
+<polygon fill="none" points="675,-0.5 675,-46.5 839,-46.5 839,-0.5 675,-0.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-31.3">FS_TREE "postgres"</text>
+<polyline fill="none" points="675,-23.5 839,-23.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-8.3">256: inode_item DIR</text>
+</g>
+<!-- roottree&#45;&gt;postgres -->
+<g class="edge" id="edge19"><title>roottree:root_sub_postgres-&gt;postgres:label</title>
+<path d="M500,-326.5C624.623,-326.5 481.016,-140.663 572,-55.5 603.158,-26.3354 624.373,-33.9878 663.847,-35.3228" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.94,-38.8249 674,-35.5 664.063,-31.8259 663.94,-38.8249" stroke="black" stroke-width="2"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge2"><title>toplevel:toplevel_dir_root-&gt;roottree:root_sub_root</title>
+<path d="M572,-483.5C525.217,-483.5 546.658,-408.078 510.001,-396.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.385,-393.402 500,-395.5 509.427,-400.336 510.385,-393.402" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge3"><title>toplevel:toplevel_dir_home-&gt;roottree:root_sub_home</title>
+<path d="M572,-460.5C525.217,-460.5 546.658,-385.078 510.001,-373.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.385,-370.402 500,-372.5 509.427,-377.336 510.385,-370.402" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge5"><title>toplevel:toplevel_dir_postgres-&gt;roottree:root_sub_postgres</title>
+<path d="M572,-414.5C525.217,-414.5 546.658,-339.078 510.001,-327.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.385,-324.402 500,-326.5 509.427,-331.336 510.385,-324.402" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge6"><title>toplevel:toplevel_dir_toplevels1-&gt;roottree:root_sub_s1</title>
+<path d="M572,-391.5C525.217,-391.5 546.658,-316.078 510.001,-304.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510.385,-301.402 500,-303.5 509.427,-308.336 510.385,-301.402" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;roottree -->
+<g class="edge" id="edge7"><title>toplevel:toplevel_dir_www-&gt;roottree:root_sub_www</title>
+<path d="M572,-345.5C543.581,-345.5 534.149,-348.645 510.032,-349.358" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.949,-345.858 500,-349.5 510.049,-352.858 509.949,-345.858" stroke="black"></polygon>
+</g>
+<!-- toplevel&#45;&gt;toplevel -->
+<g class="edge" id="edge4"><title>toplevel:toplevel_dir_var:e-&gt;toplevel:toplevel_inode_var:e</title>
+<path d="M942,-437.5C1010.33,-446.5 1147,-446.5 1147,-403 1147,-361.539 1022.85,-359.596 952.039,-367.297" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="951.513,-363.835 942,-368.5 952.345,-370.785 951.513,-363.835" stroke="black"></polygon>
+</g>
+<!-- toplevels1&#45;&gt;roottree -->
+<g class="edge" id="edge8"><title>toplevels1:toplevels1_dir_root-&gt;roottree:root_sub_root</title>
+<path d="M584,-257.5C515.844,-257.5 566.087,-381.84 509.956,-394.469" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.586,-390.988 500,-395.5 510.307,-397.951 509.586,-390.988" stroke="black"></polygon>
+</g>
+<!-- toplevels1&#45;&gt;roottree -->
+<g class="edge" id="edge9"><title>toplevels1:toplevels1_dir_home-&gt;roottree:root_sub_home</title>
+<path d="M584,-234.5C515.844,-234.5 566.087,-358.84 509.956,-371.469" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.586,-367.988 500,-372.5 510.307,-374.951 509.586,-367.988" stroke="black"></polygon>
+</g>
+<!-- toplevels1&#45;&gt;roottree -->
+<g class="edge" id="edge11"><title>toplevels1:toplevels1_dir_postgres-&gt;roottree:root_sub_postgres</title>
+<path d="M584,-187.5C515.483,-187.5 566.393,-312.741 510.006,-325.461" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.585,-321.986 500,-326.5 510.308,-328.948 509.585,-321.986" stroke="black"></polygon>
+</g>
+<!-- toplevels1&#45;&gt;roottree -->
+<g class="edge" id="edge12"><title>toplevels1:toplevels1_dir_www-&gt;roottree:root_sub_www</title>
+<path d="M584,-141.5C488.001,-141.5 591.43,-334.349 510.233,-348.662" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.681,-345.195 500,-349.5 510.252,-352.172 509.681,-345.195" stroke="black"></polygon>
+</g>
+<!-- toplevels1&#45;&gt;toplevels1 -->
+<g class="edge" id="edge10"><title>toplevels1:toplevels1_dir_var:e-&gt;toplevels1:toplevels1_inode_var:e</title>
+<path d="M929,-210.5C997.333,-219.5 1134,-219.5 1134,-187.5 1134,-157 1009.85,-155.57 939.039,-163.296" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="938.512,-159.834 929,-164.5 939.346,-166.784 938.512,-159.834" stroke="black"></polygon>
+</g>
+</g>
+</svg>
+<p>在 ROOT_TREE 中增加了 260 號子卷，其內容複製自 toplevel 子卷，然後 FS_TREE toplevel
+的 256 號 inode 也就是根目錄中增加一個 dir_item 名叫 "<a class="reference external" href="mailto:toplevel@s1">toplevel@s1</a>" 它指向 ROOT_ITEM
+的 260 號子卷。這裏看似是完整複製了整個 FS_TREE 的內容，這是因爲 CoW b-tree
+，當只有一個葉子時就複製整個葉子。如果子卷內容再多一些，除了葉子之外還有中間節點，
+那麼只有被修改的葉子和其上的中間節點需要複製。</p>
+<p>從子卷和快照的這種實現方式，可以看出： <strong>雖然子卷可以嵌套子卷，但是對含有嵌套子卷的子卷做快照難以快速實現</strong>
+。因此在目前實現的 btrfs 語義中，當子卷 S1 嵌套有別的子卷 S2 的時候，對 S1 做</p>
+</div>
+<div class="section" id="zfs-dataset-snapshot-clone-bookmark-checkpoint">
+<h2><a class="toc-backref" href="#id2">ZFS 的數據集（dataset）、快照（snapshot）、克隆（clone）、書籤（bookmark）和檢查點（checkpoint）</a></h2>
+<p>Btrfs 給傳統文件系統只增加了子卷的概念，相比之下 ZFS 中類似子卷的概念有好幾個，分別叫：</p>
+<ul class="simple">
+<li>數據集（dataset）</li>
+<li>快照（snapshot）</li>
+<li>克隆（clone）</li>
+<li>書籤（bookmark）：從 ZFS on Linux v0.6.4 開始</li>
+<li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
+</ul>
+<p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些東西：</p>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/d0a8892b.png"/>
+<div class="section" id="dataset">
+<h3><a class="toc-backref" href="#id3">數據集（dataset）</a></h3>
+<p>先從最簡單的概念說起。在 ZFS 的術語中，把底層管理和釋放存儲設備空間的叫做 ZFS 存儲池（pool），
+簡稱 zpool ，其上可以創建多個數據集（dataset）。容易看出數據集的概念直接對應 btrfs
+中的子卷。也有很多介紹 ZFS 的文檔中把一個數據集（dataset）叫做一個文件系統（filesystem），
+這或許是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 這樣的）傳統的卷管理器
+與其上創建的多個文件系統（Solaris UFS 或者 Linux ext）這樣的上下層級做類比。
+從 btrfs 的子卷在內部結構中叫作 FS_TREE 這一點可以看出，至少在 btrfs
+早期設計中大概也是把子卷稱爲 filesystem 做過類似的類比的。</p>
+<p>與 btrfs 的子卷不同的是， ZFS 的數據集之間是完全隔離的，（除了後文會講的 dedup
+方式之外）不可以共享任何數據或者元數據。</p>
+</div>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f94e2f8d330> 番目の文章：                  </h4>
+                </div>
+                <ul class="list-group">
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus コメント            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'btrfs-vs-zfs-difference-in-implementing-snapshots';
+                        var disqus_url = 'http://farseerfc.me/jp/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/jp/about.html">
+farseerfc に連絡</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/jp/about.html"><img width="100%" src="//farseerfc.me/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHubのリポ</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目次</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+
+<ul class="simple">
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></li>
+<li><a class="reference internal" href="#zfs-dataset-snapshot-clone-bookmark-checkpoint" id="id2">ZFS 的數據集（dataset）、快照（snapshot）、克隆（clone）、書籤（bookmark）和檢查點（checkpoint）</a><ul>
+<li><a class="reference internal" href="#dataset" id="id3">數據集（dataset）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2014 farseerfc
+            &middot; ここは            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> で生成する                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/jp/../theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
