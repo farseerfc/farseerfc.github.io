@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink" />
-        <meta name="description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」，或许（在存储领域人尽皆知而领域外）鲜有人知在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。我一开始也带着「 Btrfs 和 ZFS 都提供了类似的功能，因此两者必然有类似的设计」这样的先入观念 …" />
+        <meta name="description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」，或许（在存储领域人尽皆知而领域外）鲜有人知在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的 论文 和 发表幻灯片 也明显提到 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Btrfs vs ZFS 实现 snapshot 的差异"/>
         <meta property="og:url" content="//farseerfc.me/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"/>
-        <meta property="og:description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」，或许（在存储领域人尽皆知而领域外）鲜有人知在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。我一开始也带着「 Btrfs 和 ZFS 都提供了类似的功能，因此两者必然有类似的设计」这样的先入观念 …"/>
+        <meta property="og:description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」，或许（在存储领域人尽皆知而领域外）鲜有人知在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的 论文 和 发表幻灯片 也明显提到 …"/>
         <meta property="article:published_time" content="2020-01-01" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="btrfs" />
@@ -228,9 +228,9 @@ Farseerfc的小窝            </a>
 <li class="active"><a href="//farseerfc.me/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html">简体</a></li><li><a href="//farseerfc.me/zhs/../drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html" class="translate">繁體</a></li></ul>
 </div>
 
-    <a onclick="$.get('//farseerfc.me/zhs/.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
-    <a href="//farseerfc.me/zhs/.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
-    <a href="//farseerfc.me/zhs/.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+    <a onclick="$.get('//farseerfc.me/zhs/btrfs-vs-zfs-difference-in-implementing-snapshots.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/zhs/btrfs-vs-zfs-difference-in-implementing-snapshots.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/btrfs-vs-zfs-difference-in-implementing-snapshots.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
 
 <small><span><a href="//farseerfc.me/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="btrfs-vs-zfs-difference-in-implementing-snapshots" data-disqus-url="http://farseerfc.me/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
 	<a href="//farseerfc.me/zhs/tag/btrfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> btrfs</a>
@@ -256,9 +256,15 @@ Farseerfc的小窝            </a>
                         <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></li>
-<li><a class="reference internal" href="#zfs-dataset-snapshot-clone-bookmark-checkpoint" id="id2">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）、书签（bookmark）和检查点（checkpoint）</a><ul>
-<li><a class="reference internal" href="#dataset" id="id3">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的术语</a></li>
+<li><a class="reference internal" href="#id3" id="id8">于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id9">那么快照又是如何记录的呢？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#dataset" id="id11">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
 </ul>
 </li>
 </ul>
@@ -271,21 +277,27 @@ Farseerfc的小窝            </a>
 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」，或许（在存储领域人尽皆知而领域外）鲜有人知在 ZFS
 之前就有 <a class="reference external" href="https://en.wikipedia.org/wiki/NetApp">NetApp</a> 的商业产品
 <a class="reference external" href="https://en.wikipedia.org/wiki/Write_Anywhere_File_Layout">WAFL(Write Anywhere File Layout)</a>
-实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。我一开始也带着「 Btrfs 和 ZFS
+实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的
+<a class="reference external" href="https://btrfs.wiki.kernel.org/images-btrfs/6/68/Btree_TOS.pdf">论文</a>
+和 <a class="reference external" href="https://btrfs.wiki.kernel.org/images-btrfs/6/63/LinuxFS_Workshop.pdf">发表幻灯片</a>
+也明显提到 WAFL 比提到 ZFS 更多一些。
+我一开始也带着「 Btrfs 和 ZFS
 都提供了类似的功能，因此两者必然有类似的设计」这样的先入观念，尝试去使用这两个文件系统，
 却经常撞上两者细节上的差异，导致使用时需要不尽相同的工作流，
 或者看似相似的用法有不太一样的性能表现，又或者一边有的功能（比如 ZFS 的 inband dedup ，
 Btrfs 的 reflink ）在另一边没有的情况。</p>
-<p>为了更好地理解这些差异，我四处查询这两个文件系统的实现细节，于是有了这篇笔记，
+<p>为了更好地理解这些差异，我四处搜罗这两个文件系统的实现细节，于是有了这篇笔记，
 记录一下我查到的种种发现和自己的理解。<del>（或许会写成一个系列？还是先别乱挖坑不填。）</del>
 只是自己的笔记，所有参阅的资料文档都是二手资料，没有深挖过源码，还参杂了自己的理解，
 于是难免有和事实相违的地方，如有写错，还请留言纠正。</p>
 <div class="section" id="btrfs-subvolume-snapshot">
-<h2><a class="toc-backref" href="#id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
+<h2><a class="toc-backref" href="#id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
 <p>先从两个文件系统中（表面上看起来）比较简单的 btrfs 的子卷（subvolume）和快照（snapshot）说起。
 关于子卷和快照的常规用法、推荐布局之类的话题就不细说了，网上能找到很多不错的资料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 页</a>
 和 Arch wiki 上 <a class="reference external" href="https://wiki.archlinux.org/index.php/Btrfs#Subvolumes">Btrfs#Subvolumes</a> 页都有不错的参考价值。</p>
+<div class="section" id="subvolume-snapshot">
+<h3><a class="toc-backref" href="#id7">子卷（subvolume）和快照（snapshot）的术语</a></h3>
 <p>在 btrfs 中，存在于存储媒介中的只有「子卷」的概念，「快照」只是个创建「子卷」的方式，
 换句话说在 btrfs 的术语里，子卷（subvolume）是个名词，而快照（snapshot）是个动词。
 如果脱离了 btrfs 术语的上下文，或者不精确地随口说说的时候，也经常有人把 btrfs
@@ -355,8 +367,10 @@ cp -r --reflink=always</code>
 共享原本的数据，但不共享元数据，这样创建出的就不是快照。</p>
 <p>说了这么多，其实关键的只是 btrfs 在传统 Unix 文件系统的「目录/文件/inode」
 这些东西之外只增加了一个「子卷」的新概念，而子卷间可以共享元数据或者数据，
-用快照命令创建出的子卷就是共享一部分元数据。于是这个子卷在文件系统中具体是如何记录的呢？
-举个例子解释可能比较好理解：</p>
+用快照命令创建出的子卷就是共享一部分元数据。</p>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id8">于是子卷在存储介质中是如何记录的呢？</a></h3>
 <p>比如在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Flat">SysadminGuide 这页的 Flat 布局</a>
 有个子卷布局的例子。</p>
 <pre class="code literal-block">
@@ -606,15 +620,17 @@ toplevel         (volume root directory, not to be mounted by default)
 </svg>
 <p>上图中已经隐去了很多和本文无关的具体细节，所有这些细节都可以通过
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Manpage/btrfs-inspect-internal">btrfs inspect-internal 的 dump-super 和 dump-tree</a>
-查看到。btrfs 中的每棵树都可以看作是一个数据库表，可以包含很多表项，根据 KEY 排序，而 KEY
-是 (object_id, item_type, item_offset) 这样的三元组。每个 object 在树中用一个或多个
-item 描述，同 object_id 的 item 共同描述一个对象（object）。B树中的 key 不必连续，从而
-object_id 也不必连续，只是按大小排序。有一些预留的 object_id 不能用作别的用途，
-他们的编号范围是 -255ULL 到 255ULL，也就是表中前 255 和最后 255 个编号预留。</p>
-<p>ROOT_TREE 中包含了到别的所有 tree 的定义，像 2 号 extent_tree ，3 号 chunk_tree ，
-4 号 dev_tree ，10 号 free_space_tree ，这些 tree 都是描述文件系统结构非常重要的 tree
-。然后在 5 号对象有一个 fs_tree 它描述了整个 btrfs pool 的顶级子卷，也就是图中叫
-toplevel 的那个子卷。除了顶级子卷之外，别的所有子卷的 object_id
+查看到。btrfs 中的每棵树都可以看作是一个数据库中的表，可以包含很多表项，根据 KEY 排序，而 KEY
+是 (object_id, item_type, item_extra) 这样的三元组。每个对象（object）在树中用一个或多个
+表项（item）描述，同 object_id 的表项共同描述一个对象（object）。B树中的 key
+只用来比较大小不必连续，从而 object_id 也不必连续，只是按大小排序。有一些预留的 object_id
+不能用作别的用途，他们的编号范围是 -255ULL 到 255ULL，也就是表中前 255 和最后 255 个编号预留。</p>
+<p>ROOT_TREE 中记录了到所有别的B树的指针，在一些文档中叫做 tree of tree roots 。「所有别的B树」
+举例来说比如 2 号 extent_tree ，3 号 chunk_tree ， 4 号 dev_tree ，10 号 free_space_tree
+，这些B树都是描述 btrfs 文件系统结构非常重要的组成部分，但是在本文关系不大，
+今后有机会再讨论它们。在 ROOT_TREE 的 5 号对象有一个 fs_tree ，它描述了整个 btrfs pool
+的顶级子卷，也就是图中叫 toplevel 的那个子卷（有些文档用定冠词称 the FS_TREE
+的时候就是在说这个 5 号树，而不是别的子卷的 FS_TREE ）。除了顶级子卷之外，别的所有子卷的 object_id
 在 256ULL 到 -256ULL 的范围之间，对子卷而言 ROOT_TREE 中的这些 object_id 也同时是它们的
 子卷 id ，在内核挂载文件系统的时候可以用 subvolid 找到它们，别的一些对子卷的操作也可以直接用
 subvolid 表示一个子卷。 ROOT_TREE 的 6 号对象描述的不是一棵树，而是一个名叫 default
@@ -626,16 +642,28 @@ btrfs subvolume set-default</code>
 <p>每一个子卷都有一棵自己的 FS_TREE （有的文档中叫 file tree），一个 FS_TREE 相当于传统 Unix
 文件系统中的一整个 inode table ，只不过它除了包含 inode 信息之外还包含所有文件夹内容。在
 FS_TREE 中， object_id 同时也是它所描述对象的 inode 号，所以 btrfs
-的子卷有互相独立的 inode 编号，不同子卷中的文件或目录可以拥有相同的 inode 。 FS_TREE
+的 <strong>子卷有互相独立的 inode 编号</strong> ，不同子卷中的文件或目录可以拥有相同的 inode 。 FS_TREE
 中一个目录用一个 inode_item 和多个 dir_item 描述， inode_item 是目录自己的 inode
-，那些 dir_item 是目录的内容。 dir_item 可以指向别的 inode_item ，描述普通文件和子目录，
-也可以指向 root_item ，描述这个目录指向一个子卷。</p>
+，那些 dir_item 是目录的内容。 dir_item 可以指向别的 inode_item 来描述普通文件和子目录，
+也可以指向 root_item 来描述这个目录指向一个子卷。有人或许疑惑，子卷就没有自己的 inode
+么？其实如果看 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Data_Structures#btrfs_root_item">数据结构定义</a>
+的话 <code class="code">
+struct btrfs_root_item</code>
+ 结构在最开头的地方包含了一个
+<code class="code">
+struct btrfs_inode_item</code>
+ 所以 root_item 也同时作为子卷的 inode
+，不过用户通常看不到这个子卷的 inode ，因为子卷在被（手动或自动地）挂载到目录上之后，
+用户会看到的是子卷的根目录的 inode 。</p>
 <p>比如上图 FS_TREE toplevel 中，有两个对象，第一个 256 是（子卷的）根目录，第二个 257
 是 "var" 目录，256 有4个子目录，其中 "root" "home" "postgres" 这三个指向了 ROOT_TREE
 中的对应子卷，而 "var" 指向了 inode 257 。然后 257 有一个子目录叫 "www" 它指向了
 ROOT_TREE 中 object_id 为 258 的子卷。</p>
+</div>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id9">那么快照又是如何记录的呢？</a></h3>
 <p>以上是子卷、目录、 inode 在 btrfs 中的记录方式，你可能想知道，如何记录一个快照呢？
-如果我们在上面的布局基础上执行：</p>
+特别是，如果对一个包含子卷的子卷创建了快照，会得到什么结果呢？如果我们在上面的布局基础上执行：</p>
 <pre class="code bash literal-block">
 btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 </pre>
@@ -647,61 +675,61 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 <!-- Generated by graphviz version 2.38.0 (20140413.2041)
  -->
 <!-- Title: Flat_layout_on_disk Pages: 1 -->
-<svg class="svg-responsive" height="680pt" viewbox="0.00 0.00 1155.00 680.00" width="1155pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 676)">
+<svg class="svg-responsive" height="712pt" viewbox="0.00 0.00 1155.00 712.00" width="1155pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 708)">
 <title>Flat_layout_on_disk</title>
-<polygon fill="white" points="-4,4 -4,-676 1151,-676 1151,4 -4,4" stroke="none"></polygon>
+<polygon fill="white" points="-4,4 -4,-708 1151,-708 1151,4 -4,4" stroke="none"></polygon>
 <!-- superblock -->
 <g class="node" id="node1"><title>superblock</title>
-<polygon fill="none" points="0,-523.5 0,-615.5 121,-615.5 121,-523.5 0,-523.5" stroke="black"></polygon>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-600.3">SUPERBLOCK</text>
-<polyline fill="none" points="0,-592.5 121,-592.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-577.3">...</text>
-<polyline fill="none" points="0,-569.5 121,-569.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-554.3">root_tree</text>
-<polyline fill="none" points="0,-546.5 121,-546.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-531.3">...</text>
+<polygon fill="none" points="0,-611.5 0,-703.5 121,-703.5 121,-611.5 0,-611.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-688.3">SUPERBLOCK</text>
+<polyline fill="none" points="0,-680.5 121,-680.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-665.3">...</text>
+<polyline fill="none" points="0,-657.5 121,-657.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-642.3">root_tree</text>
+<polyline fill="none" points="0,-634.5 121,-634.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="60.5" y="-619.3">...</text>
 </g>
 <!-- roottree -->
 <g class="node" id="node2"><title>roottree</title>
-<polygon fill="none" points="193,-246.5 193,-568.5 500,-568.5 500,-246.5 193,-246.5" stroke="black"></polygon>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-553.3">ROOT_TREE</text>
-<polyline fill="none" points="193,-545.5 500,-545.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-530.3">2: extent_tree</text>
-<polyline fill="none" points="193,-522.5 500,-522.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-507.3">3: chunk_tree</text>
-<polyline fill="none" points="193,-499.5 500,-499.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-484.3">4: dev_tree</text>
-<polyline fill="none" points="193,-476.5 500,-476.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-461.3">5: fs_tree</text>
-<polyline fill="none" points="193,-453.5 500,-453.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-438.3">6: root_dir "default" -&gt; ROOT_ITEM 256</text>
-<polyline fill="none" points="193,-430.5 500,-430.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-415.3">10: free_space_tree</text>
-<polyline fill="none" points="193,-407.5 500,-407.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-392.3">256: fs_tree "root"</text>
-<polyline fill="none" points="193,-384.5 500,-384.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-369.3">257: fs_tree "home"</text>
-<polyline fill="none" points="193,-361.5 500,-361.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-346.3">258: fs_tree "www"</text>
-<polyline fill="none" points="193,-338.5 500,-338.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-323.3">259: fs_tree "postgres"</text>
-<polyline fill="none" points="193,-315.5 500,-315.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-300.3">260: fs_tree "toplevel@s1"</text>
-<polyline fill="none" points="193,-292.5 500,-292.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-277.3">-7: tree_log_tree</text>
-<polyline fill="none" points="193,-269.5 500,-269.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-254.3">-5: orphan_root</text>
+<polygon fill="none" points="193,-334.5 193,-656.5 500,-656.5 500,-334.5 193,-334.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-641.3">ROOT_TREE</text>
+<polyline fill="none" points="193,-633.5 500,-633.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-618.3">2: extent_tree</text>
+<polyline fill="none" points="193,-610.5 500,-610.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-595.3">3: chunk_tree</text>
+<polyline fill="none" points="193,-587.5 500,-587.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-572.3">4: dev_tree</text>
+<polyline fill="none" points="193,-564.5 500,-564.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-549.3">5: fs_tree</text>
+<polyline fill="none" points="193,-541.5 500,-541.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-526.3">6: root_dir "default" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="193,-518.5 500,-518.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-503.3">10: free_space_tree</text>
+<polyline fill="none" points="193,-495.5 500,-495.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-480.3">256: fs_tree "root"</text>
+<polyline fill="none" points="193,-472.5 500,-472.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-457.3">257: fs_tree "home"</text>
+<polyline fill="none" points="193,-449.5 500,-449.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-434.3">258: fs_tree "www"</text>
+<polyline fill="none" points="193,-426.5 500,-426.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-411.3">259: fs_tree "postgres"</text>
+<polyline fill="none" points="193,-403.5 500,-403.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-388.3">260: fs_tree "toplevel@s1"</text>
+<polyline fill="none" points="193,-380.5 500,-380.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-365.3">-7: tree_log_tree</text>
+<polyline fill="none" points="193,-357.5 500,-357.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="346.5" y="-342.3">-5: orphan_root</text>
 </g>
 <!-- superblock&#45;&gt;roottree -->
 <g class="edge" id="edge1"><title>superblock:sn_root-&gt;roottree:label</title>
-<path d="M121,-557.5C149.375,-557.5 158.88,-557.5 182.979,-557.5" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="183,-561 193,-557.5 183,-554 183,-561" stroke="black" stroke-width="2"></polygon>
+<path d="M121,-645.5C149.375,-645.5 158.88,-645.5 182.979,-645.5" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="183,-649 193,-645.5 183,-642 183,-649" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- roottree&#45;&gt;roottree -->
-<g class="edge" id="edge15"><title>roottree:root_dir:e-&gt;roottree:root_sub_root:e</title>
-<path d="M500.5,-442.5C547.667,-451.5 643,-451.5 643,-419 643,-388.658 559.908,-386.643 510.492,-393.833" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.788,-390.402 500.5,-395.5 510.94,-397.307 509.788,-390.402" stroke="black"></polygon>
+<g class="edge" id="edge10"><title>roottree:root_dir:e-&gt;roottree:root_sub_root:e</title>
+<path d="M500.5,-530.5C547.667,-539.5 643,-539.5 643,-507 643,-476.658 559.908,-474.643 510.492,-481.833" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.788,-478.402 500.5,-483.5 510.94,-485.307 509.788,-478.402" stroke="black"></polygon>
 </g>
 <!-- toplevel -->
 <g class="node" id="node3"><title>toplevel</title>
@@ -725,33 +753,33 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 <text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-341.8">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
 </g>
 <!-- roottree&#45;&gt;toplevel -->
-<g class="edge" id="edge13"><title>roottree:root_fs-&gt;toplevel:label</title>
-<path d="M500,-465.5C538.968,-465.5 531.179,-518.517 561.745,-528.043" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="561.607,-531.558 572,-529.5 562.592,-524.628 561.607,-531.558" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge8"><title>roottree:root_fs-&gt;toplevel:label</title>
+<path d="M500,-553.5C530.042,-553.5 536.927,-534.463 561.903,-530.299" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="562.307,-533.778 572,-529.5 561.755,-526.799 562.307,-533.778" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- toplevels1 -->
 <g class="node" id="node4"><title>toplevels1</title>
-<polygon fill="none" points="585,-130.5 585,-314.5 929,-314.5 929,-130.5 585,-130.5" stroke="black"></polygon>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-299.3">FS_TREE "toplevel@s1"</text>
-<polyline fill="none" points="585,-291.5 929,-291.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-276.3">256: inode_item DIR</text>
-<polyline fill="none" points="585,-268.5 929,-268.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-253.3">256: dir_item: "root" -&gt; ROOT_ITEM 256</text>
-<polyline fill="none" points="585,-245.5 929,-245.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-230.3">256: dir_item: "home" -&gt; ROOT_ITEM 257</text>
-<polyline fill="none" points="585,-222.5 929,-222.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-207.3">256: dir_item: "var" -&gt; INODE_ITEM 257</text>
-<polyline fill="none" points="585,-199.5 929,-199.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-184.3">256: dir_item: "postgres" -&gt; ROOT_ITEM 259</text>
-<polyline fill="none" points="585,-176.5 929,-176.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-161.3">257: inode_item DIR</text>
-<polyline fill="none" points="585,-153.5 929,-153.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-138.3">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
+<polygon fill="none" points="585,-0.5 585,-184.5 929,-184.5 929,-0.5 585,-0.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-169.3">FS_TREE "toplevel@s1"</text>
+<polyline fill="none" points="585,-161.5 929,-161.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-146.3">256: inode_item DIR</text>
+<polyline fill="none" points="585,-138.5 929,-138.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-123.3">256: dir_item: "root" -&gt; ROOT_ITEM 256</text>
+<polyline fill="none" points="585,-115.5 929,-115.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-100.3">256: dir_item: "home" -&gt; ROOT_ITEM 257</text>
+<polyline fill="none" points="585,-92.5 929,-92.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-77.3">256: dir_item: "var" -&gt; INODE_ITEM 257</text>
+<polyline fill="none" points="585,-69.5 929,-69.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-54.3">256: dir_item: "postgres" -&gt; ROOT_ITEM 259</text>
+<polyline fill="none" points="585,-46.5 929,-46.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-31.3">257: inode_item DIR</text>
+<polyline fill="none" points="585,-23.5 929,-23.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-8.3">257: dir_item: "www" -&gt; ROOT_ITEM 258</text>
 </g>
 <!-- roottree&#45;&gt;toplevels1 -->
-<g class="edge" id="edge14"><title>roottree:root_sub_s1-&gt;toplevels1:label</title>
-<path d="M500,-303.5C533.688,-303.5 544.577,-303.5 573.811,-303.5" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="574,-307 584,-303.5 574,-300 574,-307" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge9"><title>roottree:root_sub_s1-&gt;toplevels1:label</title>
+<path d="M500,-391.5C600.182,-391.5 488.581,-188.559 573.873,-174.289" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="574.302,-177.767 584,-173.5 573.758,-170.788 574.302,-177.767" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- root -->
 <g class="node" id="node5"><title>root</title>
@@ -761,9 +789,9 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 <text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-633.3">256: inode_item DIR</text>
 </g>
 <!-- roottree&#45;&gt;root -->
-<g class="edge" id="edge16"><title>roottree:root_sub_root-&gt;root:label</title>
-<path d="M500,-395.5C603.303,-395.5 502.401,-540.161 572,-616.5 602.859,-650.348 621.757,-659.262 663.75,-660.374" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="663.958,-663.877 674,-660.5 664.044,-656.877 663.958,-663.877" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge11"><title>roottree:root_sub_root-&gt;root:label</title>
+<path d="M500,-483.5C567.217,-483.5 522.405,-571.13 572,-616.5 605.796,-647.416 622.182,-658.839 663.796,-660.328" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.942,-663.831 674,-660.5 664.06,-656.832 663.942,-663.831" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- home -->
 <g class="node" id="node6"><title>home</title>
@@ -773,102 +801,122 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 <text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-568.3">256: inode_item DIR</text>
 </g>
 <!-- roottree&#45;&gt;home -->
-<g class="edge" id="edge17"><title>roottree:root_sub_home-&gt;home:label</title>
-<path d="M500,-372.5C585.338,-372.5 512.603,-489.225 572,-550.5 604.062,-583.576 621.843,-594.046 664,-595.354" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="663.95,-598.854 674,-595.5 664.052,-591.855 663.95,-598.854" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge12"><title>roottree:root_sub_home-&gt;home:label</title>
+<path d="M500,-460.5C551.225,-460.5 531.4,-519.264 572,-550.5 608.433,-578.53 622.41,-593.282 663.804,-595.268" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.923,-598.772 674,-595.5 664.082,-591.773 663.923,-598.772" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- www -->
 <g class="node" id="node7"><title>www</title>
-<polygon fill="none" points="675,-65.5 675,-111.5 839,-111.5 839,-65.5 675,-65.5" stroke="black"></polygon>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-96.3">FS_TREE "www"</text>
-<polyline fill="none" points="675,-88.5 839,-88.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-73.3">256: inode_item DIR</text>
+<polygon fill="none" points="675,-268.5 675,-314.5 839,-314.5 839,-268.5 675,-268.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-299.3">FS_TREE "www"</text>
+<polyline fill="none" points="675,-291.5 839,-291.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-276.3">256: inode_item DIR</text>
 </g>
 <!-- roottree&#45;&gt;www -->
-<g class="edge" id="edge18"><title>roottree:root_sub_www-&gt;www:label</title>
-<path d="M500,-349.5C606.69,-349.5 492.49,-191.64 572,-120.5 603.805,-92.0428 624.471,-99.0956 663.859,-100.335" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="663.944,-103.837 674,-100.5 664.058,-96.8378 663.944,-103.837" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge13"><title>roottree:root_sub_www-&gt;www:label</title>
+<path d="M500,-437.5C559.551,-437.5 522.961,-358.285 572,-324.5 607.137,-300.293 624.84,-302.871 663.654,-303.421" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.974,-306.924 674,-303.5 664.027,-299.924 663.974,-306.924" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- postgres -->
 <g class="node" id="node8"><title>postgres</title>
-<polygon fill="none" points="675,-0.5 675,-46.5 839,-46.5 839,-0.5 675,-0.5" stroke="black"></polygon>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-31.3">FS_TREE "postgres"</text>
-<polyline fill="none" points="675,-23.5 839,-23.5 " stroke="black"></polyline>
-<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-8.3">256: inode_item DIR</text>
+<polygon fill="none" points="675,-203.5 675,-249.5 839,-249.5 839,-203.5 675,-203.5" stroke="black"></polygon>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-234.3">FS_TREE "postgres"</text>
+<polyline fill="none" points="675,-226.5 839,-226.5 " stroke="black"></polyline>
+<text font-family="Times,serif" font-size="14.00" text-anchor="middle" x="757" y="-211.3">256: inode_item DIR</text>
 </g>
 <!-- roottree&#45;&gt;postgres -->
-<g class="edge" id="edge19"><title>roottree:root_sub_postgres-&gt;postgres:label</title>
-<path d="M500,-326.5C624.623,-326.5 481.016,-140.663 572,-55.5 603.158,-26.3354 624.373,-33.9878 663.847,-35.3228" fill="none" stroke="black" stroke-width="2"></path>
-<polygon fill="black" points="663.94,-38.8249 674,-35.5 664.063,-31.8259 663.94,-38.8249" stroke="black" stroke-width="2"></polygon>
+<g class="edge" id="edge14"><title>roottree:root_sub_postgres-&gt;postgres:label</title>
+<path d="M500,-414.5C576.362,-414.5 511.957,-305.68 572,-258.5 605.486,-232.187 624.657,-237.392 663.641,-238.365" fill="none" stroke="black" stroke-width="2"></path>
+<polygon fill="black" points="663.955,-241.87 674,-238.5 664.046,-234.87 663.955,-241.87" stroke="black" stroke-width="2"></polygon>
 </g>
 <!-- toplevel&#45;&gt;roottree -->
 <g class="edge" id="edge2"><title>toplevel:toplevel_dir_root-&gt;roottree:root_sub_root</title>
-<path d="M572,-483.5C525.217,-483.5 546.658,-408.078 510.001,-396.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="510.385,-393.402 500,-395.5 509.427,-400.336 510.385,-393.402" stroke="black"></polygon>
+<path d="M572,-483.5C543.625,-483.5 534.12,-483.5 510.021,-483.5" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510,-480 500,-483.5 510,-487 510,-480" stroke="black"></polygon>
 </g>
 <!-- toplevel&#45;&gt;roottree -->
 <g class="edge" id="edge3"><title>toplevel:toplevel_dir_home-&gt;roottree:root_sub_home</title>
-<path d="M572,-460.5C525.217,-460.5 546.658,-385.078 510.001,-373.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="510.385,-370.402 500,-372.5 509.427,-377.336 510.385,-370.402" stroke="black"></polygon>
+<path d="M572,-460.5C543.625,-460.5 534.12,-460.5 510.021,-460.5" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510,-457 500,-460.5 510,-464 510,-457" stroke="black"></polygon>
 </g>
 <!-- toplevel&#45;&gt;roottree -->
 <g class="edge" id="edge5"><title>toplevel:toplevel_dir_postgres-&gt;roottree:root_sub_postgres</title>
-<path d="M572,-414.5C525.217,-414.5 546.658,-339.078 510.001,-327.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="510.385,-324.402 500,-326.5 509.427,-331.336 510.385,-324.402" stroke="black"></polygon>
+<path d="M572,-414.5C543.625,-414.5 534.12,-414.5 510.021,-414.5" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510,-411 500,-414.5 510,-418 510,-411" stroke="black"></polygon>
 </g>
 <!-- toplevel&#45;&gt;roottree -->
 <g class="edge" id="edge6"><title>toplevel:toplevel_dir_toplevels1-&gt;roottree:root_sub_s1</title>
-<path d="M572,-391.5C525.217,-391.5 546.658,-316.078 510.001,-304.882" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="510.385,-301.402 500,-303.5 509.427,-308.336 510.385,-301.402" stroke="black"></polygon>
+<path d="M572,-391.5C543.625,-391.5 534.12,-391.5 510.021,-391.5" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="510,-388 500,-391.5 510,-395 510,-388" stroke="black"></polygon>
 </g>
 <!-- toplevel&#45;&gt;roottree -->
 <g class="edge" id="edge7"><title>toplevel:toplevel_dir_www-&gt;roottree:root_sub_www</title>
-<path d="M572,-345.5C543.581,-345.5 534.149,-348.645 510.032,-349.358" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.949,-345.858 500,-349.5 510.049,-352.858 509.949,-345.858" stroke="black"></polygon>
+<path d="M572,-345.5C523.932,-345.5 547.657,-424.351 510.245,-436.055" fill="none" stroke="black" stroke-dasharray="5,2"></path>
+<polygon fill="none" points="509.413,-432.638 500,-437.5 510.391,-439.569 509.413,-432.638" stroke="black"></polygon>
 </g>
 <!-- toplevel&#45;&gt;toplevel -->
 <g class="edge" id="edge4"><title>toplevel:toplevel_dir_var:e-&gt;toplevel:toplevel_inode_var:e</title>
 <path d="M942,-437.5C1010.33,-446.5 1147,-446.5 1147,-403 1147,-361.539 1022.85,-359.596 952.039,-367.297" fill="none" stroke="black" stroke-dasharray="5,2"></path>
 <polygon fill="none" points="951.513,-363.835 942,-368.5 952.345,-370.785 951.513,-363.835" stroke="black"></polygon>
 </g>
-<!-- toplevels1&#45;&gt;roottree -->
-<g class="edge" id="edge8"><title>toplevels1:toplevels1_dir_root-&gt;roottree:root_sub_root</title>
-<path d="M584,-257.5C515.844,-257.5 566.087,-381.84 509.956,-394.469" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.586,-390.988 500,-395.5 510.307,-397.951 509.586,-390.988" stroke="black"></polygon>
-</g>
-<!-- toplevels1&#45;&gt;roottree -->
-<g class="edge" id="edge9"><title>toplevels1:toplevels1_dir_home-&gt;roottree:root_sub_home</title>
-<path d="M584,-234.5C515.844,-234.5 566.087,-358.84 509.956,-371.469" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.586,-367.988 500,-372.5 510.307,-374.951 509.586,-367.988" stroke="black"></polygon>
-</g>
-<!-- toplevels1&#45;&gt;roottree -->
-<g class="edge" id="edge11"><title>toplevels1:toplevels1_dir_postgres-&gt;roottree:root_sub_postgres</title>
-<path d="M584,-187.5C515.483,-187.5 566.393,-312.741 510.006,-325.461" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.585,-321.986 500,-326.5 510.308,-328.948 509.585,-321.986" stroke="black"></polygon>
-</g>
-<!-- toplevels1&#45;&gt;roottree -->
-<g class="edge" id="edge12"><title>toplevels1:toplevels1_dir_www-&gt;roottree:root_sub_www</title>
-<path d="M584,-141.5C488.001,-141.5 591.43,-334.349 510.233,-348.662" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="509.681,-345.195 500,-349.5 510.252,-352.172 509.681,-345.195" stroke="black"></polygon>
-</g>
-<!-- toplevels1&#45;&gt;toplevels1 -->
-<g class="edge" id="edge10"><title>toplevels1:toplevels1_dir_var:e-&gt;toplevels1:toplevels1_inode_var:e</title>
-<path d="M929,-210.5C997.333,-219.5 1134,-219.5 1134,-187.5 1134,-157 1009.85,-155.57 939.039,-163.296" fill="none" stroke="black" stroke-dasharray="5,2"></path>
-<polygon fill="none" points="938.512,-159.834 929,-164.5 939.346,-166.784 938.512,-159.834" stroke="black"></polygon>
-</g>
 </g>
 </svg>
 <p>在 ROOT_TREE 中增加了 260 号子卷，其内容复制自 toplevel 子卷，然后 FS_TREE toplevel
 的 256 号 inode 也就是根目录中增加一个 dir_item 名叫 "<a class="reference external" href="mailto:toplevel@s1">toplevel@s1</a>" 它指向 ROOT_ITEM
 的 260 号子卷。这里看似是完整复制了整个 FS_TREE 的内容，这是因为 CoW b-tree
-，当只有一个叶子时就复制整个叶子。如果子卷内容再多一些，除了叶子之外还有中间节点，
-那么只有被修改的叶子和其上的中间节点需要复制。</p>
-<p>从子卷和快照的这种实现方式，可以看出： <strong>虽然子卷可以嵌套子卷，但是对含有嵌套子卷的子卷做快照难以快速实现</strong>
-。因此在目前实现的 btrfs 语义中，当子卷 S1 嵌套有别的子卷 S2 的时候，对 S1 做</p>
+当只有一个叶子节点时就复制整个叶子节点。如果子卷内容再多一些，除了叶子之外还有中间节点，
+那么只有被修改的叶子和其上的中间节点需要复制。从而创建快照的开销基本上是
+O( level of FS_TREE )，而B树的高度一般都能维持在很低的程度，所以快照创建速度近乎是常数开销。</p>
+<p>从子卷和快照的这种实现方式，可以看出： <strong>虽然子卷可以嵌套子卷，但是对含有嵌套子卷的子卷做快照的语义有些特别</strong>
+。上图中我没有画 <a class="reference external" href="mailto:toplevel@s1">toplevel@s1</a> 下的各个子卷到对应 ROOT_ITEM 之间的虚线箭头，
+是因为这时候如果你尝试直接跳过 toplevel 挂载 <a class="reference external" href="mailto:toplevel@s1">toplevel@s1</a> 到挂载点，
+会发现那些子卷没有被自动挂载，更奇怪的是那些子卷的目录项也不是个普通目录，
+尝试往它们中放东西会得到无权访问的错误，对它们能做的唯一事情是手动将别的子卷挂载在上面。
+推测原因在于这些子目录并不是真的目录，没有对应的目录的 inode ，试图查看它们的 inode
+号会得到 2 号，而这是个保留号不应该出现在 btrfs 的 inode 号中。
+每个子卷创建时会记录包含它的上级子卷，用 <code class="code">
+btrfs subvolume list</code>
+ 可以看到每个子卷的
+top level subvolid ，猜测当挂载 A 而 A 中嵌套的 B 子卷记录的上级子卷不是 A 的时候，
+会出现上述奇怪行为。嵌套子卷的快照还有一些别的奇怪行为，大家可以自己探索探索。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+建议用平坦的子卷布局</div>
+<div class="panel-body">
+<p>因为上述嵌套子卷在做快照时的特殊行为，
+我个人建议是 <strong>保持平坦的子卷布局</strong> ，也就是说：</p>
+<ol class="arabic simple">
+<li>只让顶层子卷包含其它子卷，除了顶层子卷之外的子卷只做手工挂载，不放嵌套子卷</li>
+<li>只在顶层子卷对其它子卷做快照，不快照顶层子卷</li>
+<li>虽然可以在顶层子卷放子卷之外的东西（文件或目录），不过因为想避免对顶层子卷做快照，
+所以避免在顶层子卷放普通文件。</li>
+</ol>
 </div>
-<div class="section" id="zfs-dataset-snapshot-clone-bookmark-checkpoint">
-<h2><a class="toc-backref" href="#id2">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）、书签（bookmark）和检查点（checkpoint）</a></h2>
-<p>Btrfs 给传统文件系统只增加了子卷的概念，相比之下 ZFS 中类似子卷的概念有好几个，分别叫：</p>
+</div>
+<p>btrfs 的子卷可以设置「可写」或者「只读」，在创建一个快照的时候也可以通过 <code class="code">
+-r</code>
+
+参数创建出一个只读快照。通常只读快照可能比可写的快照更有用，因为 <code class="code">
+btrfs send</code>
+
+命令只接受只读快照作为参考点。子卷可以有两种方式切换它是否只读的属性，可以通过
+<code class="code">
+btrfs property set &lt;subvol&gt; ro</code>
+ 直接修改是否只读，也可以对只读子卷用
+<code class="code">
+btrfs subvolume snapshot</code>
+ 创建出可写子卷，或者反过来对可写子卷创建出只读子卷。</p>
+<p>只读快照也有些特殊的限制，在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Special_Cases">SysadminGuide#Special_Cases</a>
+就提到一例，你不能把只读快照用 mv 移出包含它的目录，虽然你能用 mv 给它改名或者移动包含它的目录
+到别的地方。 btrfs wiki 上给出这个限制的原因是子卷中记录了它的上级，
+所以要移动它到别的上级需要修改这个子卷，从而只读子卷没法移动到别的上级（
+不过我还没搞清楚子卷在哪儿记录了它的上级，记录的是上级目录还是上级子卷）。不过这个限制可以通过
+对只读子卷在目标位置创建一个新的只读快照，然后删掉原位置的只读快照来解决。</p>
+</div>
+</div>
+<div class="section" id="zfs-dataset-snapshot-clone">
+<h2><a class="toc-backref" href="#id10">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）及其它</a></h2>
+<p>Btrfs 给传统文件系统只增加了子卷的概念，相比之下 ZFS 中类似子卷的概念有好几个，据我所知有这些：</p>
 <ul class="simple">
 <li>数据集（dataset）</li>
 <li>快照（snapshot）</li>
@@ -879,7 +927,7 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 <p>梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些东西：</p>
 <img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/d0a8892b.png"/>
 <div class="section" id="dataset">
-<h3><a class="toc-backref" href="#id3">数据集（dataset）</a></h3>
+<h3><a class="toc-backref" href="#id11">数据集（dataset）</a></h3>
 <p>先从最简单的概念说起。在 ZFS 的术语中，把底层管理和释放存储设备空间的叫做 ZFS 存储池（pool），
 简称 zpool ，其上可以创建多个数据集（dataset）。容易看出数据集的概念直接对应 btrfs
 中的子卷。也有很多介绍 ZFS 的文档中把一个数据集（dataset）叫做一个文件系统（filesystem），
@@ -888,7 +936,12 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
 从 btrfs 的子卷在内部结构中叫作 FS_TREE 这一点可以看出，至少在 btrfs
 早期设计中大概也是把子卷称为 filesystem 做过类似的类比的。</p>
 <p>与 btrfs 的子卷不同的是， ZFS 的数据集之间是完全隔离的，（除了后文会讲的 dedup
-方式之外）不可以共享任何数据或者元数据。</p>
+方式之外）不可以共享任何数据或者元数据。一个数据集还包含了隶属于其中的快照（snapshot）、
+克隆（clone）和书签（bookmark）。</p>
+</div>
+<div class="section" id="snapshot">
+<h3><a class="toc-backref" href="#id12">快照（snapshot）</a></h3>
+<p>一个 ZFS 的快照有点像一个 btrfs 的只读快照，是标记数据集在某一历史时刻上的只读状态。</p>
 </div>
 </div>
 
@@ -910,7 +963,7 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f94e31657f0> 篇：                  </h4>
+这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f0a907e1730> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1504,9 +1557,15 @@ btrfs subvolume snapshot toplevel toplevel/toplevel@s1
             <div class="toc" id="">
 
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id1">Btrfs 的子卷（subvolume）和快照（snapshot）</a></li>
-<li><a class="reference internal" href="#zfs-dataset-snapshot-clone-bookmark-checkpoint" id="id2">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）、书签（bookmark）和检查点（checkpoint）</a><ul>
-<li><a class="reference internal" href="#dataset" id="id3">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的术语</a></li>
+<li><a class="reference internal" href="#id3" id="id8">于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id9">那么快照又是如何记录的呢？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#dataset" id="id11">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
 </ul>
 </li>
 </ul>
