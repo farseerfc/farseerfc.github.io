@@ -265,6 +265,7 @@ Farseerfc的小窩            </a>
 <li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的數據集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
 <li><a class="reference internal" href="#dataset" id="id11">數據集（dataset）</a></li>
 <li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id13">克隆（clone）</a></li>
 </ul>
 </li>
 </ul>
@@ -927,12 +928,12 @@ btrfs subvolume snapshot</code>
 <li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
 </ul>
 <p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些東西：</p>
-<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/d0a8892b.png"/>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/d0a8892b.png"/>
 <div class="section" id="dataset">
 <h3><a class="toc-backref" href="#id11">數據集（dataset）</a></h3>
 <p>先從最簡單的概念說起。在 ZFS 的術語中，把底層管理和釋放存儲設備空間的叫做 ZFS 存儲池（pool），
 簡稱 zpool ，其上可以創建多個數據集（dataset）。容易看出數據集的概念直接對應 btrfs
-中的子卷。也有很多介紹 ZFS 的文檔中把一個數據集（dataset）叫做一個文件系統（filesystem），
+中的子卷。也有很多 ZFS 的文檔中把一個數據集（dataset）叫做一個文件系統（filesystem），
 這或許是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 這樣的）傳統的卷管理器
 與其上創建的多個文件系統（Solaris UFS 或者 Linux ext）這樣的上下層級做類比。
 從 btrfs 的子卷在內部結構中叫作 FS_TREE 這一點可以看出，至少在 btrfs
@@ -944,7 +945,33 @@ btrfs subvolume snapshot</code>
 </div>
 <div class="section" id="snapshot">
 <h3><a class="toc-backref" href="#id12">快照（snapshot）</a></h3>
-<p>一個 ZFS 的快照有點像一個 btrfs 的只讀快照，是標記數據集在某一歷史時刻上的只讀狀態。</p>
+<p>ZFS 的快照對應 btrfs 的只讀快照，是標記數據集在某一歷史時刻上的只讀狀態。
+和 btrfs 的只讀快照一樣， ZFS 的快照也兼作 send/receive 時的參考點。</p>
+<p>ZFS 中快照是排列在一個時間線上的，因爲都是只讀快照，它們是數據集在歷史上的不同時間點。
+這裏說的時間不是系統時鐘的時間，而是 ZFS 中事務組（TXG, transaction group）的一個序號。
+整個 ZFS pool 的每次寫入會被合併到一個事務組，對事務組分配一個嚴格遞增的序列號，
+提交一個事務組具有類似數據庫中事務的語義：要麼整個事務組都被完整提交，要麼整個 pool
+處於上一個事務組的狀態，即使中間發生突然斷電之類的意外也不會破壞事務語義。
+因此 ZFS 快照就是數據集處於某一個事務組時的狀態。</p>
+<p>如果不滿於對數據集進行的修改，想把整個數據集恢復到之前的狀態，那麼可以回滾（rollback
+）數據集到一個快照。回滾操作會撤銷掉對數據集的所有更改，並且默認參數下只能回滾到最近的一個快照。
+如果想回滾到更早的快照，可以先刪掉最近的幾個，或者可以使用 <code class="code">
+zfs rollback -r</code>
+
+參數刪除中間的快照並回滾。</p>
+<p>除了回滾操作，還可以直接只讀訪問到快照中的文件。 ZFS 的數據集中有個隱藏文件夾叫 ".zsh"
+，所以如果只想回滾一部分文件，可以從 ".zsh/snapshot/SNAPSHOT-NAME" 中把需要的文件複製出來。</p>
+</div>
+<div class="section" id="clone">
+<h3><a class="toc-backref" href="#id13">克隆（clone）</a></h3>
+<p>ZFS 的克隆有點像 btrfs 的可寫快照。因爲 ZFS 的快照是只讀的，如果想對快照做寫入，那需要先用
+<code class="code">
+zfs clone</code>
+ 從快照中建出一個克隆，創建出的克隆和快照共享元數據和數據。
+創建了克隆之後，作爲克隆參考點的快照會成爲克隆的父親，克隆存在期間無法刪除掉作爲其父親的快照。</p>
+<p>一個數據集可以有多個克隆</p>
+<p>可以看出和 btrfs 相比， ZFS 的快照有更多限制，而 ZFS 快照允許的操作都可以在 btrfs 中通過
+文件系統操作進行</p>
 </div>
 </div>
 
@@ -966,7 +993,7 @@ btrfs subvolume snapshot</code>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fdc4133d3b0> 篇：                  </h4>
+這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f43e9e79870> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1569,6 +1596,7 @@ btrfs subvolume snapshot</code>
 <li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的數據集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
 <li><a class="reference internal" href="#dataset" id="id11">數據集（dataset）</a></li>
 <li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id13">克隆（clone）</a></li>
 </ul>
 </li>
 </ul>
