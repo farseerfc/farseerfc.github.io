@@ -254,7 +254,7 @@ Farseerfc的小窝            </a>
 目录                        </div>
                         <div class="panel-boy">
                         <div class="toc" id="">
-
+<p class="topic-title">Contents</p>
 <ul class="simple">
 <li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
 <li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的术语</a></li>
@@ -263,9 +263,15 @@ Farseerfc的小窝            </a>
 </ul>
 </li>
 <li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#dataset" id="id11">数据集（dataset）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id13">克隆（clone）</a></li>
+<li><a class="reference internal" href="#zfs" id="id11">ZFS 中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id12">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id13">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id14">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id15">书签（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id16">检查点（checkpoint）</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id17">ZFS 的概念与 btrfs 概念的对比</a></li>
 </ul>
 </li>
 </ul>
@@ -287,7 +293,10 @@ ZFS 之前就有 <a class="reference external" href="https://en.wikipedia.org/wi
 都提供了类似的功能，因此两者必然有类似的设计」这样的先入观念，尝试去使用这两个文件系统，
 却经常撞上两者细节上的差异，导致使用时需要不尽相同的工作流，
 或者看似相似的用法有不太一样的性能表现，又或者一边有的功能（比如 ZFS 的 inband dedup ，
-Btrfs 的 reflink ）在另一边没有的情况。</p>
+Btrfs 的 reflink ）在另一边没有的情况。后来看到了
+<a class="reference external" href="https://lwn.net/Articles/342892/">LWN 的这篇 《A short history of btrfs》</a>
+让我意识到 btrfs 和 ZFS 虽然表面功能上看起来类似，但是实现细节上完全不一样，
+所以需要不一样的用法，适用于不一样的使用场景。</p>
 <p>为了更好地理解这些差异，我四处搜罗这两个文件系统的实现细节，于是有了这篇笔记，
 记录一下我查到的种种发现和自己的理解。<del>（或许会写成一个系列？还是先别乱挖坑不填。）</del>
 只是自己的笔记，所有参阅的资料文档都是二手资料，没有深挖过源码，还参杂了自己的理解，
@@ -298,6 +307,10 @@ Btrfs 的 reflink ）在另一边没有的情况。</p>
 关于子卷和快照的常规用法、推荐布局之类的话题就不细说了，网上能找到很多不错的资料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 页</a>
 和 Arch wiki 上 <a class="reference external" href="https://wiki.archlinux.org/index.php/Btrfs#Subvolumes">Btrfs#Subvolumes</a> 页都有不错的参考价值。</p>
+<p>关于写时拷贝（CoW）文件系统的优势，我们为什么要用 btrfs/zfs 这样的写时拷贝文件系统，
+而不是传统的文件系统设计，或者写时拷贝文件系统在使用时有什么区别之类的，网上同样也能找到很多介绍
+，这里不想再讨论。这里假设你用过 btrfs/zfs 至少一个的快照功能，知道它该怎么用，
+并且想知道更多细节，判断怎么用那些功能才合理。</p>
 <div class="section" id="subvolume-snapshot">
 <h3><a class="toc-backref" href="#id7">子卷（subvolume）和快照（snapshot）的术语</a></h3>
 <p>在 btrfs 中，存在于存储媒介中的只有「子卷」的概念，「快照」只是个创建「子卷」的方式，
@@ -928,11 +941,13 @@ btrfs subvolume snapshot</code>
 <li>检查点（checkpoint）：从 ZFS on Linux v0.8.0 开始</li>
 </ul>
 <p>梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些概念：</p>
-<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/d0a8892b.png"/>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/691888f7.png"/>
 <p>上图中，假设我们有一个 pool ，其中有 4 个数据集叫 d1~d4 ，然后数据集 d1 有两个快照 s1 和
 s2 。</p>
+<div class="section" id="zfs">
+<h3><a class="toc-backref" href="#id11">ZFS 中和快照相关的一些术语和概念</a></h3>
 <div class="section" id="dataset">
-<h3><a class="toc-backref" href="#id11">数据集（dataset）</a></h3>
+<h4><a class="toc-backref" href="#id12">数据集（dataset）</a></h4>
 <p>先从最简单的概念说起。在 ZFS 的术语中，把底层管理和释放存储设备空间的叫做 ZFS 存储池（pool），
 简称 zpool ，其上可以创建多个数据集（dataset）。容易看出数据集的概念直接对应 btrfs
 中的子卷。也有很多 ZFS 的文档中把一个数据集（dataset）叫做一个文件系统（filesystem），
@@ -946,7 +961,7 @@ s2 。</p>
 但是在 ROOT_TREE 的记录中属于平级的关系。</p>
 </div>
 <div class="section" id="snapshot">
-<h3><a class="toc-backref" href="#id12">快照（snapshot）</a></h3>
+<h4><a class="toc-backref" href="#id13">快照（snapshot）</a></h4>
 <p>ZFS 的快照对应 btrfs 的只读快照，是标记数据集在某一历史时刻上的只读状态。
 和 btrfs 的只读快照一样， ZFS 的快照也兼作 send/receive 时的参考点。</p>
 <p>ZFS 中快照是排列在一个时间线上的，因为都是只读快照，它们是数据集在历史上的不同时间点。
@@ -965,13 +980,50 @@ zfs rollback -r</code>
 ，所以如果只想回滚一部分文件，可以从 ".zsh/snapshot/SNAPSHOT-NAME" 中把需要的文件复制出来。</p>
 </div>
 <div class="section" id="clone">
-<h3><a class="toc-backref" href="#id13">克隆（clone）</a></h3>
+<h4><a class="toc-backref" href="#id14">克隆（clone）</a></h4>
 <p>ZFS 的克隆有点像 btrfs 的可写快照。因为 ZFS 的快照是只读的，如果想对快照做写入，那需要先用
 <code class="code">
 zfs clone</code>
- 从快照中建出一个克隆，创建出的克隆和快照共享元数据和数据。
-创建了克隆之后，作为克隆参考点的快照会成为克隆的父亲，克隆存在期间无法删除掉作为其父亲的快照。</p>
-<p>一个数据集可以有多个克隆</p>
+ 从快照中建出一个克隆，创建出的克隆和快照共享元数据和数据，
+然后对克隆的写入不影响数据集原本的写入点。
+创建了克隆之后，作为克隆参考点的快照会成为克隆的依赖，克隆存在期间无法删除掉作为其依赖的快照。</p>
+<p>一个数据集可以有多个克隆，这些克隆都独立于数据集当前的写入点。使用 <code class="code">
+zfs promote</code>
+
+命令可以把一个克隆「升级」成为数据集的当前写入点，从而数据集原本的写入点会调转依赖关系，
+成为这个新写入点的一个克隆，被升级的克隆原本依赖的快照和之前的快照会成为新数据集写入点的快照。</p>
+</div>
+<div class="section" id="bookmark">
+<h4><a class="toc-backref" href="#id15">书签（bookmark）</a></h4>
+<p>这是 ZFS 一个比较新的特性，ZFS on Linux 分支从 v0.6.4 开始支持创建书签的功能。</p>
+<p>书签特性存在的理由是基于这样的事实：原本 ZFS 在 send 两个快照间的差异的时候，比如 send S1 和
+S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（TXG id），而不需要 S1 快照的数据，
+就可以计算出 S1 到 S2 的差异。在接收端则需要 S1 的完整数据，在其上根据接收到的数据流创建 S2 。
+因此在发送端，可以把快照 S1 转变成书签，只留下时间戳元数据而不保留任何目录结构或者文件内容。
+书签只能作为增量 send 时的参考点，并且在接收端需要有对应的快照，这种方式可以在发送端节省很多存储。</p>
+<p>通常的使用场景是，比如你有一个笔记本电脑，上面有 ZFS 存储的数据，然后使用一个服务器上 ZFS
+作为接收端，定期对笔记本上的 ZFS 做快照然后 send 给服务器。在没有书签功能的时候，
+笔记本上至少得保留一个和服务器上相同的快照，作为 send 的增量参考点，
+而这个快照的内容已经在服务器上所以不需要保留在笔记本中。有了快照之后，每次将定期的新快照 send
+到服务器之后，就可以把这个快照转化成书签，节省存储开销。</p>
+</div>
+<div class="section" id="checkpoint">
+<h4><a class="toc-backref" href="#id16">检查点（checkpoint）</a></h4>
+<p>这也是 ZFS 的新特性ZFS on Linux 分支从 v0.6.4 开始支持创建检查点。</p>
+<p>简而言之，检查点可以看作是整个 pool 级别的快照，使用检查点能快速将整个 pool 都恢复到上一个状态。
+这边有篇文章介绍 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
+，可以看出当 pool 有检查点的时候很多 pool wide 的功能会受影响（不能删除 vdev ，不能处于
+degraded 状态，不能 scrub 到当前 pool 已经释放而检查点还在引用的数据块），
+于是检查点功能设计上更多是给系统管理员准备的在调整 ZFS pool 时的后悔药，
+日用状态下应该删除掉所有检查点。</p>
+</div>
+</div>
+<div class="section" id="zfs-btrfs">
+<h3><a class="toc-backref" href="#id17">ZFS 的概念与 btrfs 概念的对比</a></h3>
+<p>先说书签和检查点，因为这是两个 btrfs 完全没有的功能。</p>
+<p>书签功能完全围绕 ZFS send 的工作原理，
+而 ZFS send 位于 ZFS 设计的 DSL (dataset and snapshot layer) 层面，甚至不关心它 send
+的快照的数据是来自文件系统还是 zvol 。</p>
 <p>可以看出和 btrfs 相比， ZFS 的快照有更多限制，而 ZFS 快照允许的操作都可以在 btrfs 中通过
 文件系统操作进行</p>
 </div>
@@ -995,7 +1047,7 @@ zfs clone</code>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f7aa5f6a4f0> 篇：                  </h4>
+这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fb6ba423370> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1587,7 +1639,7 @@ zfs clone</code>
             </div>
             <div class="panel-boy">
             <div class="toc" id="">
-
+<p class="topic-title">Contents</p>
 <ul class="simple">
 <li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
 <li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的术语</a></li>
@@ -1596,9 +1648,15 @@ zfs clone</code>
 </ul>
 </li>
 <li><a class="reference internal" href="#zfs-dataset-snapshot-clone" id="id10">ZFS 的数据集（dataset）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#dataset" id="id11">数据集（dataset）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id12">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id13">克隆（clone）</a></li>
+<li><a class="reference internal" href="#zfs" id="id11">ZFS 中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id12">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id13">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id14">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id15">书签（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id16">检查点（checkpoint）</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id17">ZFS 的概念与 btrfs 概念的对比</a></li>
 </ul>
 </li>
 </ul>
