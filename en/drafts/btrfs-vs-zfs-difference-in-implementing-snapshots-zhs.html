@@ -935,7 +935,7 @@ btrfs subvolume snapshot</code>
 <li>检查点（checkpoint）：从 ZFS on Linux v0.8.0 开始</li>
 </ul>
 <p>梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/691888f7.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/691888f7.png"/>
 <p>上图中，假设我们有一个 pool ，其中有 4 个数据集叫 d1~d4 ，然后数据集 d1 有两个快照 s1 和
 s2 。</p>
 <div class="section" id="zfs">
@@ -1003,21 +1003,32 @@ S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（T
 </div>
 <div class="section" id="checkpoint">
 <h4><a class="toc-backref" href="#id16">检查点（checkpoint）</a></h4>
-<p>这也是 ZFS 的新特性ZFS on Linux 分支从 v0.6.4 开始支持创建检查点。</p>
-<p>简而言之，检查点可以看作是整个 pool 级别的快照，使用检查点能快速将整个 pool 都恢复到上一个状态。
+<p>这也是 ZFS 的新特性， ZFS on Linux 分支从 v0.8.0 开始支持创建检查点。</p>
+<p>简而言之，检查点可以看作是整个存储池级别的快照，使用检查点能快速将整个存储池都恢复到上一个状态。
 这边有篇文章介绍 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
-，可以看出当 pool 有检查点的时候很多 pool wide 的功能会受影响（不能删除 vdev ，不能处于
-degraded 状态，不能 scrub 到当前 pool 已经释放而检查点还在引用的数据块），
-于是检查点功能设计上更多是给系统管理员准备的在调整 ZFS pool 时的后悔药，
-日用状态下应该删除掉所有检查点。</p>
+，可以看出当存储池中有检查点的时候很多存储池的功能会受影响（比如不能删除 vdev 、不能处于
+degraded 状态、不能 scrub 到当前存储池中已经释放而在检查点还在引用的数据块），
+于是检查点功能设计上更多是给系统管理员准备的用于调整整个 ZFS pool 时的后悔药，
+调整结束后日用状态下应该删除掉所有检查点。</p>
 </div>
 </div>
 <div class="section" id="zfs-btrfs">
 <h3><a class="toc-backref" href="#id17">ZFS 的概念与 btrfs 概念的对比</a></h3>
-<p>先说书签和检查点，因为这是两个 btrfs 完全没有的功能。</p>
-<p>书签功能完全围绕 ZFS send 的工作原理，
-而 ZFS send 位于 ZFS 设计的 DSL (dataset and snapshot layer) 层面，甚至不关心它 send
-的快照的数据是来自文件系统还是 zvol 。</p>
+<p>先说书签和检查点，因为这是两个 btrfs （目前）完全没有的功能。</p>
+<p>书签功能完全围绕 ZFS send 的工作原理，而 ZFS send 位于 ZFS 设计的
+DSL(dataset and snapshot layer) 层面，甚至不关心它 send
+的快照的数据是来自文件系统还是 zvol 。在发送端它只是从目标快照递归取数据块，判断 TXG
+是否老于参照点的快照，然后把新的数据块全部发往 send stream ；在接收端也只是完整地接收数据块，
+不加以处理，。与之不同的是 btrfs 的 send 的工作原理是工作在文件系统的只读子卷层面，
+发送端在内核代码中根据目标快照的 b 树和参照点快照的 generation 生成一个 diff
+（可以通过 <code class="code">
+btrfs subvolume find-new</code>
+ 直接拿到这个 diff ），然后在用户态代码中根据
+diff 和参照点、目标快照的两个只读子卷的数据产生一连串修改文件系统的指令，
+指令包括创建文件、删除文件、让文件引用数据块（保持 reflink ）等操作；在接收端则完全工作在用户态下，
+根据接收到的指令重建目标快照。可见 btrfs send 需要在发送端读取参照点快照的数据（比如找到
+reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</p>
+<p>检查点</p>
 <p>可以看出和 btrfs 相比， ZFS 的快照有更多限制，而 ZFS 快照允许的操作都可以在 btrfs 中通过
 文件系统操作进行</p>
 </div>
@@ -1041,7 +1052,7 @@ degraded 状态，不能 scrub 到当前 pool 已经释放而检查点还在引�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7fb6b9b606b0> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7fcc9defcdf0> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
