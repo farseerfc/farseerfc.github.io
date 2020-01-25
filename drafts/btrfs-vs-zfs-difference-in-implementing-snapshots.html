@@ -256,23 +256,27 @@ Farseerfc的小窩            </a>
                         <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的術語</a></li>
-<li><a class="reference internal" href="#id3" id="id8">於是子卷在存儲介質中是如何記錄的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id9">那麼快照又是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id9">子卷（subvolume）和快照（snapshot）的術語</a></li>
+<li><a class="reference internal" href="#id3" id="id10">於是子卷在存儲介質中是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id11">那麼快照又是如何記錄的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id10">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id11">ZFS 中和快照相關的一些術語和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id12">數據集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id13">文件系統（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id14">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id15">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id16">書籤（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id17">檢查點（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id13">ZFS 設計中和快照相關的一些術語和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id14">數據集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id15">文件系統（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id16">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id17">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id18">書籤（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id19">檢查點（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id18">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id20">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#id6" id="id21">ZFS 中是如何存儲這些數據集的呢</a><ul>
+<li><a class="reference internal" href="#id7" id="id22">ZFS設計中的子系統層級</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -303,7 +307,7 @@ Btrfs 的 reflink ）在另一邊沒有的情況。後來看到了
 只是自己的筆記，所有參閱的資料文檔都是二手資料，沒有深挖過源碼，還參雜了自己的理解，
 於是難免有和事實相違的地方，如有寫錯，還請留言糾正。</p>
 <div class="section" id="btrfs-subvolume-snapshot">
-<h2><a class="toc-backref" href="#id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
+<h2><a class="toc-backref" href="#id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
 <p>先從兩個文件系統中（表面上看起來）比較簡單的 btrfs 的子卷（subvolume）和快照（snapshot）說起。
 關於子卷和快照的常規用法、推薦佈局之類的話題就不細說了，網上能找到很多不錯的資料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 頁</a>
@@ -313,7 +317,7 @@ Btrfs 的 reflink ）在另一邊沒有的情況。後來看到了
 ，這裏不想再討論。這裏假設你用過 btrfs/zfs 至少一個的快照功能，知道它該怎麼用，
 並且想知道更多細節，判斷怎麼用那些功能才合理。</p>
 <div class="section" id="subvolume-snapshot">
-<h3><a class="toc-backref" href="#id7">子卷（subvolume）和快照（snapshot）的術語</a></h3>
+<h3><a class="toc-backref" href="#id9">子卷（subvolume）和快照（snapshot）的術語</a></h3>
 <p>在 btrfs 中，存在於存儲媒介中的只有「子卷」的概念，「快照」只是個創建「子卷」的方式，
 換句話說在 btrfs 的術語裏，子卷（subvolume）是個名詞，而快照（snapshot）是個動詞。
 如果脫離了 btrfs 術語的上下文，或者不精確地稱呼的時候，也經常有文檔把 btrfs
@@ -387,7 +391,7 @@ cp -r --reflink=always</code>
 用快照命令創建出的子卷就是共享一部分元數據。</p>
 </div>
 <div class="section" id="id3">
-<h3><a class="toc-backref" href="#id8">於是子卷在存儲介質中是如何記錄的呢？</a></h3>
+<h3><a class="toc-backref" href="#id10">於是子卷在存儲介質中是如何記錄的呢？</a></h3>
 <p>比如在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Flat">SysadminGuide 這頁的 Flat 佈局</a>
 有個子卷佈局的例子。</p>
 <pre class="code literal-block">
@@ -713,7 +717,7 @@ struct btrfs_inode_item</code>
 ROOT_TREE 中 object_id 爲 258 的子卷。</p>
 </div>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id9">那麼快照又是如何記錄的呢？</a></h3>
+<h3><a class="toc-backref" href="#id11">那麼快照又是如何記錄的呢？</a></h3>
 <p>以上是子卷、目錄、 inode 在 btrfs 中的記錄方式，你可能想知道，如何記錄一個快照呢？
 特別是，如果對一個包含子卷的子卷創建了快照，會得到什麼結果呢？如果我們在上面的佈局基礎上執行：</p>
 <pre class="code bash literal-block">
@@ -989,7 +993,7 @@ btrfs subvolume snapshot</code>
 </div>
 </div>
 <div class="section" id="zfs-filesystem-snapshot-clone">
-<h2><a class="toc-backref" href="#id10">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
+<h2><a class="toc-backref" href="#id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
 <p>Btrfs 給傳統文件系統只增加了子卷的概念，相比之下 ZFS 中類似子卷的概念有好幾個，據我所知有這些：</p>
 <ul class="simple">
 <li>數據集（dataset）</li>
@@ -1000,13 +1004,14 @@ btrfs subvolume snapshot</code>
 <li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
 </ul>
 <p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
-，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。</p>
+，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
+cp2 。這個簡圖將作爲例子在後面介紹這些概念。</p>
 <div class="section" id="zfs">
-<h3><a class="toc-backref" href="#id11">ZFS 中和快照相關的一些術語和概念</a></h3>
+<h3><a class="toc-backref" href="#id13">ZFS 設計中和快照相關的一些術語和概念</a></h3>
 <div class="section" id="dataset">
-<h4><a class="toc-backref" href="#id12">數據集（dataset）</a></h4>
+<h4><a class="toc-backref" href="#id14">數據集（dataset）</a></h4>
 <p>ZFS 中把文件系統、快照、克隆、zvol 等概念統稱爲數據集（dataset）。
 一些文檔和介紹中把文件系統叫做數據集，大概因爲在 ZFS 中，文件系統是最先創建並且最有用的數據集。</p>
 <p>在 ZFS 的術語中，把底層管理和釋放存儲設備空間的叫做 ZFS 存儲池（pool），
@@ -1025,7 +1030,7 @@ pool_name/​dataset_path@snapshot_name</code>
 塊設備某種程度上模擬 zvol 的功能。</p>
 </div>
 <div class="section" id="filesystem">
-<h4><a class="toc-backref" href="#id13">文件系統（filesystem）</a></h4>
+<h4><a class="toc-backref" href="#id15">文件系統（filesystem）</a></h4>
 <p>創建了 ZFS 存儲池後，首先要在其中創建文件系統（filesystem），才能在文件系統中存儲文件。
 容易看出 ZFS 文件系統的概念直接對應 btrfs 中的子卷。文件系統（filesystem）這個術語，
 從命名方式來看或許是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 這樣的）傳統的卷管理器
@@ -1039,9 +1044,10 @@ pool_name/​dataset_path@snapshot_name</code>
 方式之外）不可以共享任何數據或者元數據。一個文件系統還包含了隸屬於其中的快照（snapshot）、
 克隆（clone）和書籤（bookmark）。在 btrfs 中一個子卷和對其創建的快照之間雖然有父子關係，
 但是在 ROOT_TREE 的記錄中屬於平級的關係。</p>
+<p>上面簡圖中 pool 裏面包含 3 個文件系統，分別是 fs1~3 。</p>
 </div>
 <div class="section" id="snapshot">
-<h4><a class="toc-backref" href="#id14">快照（snapshot）</a></h4>
+<h4><a class="toc-backref" href="#id16">快照（snapshot）</a></h4>
 <p>ZFS 的快照對應 btrfs 的只讀快照，是標記數據集在某一歷史時刻上的只讀狀態。
 和 btrfs 的只讀快照一樣， ZFS 的快照也兼作 send/receive 時的參考點。
 快照隸屬於一個數據集，這說明 ZFS 的文件系統或者 zvol 都可以創建快照。</p>
@@ -1058,10 +1064,18 @@ zfs rollback -r</code>
 
 參數刪除中間的快照並回滾。</p>
 <p>除了回滾操作，還可以直接只讀訪問到快照中的文件。 ZFS 的文件系統中有個隱藏文件夾叫 ".zfs"
-，所以如果只想回滾一部分文件，可以從 ".zfs/snapshot/SNAPSHOT-NAME" 中把需要的文件複製出來。</p>
+，所以如果只想回滾一部分文件，可以從 ".zfs/snapshots/SNAPSHOT-NAME" 中把需要的文件複製出來。</p>
+<p>比如上面簡圖中 fs1 就有 <code class="code">
+pool/​fs1@s1</code>
+ 和 <code class="code">
+pool/​fs1@s2</code>
+ 這兩個快照，
+那麼可以在 fs1 掛載點下 <code class="code">
+.zfs/​snapshots/​s1</code>
+ 的路徑直接訪問到 s1 中的內容。</p>
 </div>
 <div class="section" id="clone">
-<h4><a class="toc-backref" href="#id15">克隆（clone）</a></h4>
+<h4><a class="toc-backref" href="#id17">克隆（clone）</a></h4>
 <p>ZFS 的克隆有點像 btrfs 的可寫快照。因爲 ZFS 的快照是只讀的，如果想對快照做寫入，那需要先用
 <code class="code">
 zfs clone</code>
@@ -1073,9 +1087,10 @@ zfs promote</code>
 
 命令可以把一個克隆「升級」成爲數據集的當前寫入點，從而數據集原本的寫入點會調轉依賴關係，
 成爲這個新寫入點的一個克隆，被升級的克隆原本依賴的快照和之前的快照會成爲新數據集寫入點的快照。</p>
+<p>比如上面簡圖中 fs1 有 c1 的克隆，它依賴於 s2 這個快照，從而 c1 存在的時候就不能刪除掉 s2 。</p>
 </div>
 <div class="section" id="bookmark">
-<h4><a class="toc-backref" href="#id16">書籤（bookmark）</a></h4>
+<h4><a class="toc-backref" href="#id18">書籤（bookmark）</a></h4>
 <p>這是 ZFS 一個比較新的特性，ZFS on Linux 分支從 v0.6.4 開始支持創建書籤的功能。</p>
 <p>書籤特性存在的理由是基於這樣的事實：原本 ZFS 在 send 兩個快照間的差異的時候，比如 send S1 和
 S2 之間的差異，在發送端實際上只需要 S1 中記錄的時間戳（TXG id），而不需要 S1 快照的數據，
@@ -1089,7 +1104,7 @@ S2 之間的差異，在發送端實際上只需要 S1 中記錄的時間戳（T
 有了書籤功能之後，每次將定期的新快照發送到服務器之後，就可以把這個快照轉化成書籤，節省存儲開銷。</p>
 </div>
 <div class="section" id="checkpoint">
-<h4><a class="toc-backref" href="#id17">檢查點（checkpoint）</a></h4>
+<h4><a class="toc-backref" href="#id19">檢查點（checkpoint）</a></h4>
 <p>這也是 ZFS 的新特性， ZFS on Linux 分支從 v0.8.0 開始支持創建檢查點。</p>
 <p>簡而言之，檢查點可以看作是整個存儲池級別的快照，使用檢查點能快速將整個存儲池都恢復到上一個狀態。
 這邊有篇文章介紹 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
@@ -1100,10 +1115,10 @@ degraded 狀態、不能 scrub 到當前存儲池中已經釋放而在檢查點�
 </div>
 </div>
 <div class="section" id="zfs-btrfs">
-<h3><a class="toc-backref" href="#id18">ZFS 的概念與 btrfs 概念的對比</a></h3>
+<h3><a class="toc-backref" href="#id20">ZFS 的概念與 btrfs 概念的對比</a></h3>
 <p>先說書籤和檢查點，因爲這是兩個 btrfs 目前完全沒有的功能。</p>
 <p>書籤功能完全圍繞 ZFS send 的工作原理，而 ZFS send 位於 ZFS 設計中的
-DSL(dataset and snapshot layer) 層面，甚至不關心它 send
+DSL 層面，甚至不關心它 send
 的快照的數據是來自文件系統還是 zvol 。在發送端它只是從目標快照遞歸取數據塊，判斷 TXG
 是否老於參照點的快照，然後把新的數據塊全部發往 send stream ；在接收端也只是完整地接收數據塊，
 不加以處理，。與之不同的是 btrfs 的 send 的工作原理是工作在文件系統的只讀子卷層面，
@@ -1118,7 +1133,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="table field-list docutils" frame="void" rules="none">
+<table border="0" class="table docutils field-list" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1131,7 +1146,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="table field-list docutils" frame="void" rules="none">
+<table border="0" class="table docutils field-list" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1174,9 +1189,298 @@ btrfs subvolume snapshot</code>
 時，一些人困惑的起源（甚至有人據此說 ZFS 比 btrfs 好在 cli 設計上）。</p>
 <p>不過 btrfs 子卷的設計也使它在系統管理上有了更大的靈活性。比如在 btrfs
 中刪除一個子卷不會受制於別的子卷是否存在，而在 zfs 中要刪除一個快照必須先保證先摧毀掉依賴它的克隆。
-再比如 btrfs 的可選子卷沒有優劣之分，而 zfs 中一個文件系統和其克隆之間有明顯的差異，所以需要
-promote 命令調整差異。</p>
-<p>加上 btrfs 有 reflink ，這給了 btrfs 在使用中更大的靈活性，可以有一些 zfs 很難做到的用法。</p>
+再比如 btrfs 的可寫子卷沒有主次之分，而 zfs 中一個文件系統和其克隆之間有明顯的區別，所以需要
+promote 命令調整差異。還有比如 ZFS 的文件系統只能回滾到最近一次的快照，
+要回滾到更久之前的快照需要刪掉中間的快照，並且回滾之後原本的文件系統數據和快照數據就被丟棄了；
+而 btrfs 中因爲回滾操作相當於調整子卷的掛載，所以不需要刪掉快照，
+並且回滾之後原本的子卷和快照還可以繼續保留。</p>
+<p>加上 btrfs 有 reflink ，這給了 btrfs 在使用中更大的靈活性，可以有一些 zfs 很難做到的用法。
+比如想從快照中打撈出一些虛擬機鏡像的歷史副本，而不想回滾整個快照的時候，在
+btrfs 中可以直接 <code class="code">
+cp --reflink=always</code>
+ 將鏡像從快照中複製出來，此時的複製將和快照共享數據塊；
+而在 zfs 中只能用普通 cp 複製，會浪費很多存儲空間。</p>
+</div>
+<div class="section" id="id6">
+<h3><a class="toc-backref" href="#id21">ZFS 中是如何存儲這些數據集的呢</a></h3>
+<p>要講到存儲細節，首先需要提一下 ZFS 的分層設計。不像 btrfs 基於現代 Linux
+內核，有許多現有文件系統已經實現好的基礎設施可以利用，並且大體上只用到一種核心數據結構（CoW的B樹）；
+ZFS 則脫胎於 Solaris 的野心勃勃，設計時就分成很多不同的子系統，逐步提升抽象層次，
+並且每個子系統都發明了許多特定需求下的數據結構來描述存儲的信息。</p>
+<p>ZFS 在設計之初背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統
+只負責文件系統的功能而把其餘功能（比如內存髒頁管理，IO調度）交給內核更底層的子系統， ZFS
+的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。
+而本文想講的只是 ZFS 中與快照相關的一些部分，於是先從 ZFS 的整體設計上說一下和快照相關的概念位於
+ZFS 設計中的什麼位置。</p>
+<div class="section" id="id7">
+<h4><a class="toc-backref" href="#id22">ZFS設計中的子系統層級</a></h4>
+<p>首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: ZFS_Layer_Architecture Pages: 1 -->
+<svg class="svg-responsive" height="570pt" viewbox="0.00 0.00 483.00 570.00" width="483pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 566)">
+<title>ZFS_Layer_Architecture</title>
+<polygon fill="#ffffff" points="-4,4 -4,-566 479,-566 479,4 -4,4" stroke="transparent"></polygon>
+<g class="cluster" id="clust4">
+<title>clusterTOL</title>
+<polygon fill="none" points="184.5,-227 184.5,-374 398.5,-374 398.5,-227 184.5,-227" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="291.5" y="-358.8">TOL</text>
+</g>
+<g class="cluster" id="clust8">
+<title>clusterSPA</title>
+<polygon fill="none" points="173.5,-8 173.5,-155 329.5,-155 329.5,-8 173.5,-8" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="251.5" y="-139.8">SPA</text>
+</g>
+<!-- Filesystem API -->
+<g class="node" id="node1">
+<title>Filesystem API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-540.3">Filesystem API</text>
+</g>
+<!-- VFS -->
+<g class="node" id="node4">
+<title>VFS</title>
+<ellipse cx="219.5" cy="-472" fill="none" rx="30.5947" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-468.3">VFS</text>
+</g>
+<!-- Filesystem API&#45;&gt;VFS -->
+<g class="edge" id="edge1">
+<title>Filesystem API-&gt;VFS</title>
+<path d="M219.5,-525.8314C219.5,-518.131 219.5,-508.9743 219.5,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-500.4132 219.5,-490.4133 216.0001,-500.4133 223.0001,-500.4132" stroke="#000000"></polygon>
+</g>
+<!-- Block device API -->
+<g class="node" id="node2">
+<title>Block device API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="69.5" y="-540.3">Block device API</text>
+</g>
+<!-- /dev/zvol/... -->
+<g class="node" id="node5">
+<title>/dev/zvol/...</title>
+<ellipse cx="76.5" cy="-472" fill="none" rx="63.8893" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="76.5" y="-468.3">/dev/zvol/...</text>
+</g>
+<!-- Block device API&#45;&gt;/dev/zvol/... -->
+<g class="edge" id="edge2">
+<title>Block device API-&gt;/dev/zvol/...</title>
+<path d="M71.2664,-525.8314C72.015,-518.131 72.9053,-508.9743 73.7373,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="77.2256,-500.7051 74.7098,-490.4133 70.2585,-500.0276 77.2256,-500.7051" stroke="#000000"></polygon>
+</g>
+<!-- ZFS Management API -->
+<g class="node" id="node3">
+<title>ZFS Management API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="387.5" y="-540.3">ZFS Management API</text>
+</g>
+<!-- /dev/zfs ioctl -->
+<g class="node" id="node6">
+<title>/dev/zfs ioctl</title>
+<ellipse cx="381.5" cy="-472" fill="none" rx="69.5877" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="381.5" y="-468.3">/dev/zfs ioctl</text>
+</g>
+<!-- ZFS Management API&#45;&gt;/dev/zfs ioctl -->
+<g class="edge" id="edge3">
+<title>ZFS Management API-&gt;/dev/zfs ioctl</title>
+<path d="M385.9859,-525.8314C385.3442,-518.131 384.5812,-508.9743 383.8681,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="387.3529,-500.088 383.0344,-490.4133 380.3771,-500.6694 387.3529,-500.088" stroke="#000000"></polygon>
+</g>
+<!-- ZPL -->
+<g class="node" id="node7">
+<title>ZPL</title>
+<polygon fill="none" points="246.5,-418 192.5,-418 192.5,-382 246.5,-382 246.5,-418" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-396.3">ZPL</text>
+</g>
+<!-- VFS&#45;&gt;ZPL -->
+<g class="edge" id="edge4">
+<title>VFS-&gt;ZPL</title>
+<path d="M219.5,-453.8314C219.5,-446.131 219.5,-436.9743 219.5,-428.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-428.4132 219.5,-418.4133 216.0001,-428.4133 223.0001,-428.4132" stroke="#000000"></polygon>
+</g>
+<!-- ZVOL -->
+<g class="node" id="node8">
+<title>ZVOL</title>
+<polygon fill="none" points="120,-418 61,-418 61,-382 120,-382 120,-418" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="90.5" y="-396.3">ZVOL</text>
+</g>
+<!-- /dev/zvol/...&#45;&gt;ZVOL -->
+<g class="edge" id="edge5">
+<title>/dev/zvol/...-&gt;ZVOL</title>
+<path d="M80.0328,-453.8314C81.5301,-446.131 83.3105,-436.9743 84.9745,-428.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="88.4465,-428.8975 86.9196,-418.4133 81.5752,-427.5614 88.4465,-428.8975" stroke="#000000"></polygon>
+</g>
+<!-- DSL -->
+<g class="node" id="node11">
+<title>DSL</title>
+<polygon fill="none" points="390.5,-343 336.5,-343 336.5,-307 390.5,-307 390.5,-343" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="363.5" y="-321.3">DSL</text>
+</g>
+<!-- /dev/zfs ioctl&#45;&gt;DSL -->
+<g class="edge" id="edge9">
+<title>/dev/zfs ioctl-&gt;DSL</title>
+<path d="M379.2928,-453.9749C376.216,-428.8475 370.6069,-383.0393 366.9682,-353.324" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="370.4148,-352.673 365.7252,-343.1725 363.4667,-353.5238 370.4148,-352.673" stroke="#000000"></polygon>
+</g>
+<!-- ZAP -->
+<g class="node" id="node9">
+<title>ZAP</title>
+<polygon fill="none" points="246.5,-343 192.5,-343 192.5,-307 246.5,-307 246.5,-343" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-321.3">ZAP</text>
+</g>
+<!-- ZPL&#45;&gt;ZAP -->
+<g class="edge" id="edge6">
+<title>ZPL-&gt;ZAP</title>
+<path d="M219.5,-381.8446C219.5,-373.3401 219.5,-363.0076 219.5,-353.4964" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-353.2481 219.5,-343.2482 216.0001,-353.2482 223.0001,-353.2481" stroke="#000000"></polygon>
+</g>
+<!-- ZIL -->
+<g class="node" id="node10">
+<title>ZIL</title>
+<polygon fill="none" points="318.5,-343 264.5,-343 264.5,-307 318.5,-307 318.5,-343" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="291.5" y="-321.3">ZIL</text>
+</g>
+<!-- ZPL&#45;&gt;ZIL -->
+<g class="edge" id="edge7">
+<title>ZPL-&gt;ZIL</title>
+<path d="M246.6001,-381.8614C249.7221,-379.3607 252.7632,-376.7146 255.5,-374 262.1796,-367.3746 268.5716,-359.4234 274.0667,-351.8725" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="277.2028,-353.4956 280.0689,-343.2958 271.4677,-349.482 277.2028,-353.4956" stroke="#000000"></polygon>
+</g>
+<!-- DMU -->
+<g class="node" id="node12">
+<title>DMU</title>
+<polygon fill="none" points="246.5,-271 192.5,-271 192.5,-235 246.5,-235 246.5,-271" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-249.3">DMU</text>
+</g>
+<!-- ZPL&#45;&gt;DMU -->
+<g class="edge" id="edge11">
+<title>ZPL-&gt;DMU</title>
+<path d="M192.2089,-384.8579C188.7022,-381.7348 185.6059,-378.1186 183.5,-374 169.9436,-347.487 174.8709,-335.5001 183.5,-307 186.4564,-297.2355 191.8252,-287.6229 197.53,-279.2762" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="200.4414,-281.2239 203.5095,-271.0831 194.7871,-277.0973 200.4414,-281.2239" stroke="#000000"></polygon>
+</g>
+<!-- ZVOL&#45;&gt;DMU -->
+<g class="edge" id="edge12">
+<title>ZVOL-&gt;DMU</title>
+<path d="M105.9944,-381.6999C122.0079,-362.8551 147.7965,-332.6963 170.5,-307 178.6685,-297.7547 187.7187,-287.723 195.7956,-278.8433" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="198.4446,-281.1328 202.5963,-271.3853 193.2721,-276.4163 198.4446,-281.1328" stroke="#000000"></polygon>
+</g>
+<!-- ZAP&#45;&gt;DMU -->
+<g class="edge" id="edge10">
+<title>ZAP-&gt;DMU</title>
+<path d="M219.5,-306.8314C219.5,-299.131 219.5,-289.9743 219.5,-281.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-281.4132 219.5,-271.4133 216.0001,-281.4133 223.0001,-281.4132" stroke="#000000"></polygon>
+</g>
+<!-- ZIO -->
+<g class="node" id="node14">
+<title>ZIO</title>
+<polygon fill="none" points="321.5,-124 267.5,-124 267.5,-88 321.5,-88 321.5,-124" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="294.5" y="-102.3">ZIO</text>
+</g>
+<!-- ZIL&#45;&gt;ZIO -->
+<g class="edge" id="edge15">
+<title>ZIL-&gt;ZIO</title>
+<path d="M291.7506,-306.7049C292.2747,-268.4458 293.4896,-179.7623 294.1141,-134.1742" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="297.6148,-134.1361 294.2522,-124.089 290.6155,-134.0401 297.6148,-134.1361" stroke="#000000"></polygon>
+</g>
+<!-- DSL&#45;&gt;ZAP -->
+<g class="edge" id="edge8">
+<title>DSL-&gt;ZAP</title>
+<path d="M355.7081,-343.0803C348.4513,-356.9247 336.0935,-374.2664 318.5,-378 295.0228,-382.9822 287.9772,-382.9822 264.5,-378 260.2181,-377.0913 258.91,-376.7445 255.5,-374 247.77,-367.7785 240.863,-359.5194 235.2167,-351.5579" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="238.0665,-349.5228 229.6055,-343.1461 232.2432,-353.4074 238.0665,-349.5228" stroke="#000000"></polygon>
+</g>
+<!-- DSL&#45;&gt;DMU -->
+<g class="edge" id="edge13">
+<title>DSL-&gt;DMU</title>
+<path d="M336.4147,-311.4574C313.7307,-300.1153 281.1433,-283.8217 256.1319,-271.316" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="257.463,-268.0684 246.9534,-266.7267 254.3325,-274.3294 257.463,-268.0684" stroke="#000000"></polygon>
+</g>
+<!-- ARC -->
+<g class="node" id="node13">
+<title>ARC</title>
+<polygon fill="none" points="245.5,-199 191.5,-199 191.5,-163 245.5,-163 245.5,-199" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="218.5" y="-177.3">ARC</text>
+</g>
+<!-- DMU&#45;&gt;ARC -->
+<g class="edge" id="edge14">
+<title>DMU-&gt;ARC</title>
+<path d="M219.2477,-234.8314C219.1407,-227.131 219.0135,-217.9743 218.8947,-209.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="222.3944,-209.3637 218.7557,-199.4133 215.3951,-209.4609 222.3944,-209.3637" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC -->
+<g class="node" id="node15">
+<title>L2ARC</title>
+<polygon fill="none" points="249.5,-124 181.5,-124 181.5,-88 249.5,-88 249.5,-124" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="215.5" y="-102.3">L2ARC</text>
+</g>
+<!-- ARC&#45;&gt;L2ARC -->
+<g class="edge" id="edge16">
+<title>ARC-&gt;L2ARC</title>
+<path d="M217.7738,-162.8446C217.4336,-154.3401 217.0203,-144.0076 216.6399,-134.4964" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="220.1269,-134.1003 216.2299,-124.2482 213.1325,-134.3801 220.1269,-134.1003" stroke="#000000"></polygon>
+</g>
+<!-- VDEV/RAIDZ -->
+<g class="node" id="node16">
+<title>VDEV/RAIDZ</title>
+<polygon fill="none" points="307.5,-52 195.5,-52 195.5,-16 307.5,-16 307.5,-52" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="251.5" y="-30.3">VDEV/RAIDZ</text>
+</g>
+<!-- ZIO&#45;&gt;VDEV/RAIDZ -->
+<g class="edge" id="edge19">
+<title>ZIO-&gt;VDEV/RAIDZ</title>
+<path d="M283.6493,-87.8314C278.7977,-79.7079 272.9783,-69.9637 267.632,-61.0118" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="270.6292,-59.2041 262.4968,-52.4133 264.6194,-62.7933 270.6292,-59.2041" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC&#45;&gt;ZIO -->
+<g class="edge" id="edge17">
+<title>L2ARC-&gt;ZIO</title>
+<path d="M249.7539,-106C252.2119,-106 254.6699,-106 257.1278,-106" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="257.2329,-109.5001 267.2328,-106 257.2328,-102.5001 257.2329,-109.5001" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC&#45;&gt;VDEV/RAIDZ -->
+<g class="edge" id="edge18">
+<title>L2ARC-&gt;VDEV/RAIDZ</title>
+<path d="M224.5843,-87.8314C228.5615,-79.8771 233.3155,-70.369 237.7139,-61.5723" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="240.9517,-62.9228 242.2934,-52.4133 234.6907,-59.7923 240.9517,-62.9228" stroke="#000000"></polygon>
+</g>
+</g>
+</svg>
+<p>一兩句話介紹各個子系統的縮寫：</p>
+<table border="0" class="table docutils field-list" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">ZPL:</th><td class="field-body">ZFS Posix Layer ，提供符合 POSIX 文件系統的語義，也就是包括文件、目錄這些抽象以及
+inode 屬性、權限那些，對一個普通 FS 而言用戶直接接觸的部分。</td>
+</tr>
+<tr class="field"><th class="field-name">ZVOL:</th><td class="field-body">ZFS VOLume ，有點像 loopback block device ，暴露一個塊設備的接口，其上可以創建別的
+FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口所以一開始先實現的它，而且
+<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 沒有 sparse 文件的時候可以用它模擬很大的塊設備，測試 Solaris UFS 對 TB 級存儲的支持情況</a>。</td>
+</tr>
+<tr class="field"><th class="field-name">TOL:</th><td class="field-body">Transactional Object Layer，在數據塊的基礎上提供一個事務性的對象語義層。
+每個對象用多個數據塊存儲，每個數據塊大概是 4K~128K 這樣的數量級。</td>
+</tr>
+<tr class="field"><th class="field-name">ZAP:</th><td class="field-body">ZFS Attribute Processor ，在「對象」基礎上提供緊湊的 name/value 映射，從而文件夾內容、文件屬性之類的都是基於 ZAP 。</td>
+</tr>
+<tr class="field"><th class="field-name">ZIL:</th><td class="field-body">ZFS Intent Log ，記錄兩次完整事務語義提交之間的 log ，用來加速實現 fsync 之類的保證。</td>
+</tr>
+<tr class="field"><th class="field-name">DSL:</th><td class="field-body">Dataset &amp; Snapshot Layer ，數據集和快照層，這是本文的重點。</td>
+</tr>
+<tr class="field"><th class="field-name">DMU:</th><td class="field-body">Data Management Unit ，在塊的基礎上提供「對象」的抽象。每個「對象」可以是一個文件，或者是別的 ZFS 內部需要記錄的東西。</td>
+</tr>
+<tr class="field"><th class="field-name">ARC:</th><td class="field-body">Adaptive Replacement Cache，作用相當於 pagecache 。</td>
+</tr>
+<tr class="field"><th class="field-name">SPA:</th><td class="field-body">Storage Pool Allocator ，從內核的多個塊設備中抽象出存儲池。</td>
+</tr>
+<tr class="field"><th class="field-name">ZIO:</th><td class="field-body">ZFS I/O，作用相當於 IO scheduler 。</td>
+</tr>
+<tr class="field"><th class="field-name">VDEV:</th><td class="field-body">Virtual DEVice ，作用相當於 Linux Device Mapper ，提供 Stripe/Mirror/RAIDZ
+之類的多設備存儲池管理和抽象。</td>
+</tr>
+</tbody>
+</table>
+<p>和本文內容密切相關的是 ZPL 、 DSL 、 DMU 這些部分。</p>
+</div>
 </div>
 </div>
 
@@ -1198,7 +1502,7 @@ promote 命令調整差異。</p>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fe798728970> 篇：                  </h4>
+這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fcc3a22c9f0> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1792,23 +2096,27 @@ promote 命令調整差異。</p>
             <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id6">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id7">子卷（subvolume）和快照（snapshot）的術語</a></li>
-<li><a class="reference internal" href="#id3" id="id8">於是子卷在存儲介質中是如何記錄的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id9">那麼快照又是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id9">子卷（subvolume）和快照（snapshot）的術語</a></li>
+<li><a class="reference internal" href="#id3" id="id10">於是子卷在存儲介質中是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id11">那麼快照又是如何記錄的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id10">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id11">ZFS 中和快照相關的一些術語和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id12">數據集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id13">文件系統（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id14">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id15">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id16">書籤（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id17">檢查點（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id13">ZFS 設計中和快照相關的一些術語和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id14">數據集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id15">文件系統（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id16">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id17">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id18">書籤（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id19">檢查點（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id18">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id20">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#id6" id="id21">ZFS 中是如何存儲這些數據集的呢</a><ul>
+<li><a class="reference internal" href="#id7" id="id22">ZFS設計中的子系統層級</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
