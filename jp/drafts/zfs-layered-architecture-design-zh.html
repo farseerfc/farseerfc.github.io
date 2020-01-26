@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>ZFS 分層架構設計 - Farseerfcの巣</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/jp/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/jp/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/jp/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="zfs,layered,architecture" />
+        <meta name="description" content="ZFS 在設計之初背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統 只負責文件系統的功能而把其餘功能（比如內存髒頁管理，IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。 而本文想講的只是 ZFS 中與快照相關的一些部分，於是先從 ZFS 的整體設計上說一下和快照相關的概念位於 ZFS 設計中的什麼位置。 子系統整體架構 首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統： ZFS_Layer_Architecture clusterTOL TOL clusterSPA SPA Filesystem API Filesystem API VFS VFS Filesystem API-&gt;VFS Block device …" />
+
+        <meta property="og:site_name" content="Farseerfcの巣" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="ZFS 分層架構設計"/>
+        <meta property="og:url" content="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html"/>
+        <meta property="og:description" content="ZFS 在設計之初背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統 只負責文件系統的功能而把其餘功能（比如內存髒頁管理，IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。 而本文想講的只是 ZFS 中與快照相關的一些部分，於是先從 ZFS 的整體設計上說一下和快照相關的概念位於 ZFS 設計中的什麼位置。 子系統整體架構 首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統： ZFS_Layer_Architecture clusterTOL TOL clusterSPA SPA Filesystem API Filesystem API VFS VFS Filesystem API-&gt;VFS Block device …"/>
+        <meta property="article:published_time" content="2020-01-26" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="zfs" />
+            <meta property="article:tag" content="layered" />
+            <meta property="article:tag" content="architecture" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/jp/zfs-layered-architecture-design.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/jp/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/jp/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/jp/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/jp/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfcの巣 ATOM Feed"/>
+
+        <link href="//farseerfc.me/jp/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/jp/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/jp/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">ZFS 分層架構設計 - Farseerfcの巣</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">ナビの切り替え</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/jp/" class="navbar-brand">
+Farseerfcの巣            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li class="active"><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li class="active"><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                                 連絡
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/jp/pages/about.html"><i class="fa fa-user"></i>
+                         連絡
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/jp/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/jp/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/jp/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="検索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/jp/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">一覧</span></a></li>
+              <li><a href="//farseerfc.me/jp/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/jp/" title="Farseerfcの巣"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/jp/category/tech.html" title="tech">tech</a></li>
+                <li class="active">ZFS 分層架構設計</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        ZFS 分層架構設計
+                        <a href="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="ZFS 分層架構設計　へのパーマリンク">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-01-26T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年01月26日(週日)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html">繁體</a></li><li><a href="//farseerfc.me/jp/zhs/drafts/zfs-layered-architecture-design.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/jp/zfs-layered-architecture-design.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="このページのソースコードを表示する"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/jp/zfs-layered-architecture-design.pdf" class="btn btn-primary" title="このページの印刷版PDFファイルを表示する" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/jp/zfs-layered-architecture-design.png" class="btn btn-primary" title="このページのスクリーンショットPNGファイルを表示する" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="zfs-layered-architecture-design" data-disqus-url="http://farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/jp/tag/zfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> zfs</a>
+	<a href="//farseerfc.me/jp/tag/layered.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> layered</a>
+	<a href="//farseerfc.me/jp/tag/architecture.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> architecture</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目次                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id2">子系統整體架構</a></li>
+<li><a class="reference internal" href="#vdev" id="id3">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id4">ZIO</a></li>
+<li><a class="reference internal" href="#zpl" id="id5">ZPL</a></li>
+<li><a class="reference internal" href="#zvol" id="id6">ZVOL</a></li>
+<li><a class="reference internal" href="#tol" id="id7">TOL</a></li>
+<li><a class="reference internal" href="#zap" id="id8">ZAP</a></li>
+<li><a class="reference internal" href="#zil" id="id9">ZIL</a></li>
+<li><a class="reference internal" href="#dsl" id="id10">DSL</a></li>
+<li><a class="reference internal" href="#dmu" id="id11">DMU</a></li>
+<li><a class="reference internal" href="#arc" id="id12">ARC</a></li>
+<li><a class="reference internal" href="#spa" id="id13">SPA</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<p>ZFS 在設計之初背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統
+只負責文件系統的功能而把其餘功能（比如內存髒頁管理，IO調度）交給內核更底層的子系統， ZFS
+的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。
+而本文想講的只是 ZFS 中與快照相關的一些部分，於是先從 ZFS 的整體設計上說一下和快照相關的概念位於
+ZFS 設計中的什麼位置。</p>
+<div class="section" id="id1">
+<h2><a class="toc-backref" href="#id2">子系統整體架構</a></h2>
+<p>首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: ZFS_Layer_Architecture Pages: 1 -->
+<svg class="svg-responsive" height="570pt" viewbox="0.00 0.00 483.00 570.00" width="483pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 566)">
+<title>ZFS_Layer_Architecture</title>
+<polygon fill="#ffffff" points="-4,4 -4,-566 479,-566 479,4 -4,4" stroke="transparent"></polygon>
+<g class="cluster" id="clust4">
+<title>clusterTOL</title>
+<g id="a_clust4"><a xlink:href="#tol" xlink:title="TOL">
+<polygon fill="none" points="184.5,-227 184.5,-374 398.5,-374 398.5,-227 184.5,-227" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="291.5" y="-358.8">TOL</text>
+</a>
+</g>
+</g>
+<g class="cluster" id="clust8">
+<title>clusterSPA</title>
+<g id="a_clust8"><a xlink:href="#spa" xlink:title="SPA">
+<polygon fill="none" points="170.5,-8 170.5,-155 326.5,-155 326.5,-8 170.5,-8" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="248.5" y="-139.8">SPA</text>
+</a>
+</g>
+</g>
+<!-- Filesystem API -->
+<g class="node" id="node1">
+<title>Filesystem API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-540.3">Filesystem API</text>
+</g>
+<!-- VFS -->
+<g class="node" id="node4">
+<title>VFS</title>
+<ellipse cx="219.5" cy="-472" fill="none" rx="30.5947" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-468.3">VFS</text>
+</g>
+<!-- Filesystem API&#45;&gt;VFS -->
+<g class="edge" id="edge1">
+<title>Filesystem API-&gt;VFS</title>
+<path d="M219.5,-525.8314C219.5,-518.131 219.5,-508.9743 219.5,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-500.4132 219.5,-490.4133 216.0001,-500.4133 223.0001,-500.4132" stroke="#000000"></polygon>
+</g>
+<!-- Block device API -->
+<g class="node" id="node2">
+<title>Block device API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="69.5" y="-540.3">Block device API</text>
+</g>
+<!-- /dev/zvol/... -->
+<g class="node" id="node5">
+<title>/dev/zvol/...</title>
+<ellipse cx="76.5" cy="-472" fill="none" rx="63.8893" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="76.5" y="-468.3">/dev/zvol/...</text>
+</g>
+<!-- Block device API&#45;&gt;/dev/zvol/... -->
+<g class="edge" id="edge2">
+<title>Block device API-&gt;/dev/zvol/...</title>
+<path d="M71.2664,-525.8314C72.015,-518.131 72.9053,-508.9743 73.7373,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="77.2256,-500.7051 74.7098,-490.4133 70.2585,-500.0276 77.2256,-500.7051" stroke="#000000"></polygon>
+</g>
+<!-- ZFS Management API -->
+<g class="node" id="node3">
+<title>ZFS Management API</title>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="387.5" y="-540.3">ZFS Management API</text>
+</g>
+<!-- /dev/zfs ioctl -->
+<g class="node" id="node6">
+<title>/dev/zfs ioctl</title>
+<ellipse cx="381.5" cy="-472" fill="none" rx="69.5877" ry="18" stroke="#000000"></ellipse>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="381.5" y="-468.3">/dev/zfs ioctl</text>
+</g>
+<!-- ZFS Management API&#45;&gt;/dev/zfs ioctl -->
+<g class="edge" id="edge3">
+<title>ZFS Management API-&gt;/dev/zfs ioctl</title>
+<path d="M385.9859,-525.8314C385.3442,-518.131 384.5812,-508.9743 383.8681,-500.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="387.3529,-500.088 383.0344,-490.4133 380.3771,-500.6694 387.3529,-500.088" stroke="#000000"></polygon>
+</g>
+<!-- ZPL -->
+<g class="node" id="node7">
+<title>ZPL</title>
+<g id="a_node7"><a xlink:href="#zpl" xlink:title="ZPL">
+<polygon fill="none" points="246.5,-418 192.5,-418 192.5,-382 246.5,-382 246.5,-418" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-396.3">ZPL</text>
+</a>
+</g>
+</g>
+<!-- VFS&#45;&gt;ZPL -->
+<g class="edge" id="edge4">
+<title>VFS-&gt;ZPL</title>
+<path d="M219.5,-453.8314C219.5,-446.131 219.5,-436.9743 219.5,-428.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-428.4132 219.5,-418.4133 216.0001,-428.4133 223.0001,-428.4132" stroke="#000000"></polygon>
+</g>
+<!-- ZVOL -->
+<g class="node" id="node8">
+<title>ZVOL</title>
+<g id="a_node8"><a xlink:href="#zvol" xlink:title="ZVOL">
+<polygon fill="none" points="120,-418 61,-418 61,-382 120,-382 120,-418" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="90.5" y="-396.3">ZVOL</text>
+</a>
+</g>
+</g>
+<!-- /dev/zvol/...&#45;&gt;ZVOL -->
+<g class="edge" id="edge5">
+<title>/dev/zvol/...-&gt;ZVOL</title>
+<path d="M80.0328,-453.8314C81.5301,-446.131 83.3105,-436.9743 84.9745,-428.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="88.4465,-428.8975 86.9196,-418.4133 81.5752,-427.5614 88.4465,-428.8975" stroke="#000000"></polygon>
+</g>
+<!-- DSL -->
+<g class="node" id="node11">
+<title>DSL</title>
+<g id="a_node11"><a xlink:href="#dsl" xlink:title="DSL">
+<polygon fill="none" points="390.5,-343 336.5,-343 336.5,-307 390.5,-307 390.5,-343" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="363.5" y="-321.3">DSL</text>
+</a>
+</g>
+</g>
+<!-- /dev/zfs ioctl&#45;&gt;DSL -->
+<g class="edge" id="edge9">
+<title>/dev/zfs ioctl-&gt;DSL</title>
+<path d="M379.2928,-453.9749C376.216,-428.8475 370.6069,-383.0393 366.9682,-353.324" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="370.4148,-352.673 365.7252,-343.1725 363.4667,-353.5238 370.4148,-352.673" stroke="#000000"></polygon>
+</g>
+<!-- ZAP -->
+<g class="node" id="node9">
+<title>ZAP</title>
+<g id="a_node9"><a xlink:href="#zap" xlink:title="ZAP">
+<polygon fill="none" points="246.5,-343 192.5,-343 192.5,-307 246.5,-307 246.5,-343" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-321.3">ZAP</text>
+</a>
+</g>
+</g>
+<!-- ZPL&#45;&gt;ZAP -->
+<g class="edge" id="edge6">
+<title>ZPL-&gt;ZAP</title>
+<path d="M219.5,-381.8446C219.5,-373.3401 219.5,-363.0076 219.5,-353.4964" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-353.2481 219.5,-343.2482 216.0001,-353.2482 223.0001,-353.2481" stroke="#000000"></polygon>
+</g>
+<!-- ZIL -->
+<g class="node" id="node10">
+<title>ZIL</title>
+<g id="a_node10"><a xlink:href="#zil" xlink:title="ZIL">
+<polygon fill="none" points="318.5,-343 264.5,-343 264.5,-307 318.5,-307 318.5,-343" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="291.5" y="-321.3">ZIL</text>
+</a>
+</g>
+</g>
+<!-- ZPL&#45;&gt;ZIL -->
+<g class="edge" id="edge7">
+<title>ZPL-&gt;ZIL</title>
+<path d="M246.6001,-381.8614C249.7221,-379.3607 252.7632,-376.7146 255.5,-374 262.1796,-367.3746 268.5716,-359.4234 274.0667,-351.8725" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="277.2028,-353.4956 280.0689,-343.2958 271.4677,-349.482 277.2028,-353.4956" stroke="#000000"></polygon>
+</g>
+<!-- DMU -->
+<g class="node" id="node12">
+<title>DMU</title>
+<g id="a_node12"><a xlink:href="#dmu" xlink:title="DMU">
+<polygon fill="none" points="246.5,-271 192.5,-271 192.5,-235 246.5,-235 246.5,-271" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-249.3">DMU</text>
+</a>
+</g>
+</g>
+<!-- ZPL&#45;&gt;DMU -->
+<g class="edge" id="edge11">
+<title>ZPL-&gt;DMU</title>
+<path d="M192.2089,-384.8579C188.7022,-381.7348 185.6059,-378.1186 183.5,-374 169.9436,-347.487 174.8709,-335.5001 183.5,-307 186.4564,-297.2355 191.8252,-287.6229 197.53,-279.2762" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="200.4414,-281.2239 203.5095,-271.0831 194.7871,-277.0973 200.4414,-281.2239" stroke="#000000"></polygon>
+</g>
+<!-- ZVOL&#45;&gt;DMU -->
+<g class="edge" id="edge12">
+<title>ZVOL-&gt;DMU</title>
+<path d="M105.9944,-381.6999C122.0079,-362.8551 147.7965,-332.6963 170.5,-307 178.6685,-297.7547 187.7187,-287.723 195.7956,-278.8433" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="198.4446,-281.1328 202.5963,-271.3853 193.2721,-276.4163 198.4446,-281.1328" stroke="#000000"></polygon>
+</g>
+<!-- ZAP&#45;&gt;DMU -->
+<g class="edge" id="edge10">
+<title>ZAP-&gt;DMU</title>
+<path d="M219.5,-306.8314C219.5,-299.131 219.5,-289.9743 219.5,-281.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-281.4132 219.5,-271.4133 216.0001,-281.4133 223.0001,-281.4132" stroke="#000000"></polygon>
+</g>
+<!-- ZIO -->
+<g class="node" id="node14">
+<title>ZIO</title>
+<g id="a_node14"><a xlink:href="#zio" xlink:title="ZIO">
+<polygon fill="none" points="318.5,-124 264.5,-124 264.5,-88 318.5,-88 318.5,-124" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="291.5" y="-102.3">ZIO</text>
+</a>
+</g>
+</g>
+<!-- ZIL&#45;&gt;ZIO -->
+<g class="edge" id="edge15">
+<title>ZIL-&gt;ZIO</title>
+<path d="M291.5,-306.7049C291.5,-268.4458 291.5,-179.7623 291.5,-134.1742" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="295.0001,-134.089 291.5,-124.089 288.0001,-134.0891 295.0001,-134.089" stroke="#000000"></polygon>
+</g>
+<!-- DSL&#45;&gt;ZAP -->
+<g class="edge" id="edge8">
+<title>DSL-&gt;ZAP</title>
+<path d="M355.7081,-343.0803C348.4513,-356.9247 336.0935,-374.2664 318.5,-378 295.0228,-382.9822 287.9772,-382.9822 264.5,-378 260.2181,-377.0913 258.91,-376.7445 255.5,-374 247.77,-367.7785 240.863,-359.5194 235.2167,-351.5579" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="238.0665,-349.5228 229.6055,-343.1461 232.2432,-353.4074 238.0665,-349.5228" stroke="#000000"></polygon>
+</g>
+<!-- DSL&#45;&gt;DMU -->
+<g class="edge" id="edge13">
+<title>DSL-&gt;DMU</title>
+<path d="M336.4147,-311.4574C313.7307,-300.1153 281.1433,-283.8217 256.1319,-271.316" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="257.463,-268.0684 246.9534,-266.7267 254.3325,-274.3294 257.463,-268.0684" stroke="#000000"></polygon>
+</g>
+<!-- ARC -->
+<g class="node" id="node13">
+<title>ARC</title>
+<g id="a_node13"><a xlink:href="#arc" xlink:title="ARC">
+<polygon fill="none" points="246.5,-199 192.5,-199 192.5,-163 246.5,-163 246.5,-199" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="219.5" y="-177.3">ARC</text>
+</a>
+</g>
+</g>
+<!-- DMU&#45;&gt;ARC -->
+<g class="edge" id="edge14">
+<title>DMU-&gt;ARC</title>
+<path d="M219.5,-234.8314C219.5,-227.131 219.5,-217.9743 219.5,-209.4166" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="223.0001,-209.4132 219.5,-199.4133 216.0001,-209.4133 223.0001,-209.4132" stroke="#000000"></polygon>
+</g>
+<!-- ARC&#45;&gt;ZIO -->
+<g class="edge" id="edge16">
+<title>ARC-&gt;ZIO</title>
+<path d="M246.6001,-162.8614C249.7221,-160.3607 252.7632,-157.7146 255.5,-155 262.1796,-148.3746 268.5716,-140.4234 274.0667,-132.8725" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="277.2028,-134.4956 280.0689,-124.2958 271.4677,-130.482 277.2028,-134.4956" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC -->
+<g class="node" id="node15">
+<title>L2ARC</title>
+<g id="a_node15"><a xlink:href="#l2arc" xlink:title="L2ARC">
+<polygon fill="none" points="246.5,-124 178.5,-124 178.5,-88 246.5,-88 246.5,-124" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="212.5" y="-102.3">L2ARC</text>
+</a>
+</g>
+</g>
+<!-- ARC&#45;&gt;L2ARC -->
+<g class="edge" id="edge17">
+<title>ARC-&gt;L2ARC</title>
+<path d="M217.8055,-162.8446C217.0117,-154.3401 216.0474,-144.0076 215.1597,-134.4964" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="218.6174,-133.8796 214.2032,-124.2482 211.6477,-134.5302 218.6174,-133.8796" stroke="#000000"></polygon>
+</g>
+<!-- VDEV -->
+<g class="node" id="node16">
+<title>VDEV</title>
+<g id="a_node16"><a xlink:href="#vdev" xlink:title="VDEV">
+<polygon fill="none" points="280,-52 221,-52 221,-16 280,-16 280,-52" stroke="#0000ff"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="250.5" y="-30.3">VDEV</text>
+</a>
+</g>
+</g>
+<!-- ZIO&#45;&gt;VDEV -->
+<g class="edge" id="edge20">
+<title>ZIO-&gt;VDEV</title>
+<path d="M281.154,-87.8314C276.5763,-79.7925 271.0948,-70.1666 266.0412,-61.2918" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="268.9752,-59.3712 260.9853,-52.4133 262.8923,-62.8351 268.9752,-59.3712" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC&#45;&gt;ZIO -->
+<g class="edge" id="edge18">
+<title>L2ARC-&gt;ZIO</title>
+<path d="M246.7539,-106C249.2119,-106 251.6699,-106 254.1278,-106" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="254.2329,-109.5001 264.2328,-106 254.2328,-102.5001 254.2329,-109.5001" stroke="#000000"></polygon>
+</g>
+<!-- L2ARC&#45;&gt;VDEV -->
+<g class="edge" id="edge19">
+<title>L2ARC-&gt;VDEV</title>
+<path d="M222.089,-87.8314C226.3317,-79.7925 231.4121,-70.1666 236.096,-61.2918" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="239.2096,-62.8908 240.7819,-52.4133 233.0189,-59.6235 239.2096,-62.8908" stroke="#000000"></polygon>
+</g>
+</g>
+</svg>
+</div>
+<div class="section" id="vdev">
+<h2><a class="toc-backref" href="#id3">VDEV</a></h2>
+<p>Virtual DEVice</p>
+<p>作用相當於 Linux Device Mapper 層或者 FreeBSD GEOM 層，提供 Stripe/Mirror/RAIDZ
+之類的多設備存儲池管理和抽象。 ZFS 中的 vdev 形成一個樹狀結構，在樹的底層是從內核提供的物理設備，
+其上是虛擬的塊設備。每個虛擬塊設備對上對下都是塊設備接口。</p>
+</div>
+<div class="section" id="zio">
+<h2><a class="toc-backref" href="#id4">ZIO</a></h2>
+<p>ZFS I/O，作用相當於內核的 IO scheduler 。</p>
+</div>
+<div class="section" id="zpl">
+<h2><a class="toc-backref" href="#id5">ZPL</a></h2>
+<p>ZFS Posix Layer ，提供符合 POSIX 文件系統的語義，也就是包括文件、目錄這些抽象以及
+inode 屬性、權限那些，對一個普通 FS 而言用戶直接接觸的部分。</p>
+</div>
+<div class="section" id="zvol">
+<h2><a class="toc-backref" href="#id6">ZVOL</a></h2>
+<p>ZFS VOLume</p>
+<p>有點像 loopback block device ，暴露一個塊設備的接口，其上可以創建別的
+FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口所以一開始先實現的它，而且
+<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 沒有 sparse 文件的時候可以用它模擬很大的塊設備，測試 Solaris UFS 對 TB 級存儲的支持情況</a>。</p>
+</div>
+<div class="section" id="tol">
+<h2><a class="toc-backref" href="#id7">TOL</a></h2>
+<p>Transactional Object Layer</p>
+<p>在數據塊的基礎上提供一個事務性的對象語義層。
+每個對象用多個數據塊存儲，每個數據塊大概是 4K~128K 這樣的數量級。</p>
+</div>
+<div class="section" id="zap">
+<h2><a class="toc-backref" href="#id8">ZAP</a></h2>
+<p>ZFS Attribute Processor ，在「對象」基礎上提供緊湊的 name/value 映射，從而文件夾內容、文件屬性之類的都是基於 ZAP 。</p>
+</div>
+<div class="section" id="zil">
+<h2><a class="toc-backref" href="#id9">ZIL</a></h2>
+<p>ZFS Intent Log ，記錄兩次完整事務語義提交之間的 log ，用來加速實現 fsync 之類的保證。</p>
+</div>
+<div class="section" id="dsl">
+<h2><a class="toc-backref" href="#id10">DSL</a></h2>
+<p>Dataset and Snapshot Layer ，數據集和快照層，這是本文的重點。</p>
+</div>
+<div class="section" id="dmu">
+<h2><a class="toc-backref" href="#id11">DMU</a></h2>
+<p>Data Management Unit ，在塊的基礎上提供「對象」的抽象。每個「對象」可以是一個文件，或者是別的 ZFS 內部需要記錄的東西。</p>
+</div>
+<div class="section" id="arc">
+<h2><a class="toc-backref" href="#id12">ARC</a></h2>
+<p>Adaptive Replacement Cache，作用相當於 pagecache 。</p>
+</div>
+<div class="section" id="spa">
+<h2><a class="toc-backref" href="#id13">SPA</a></h2>
+<p>Storage Pool Allocator ，從內核的多個塊設備中抽象出存儲池。</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f43524e4690> 番目の文章：                  </h4>
+                </div>
+                <ul class="list-group">
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus コメント            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'zfs-layered-architecture-design';
+                        var disqus_url = 'http://farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/jp/about.html">
+farseerfc に連絡</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/jp/about.html"><img width="100%" src="//farseerfc.me/jp/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/jp/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">タグ雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/linux.html">
+                    linux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/gnome3.html">
+                    gnome3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/will.html">
+                    will <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/you.html">
+                    you <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/marry.html">
+                    marry <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/me.html">
+                    me <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/msr.html">
+                    msr <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/icse.html">
+                    icse <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/mining.html">
+                    mining <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/software.html">
+                    software <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/repository.html">
+                    repository <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/jp/tag/python.html">
+                    python <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/ruby.html">
+                    ruby <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/pelican.html">
+                    pelican <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/microsoft.html">
+                    microsoft <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/jp/tag/acpi.html">
+                    acpi <sup> 1</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHubのリポ</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目次</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id1" id="id2">子系統整體架構</a></li>
+<li><a class="reference internal" href="#vdev" id="id3">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id4">ZIO</a></li>
+<li><a class="reference internal" href="#zpl" id="id5">ZPL</a></li>
+<li><a class="reference internal" href="#zvol" id="id6">ZVOL</a></li>
+<li><a class="reference internal" href="#tol" id="id7">TOL</a></li>
+<li><a class="reference internal" href="#zap" id="id8">ZAP</a></li>
+<li><a class="reference internal" href="#zil" id="id9">ZIL</a></li>
+<li><a class="reference internal" href="#dsl" id="id10">DSL</a></li>
+<li><a class="reference internal" href="#dmu" id="id11">DMU</a></li>
+<li><a class="reference internal" href="#arc" id="id12">ARC</a></li>
+<li><a class="reference internal" href="#spa" id="id13">SPA</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2014 farseerfc
+            &middot; ここは            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> で生成する                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/jp/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/jp/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/jp/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/jp/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/jp/../theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/jp/../theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/jp/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/jp/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
