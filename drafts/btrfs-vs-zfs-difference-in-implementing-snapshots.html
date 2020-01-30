@@ -698,8 +698,11 @@ btrfs subvolume set-default</code>
 <p>每一個子卷都有一棵自己的 FS_TREE （有的文檔中叫 file tree），一個 FS_TREE 相當於傳統 Unix
 文件系統中的一整個 inode table ，只不過它除了包含 inode 信息之外還包含所有文件夾內容。在
 FS_TREE 中， object_id 同時也是它所描述對象的 inode 號，所以 btrfs
-的 <strong>子卷有互相獨立的 inode 編號</strong> ，不同子卷中的文件或目錄可以擁有相同的 inode 。 FS_TREE
-中一個目錄用一個 inode_item 和多個 dir_item 描述， inode_item 是目錄自己的 inode
+的 <strong>子卷有互相獨立的 inode 編號</strong> ，不同子卷中的文件或目錄可以擁有相同的 inode 。
+或許有人不太清楚子卷間 inode 編號獨立意味着什麼，簡單地說，這意味着你不能跨子卷創建
+hard link ，不能跨子卷 mv 移動文件而不產生複製操作。不過因爲 reflink 和 inode 無關，
+可以跨子卷創建 reflink ，也可以用 reflink + rm 的方式快速移動文件。</p>
+<p>FS_TREE 中一個目錄用一個 inode_item 和多個 dir_item 描述， inode_item 是目錄自己的 inode
 ，那些 dir_item 是目錄的內容。 dir_item 可以指向別的 inode_item 來描述普通文件和子目錄，
 也可以指向 root_item 來描述這個目錄指向一個子卷。有人或許疑惑，子卷就沒有自己的 inode
 麼？其實如果看 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Data_Structures#btrfs_root_item">數據結構定義</a>
@@ -1004,7 +1007,7 @@ btrfs subvolume snapshot</code>
 <li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
 </ul>
 <p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：</p>
-<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。</p>
@@ -1133,7 +1136,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1146,7 +1149,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1223,7 +1226,7 @@ ZFS 設計中的什麼位置。</p>
 <div class="system-messages section">
 <h2>Docutils System Messages</h2>
 <div class="system-message" id="id23">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/btrfs-vs-zfs-difference-in-implementing-snapshots.zh.rst</tt>, line 553); <em><a href="#id24">backlink</a></em></p>
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/btrfs-vs-zfs-difference-in-implementing-snapshots.zh.rst</tt>, line 557); <em><a href="#id24">backlink</a></em></p>
 Unknown target name: "dsl".</div>
 </div>
 
@@ -1245,7 +1248,7 @@ Unknown target name: "dsl".</div>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fb0eeaa64b0> 篇：                  </h4>
+這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f8dd0b8a1b0> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>

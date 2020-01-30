@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="zfs,layered,architecture" />
-        <meta name="description" content="ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux 内核已有的子系统有功能重叠。 这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 The Birth of ZFS by Jeff Bonwick Story Time (Q&amp;A) with Matt and Jeff ZFS First Mount by Mark …" />
+        <meta name="description" content="ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到类似的子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 The Birth of ZFS by Jeff Bonwick Story Time (Q&amp;A) with Matt and Jeff ZFS …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="ZFS 分层架构设计"/>
         <meta property="og:url" content="//farseerfc.me/jp/zhs/drafts/zfs-layered-architecture-design.html"/>
-        <meta property="og:description" content="ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux 内核已有的子系统有功能重叠。 这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 The Birth of ZFS by Jeff Bonwick Story Time (Q&amp;A) with Matt and Jeff ZFS First Mount by Mark …"/>
+        <meta property="og:description" content="ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到类似的子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 The Birth of ZFS by Jeff Bonwick Story Time (Q&amp;A) with Matt and Jeff ZFS …"/>
         <meta property="article:published_time" content="2020-01-30" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="zfs" />
@@ -263,7 +263,8 @@ Farseerfcの巣            </a>
 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
 IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux
 内核已有的子系统有功能重叠。</p>
-<p>这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
+<p>似乎很多关于 ZFS 的视频演讲和幻灯片有讲到类似的子系统架构，但是找了半天也没找到网上关于这个的说明文档。
+于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
 也有几段 OpenZFS Summit 视频佐以记录那段历史。</p>
 <div class="panel panel-default">
 <div class="panel-heading">
@@ -679,13 +680,15 @@ Solaris/Illumos 上也是同样，这个在
 <div class="section" id="l2arc">
 <h2><a class="toc-backref" href="#id10">L2ARC</a></h2>
 <p>Level 2 Adaptive Replacement Cache</p>
-<p>这是用 ARC 算法实现的二级缓存，存在于高速存储设备上。通常 ZFS 可以配置一块 SSD 作为高速缓存，
-减轻内存 ARC 的负担并增加缓存命中率。</p>
+<p>这是用 ARC 算法实现的二级缓存，保存于高速存储设备上。常见用法是给 ZFS pool 配置一块 SSD
+作为 L2ARC 高速缓存，减轻内存 ARC 的负担并增加缓存命中率。</p>
 </div>
 <div class="section" id="tol">
 <h2><a class="toc-backref" href="#id11">TOL</a></h2>
 <p>Transactional Object Layer</p>
-<p>这一部分子系统在数据块的基础上提供一个事务性的对象语义层。最主要的部分是 DMU 层。</p>
+<p>这一部分子系统在数据块的基础上提供一个事务性的对象语义层，这里事务性是指，
+对对象的修改处于明确的状态，不会因为突然断电之类的原因导致状态不一致。TOL
+中最主要的部分是 DMU 层。</p>
 </div>
 <div class="section" id="dmu">
 <h2><a class="toc-backref" href="#id12">DMU</a></h2>
@@ -729,7 +732,8 @@ ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来�
 </div>
 <div class="section" id="zil">
 <h2><a class="toc-backref" href="#id15">ZIL</a></h2>
-<p>ZFS Intent Log ，记录两次完整事务语义提交之间的 log ，用来加速实现 fsync 之类的保证。</p>
+<p>ZFS Intent Log</p>
+<p>记录两次完整事务语义提交之间的 log ，用来加速实现 fsync 之类的保证。</p>
 </div>
 <div class="section" id="zvol">
 <h2><a class="toc-backref" href="#id16">ZVOL</a></h2>
@@ -762,7 +766,7 @@ inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7fb0eef18930> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f8dd064a210> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
