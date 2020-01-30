@@ -31,7 +31,7 @@
         <meta property="og:title" content="ZFS 分層架構設計"/>
         <meta property="og:url" content="//farseerfc.me/jp/../drafts/zfs-layered-architecture-design.html"/>
         <meta property="og:description" content="ZFS 在設計之初源自於 Sun 內部多次重寫 UFS 的嘗試，背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統只負責文件系統的功能而把其餘功能（比如內存髒頁管理， IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。 這篇筆記試圖從 ZFS 的早期開發歷程開始，記錄一下 ZFS 分層架構中各個子系統之間的分工。 也有幾段 OpenZFS Summit 視頻佐以記錄那段歷史。 The Birth of ZFS by Jeff Bonwick Story Time (Q&amp;A) with Matt and Jeff ZFS First Mount by Mark …"/>
-        <meta property="article:published_time" content="2020-01-26" />
+        <meta property="article:published_time" content="2020-01-30" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="zfs" />
             <meta property="article:tag" content="layered" />
@@ -206,7 +206,7 @@ Farseerfcの巣            </a>
                 <div class="panel-body">
 <div class="post-info">
     <span class="published">
-        <time datetime="2020-01-26T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年01月26日(週日)</time>
+        <time datetime="2020-01-30T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年01月30日(週四)</time>
     </span>
 
 
@@ -724,7 +724,8 @@ ZAP 來存，然後文件夾內容列表有另一種數據結構 ZDS ，後來�
 </div>
 <div class="section" id="dsl">
 <h2><a class="toc-backref" href="#id14">DSL</a></h2>
-<p>Dataset and Snapshot Layer ，數據集和快照層。</p>
+<p>Dataset and Snapshot Layer</p>
+<p>數據集和快照層。</p>
 </div>
 <div class="section" id="zil">
 <h2><a class="toc-backref" href="#id15">ZIL</a></h2>
@@ -735,7 +736,7 @@ ZAP 來存，然後文件夾內容列表有另一種數據結構 ZDS ，後來�
 <p>ZFS VOLume</p>
 <p>有點像 loopback block device ，暴露一個塊設備的接口，其上可以創建別的
 FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口所以一開始先實現的它，而且
-<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 沒有 sparse 文件的時候可以用它模擬很大的塊設備，測試 Solaris UFS 對 TB 級存儲的支持情況</a>。</p>
+<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 沒有 thin provisioning storage pool 的時候可以用它模擬很大的塊設備，測試 Solaris UFS 對 TB 級存儲的支持情況</a>。</p>
 </div>
 <div class="section" id="zpl">
 <h2><a class="toc-backref" href="#id17">ZPL</a></h2>
@@ -761,7 +762,7 @@ inode 屬性、權限那些，對一個普通 FS 而言用戶直接接觸的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7fa635c1edb0> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7fb0ee41af90> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
