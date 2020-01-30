@@ -690,17 +690,37 @@ Solaris/Illumos 上也是同样，这个在
 <div class="section" id="dmu">
 <h2><a class="toc-backref" href="#id12">DMU</a></h2>
 <p>Data Management Unit</p>
-<p>在块的基础上提供「对象」的抽象。每个「对象」可以是一个文件，或者是别的 ZFS 内部需要记录的东西。
-DMU 这个名字最初是 Jeff 想类比于操作系统中内存管理的 MMU(Memory Management Unit)，
+<p>在块的基础上提供「对象」的抽象。每个「对象」可以是一个文件，或者是别的 ZFS 内部需要记录的东西。</p>
+<p>DMU 这个名字最初是 Jeff 想类比于操作系统中内存管理的 MMU(Memory Management Unit)，
 Jeff 希望 ZFS 中增加和删除文件就像内存分配一样简单，增加和移除块设备就像增加内存一样简单，
 由 DMU 负责从存储池中分配和释放数据块，对上提供事务性语义，管理员不需要管理文件存储在什么存储设备上。
 这里事务性语义指对文件的修改要么完全成功，要么完全失败，不会处于中间状态，这靠 DMU 的 CoW
 语义实现。</p>
+<p>DMU 实现了对象级别的 CoW 语义，从而任何经过了 DMU 做读写的子系统都具有了 CoW 的特征，
+这不仅包括文件、文件夹这些 ZPL 层需要的东西，也包括文件系统内部用的 spacemap 之类的设施。
+相反，不经过 DMU 的子系统则可能没法保证事务语义。这里一个特例是 ZIL ，一定程度上绕过了 DMU
+直接写日志。说一定程度是因为 ZIL 仍然靠 DMU 来扩展长度，当一个块写满日志之后需要等 DMU
+分配一个新块，在分配好的块内写日志则不需要经过 DMU 。</p>
+<p>上面提到 SPA 的时候也讲了 DMU 和 SPA 之间不同于普通块设备抽象的接口，这使得 DMU
+按整块的大小分配空间。当对象的大小超过一个固定的块大小时（4K~8M，默认128K），DMU 采用了传统
+Unix 文件系统的间接块（indirect block）的方案，不同于更现代的文件系统如
+ext4/xfs/btrfs/ntfs/hfs+ 这些使用 extent 记录连续的物理地址分配。
+间接块简单来说就是写满了 block pointer 的块组成的树状结构。 DMU 采用间接块而不是 extent
+，使得 ZFS 的空间分配更趋向碎片化。</p>
 </div>
 <div class="section" id="zap">
 <h2><a class="toc-backref" href="#id13">ZAP</a></h2>
 <p>ZFS Attribute Processor</p>
-<p>在「对象」基础上提供紧凑的 name/value 映射，从而文件夹内容、文件属性之类的都是基于 ZAP 。</p>
+<p>在 DMU 提供的「对象」抽象基础上提供紧凑的 name/value 映射存储，
+从而文件夹内容列表、文件扩展属性之类的都是基于 ZAP 来存。 ZAP 在内部分为两种存储表达：
+microZAP 和 fatZAP 。</p>
+<p>一个 microZAP 占用一整块数据块，能存 name 长度小于 50 字符并且 value 是 uint64_t 的表项，
+每个表项 64 字节。 fatZAP 则是个树状结构，能存更多更复杂的东西。可见 microZAP
+非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。</p>
+<p>在 <a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=526">ZFS First Mount by Mark Shellenbaum</a>
+中提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
+ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来常见的文件属性在 ZPL
+有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。</p>
 </div>
 <div class="section" id="dsl">
 <h2><a class="toc-backref" href="#id14">DSL</a></h2>
@@ -741,7 +761,7 @@ inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7f79f7baeb70> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f7d26f7b8d0> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
