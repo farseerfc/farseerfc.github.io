@@ -633,6 +633,9 @@ read</code>
  ，DMU 交给 SPA 一个 block pointer ，SPA 读取设备并返回给 DMU
 完整的数据块。</li>
 </ol>
+<p>也就是说，在 DMU 让 SPA 写数据块时， DMU 还不知道 SPA 会写入的地方，这完全由 SPA 判断，
+这一点通常被称为 Write Anywhere 。
+反过来 SPA 想要对一个数据块操作时，也完全不清楚这个数据块用于什么目的，属于什么文件或者文件系统结构。</p>
 </div>
 <div class="section" id="vdev">
 <h2><a class="toc-backref" href="#id7">VDEV</a></h2>
@@ -716,6 +719,13 @@ Unix 文件系统的间接块（indirect block）的方案，不同于更现代�
 ext4/xfs/btrfs/ntfs/hfs+ 这些使用 extent 记录连续的物理地址分配。
 间接块简单来说就是写满了 block pointer 的块组成的树状结构。 DMU 采用间接块而不是 extent
 ，使得 ZFS 的空间分配更趋向碎片化。</p>
+<p>上面也提到因为 SPA 和 DMU 分离， SPA 完全不知道数据块用于什么目的；这一点其实对 DMU 也是类似，
+DMU 虽然能从某个对象找到它所占用的数据块，但是 DMU 完全不知道这个对象在文件系统或者存储池中是
+用来存储什么的。当 DMU 读取数据遇到坏块（block pointer 中的校验和与 block pointer
+指向的数据块内容不一致）时，它知道这个数据块在哪儿（具体哪个设备上的哪个地址），
+但是不知道这个数据块是否和别的对象共享，不知道搬动这个数据块的影响，也没法从对象反推出文件系统路径，
+（除了明显开销很高地扫一遍整个存储池）。所以 DMU 在遇到读取错误（普通的读操作或者 scrub/resilver
+操作中）时，只能选择在同样的地址，原地写入数据块的备份（如果能找到或者推算出备份的话）。</p>
 </div>
 <div class="section" id="zap">
 <h2><a class="toc-backref" href="#id13">ZAP</a></h2>
@@ -772,7 +782,7 @@ inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f8dd080d990> 篇：                  </h4>
+这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f20078e4a50> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
