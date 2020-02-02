@@ -720,6 +720,10 @@ DMU 雖然能從某個對象找到它所佔用的數據塊，但是 DMU 完全�
 但是不知道這個數據塊是否和別的對象共享，不知道搬動這個數據塊的影響，也沒法從對象反推出文件系統路徑，
 （除了明顯開銷很高地掃一遍整個存儲池）。所以 DMU 在遇到讀取錯誤（普通的讀操作或者 scrub/resilver
 操作中）時，只能選擇在同樣的地址，原地寫入數據塊的備份（如果能找到或者推算出備份的話）。</p>
+<p>或許有人會疑惑，既然從 SPA 無法根據數據地址反推出對象，在 DMU 也無法根據對象反推出文件，那麼
+zfs 在遇到數據損壞時是如何給出損壞的文件路徑的呢？這其實基於 ZPL 的一個黑魔法：
+<a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick">在 dnode 記錄父級 dnode 的編號</a>
+。因爲是個黑魔法，這個記錄不總是對的，所以只能用於診斷信息，不能基於這個實現別的文件系統功能。</p>
 </div>
 <div class="section" id="zap">
 <h2><a class="toc-backref" href="#id13">ZAP</a></h2>
@@ -776,7 +780,7 @@ inode 屬性、權限那些，對一個普通 FS 而言用戶直接接觸的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7f2007732f30> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7fd6a51c5f90> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
