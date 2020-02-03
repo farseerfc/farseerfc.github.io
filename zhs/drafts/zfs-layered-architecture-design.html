@@ -680,6 +680,12 @@ IO 操作不至于让缓存失效率猛增。</p>
 是 ZFS 消耗内存的大户之一（另一个是可选的 dedup table），也是
 <a class="reference external" href="http://open-zfs.org/wiki/Performance_tuning#Adaptive_Replacement_Cache">ZFS 性能调优</a>
 的重中之重。</p>
+<p>当然， ZFS 采用 ARC 不依赖于内核已有的 pagecache 机制除了 LFU 平衡之外，也有其有利的一面。
+系统中多次读取因 snapshot 或者 dedup 而共享的数据块的话，在 ZFS 的 ARC 机制下，同样的
+block pointer 只会被缓存一次；而传统的 pagecache 因为基于 inode 判断是否有共享，
+所以即使这些文件有共享页面（比如 btrfs/xfs 的 reflink 形成的），也会多次读入内存。 Linux
+的 btrfs 和 xfs 在 VFS 层面有共用的 reflink 机制之后，正在努力着手改善这种局面，而 ZFS
+因为 ARC 所以从最初就避免了这种浪费。</p>
 <p>和很多传言所说的不同， ARC 的内存压力问题不仅在 Linux 内核会有，在 FreeBSD 和
 Solaris/Illumos 上也是同样，这个在
 <a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=997">ZFS First Mount by Mark Shellenbaum 的问答环节 16:37 左右有提到</a>
@@ -748,24 +754,64 @@ ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来�
 <div class="section" id="dsl">
 <h2><a class="toc-backref" href="#id14">DSL</a></h2>
 <p>Dataset and Snapshot Layer</p>
-<p>数据集和快照层。</p>
+<p>数据集和快照层，负责创建和管理快照、克隆等数据集类型，跟踪它们的写入大小，最终删除它们。
+由于 DMU 层面已经负责了对象的写时复制语义，所以 DSL 层面不需要直接接触写文件之类来自 ZPL
+的请求，无论有没有快照对 DMU 层面一样采用写时复制的方式修改文件数据。
+不过在删除快照和克隆之类的时候，则需要 DSL 参与计算没有和别的数据集共享的数据块并且删除它们。</p>
+<p>除了管理数据集， DSL 层面也提供了 zfs 中 send/receive 的能力。 ZFS 在 send 时从 DSL
+层找到快照引用到的所有数据块，把它们直接发往管道，在 receive 端则直接接收数据块并重组数据块指针。
+因为 DSL 提供的 send/receive 工作在 DMU 之上，所以在 DSL 看到的数据块是 DMU
+的数据块，下层 SPA 完成的数据压缩、加密、去重等工作，对 DMU 层完全透明。所以在最初的
+send/receive 实现中，假如数据块已经压缩，需要在 send 端经过 SPA 解压，再 receive
+端则重新压缩。最近 ZFS 的 send/receive 逐渐打破 DMU 与 SPA
+的壁垒，支持了直接发送已压缩或加密的数据块的能力。</p>
 </div>
 <div class="section" id="zil">
 <h2><a class="toc-backref" href="#id15">ZIL</a></h2>
 <p>ZFS Intent Log</p>
-<p>记录两次完整事务语义提交之间的 log ，用来加速实现 fsync 之类的保证。</p>
+<p>记录两次完整事务语义提交之间的日志，用来加速实现 fsync 之类的文件事务语义。</p>
+<p>原本 CoW 的文件系统不需要日志结构来保证文件系统结构的一致性，在 DMU
+保证了对象级别事务语义的前提下，每次完整的 transaction group commit
+都保证了文件系统一致性，挂载时也直接找到最后一个 transaction group 从它开始挂载即可。
+不过在 ZFS 中，做一次完整的 transaction group commit 是个比较耗时的操作，
+在写入文件的数据块之后，还需要更新整个 object set ，然后更新 meta-object set
+，最后更新 uberblock ，为了满足事务语义这些操作没法并行完成，所以整个 pool
+提交一次需要等待好几次磁盘写操作返回，短则一两秒，长则几分钟，
+如果事务中有要删除快照等非常耗时的操作可能还要等更久，在此期间提交的事务没法保证一致。</p>
+<p>对上层应用程序而言，通常使用 fsync 或者 fdatasync 之类的系统调用，确保文件内容本身的事务一致性。
+如果要让每次 fsync/fdatasync 等待整个 transaction group commit
+完成，那会严重拖慢很多应用程序，而如果它们不等待直接返回，则在突发断电时没有保证一致性。
+从而 ZFS 有了 ZIL ，记录两次 transaction group 的 commit 之间发生的 fsync
+，突然断电后下次 import zpool 时首先找到最近一次 transaction group ，在它基础上重放
+ZIL 中记录的写请求和 fsync 请求，从而满足 fsync API 要求的事务语义。</p>
+<p>显然对 ZIL 的写操作需要绕过 DMU 直接写入数据块，所以 ZIL 本身是以日志系统的方式组织的，每次写
+ZIL 都是在已经分配的 ZIL 块的末尾添加数据，分配新的 ZIL 块仍然需要经过 DMU
+的空间分配。</p>
+<p>传统日志型文件系统中对 data 开日志需要写两次，一次写入日志，再一次覆盖文件系统内容；在
+ZIL 实现中则不需要写两次， DMU 让 SPA 写入数据之后 ZIL 可以直接记录新数据块的
+block pointer ，所以使用 ZIL 不会导致传统日志型文件系统中双倍写入放大的问题。</p>
 </div>
 <div class="section" id="zvol">
 <h2><a class="toc-backref" href="#id16">ZVOL</a></h2>
 <p>ZFS VOLume</p>
 <p>有点像 loopback block device ，暴露一个块设备的接口，其上可以创建别的
-FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口所以一开始先实现的它，而且
-<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 没有 thin provisioning storage pool 的时候可以用它模拟很大的块设备，测试 Solaris UFS 对 TB 级存储的支持情况</a>。</p>
+FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口，所以在实现完整 ZPL
+之前，一开始就先实现了 ZVOL ，而且
+<a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298">早期 Solaris 没有 thin provisioning storage pool 的时候可以用 ZVOL 模拟很大的块设备，当时 Solaris 的 UFS 团队用它来测试 UFS 对 TB 级存储的支持情况</a>
+。</p>
+<p>因为 ZVOL 基于 DMU 上层，所以 DMU 所有的文件系统功能，比如 snapshot / dedup / compression
+都可以用在 ZVOL 上，从而让 ZVOL 上层的传统文件系统也具有类似的功能。并且 ZVOL 也具有了 ARC
+缓存的能力，和 dedup 结合之下，非常适合于在一个宿主机 ZFS
+上提供对虚拟机文件系统镜像的存储，可以节省不少存储空间和内存占用开销。</p>
 </div>
 <div class="section" id="zpl">
 <h2><a class="toc-backref" href="#id17">ZPL</a></h2>
-<p>ZFS Posix Layer ，提供符合 POSIX 文件系统的语义，也就是包括文件、目录这些抽象以及
-inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部分。</p>
+<p>ZFS Posix Layer</p>
+<p>提供符合 POSIX 文件系统的语义，也就是包括文件、目录这些抽象以及
+inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部分。
+ZPL 可以说是 ZFS 最复杂的子系统，也是 ZFS 作为一个文件系统而言最关键的部分。</p>
+<p>ZPL 的实现中直接使用了 ZAP 和 DMU 提供的抽象，比如每个 ZPL 文件用一个 DMU 对象表达，每个
+ZPL 目录用一个 ZAP 对象表达。</p>
 </div>
 
             </div>
@@ -786,7 +832,7 @@ inode 属性、权限那些，对一个普通 FS 而言用户直接接触的部�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fd6a49927b0> 篇：                  </h4>
+这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fa40621e8d0> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
