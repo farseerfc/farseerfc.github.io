@@ -163,7 +163,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
         {rank=&quot;same&quot;;node [shape=cylinder];
             &quot;physical storage devices&quot;;
         };
-        &quot;VDEV&quot; -&gt; &quot;physical storage devicZFS Posix filesystem Layer）es&quot;;
+        &quot;VDEV&quot; -&gt; &quot;physical storage devices&quot;;
 
     }
 
@@ -194,8 +194,9 @@ SPA 对 DMU 提供的接口不同于传统的块设备接口，完全利用了 C
 
 Virtual DEVice
 
-作用相当于 Linux 内核的 Device Mapper 层或者 FreeBSD GEOM 层，提供 Stripe/Mirror/RAIDZ
-之类的多设备存储池管理和抽象。 ZFS 中的 vdev 形成一个树状结构，在树的底层是从内核提供的物理设备，
+VDEV 在 ZFS 中的作用相当于 Linux 内核的 Device Mapper 层或者 FreeBSD GEOM 层，提供
+Stripe/Mirror/RAIDZ 之类的多设备存储池管理和抽象。 ZFS 中的 vdev
+形成一个树状结构，在树的底层是从内核提供的物理设备，
 其上是虚拟的块设备。每个虚拟块设备对上对下都是块设备接口，除了底层的物理设备之外，位于中间层的
 vdev 需要负责地址映射、容量转换等计算过程。
 
