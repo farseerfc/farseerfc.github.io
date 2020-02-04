@@ -1028,11 +1028,10 @@ pool_name/​dataset_path@snapshot_name</code>
 <p>數據集之間有類似文件夾的層級父子關係，這一點有用的地方在於可以在父級數據集上設定一些 ZFS 參數，
 這些參數可以被子級數據集基礎，從而通過層級關係可以方便地微調 ZFS 參數。在 btrfs
 中目前還沒有類似的屬性繼承的功能。</p>
-<p>zvol 的概念和本文關係不大，這裏簡要介紹一下。 zvol 是在 ZFS 存儲池中虛擬出的一個塊設備，
-可以在 zvol 上創建別的類型的文件系統，比如 ext4 或者 xfs 這種。很多對 ZFS 文件系統能做的操作，
-比如快照或者 send 也都能對 zvol 做，從而用 zvol 能把 ZFS 當作一個傳統的卷管理器，繞開 ZFS
-的 ZPL（ZFS Posix filesystem Layer） 層。在 Btrfs 中可以用 loopback
-塊設備某種程度上模擬 zvol 的功能。</p>
+<p>zvol 的概念和本文關係不大，可以參考我上一篇 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#ZVOL">ZFS 子系統筆記中 ZVOL 的說明</a>
+。用 zvol 能把 ZFS 當作一個傳統的卷管理器，繞開 ZFS
+的 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#ZPL">ZPL（ZFS Posix filesystem Layer）</a>
+層。在 Btrfs 中可以用 loopback 塊設備某種程度上模擬 zvol 的功能。</p>
 </div>
 <div class="section" id="filesystem">
 <h4><a class="toc-backref" href="#id15">文件系統（filesystem）</a></h4>
@@ -1122,9 +1121,10 @@ degraded 狀態、不能 scrub 到當前存儲池中已經釋放而在檢查點�
 <div class="section" id="zfs-btrfs">
 <h3><a class="toc-backref" href="#id20">ZFS 的概念與 btrfs 概念的對比</a></h3>
 <p>先說書籤和檢查點，因爲這是兩個 btrfs 目前完全沒有的功能。</p>
-<p>書籤功能完全圍繞 ZFS send 的工作原理，而 ZFS send 位於 ZFS 設計中的
-<a href="#id23"><span class="problematic" id="id24">DSL_</span></a> 層面，甚至不關心它 send
-的快照的數據是來自文件系統還是 zvol 。在發送端它只是從目標快照遞歸取數據塊，判斷 TXG
+<p>書籤功能完全圍繞 ZFS send 的工作原理，而 ZFS send 位於
+<a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#DSL">ZFS 設計中的 DSL</a>
+層面，甚至不關心它 send 的快照的數據是來自文件系統還是 zvol
+。在發送端它只是從目標快照遞歸取數據塊，判斷 TXG
 是否老於參照點的快照，然後把新的數據塊全部發往 send stream ；在接收端也只是完整地接收數據塊，
 不加以處理，。與之不同的是 btrfs 的 send 的工作原理是工作在文件系統的只讀子卷層面，
 發送端在內核代碼中根據目標快照的 b 樹和參照點快照的 generation 生成一個 diff
@@ -1138,7 +1138,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="field-list docutils table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1151,7 +1151,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="field-list docutils table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1225,12 +1225,6 @@ ZFS 設計中的什麼位置。</p>
 </div>
 </div>
 </div>
-<div class="system-messages section">
-<h2>Docutils System Messages</h2>
-<div class="system-message" id="id23">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/travis/build/farseerfc/farseerfc/content/tech/btrfs-vs-zfs-difference-in-implementing-snapshots.zh.rst</tt>, line 557); <em><a href="#id24">backlink</a></em></p>
-Unknown target name: "dsl".</div>
-</div>
 
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
@@ -1250,7 +1244,7 @@ Unknown target name: "dsl".</div>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7f9224053150> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7ff0fe069c30> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>

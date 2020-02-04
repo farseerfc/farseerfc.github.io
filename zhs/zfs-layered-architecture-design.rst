@@ -163,7 +163,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
         {rank="same";node [shape=cylinder];
             "physical storage devices";
         };
-        "VDEV" -> "physical storage devices";
+        "VDEV" -> "physical storage devicZFS Posix filesystem Layer）es";
 
     }
 
@@ -270,12 +270,18 @@ OpenZFS Summit 也有一个对 MetaSlab 分配器性能的介绍，可以看到�
 ARC
 -----------------
 
+
+.. panel-default::
+    :title: ELI5: ZFS Caching Explain Like I'm 5: How the ZFS Adaptive Replacement Cache works
+
+    .. youtube:: 1Wo3i2gkAIk
+
 Adaptive Replacement Cache
 
-作用相当于 Linux/Solaris/FreeBSD 中传统的 page/buffer cache 。
+ARC 的作用相当于 Linux/Solaris/FreeBSD 中传统的 page/buffer cache 。
 和传统 pagecache 使用 LRU (Least Recently Used) 之类的算法剔除缓存页不同， ARC
 算法试图在 LRU 和 LFU(Least Frequently Used) 之间寻找平衡，从而复制大文件之类的线性大量
-IO 操作不至于让缓存失效率猛增。
+IO 操作不至于让缓存失效率猛增。最近 FOSDEM 2019 有一个介绍 ZFS ARC 工作原理的视频。
 
 不过 ZFS 采用它自有的 ARC 一个显著缺点在于，不能和内核已有的 pagecache 机制相互配合，尤其在
 系统内存压力很大的情况下，内核与 ZFS 无关的其余部分可能难以通知 ARC 释放内存。所以 ARC
@@ -295,6 +301,13 @@ Solaris/Illumos 上也是同样，这个在
 `ZFS First Mount by Mark Shellenbaum 的问答环节 16:37 左右有提到 <https://youtu.be/xMH5rCL8S2k?t=997>`_
 。其中 Mark Shellenbaum 提到 Matt 觉得让 ARC 并入现有 pagecache
 子系统的工作量太大，难以实现。
+
+因为 ARC 工作在 ZIO 上层，所以 ARC 中缓存的数据是经过 ZIO
+从存储设备中读取出来之后解压、解密等处理之后的，原始的数据。最近 ZFS 的版本有支持一种新特性叫
+`Compressed ARC <https://www.illumos.org/issues/6950>`_
+，打破 ARC 和 VDEV 中间 ZIO 的壁垒，把压缩的数据直接缓存在 ARC
+中。这么做是因为压缩解压很快的情况下，压缩的 ARC 能节省不少内存，让更多数据保留在 ARC
+中从而提升缓存利用率，并且在有 L2ARC 的情况下也能增加 L2ARC 能存储的缓存。
 
 L2ARC
 -----------------
