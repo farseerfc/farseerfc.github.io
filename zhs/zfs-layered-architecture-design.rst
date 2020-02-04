@@ -261,7 +261,7 @@ MetaSlab 的结构很接近于 FreeBSD UFS 的 cylinder group ，或者 ext2/3/4
 或者说让近期分配的数据块的物理地址比较接近。在存储设备上创建 zpool
 的时候，首先会尽量在存储设备上分配 200 个左右的 MetaSlab ，随后给 zpool
 增加设备的话使用接近的 MetaSlab 大小。每个 MetaSlab 是连续的一整块空间，在 MetaSlab
-内对数据块空间做分配和释放。磁盘中存储的 MetaSlab 的分配情况是按需载入内存的的，系统
+内对数据块空间做分配和释放。磁盘中存储的 MetaSlab 的分配情况是按需载入内存的，系统
 import zpool 时不需要载入所有 MetaSlab 到内存，而只需加载一小部分。当前载入内存的 MetaSlab
 剩余空间告急时，会载入别的 MetaSlab 尝试分配，而从某个 MetaSlab 释放空间不需要载入 MetaSlab
 。
@@ -403,10 +403,11 @@ microZAP 和 fatZAP 。
 每个表项 64 字节。 fatZAP 则是个树状结构，能存更多更复杂的东西。可见 microZAP
 非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。
 
-在 `ZFS First Mount by Mark Shellenbaum <https://youtu.be/xMH5rCL8S2k?t=526>`_
-中提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
-ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来常见的文件属性在 ZPL
-有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。
+在 `ZFS First Mount by Mark Shellenbaum 的8:48左右 <https://youtu.be/xMH5rCL8S2k?t=526>`_
+提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
+ZAP 来存，也就是说每个文件都有个 ZAP ，其中有叫做 size 呀 owner
+之类的键值对，就像是个 JSON 对象那样，这让 ZPL 一开始很容易设计原型并且扩展。然后文件夹内容列表有另一种数据结构
+ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。
 
 DSL
 -----------------

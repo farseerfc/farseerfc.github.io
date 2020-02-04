@@ -266,22 +266,22 @@ Farseerfc的小窝            </a>
                         <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id5">早期架构</a></li>
-<li><a class="reference internal" href="#id2" id="id6">子系统整体架构</a></li>
-<li><a class="reference internal" href="#spa" id="id7">SPA</a></li>
-<li><a class="reference internal" href="#vdev" id="id8">VDEV</a></li>
-<li><a class="reference internal" href="#zio" id="id9">ZIO</a></li>
-<li><a class="reference internal" href="#metaslab" id="id10">MetaSlab</a></li>
-<li><a class="reference internal" href="#arc" id="id11">ARC</a></li>
-<li><a class="reference internal" href="#l2arc" id="id12">L2ARC</a></li>
-<li><a class="reference internal" href="#slog" id="id13">SLOG</a></li>
-<li><a class="reference internal" href="#tol" id="id14">TOL</a></li>
-<li><a class="reference internal" href="#dmu" id="id15">DMU</a></li>
-<li><a class="reference internal" href="#zap" id="id16">ZAP</a></li>
-<li><a class="reference internal" href="#dsl" id="id17">DSL</a></li>
-<li><a class="reference internal" href="#zil" id="id18">ZIL</a></li>
-<li><a class="reference internal" href="#zvol" id="id19">ZVOL</a></li>
-<li><a class="reference internal" href="#zpl" id="id20">ZPL</a></li>
+<li><a class="reference internal" href="#id1" id="id4">早期架构</a></li>
+<li><a class="reference internal" href="#id2" id="id5">子系统整体架构</a></li>
+<li><a class="reference internal" href="#spa" id="id6">SPA</a></li>
+<li><a class="reference internal" href="#vdev" id="id7">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id8">ZIO</a></li>
+<li><a class="reference internal" href="#metaslab" id="id9">MetaSlab</a></li>
+<li><a class="reference internal" href="#arc" id="id10">ARC</a></li>
+<li><a class="reference internal" href="#l2arc" id="id11">L2ARC</a></li>
+<li><a class="reference internal" href="#slog" id="id12">SLOG</a></li>
+<li><a class="reference internal" href="#tol" id="id13">TOL</a></li>
+<li><a class="reference internal" href="#dmu" id="id14">DMU</a></li>
+<li><a class="reference internal" href="#zap" id="id15">ZAP</a></li>
+<li><a class="reference internal" href="#dsl" id="id16">DSL</a></li>
+<li><a class="reference internal" href="#zil" id="id17">ZIL</a></li>
+<li><a class="reference internal" href="#zvol" id="id18">ZVOL</a></li>
+<li><a class="reference internal" href="#zpl" id="id19">ZPL</a></li>
 </ul>
 </div>
                         </div>
@@ -319,7 +319,7 @@ ZFS past &amp; future by Mark Maybee</div>
 <div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/c1ek1tFjhH8"></iframe></div></div>
 </div>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id5">早期架构</a></h2>
+<h2><a class="toc-backref" href="#id4">早期架构</a></h2>
 <p>早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。</p>
 <p>最初在 Sun 内部带领 ZFS 开发的是 <a class="reference external" href="https://blogs.oracle.com/bonwick/">Jeff Bonwick</a>
 ，他首先有了对 ZFS 整体架构的构思，然后游说 Sun 高层，亲自组建起了 ZFS
@@ -336,7 +336,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
 今后发展的方向。</p>
 </div>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id6">子系统整体架构</a></h2>
+<h2><a class="toc-backref" href="#id5">子系统整体架构</a></h2>
 <p>首先 ZFS 整体架构如下图，其中圆圈是 ZFS 给内核层的外部接口，方框是 ZFS 内部子系统（
 我给方框的子系统加上了超链接）：</p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -710,7 +710,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
 <p>接下来从底层往上介绍一下各个子系统的全称和职能。</p>
 </div>
 <div class="section" id="spa">
-<h2><a class="toc-backref" href="#id7">SPA</a></h2>
+<h2><a class="toc-backref" href="#id6">SPA</a></h2>
 <p>Storage Pool Allocator</p>
 <p>从内核提供的多个块设备中抽象出存储池的子系统。 SPA 进一步分为 ZIO 和 VDEV 两大部分和其余一些小的子系统。</p>
 <p>SPA 对 DMU 提供的接口不同于传统的块设备接口，完全利用了 CoW 文件系统对写入位置不敏感的特点。
@@ -731,7 +731,7 @@ read</code>
 反过来 SPA 想要对一个数据块操作时，也完全不清楚这个数据块用于什么目的，属于什么文件或者文件系统结构。</p>
 </div>
 <div class="section" id="vdev">
-<h2><a class="toc-backref" href="#id8">VDEV</a></h2>
+<h2><a class="toc-backref" href="#id7">VDEV</a></h2>
 <p>Virtual DEVice</p>
 <p>VDEV 在 ZFS 中的作用相当于 Linux 内核的 Device Mapper 层或者 FreeBSD GEOM 层，提供
 Stripe/Mirror/RAIDZ 之类的多设备存储池管理和抽象。 ZFS 中的 vdev
@@ -742,7 +742,7 @@ vdev 需要负责地址映射、容量转换等计算过程。</p>
 ，包括提供二级缓存的 L2ARC 设备，以及提供 ZIL 高速日志的 SLOG 设备。</p>
 </div>
 <div class="section" id="zio">
-<h2><a class="toc-backref" href="#id9">ZIO</a></h2>
+<h2><a class="toc-backref" href="#id8">ZIO</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 ZIO Pipeline by George Wilson</div>
@@ -776,7 +776,7 @@ transaction group 提交事务组。 ZIO 也负责将读写请求按同步还是
 上有了一些新的挑战。</p>
 </div>
 <div class="section" id="metaslab">
-<h2><a class="toc-backref" href="#id10">MetaSlab</a></h2>
+<h2><a class="toc-backref" href="#id9">MetaSlab</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 MetaSlab Allocation Performance by Paul Dagnelie</div>
@@ -794,14 +794,14 @@ MetaSlab Allocation Performance by Paul Dagnelie</div>
 或者说让近期分配的数据块的物理地址比较接近。在存储设备上创建 zpool
 的时候，首先会尽量在存储设备上分配 200 个左右的 MetaSlab ，随后给 zpool
 增加设备的话使用接近的 MetaSlab 大小。每个 MetaSlab 是连续的一整块空间，在 MetaSlab
-内对数据块空间做分配和释放。磁盘中存储的 MetaSlab 的分配情况是按需载入内存的的，系统
+内对数据块空间做分配和释放。磁盘中存储的 MetaSlab 的分配情况是按需载入内存的，系统
 import zpool 时不需要载入所有 MetaSlab 到内存，而只需加载一小部分。当前载入内存的 MetaSlab
 剩余空间告急时，会载入别的 MetaSlab 尝试分配，而从某个 MetaSlab 释放空间不需要载入 MetaSlab
 。</p>
 <p>OpenZFS Summit 也有一个对 MetaSlab 分配器性能的介绍，可以看到很多分配器内的细节。</p>
 </div>
 <div class="section" id="arc">
-<h2><a class="toc-backref" href="#id11">ARC</a></h2>
+<h2><a class="toc-backref" href="#id10">ARC</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 ELI5: ZFS Caching Explain Like I'm 5: How the ZFS Adaptive Replacement Cache works</div>
@@ -837,27 +837,27 @@ Solaris/Illumos 上也是同样，这个在
 中从而提升缓存利用率，并且在有 L2ARC 的情况下也能增加 L2ARC 能存储的缓存。</p>
 </div>
 <div class="section" id="l2arc">
-<h2><a class="toc-backref" href="#id12">L2ARC</a></h2>
+<h2><a class="toc-backref" href="#id11">L2ARC</a></h2>
 <p>Level 2 Adaptive Replacement Cache</p>
 <p>这是用 ARC 算法实现的二级缓存，保存于高速存储设备上。常见用法是给 ZFS pool 配置一块 SSD
 作为 L2ARC 高速缓存，减轻内存 ARC 的负担并增加缓存命中率。</p>
 </div>
 <div class="section" id="slog">
-<h2><a class="toc-backref" href="#id13">SLOG</a></h2>
+<h2><a class="toc-backref" href="#id12">SLOG</a></h2>
 <p>Separate intent LOG</p>
 <p>SLOG 是额外的日志记录设备。 SLOG 之于 ZIL 有点像 L2ARC 之余 ARC ， L2ARC 是把内存中的
 ARC 放入额外的高速存储设备，而 SLOG 是把原本和别的数据块存储在一起的 ZIL
 放到额外的高速存储设备。</p>
 </div>
 <div class="section" id="tol">
-<h2><a class="toc-backref" href="#id14">TOL</a></h2>
+<h2><a class="toc-backref" href="#id13">TOL</a></h2>
 <p>Transactional Object Layer</p>
 <p>这一部分子系统在数据块的基础上提供一个事务性的对象语义层，这里事务性是指，
 对对象的修改处于明确的状态，不会因为突然断电之类的原因导致状态不一致。TOL
 中最主要的部分是 DMU 层。</p>
 </div>
 <div class="section" id="dmu">
-<h2><a class="toc-backref" href="#id15">DMU</a></h2>
+<h2><a class="toc-backref" href="#id14">DMU</a></h2>
 <p>Data Management Unit</p>
 <p>在块的基础上提供「对象（object）」的抽象。每个「对象」可以是一个文件，或者是别的 ZFS 内部需要记录的东西。</p>
 <p>DMU 这个名字最初是 Jeff 想类比于操作系统中内存管理的 MMU(Memory Management Unit)，
@@ -899,7 +899,7 @@ zfs 在遇到数据损坏时是如何在诊断信息中给出损坏的文件路�
 。因为是个黑魔法，这个记录不总是对的，所以只能用于诊断信息，不能基于这个实现别的文件系统功能。</p>
 </div>
 <div class="section" id="zap">
-<h2><a class="toc-backref" href="#id16">ZAP</a></h2>
+<h2><a class="toc-backref" href="#id15">ZAP</a></h2>
 <p>ZFS Attribute Processor</p>
 <p>在 DMU 提供的「对象」抽象基础上提供紧凑的 name/value 映射存储，
 从而文件夹内容列表、文件扩展属性之类的都是基于 ZAP 来存。 ZAP 在内部分为两种存储表达：
@@ -907,13 +907,14 @@ microZAP 和 fatZAP 。</p>
 <p>一个 microZAP 占用一整块数据块，能存 name 长度小于 50 字符并且 value 是 uint64_t 的表项，
 每个表项 64 字节。 fatZAP 则是个树状结构，能存更多更复杂的东西。可见 microZAP
 非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。</p>
-<p>在 <a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=526">ZFS First Mount by Mark Shellenbaum</a>
-中提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
-ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来常见的文件属性在 ZPL
-有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。</p>
+<p>在 <a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=526">ZFS First Mount by Mark Shellenbaum 的8:48左右</a>
+提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
+ZAP 来存，也就是说每个文件都有个 ZAP ，其中有叫做 size 呀 owner
+之类的键值对，就像是个 JSON 对象那样，这让 ZPL 一开始很容易设计原型并且扩展。然后文件夹内容列表有另一种数据结构
+ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。</p>
 </div>
 <div class="section" id="dsl">
-<h2><a class="toc-backref" href="#id17">DSL</a></h2>
+<h2><a class="toc-backref" href="#id16">DSL</a></h2>
 <p>Dataset and Snapshot Layer</p>
 <p>数据集和快照层，负责创建和管理快照、克隆等数据集类型，跟踪它们的写入大小，最终删除它们。
 由于 DMU 层面已经负责了对象的写时复制语义和对象集的概念，所以 DSL 层面不需要直接接触写文件之类来自 ZPL
@@ -930,7 +931,7 @@ send/receive 实现中，假如数据块已经压缩，需要在 send 端经过 
 的壁垒，支持了直接发送已压缩或加密的数据块的能力。</p>
 </div>
 <div class="section" id="zil">
-<h2><a class="toc-backref" href="#id18">ZIL</a></h2>
+<h2><a class="toc-backref" href="#id17">ZIL</a></h2>
 <p>ZFS Intent Log</p>
 <p>记录两次完整事务语义提交之间的日志，用来加速实现 fsync 之类的文件事务语义。</p>
 <p>原本 CoW 的文件系统不需要日志结构来保证文件系统结构的一致性，在 DMU
@@ -956,7 +957,7 @@ ZIL 实现中则不需要重复写两次， DMU 让 SPA 写入数据之后 ZIL �
 block pointer ，所以使用 ZIL 不会导致传统日志型文件系统中双倍写入放大的问题。</p>
 </div>
 <div class="section" id="zvol">
-<h2><a class="toc-backref" href="#id19">ZVOL</a></h2>
+<h2><a class="toc-backref" href="#id18">ZVOL</a></h2>
 <p>ZFS VOLume</p>
 <p>有点像 loopback block device ，暴露一个块设备的接口，其上可以创建别的
 FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口，所以在实现完整 ZPL
@@ -969,7 +970,7 @@ FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口
 上提供对虚拟机文件系统镜像的存储，可以节省不少存储空间和内存占用开销。</p>
 </div>
 <div class="section" id="zpl">
-<h2><a class="toc-backref" href="#id20">ZPL</a></h2>
+<h2><a class="toc-backref" href="#id19">ZPL</a></h2>
 <p>ZFS Posix Layer</p>
 <p>提供符合 POSIX 文件系统语义的抽象，也就是包括文件、目录、软链接、套接字这些抽象以及
 inode 访问时间、权限那些抽象，ZPL 是 ZFS 中对一个普通 FS 而言用户直接接触的部分。
@@ -1740,22 +1741,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id5">早期架构</a></li>
-<li><a class="reference internal" href="#id2" id="id6">子系统整体架构</a></li>
-<li><a class="reference internal" href="#spa" id="id7">SPA</a></li>
-<li><a class="reference internal" href="#vdev" id="id8">VDEV</a></li>
-<li><a class="reference internal" href="#zio" id="id9">ZIO</a></li>
-<li><a class="reference internal" href="#metaslab" id="id10">MetaSlab</a></li>
-<li><a class="reference internal" href="#arc" id="id11">ARC</a></li>
-<li><a class="reference internal" href="#l2arc" id="id12">L2ARC</a></li>
-<li><a class="reference internal" href="#slog" id="id13">SLOG</a></li>
-<li><a class="reference internal" href="#tol" id="id14">TOL</a></li>
-<li><a class="reference internal" href="#dmu" id="id15">DMU</a></li>
-<li><a class="reference internal" href="#zap" id="id16">ZAP</a></li>
-<li><a class="reference internal" href="#dsl" id="id17">DSL</a></li>
-<li><a class="reference internal" href="#zil" id="id18">ZIL</a></li>
-<li><a class="reference internal" href="#zvol" id="id19">ZVOL</a></li>
-<li><a class="reference internal" href="#zpl" id="id20">ZPL</a></li>
+<li><a class="reference internal" href="#id1" id="id4">早期架构</a></li>
+<li><a class="reference internal" href="#id2" id="id5">子系统整体架构</a></li>
+<li><a class="reference internal" href="#spa" id="id6">SPA</a></li>
+<li><a class="reference internal" href="#vdev" id="id7">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id8">ZIO</a></li>
+<li><a class="reference internal" href="#metaslab" id="id9">MetaSlab</a></li>
+<li><a class="reference internal" href="#arc" id="id10">ARC</a></li>
+<li><a class="reference internal" href="#l2arc" id="id11">L2ARC</a></li>
+<li><a class="reference internal" href="#slog" id="id12">SLOG</a></li>
+<li><a class="reference internal" href="#tol" id="id13">TOL</a></li>
+<li><a class="reference internal" href="#dmu" id="id14">DMU</a></li>
+<li><a class="reference internal" href="#zap" id="id15">ZAP</a></li>
+<li><a class="reference internal" href="#dsl" id="id16">DSL</a></li>
+<li><a class="reference internal" href="#zil" id="id17">ZIL</a></li>
+<li><a class="reference internal" href="#zvol" id="id18">ZVOL</a></li>
+<li><a class="reference internal" href="#zpl" id="id19">ZPL</a></li>
 </ul>
 </div>
             </div>
