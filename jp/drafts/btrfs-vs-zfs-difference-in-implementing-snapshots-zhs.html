@@ -23,7 +23,7 @@
 <link rel="canonical" href="//farseerfc.me/jp/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html">
 
         <meta name="author" content="farseerfc" />
-        <meta name="keywords" content="btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink" />
+        <meta name="keywords" content="btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink,SPA,DMU,DSL,ZPL" />
         <meta name="description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」。或许（在存储领域人尽皆知而在领域外）鲜有人知，在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的 论文 和 发表幻灯片 …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
@@ -41,6 +41,10 @@
             <meta property="article:tag" content="subvolume" />
             <meta property="article:tag" content="dedup" />
             <meta property="article:tag" content="reflink" />
+            <meta property="article:tag" content="SPA" />
+            <meta property="article:tag" content="DMU" />
+            <meta property="article:tag" content="DSL" />
+            <meta property="article:tag" content="ZPL" />
             <meta property="article:author" content="farseerfc" />
         <meta property="og:image"
                   content="//farseerfc.me/jp/btrfs-vs-zfs-difference-in-implementing-snapshots.png"/>
@@ -235,6 +239,10 @@ Farseerfcの巣            </a>
 	<a href="//farseerfc.me/jp/tag/subvolume.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> subvolume</a>
 	<a href="//farseerfc.me/jp/tag/dedup.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> dedup</a>
 	<a href="//farseerfc.me/jp/tag/reflink.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> reflink</a>
+	<a href="//farseerfc.me/jp/tag/spa.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> SPA</a>
+	<a href="//farseerfc.me/jp/tag/dmu.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> DMU</a>
+	<a href="//farseerfc.me/jp/tag/dsl.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> DSL</a>
+	<a href="//farseerfc.me/jp/tag/zpl.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> ZPL</a>
 </span>
 
 
@@ -1130,7 +1138,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 <p>检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。</p>
 <p>除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="docutils field-list table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1143,7 +1151,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 </tbody>
 </table>
 <p>对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="docutils field-list table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1242,7 +1250,7 @@ Unknown target name: "dsl".</div>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7fa4056b36f0> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f9223ef45d0> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>

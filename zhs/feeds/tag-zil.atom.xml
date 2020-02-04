@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - ZIL</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-zil.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-02-04T16:59:00+09:00</updated><entry><title>ZFS 分层架构设计</title><link href="//farseerfc.me/zhs/zfs-layered-architecture-design.html" rel="alternate"></link><published>2020-02-04T16:59:00+09:00</published><updated>2020-02-04T16:59:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-02-04:/zhs/zfs-layered-architecture-design.html</id><summary type="html">
+&lt;p&gt;ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris
+诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
+IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD
+内核已有的子系统有功能重叠。&lt;/p&gt;
+&lt;p&gt;似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。
+于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
+也有几段 OpenZFS Summit 视频佐以记录那段历史。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+The Birth of ZFS by Jeff Bonwick&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/dcV2PaMTAJ4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Story Time (Q&amp;amp;A) with Matt and Jeff …&lt;/div&gt;&lt;/div&gt;</summary><content type="html">
+&lt;p&gt;ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris
+诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
+IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD
+内核已有的子系统有功能重叠。&lt;/p&gt;
+&lt;p&gt;似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。
+于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
+也有几段 OpenZFS Summit 视频佐以记录那段历史。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+The Birth of ZFS by Jeff Bonwick&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/dcV2PaMTAJ4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Story Time (Q&amp;amp;A) with Matt and Jeff&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/yNKZQBsTX08"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZFS First Mount by Mark Shellenbaum&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/xMH5rCL8S2k"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZFS past &amp;amp; future by Mark Maybee&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/c1ek1tFjhH8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;早期架构&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。&lt;/p&gt;
+&lt;p&gt;最初在 Sun 内部带领 ZFS 开发的是 &lt;a class="reference external" href="https://blogs.oracle.com/bonwick/"&gt;Jeff Bonwick&lt;/a&gt;
+，他首先有了对 ZFS 整体架构的构思，然后游说 Sun 高层，亲自组建起了 ZFS
+开发团队，招募了当时刚从大学毕业的 &lt;a class="reference external" href="http://open-zfs.org/wiki/User:Mahrens"&gt;Matt Ahrens&lt;/a&gt;
+。作为和 Sun 高层谈妥的条件， Jeff 也必须负责 Solaris 整体的 Storage &amp;amp; Filesystem Team
+，于是他又从 Solaris 的 Storage Team 抽调了 UFS 部分的负责人 Mark Shellenbaum 和
+Mark Maybee 来开发 ZFS 。而如今昔日升阳已然日落， Jeff
+成立了独立公司继续开拓服务器存储领域， Matt 是 OpenZFS 项目的负责人，两位 Mark 则留在了
+Sun/Oracle 成为了 Oracle ZFS 分支的维护者。&lt;/p&gt;
+&lt;p&gt;在开发早期，作为分工， Jeff 负责 ZFS 设计中最底层的 SPA ，提供多个存储设备组成的存储池抽象；
+Matt 负责 ZFS 设计中最至关重要的 DMU 引擎，在块设备基础上提供具有事务语义的对象存储；
+而两位 Mark 负责 ZFS 设计中直接面向用户的 ZPL ，在 DMU 基础上提供完整 POSIX 文件系统语义。
+ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架构上，继续影响（增强或者限制） ZFS
+今后发展的方向。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;子系统整体架构&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先 ZFS 整体架构如下图，其中圆圈是 ZFS 给内核层的外部接口，方框是 ZFS 内部子系统（
+我给方框的子系统加上了超链接）：&lt;/p&gt;
+&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
+
+&lt;!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ --&gt;
+&lt;!-- Title: ZFS_Layer_Architecture Pages: 1 --&gt;
+&lt;svg class="svg-responsive" height="626pt" viewbox="0.00 0.00 806.50 626.00" width="807pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"&gt;
+&lt;g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 622)"&gt;
+&lt;title&gt;ZFS_Layer_Architecture&lt;/title&gt;
+&lt;polygon fill="#ffffff" points="-4,4 -4,-622 802.5,-622 802.5,4 -4,4" stroke="transparent"&gt;&lt;/polygon&gt;
+&lt;g class="cluster" id="clust4"&gt;
+&lt;title&gt;clusterTOL&lt;/title&gt;
+&lt;g id="a_clust4"&gt;&lt;a xlink:href="#tol" xlink:title="TOL"&gt;
+&lt;polygon fill="none" points="493.5,-355 493.5,-574 583.5,-574 583.5,-355 493.5,-355" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="538.5" y="-558.8"&gt;TOL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;g class="cluster" id="clust9"&gt;
+&lt;title&gt;clusterSPA&lt;/title&gt;
+&lt;g id="a_clust9"&gt;&lt;a xlink:href="#spa" xlink:title="SPA"&gt;
+&lt;polygon fill="none" points="415.5,-64 415.5,-283 649.5,-283 649.5,-64 415.5,-64" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="532.5" y="-267.8"&gt;SPA&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- Filesystem API --&gt;
+&lt;g class="node" id="node1"&gt;
+&lt;title&gt;Filesystem API&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="62.5" y="-596.3"&gt;Filesystem API&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- VFS --&gt;
+&lt;g class="node" id="node5"&gt;
+&lt;title&gt;VFS&lt;/title&gt;
+&lt;ellipse cx="62.5" cy="-525" fill="none" rx="30.5947" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="62.5" y="-521.3"&gt;VFS&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- Filesystem API&amp;#45;&amp;gt;VFS --&gt;
+&lt;g class="edge" id="edge1"&gt;
+&lt;title&gt;Filesystem API-&amp;gt;VFS&lt;/title&gt;
+&lt;path d="M62.5,-581.8446C62.5,-573.3401 62.5,-563.0076 62.5,-553.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="66.0001,-553.2481 62.5,-543.2482 59.0001,-553.2482 66.0001,-553.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- Block device API --&gt;
+&lt;g class="node" id="node2"&gt;
+&lt;title&gt;Block device API&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="437.5" y="-596.3"&gt;Block device API&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zvol/... --&gt;
+&lt;g class="node" id="node6"&gt;
+&lt;title&gt;/dev/zvol/...&lt;/title&gt;
+&lt;ellipse cx="421.5" cy="-525" fill="none" rx="63.8893" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="421.5" y="-521.3"&gt;/dev/zvol/...&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- Block device API&amp;#45;&amp;gt;/dev/zvol/... --&gt;
+&lt;g class="edge" id="edge2"&gt;
+&lt;title&gt;Block device API-&amp;gt;/dev/zvol/...&lt;/title&gt;
+&lt;path d="M433.6268,-581.8446C431.7795,-573.1849 429.5277,-562.6301 427.4684,-552.9768" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="430.8469,-552.0379 425.3375,-542.9882 424.001,-553.4984 430.8469,-552.0379" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZFS Management API (libzfs) --&gt;
+&lt;g class="node" id="node3"&gt;
+&lt;title&gt;ZFS Management API (libzfs)&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="684.5" y="-596.3"&gt;ZFS Management API (libzfs)&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl --&gt;
+&lt;g class="node" id="node7"&gt;
+&lt;title&gt;/dev/zfs ioctl&lt;/title&gt;
+&lt;ellipse cx="684.5" cy="-525" fill="none" rx="69.5877" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="684.5" y="-521.3"&gt;/dev/zfs ioctl&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- ZFS Management API (libzfs)&amp;#45;&amp;gt;/dev/zfs ioctl --&gt;
+&lt;g class="edge" id="edge3"&gt;
+&lt;title&gt;ZFS Management API (libzfs)-&amp;gt;/dev/zfs ioctl&lt;/title&gt;
+&lt;path d="M684.5,-581.8446C684.5,-573.3401 684.5,-563.0076 684.5,-553.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="688.0001,-553.2481 684.5,-543.2482 681.0001,-553.2482 688.0001,-553.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- NFS/Samba API (libshare) --&gt;
+&lt;g class="node" id="node4"&gt;
+&lt;title&gt;NFS/Samba API (libshare)&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="246.5" y="-596.3"&gt;NFS/Samba API (libshare)&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- NFS/CIFS vop_rwlock --&gt;
+&lt;g class="node" id="node8"&gt;
+&lt;title&gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;ellipse cx="225.5" cy="-525" fill="none" rx="114.2798" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="225.5" y="-521.3"&gt;NFS/CIFS vop_rwlock&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- NFS/Samba API (libshare)&amp;#45;&amp;gt;NFS/CIFS vop_rwlock --&gt;
+&lt;g class="edge" id="edge4"&gt;
+&lt;title&gt;NFS/Samba API (libshare)-&amp;gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;path d="M241.4165,-581.8446C238.966,-573.0928 235.9735,-562.4053 233.2473,-552.669" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="236.6034,-551.6741 230.5367,-542.9882 229.8627,-553.5616 236.6034,-551.6741" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- VFS&amp;#45;&amp;gt;NFS/CIFS vop_rwlock --&gt;
+&lt;g class="edge" id="edge5"&gt;
+&lt;title&gt;VFS-&amp;gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;path d="M93.0625,-525C95.6653,-525 98.2682,-525 100.871,-525" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="100.9106,-528.5001 110.9105,-525 100.9105,-521.5001 100.9106,-528.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZPL --&gt;
+&lt;g class="node" id="node9"&gt;
+&lt;title&gt;ZPL&lt;/title&gt;
+&lt;g id="a_node9"&gt;&lt;a xlink:href="#zpl" xlink:title="ZPL"&gt;
+&lt;polygon fill="none" points="367.5,-471 313.5,-471 313.5,-435 367.5,-435 367.5,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="340.5" y="-449.3"&gt;ZPL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- VFS&amp;#45;&amp;gt;ZPL --&gt;
+&lt;g class="edge" id="edge6"&gt;
+&lt;title&gt;VFS-&amp;gt;ZPL&lt;/title&gt;
+&lt;path d="M86.3025,-513.3546C91.5594,-511.0472 97.1562,-508.7886 102.5,-507 171.7912,-483.808 255.7337,-467.3568 303.1418,-459.0894" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="303.9854,-462.4959 313.2493,-457.3547 302.8013,-455.5968 303.9854,-462.4959" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZVOL --&gt;
+&lt;g class="node" id="node10"&gt;
+&lt;title&gt;ZVOL&lt;/title&gt;
+&lt;g id="a_node10"&gt;&lt;a xlink:href="#zvol" xlink:title="ZVOL"&gt;
+&lt;polygon fill="none" points="483,-471 424,-471 424,-435 483,-435 483,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-449.3"&gt;ZVOL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zvol/...&amp;#45;&amp;gt;ZVOL --&gt;
+&lt;g class="edge" id="edge7"&gt;
+&lt;title&gt;/dev/zvol/...-&amp;gt;ZVOL&lt;/title&gt;
+&lt;path d="M429.575,-506.8314C433.1102,-498.8771 437.336,-489.369 441.2456,-480.5723" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="444.4532,-481.9729 445.3163,-471.4133 438.0565,-479.1299 444.4532,-481.9729" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL --&gt;
+&lt;g class="node" id="node11"&gt;
+&lt;title&gt;DSL&lt;/title&gt;
+&lt;g id="a_node11"&gt;&lt;a xlink:href="#dsl" xlink:title="DSL"&gt;
+&lt;polygon fill="none" points="557.5,-543 503.5,-543 503.5,-507 557.5,-507 557.5,-543" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="530.5" y="-521.3"&gt;DSL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl&amp;#45;&amp;gt;DSL --&gt;
+&lt;g class="edge" id="edge10"&gt;
+&lt;title&gt;/dev/zfs ioctl-&amp;gt;DSL&lt;/title&gt;
+&lt;path d="M614.5895,-525C598.9983,-525 583.4071,-525 567.8159,-525" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="567.5703,-521.5001 557.5703,-525 567.5703,-528.5001 567.5703,-521.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- VDEV --&gt;
+&lt;g class="node" id="node20"&gt;
+&lt;title&gt;VDEV&lt;/title&gt;
+&lt;g id="a_node20"&gt;&lt;a xlink:href="#vdev" xlink:title="VDEV"&gt;
+&lt;polygon fill="none" points="546,-108 487,-108 487,-72 546,-72 546,-108" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="516.5" y="-86.3"&gt;VDEV&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge29"&gt;
+&lt;title&gt;/dev/zfs ioctl-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M689.2656,-506.9623C696.0025,-479.8344 707.5,-426.8236 707.5,-381 707.5,-381 707.5,-381 707.5,-234 707.5,-186.6526 686.8759,-174.3079 650.5,-144 623.0063,-121.0926 584.5356,-106.9458 555.8638,-98.9099" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="556.7296,-95.5186 546.165,-96.3181 554.9223,-102.2812 556.7296,-95.5186" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DMU --&gt;
+&lt;g class="node" id="node13"&gt;
+&lt;title&gt;DMU&lt;/title&gt;
+&lt;g id="a_node13"&gt;&lt;a xlink:href="#dmu" xlink:title="DMU"&gt;
+&lt;polygon fill="none" points="555.5,-399 501.5,-399 501.5,-363 555.5,-363 555.5,-399" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-377.3"&gt;DMU&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- NFS/CIFS vop_rwlock&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge15"&gt;
+&lt;title&gt;NFS/CIFS vop_rwlock-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M285.6968,-509.563C314.41,-500.7092 348.5163,-487.9433 376.5,-471 396.6786,-458.7825 395.9728,-448.2337 415.5,-435 439.4387,-418.7766 469.0038,-404.835 491.8877,-395.1832" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="493.3442,-398.3685 501.2501,-391.3152 490.6713,-391.8989 493.3442,-398.3685" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZAP --&gt;
+&lt;g class="node" id="node12"&gt;
+&lt;title&gt;ZAP&lt;/title&gt;
+&lt;g id="a_node12"&gt;&lt;a xlink:href="#zap" xlink:title="ZAP"&gt;
+&lt;polygon fill="none" points="555.5,-471 501.5,-471 501.5,-435 555.5,-435 555.5,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-449.3"&gt;ZAP&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;ZAP --&gt;
+&lt;g class="edge" id="edge8"&gt;
+&lt;title&gt;ZPL-&amp;gt;ZAP&lt;/title&gt;
+&lt;path d="M367.5472,-469.1304C396.6265,-484.3281 444.0019,-502.8552 483.5,-489 490.6397,-486.4955 497.4881,-482.3291 503.5943,-477.7013" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="505.9521,-480.293 511.4185,-471.2173 501.4855,-474.9032 505.9521,-480.293" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge12"&gt;
+&lt;title&gt;ZPL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M367.7478,-440.7581C372.3191,-438.7848 377.0292,-436.8006 381.5,-435 418.7731,-419.9886 462.0037,-404.312 491.8902,-393.7414" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="493.2174,-396.9848 501.4861,-390.3607 490.8913,-390.3825 493.2174,-396.9848" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIL --&gt;
+&lt;g class="node" id="node15"&gt;
+&lt;title&gt;ZIL&lt;/title&gt;
+&lt;g id="a_node15"&gt;&lt;a xlink:href="#zil" xlink:title="ZIL"&gt;
+&lt;polygon fill="none" points="480.5,-327 426.5,-327 426.5,-291 480.5,-291 480.5,-327" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-305.3"&gt;ZIL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;ZIL --&gt;
+&lt;g class="edge" id="edge16"&gt;
+&lt;title&gt;ZPL-&amp;gt;ZIL&lt;/title&gt;
+&lt;path d="M354.8115,-434.7623C374.5947,-409.5518 410.4107,-363.9103 433.0226,-335.0952" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="435.8847,-337.1173 439.3047,-327.0896 430.3778,-332.7959 435.8847,-337.1173" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZVOL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge13"&gt;
+&lt;title&gt;ZVOL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M472.4257,-434.8314C481.4857,-426.1337 492.4809,-415.5783 502.3265,-406.1265" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="504.7904,-408.613 509.5804,-399.1628 499.9426,-403.5633 504.7904,-408.613" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL&amp;#45;&amp;gt;ZAP --&gt;
+&lt;g class="edge" id="edge9"&gt;
+&lt;title&gt;DSL-&amp;gt;ZAP&lt;/title&gt;
+&lt;path d="M529.9953,-506.8314C529.7814,-499.131 529.5271,-489.9743 529.2894,-481.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.7879,-481.3122 529.0115,-471.4133 525.7906,-481.5066 532.7879,-481.3122" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge14"&gt;
+&lt;title&gt;DSL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M545.614,-506.7768C552.8549,-496.8586 560.7524,-483.9858 564.5,-471 568.9365,-455.6274 569.1365,-450.3135 564.5,-435 561.5436,-425.2355 556.1748,-415.6229 550.47,-407.2762" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="553.2129,-405.0973 544.4905,-399.0831 547.5586,-409.2239 553.2129,-405.0973" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZAP&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge11"&gt;
+&lt;title&gt;ZAP-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M528.5,-434.8314C528.5,-427.131 528.5,-417.9743 528.5,-409.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-409.4132 528.5,-399.4133 525.0001,-409.4133 532.0001,-409.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ARC --&gt;
+&lt;g class="node" id="node14"&gt;
+&lt;title&gt;ARC&lt;/title&gt;
+&lt;g id="a_node14"&gt;&lt;a xlink:href="#arc" xlink:title="ARC"&gt;
+&lt;polygon fill="none" points="555.5,-327 501.5,-327 501.5,-291 555.5,-291 555.5,-327" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-305.3"&gt;ARC&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- DMU&amp;#45;&amp;gt;ARC --&gt;
+&lt;g class="edge" id="edge17"&gt;
+&lt;title&gt;DMU-&amp;gt;ARC&lt;/title&gt;
+&lt;path d="M528.5,-362.8314C528.5,-355.131 528.5,-345.9743 528.5,-337.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-337.4132 528.5,-327.4133 525.0001,-337.4133 532.0001,-337.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- MetaSlab --&gt;
+&lt;g class="node" id="node19"&gt;
+&lt;title&gt;MetaSlab&lt;/title&gt;
+&lt;g id="a_node19"&gt;&lt;a xlink:href="#metaslab" xlink:title="MetaSlab"&gt;
+&lt;polygon fill="none" points="641,-180 556,-180 556,-144 641,-144 641,-180" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="598.5" y="-158.3"&gt;MetaSlab&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- DMU&amp;#45;&amp;gt;MetaSlab --&gt;
+&lt;g class="edge" id="edge23"&gt;
+&lt;title&gt;DMU-&amp;gt;MetaSlab&lt;/title&gt;
+&lt;path d="M555.6383,-368.3974C585.2203,-352.9755 630.9457,-323.7894 650.5,-283 663.3726,-256.1483 661.6355,-243.6173 650.5,-216 646.1775,-205.2796 638.5956,-195.4983 630.5361,-187.2948" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="632.7442,-184.5652 623.0801,-180.2228 627.927,-189.644 632.7442,-184.5652" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO --&gt;
+&lt;g class="node" id="node16"&gt;
+&lt;title&gt;ZIO&lt;/title&gt;
+&lt;g id="a_node16"&gt;&lt;a xlink:href="#zio" xlink:title="ZIO"&gt;
+&lt;polygon fill="none" points="555.5,-252 501.5,-252 501.5,-216 555.5,-216 555.5,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-230.3"&gt;ZIO&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ARC&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge20"&gt;
+&lt;title&gt;ARC-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M528.5,-290.8446C528.5,-282.3401 528.5,-272.0076 528.5,-262.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-262.2481 528.5,-252.2482 525.0001,-262.2482 532.0001,-262.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC --&gt;
+&lt;g class="node" id="node17"&gt;
+&lt;title&gt;L2ARC&lt;/title&gt;
+&lt;g id="a_node17"&gt;&lt;a xlink:href="#l2arc" xlink:title="L2ARC"&gt;
+&lt;polygon fill="none" points="641.5,-252 573.5,-252 573.5,-216 641.5,-216 641.5,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="607.5" y="-230.3"&gt;L2ARC&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ARC&amp;#45;&amp;gt;L2ARC --&gt;
+&lt;g class="edge" id="edge21"&gt;
+&lt;title&gt;ARC-&amp;gt;L2ARC&lt;/title&gt;
+&lt;path d="M554.9972,-290.9209C558.2877,-288.3716 561.5341,-285.6973 564.5,-283 572.1249,-276.0657 579.7661,-267.8645 586.4472,-260.1753" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="589.4807,-262.0092 593.2739,-252.1166 584.1396,-257.4845 589.4807,-262.0092" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIL&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge19"&gt;
+&lt;title&gt;ZIL-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M480.869,-292.5464C484.9519,-289.5928 488.9697,-286.3728 492.5,-283 499.3026,-276.501 505.7319,-268.5881 511.2235,-261.0336" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="514.3671,-262.6436 517.2054,-252.436 508.6211,-258.6456 514.3671,-262.6436" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- SLOG --&gt;
+&lt;g class="node" id="node18"&gt;
+&lt;title&gt;SLOG&lt;/title&gt;
+&lt;g id="a_node18"&gt;&lt;a xlink:href="#slog" xlink:title="SLOG"&gt;
+&lt;polygon fill="none" points="483,-252 424,-252 424,-216 483,-216 483,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-230.3"&gt;SLOG&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZIL&amp;#45;&amp;gt;SLOG --&gt;
+&lt;g class="edge" id="edge18"&gt;
+&lt;title&gt;ZIL-&amp;gt;SLOG&lt;/title&gt;
+&lt;path d="M453.5,-290.8446C453.5,-282.3401 453.5,-272.0076 453.5,-262.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="457.0001,-262.2481 453.5,-252.2482 450.0001,-262.2482 457.0001,-262.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO&amp;#45;&amp;gt;MetaSlab --&gt;
+&lt;g class="edge" id="edge24"&gt;
+&lt;title&gt;ZIO-&amp;gt;MetaSlab&lt;/title&gt;
+&lt;path d="M546.164,-215.8314C554.4732,-207.2848 564.5264,-196.9443 573.5918,-187.6198" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="576.1369,-190.023 580.5982,-180.4133 571.1179,-185.1435 576.1369,-190.023" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge28"&gt;
+&lt;title&gt;ZIO-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M526.9802,-215.7623C524.9334,-191.201 521.2706,-147.2474 518.8628,-118.3541" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="522.3259,-117.7644 518.0075,-108.0896 515.3501,-118.3458 522.3259,-117.7644" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge22"&gt;
+&lt;title&gt;L2ARC-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M573.4775,-234C570.8786,-234 568.2797,-234 565.6807,-234" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="565.6563,-230.5001 555.6563,-234 565.6562,-237.5001 565.6563,-230.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge26"&gt;
+&lt;title&gt;L2ARC-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M581.9503,-215.8625C570.0905,-206.3385 556.6295,-193.7883 547.5,-180 535.0104,-161.137 527.0138,-136.7121 522.2764,-118.0676" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="525.6279,-117.032 519.9132,-108.1105 518.8171,-118.6485 525.6279,-117.032" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- SLOG&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge25"&gt;
+&lt;title&gt;SLOG-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M461.479,-215.7623C472.3192,-190.9846 491.7938,-146.4714 504.4277,-117.5939" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="507.7841,-118.6541 508.5858,-108.0896 501.371,-115.8483 507.7841,-118.6541" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- MetaSlab&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge27"&gt;
+&lt;title&gt;MetaSlab-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M577.8079,-143.8314C567.8052,-135.0485 555.645,-124.3712 544.8001,-114.8489" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="547.0092,-112.1308 537.1854,-108.1628 542.3906,-117.3909 547.0092,-112.1308" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- physical storage devices --&gt;
+&lt;g class="node" id="node21"&gt;
+&lt;title&gt;physical storage devices&lt;/title&gt;
+&lt;path d="M613,-32.7273C613,-34.5331 569.7472,-36 516.5,-36 463.2528,-36 420,-34.5331 420,-32.7273 420,-32.7273 420,-3.2727 420,-3.2727 420,-1.4669 463.2528,0 516.5,0 569.7472,0 613,-1.4669 613,-3.2727 613,-3.2727 613,-32.7273 613,-32.7273" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;path d="M613,-32.7273C613,-30.9214 569.7472,-29.4545 516.5,-29.4545 463.2528,-29.4545 420,-30.9214 420,-32.7273" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="516.5" y="-14.3"&gt;physical storage devices&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- VDEV&amp;#45;&amp;gt;physical storage devices --&gt;
+&lt;g class="edge" id="edge30"&gt;
+&lt;title&gt;VDEV-&amp;gt;physical storage devices&lt;/title&gt;
+&lt;path d="M516.5,-71.8314C516.5,-64.131 516.5,-54.9743 516.5,-46.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="520.0001,-46.4132 516.5,-36.4133 513.0001,-46.4133 520.0001,-46.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+&lt;p&gt;接下来从底层往上介绍一下各个子系统的全称和职能。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="spa"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;SPA&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Storage Pool Allocator&lt;/p&gt;
+&lt;p&gt;从内核提供的多个块设备中抽象出存储池的子系统。 SPA 进一步分为 ZIO 和 VDEV 两大部分和其余一些小的子系统。&lt;/p&gt;
+&lt;p&gt;SPA 对 DMU 提供的接口不同于传统的块设备接口，完全利用了 CoW 文件系统对写入位置不敏感的特点。
+传统的块设备接口通常是写入时指定一个写入地址，把缓冲区写到磁盘指定的位置上，而 DMU 可以让 SPA
+做两种操作：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+write&lt;/code&gt;
+ ， DMU 交给 SPA 一个数据块的内存指针， SPA
+负责找设备写入这个数据块，然后返回给 DMU 一个 block pointer 。&lt;/li&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+read&lt;/code&gt;
+ ，DMU 交给 SPA 一个 block pointer ，SPA 读取设备并返回给 DMU
+完整的数据块。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也就是说，在 DMU 让 SPA 写数据块时， DMU 还不知道 SPA 会写入的地方，这完全由 SPA 判断，
+这一点通常被称为 Write Anywhere ，在别的 CoW 文件系统比如 Btrfs 和 WAFL 中也有这个特点。
+反过来 SPA 想要对一个数据块操作时，也完全不清楚这个数据块用于什么目的，属于什么文件或者文件系统结构。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="vdev"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;VDEV&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Virtual DEVice&lt;/p&gt;
+&lt;p&gt;作用相当于 Linux 内核的 Device Mapper 层或者 FreeBSD GEOM 层，提供 Stripe/Mirror/RAIDZ
+之类的多设备存储池管理和抽象。 ZFS 中的 vdev 形成一个树状结构，在树的底层是从内核提供的物理设备，
+其上是虚拟的块设备。每个虚拟块设备对上对下都是块设备接口，除了底层的物理设备之外，位于中间层的
+vdev 需要负责地址映射、容量转换等计算过程。&lt;/p&gt;
+&lt;p&gt;除了用于存储数据的 Stripe/Mirror/RAIDZ 之类的 VDEV ，还有一些特殊用途的 VDEV
+，包括提供二级缓存的 L2ARC 设备，以及提供 ZIL 高速日志的 SLOG 设备。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zio"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;ZIO&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZIO Pipeline by George Wilson&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/qkA5HhfzsvM"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;ZFS I/O&lt;/p&gt;
+&lt;p&gt;作用相当于内核的 IO scheduler 和 pagecache write back 机制。
+OpenZFS Summit 有个演讲整理了 ZIO 流水线的工作原理。
+ZIO 内部使用流水线和事件驱动机制，避免让上层的 ZFS 线程阻塞等待在 IO 操作上。
+ZIO 把一个上层的写请求转换成多个写操作，负责把这些写操作合并到
+transaction group 提交事务组。 ZIO 也负责将读写请求按同步还是异步分成不同的读写优先级并实施优先级调度，
+在 &lt;a class="reference external" href="https://github.com/zfsonlinux/zfs/wiki/ZIO-Scheduler"&gt;OpenZFS 项目 wiki 页有一篇描述 ZIO 调度&lt;/a&gt;
+的细节。&lt;/p&gt;
+&lt;p&gt;除了调度之外， ZIO 层还负责在读写流水线中拆解和拼装数据块。上层 DMU 交给 SPA 的数据块有固定大小，
+目前默认是 128KiB ，pool 整体的参数可以调整块大小在 4KiB 到 8MiB 之间。ZIO
+拿到整块大小的数据块之后，在流水线中可以对数据块做诸如以下操作：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;用压缩算法，压缩/解压数据块。&lt;/li&gt;
+&lt;li&gt;查询 dedup table ，对数据块去重。&lt;/li&gt;
+&lt;li&gt;加密/解密数据块。&lt;/li&gt;
+&lt;li&gt;计算数据块的校验和。&lt;/li&gt;
+&lt;li&gt;如果底层分配器不能分配完整的 128KiB （或 zpool 设置的大小），那么尝试分配多个小块，然后用多个
+512B 的指针间接块连起多个小块的，拼装成一个虚拟的大块，这个机制叫
+&lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSGangBlocks"&gt;gang block&lt;/a&gt;
+。通常 ZFS 中用到 gang block 时，整个存储池处于极度空间不足的情况，由 gang block
+造成严重性能下降，而 gang block 的意义在于在空间接近要满的时候也能 CoW
+写入一些元数据，释放亟需的存储空间。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可见经过 ZIO 流水线之后，数据块不再是统一大小，这使得 ZFS 用在 4K 对齐的磁盘或者 SSD
+上有了一些新的挑战。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="metaslab"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;MetaSlab&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+MetaSlab Allocation Performance by Paul Dagnelie&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/LZpaTGNvalE"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;MetaSlab 是 ZFS 的块分配器。 VDEV 把存储设备抽象成存储池之后， MetaSlab
+负责实际从存储设备上分配数据块，跟踪记录可用空间和已用空间。&lt;/p&gt;
+&lt;p&gt;叫 MetaSlab 这个名字是因为 Jeff 最初同时也给 Solaris 内核写过
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Slab_allocation"&gt;slab 分配器&lt;/a&gt;
+，一开始设计 SPA 的时候 Jeff 想在 SPA 中也利用 Solaris 的 slab
+分配器对磁盘空间使用类似的分配算法。后来 MetaSlab 逐渐不再使用 slab 算法，只有名字留了下来。&lt;/p&gt;
+&lt;p&gt;MetaSlab 的结构很接近于 FreeBSD UFS 的 cylinder group ，或者 ext2/3/4 的 block group
+，或者 xfs 的 allocation group ，目的都是让存储分配策略「局域化」，
+或者说让近期分配的数据块的物理地址比较接近。在存储设备上创建 zpool
+的时候，首先会尽量在存储设备上分配 200 个左右的 MetaSlab ，随后给 zpool
+增加设备的话使用接近的 MetaSlab 大小。每个 MetaSlab 是连续的一整块空间，在 MetaSlab
+内对数据块空间做分配和释放。磁盘中存储的 MetaSlab 的分配情况是按需载入内存的的，系统
+import zpool 时不需要载入所有 MetaSlab 到内存，而只需加载一小部分。当前载入内存的 MetaSlab
+剩余空间告急时，会载入别的 MetaSlab 尝试分配，而从某个 MetaSlab 释放空间不需要载入 MetaSlab
+。&lt;/p&gt;
+&lt;p&gt;OpenZFS Summit 也有一个对 MetaSlab 分配器性能的介绍，可以看到很多分配器内的细节。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="arc"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Adaptive Replacement Cache&lt;/p&gt;
+&lt;p&gt;作用相当于 Linux/Solaris/FreeBSD 中传统的 page/buffer cache 。
+和传统 pagecache 使用 LRU (Least Recently Used) 之类的算法剔除缓存页不同， ARC
+算法试图在 LRU 和 LFU(Least Frequently Used) 之间寻找平衡，从而复制大文件之类的线性大量
+IO 操作不至于让缓存失效率猛增。&lt;/p&gt;
+&lt;p&gt;不过 ZFS 采用它自有的 ARC 一个显著缺点在于，不能和内核已有的 pagecache 机制相互配合，尤其在
+系统内存压力很大的情况下，内核与 ZFS 无关的其余部分可能难以通知 ARC 释放内存。所以 ARC
+是 ZFS 消耗内存的大户之一（另一个是可选的 dedup table），也是
+&lt;a class="reference external" href="http://open-zfs.org/wiki/Performance_tuning#Adaptive_Replacement_Cache"&gt;ZFS 性能调优&lt;/a&gt;
+的重中之重。&lt;/p&gt;
+&lt;p&gt;当然， ZFS 采用 ARC 不依赖于内核已有的 pagecache 机制除了 LFU 平衡的好处之外，也有别的有利的一面。
+系统中多次读取因 snapshot 或者 dedup 而共享的数据块的话，在 ZFS 的 ARC 机制下，同样的
+block pointer 只会被缓存一次；而传统的 pagecache 因为基于 inode 判断是否有共享，
+所以即使这些文件有共享页面（比如 btrfs/xfs 的 reflink 形成的），也会多次读入内存。 Linux
+的 btrfs 和 xfs 在 VFS 层面有共用的 reflink 机制之后，正在努力着手改善这种局面，而 ZFS
+因为 ARC 所以从最初就避免了这种浪费。&lt;/p&gt;
+&lt;p&gt;和很多传言所说的不同， ARC 的内存压力问题不仅在 Linux 内核会有，在 FreeBSD 和
+Solaris/Illumos 上也是同样，这个在
+&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=997"&gt;ZFS First Mount by Mark Shellenbaum 的问答环节 16:37 左右有提到&lt;/a&gt;
+。其中 Mark Shellenbaum 提到 Matt 觉得让 ARC 并入现有 pagecache
+子系统的工作量太大，难以实现。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="l2arc"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;L2ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Level 2 Adaptive Replacement Cache&lt;/p&gt;
+&lt;p&gt;这是用 ARC 算法实现的二级缓存，保存于高速存储设备上。常见用法是给 ZFS pool 配置一块 SSD
+作为 L2ARC 高速缓存，减轻内存 ARC 的负担并增加缓存命中率。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="slog"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;SLOG&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Separate intent LOG&lt;/p&gt;
+&lt;p&gt;SLOG 是额外的日志记录设备。 SLOG 之于 ZIL 有点像 L2ARC 之余 ARC ， L2ARC 是把内存中的
+ARC 放入额外的高速存储设备，而 SLOG 是把原本和别的数据块存储在一起的 ZIL
+放到额外的高速存储设备。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tol"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;TOL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Transactional Object Layer&lt;/p&gt;
+&lt;p&gt;这一部分子系统在数据块的基础上提供一个事务性的对象语义层，这里事务性是指，
+对对象的修改处于明确的状态，不会因为突然断电之类的原因导致状态不一致。TOL
+中最主要的部分是 DMU 层。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="dmu"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;DMU&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Data Management Unit&lt;/p&gt;
+&lt;p&gt;在块的基础上提供「对象（object）」的抽象。每个「对象」可以是一个文件，或者是别的 ZFS 内部需要记录的东西。&lt;/p&gt;
+&lt;p&gt;DMU 这个名字最初是 Jeff 想类比于操作系统中内存管理的 MMU(Memory Management Unit)，
+Jeff 希望 ZFS 中增加和删除文件就像内存分配一样简单，增加和移除块设备就像增加内存一样简单，
+由 DMU 负责从存储池中分配和释放数据块，对上提供事务性语义，管理员不需要管理文件存储在什么存储设备上。
+这里事务性语义指对文件的修改要么完全成功，要么完全失败，不会处于中间状态，这靠 DMU 的 CoW
+语义实现。&lt;/p&gt;
+&lt;p&gt;DMU 实现了对象级别的 CoW 语义，从而任何经过了 DMU 做读写的子系统都具有了 CoW 的特征，
+这不仅包括文件、文件夹这些 ZPL 层需要的东西，也包括文件系统内部用的 spacemap 之类的设施。
+相反，不经过 DMU 的子系统则可能没法保证事务语义。这里一个特例是 ZIL ，一定程度上绕过了 DMU
+直接写日志。说一定程度是因为 ZIL 仍然靠 DMU 来扩展长度，当一个块写满日志之后需要等 DMU
+分配一个新块，在分配好的块内写日志则不需要经过 DMU 。所有经过 DMU 子系统的对象都有 CoW
+语义，也意味着 ZFS 中不能对某些文件可选地关闭 CoW ，不能提供数据库应用的 direct IO 之类的接口。&lt;/p&gt;
+&lt;p&gt;「对象（object）」抽象是 DMU 最重要的抽象，一个对象的大小可变，占用一个或者多个数据块（
+默认一个数据块 128KiB ）。上面提到 SPA 的时候也讲了 DMU 和 SPA 之间不同于普通块设备抽象的接口，这使得 DMU
+按整块的大小分配空间。当对象使用多个数据块存储时， DMU 提供间接块（indirect block）来引用这些数据块。
+间接块很像传统 Unix 文件系统（Solaris UFS 或者 Linux ext2）中的一级二级三级间接块，
+一个间接块存储很多块指针（block pointer），多个间接块形成树状结构，最终一个块指针可以引用到一个对象。
+更现代的文件系统比如 ext4/xfs/btrfs/ntfs 提供了 extent 抽象，可以指向一个连续范围的存储块，
+而 ZFS 不使用类似 extent 的抽象。DMU 采用间接块而不是 extent
+，使得 ZFS 的空间分配更趋向碎片化，为了避免碎片化造成的性能影响，需要尽量延迟写入使得一次写入能在磁盘上
+尽量连续，这里 ARC 提供的缓存和 ZIO 提供的流水线对延迟写入避免碎片有至关重要的帮助。&lt;/p&gt;
+&lt;p&gt;有了「对象（object）」的抽象之后， DMU 进一步实现了「对象集（objectset）」的抽象，
+一个对象集中保存一系列按顺序编号的 dnode （ ZFS 中类似 inode 的数据结构），每个 dnode 有足够空间
+指向一个对象的最多三个块指针，如果对象需要更多数据块可以使用间接块，如果对象很小也可以直接压缩进
+dnode 。随后 DSL 又进一步用对象集来实现数据集（dataset）抽象，提供比如文件系统（filesystem
+）、快照（snapshot）、克隆（clone）之类的抽象。一个对象集中的对象可以通过 dnode 编号相互引用，
+就像普通文件系统的硬链接引用 inode 编号那样。&lt;/p&gt;
+&lt;p&gt;上面也提到因为 SPA 和 DMU 分离， SPA 完全不知道数据块用于什么目的；这一点其实对 DMU 也是类似，
+DMU 虽然能从某个对象找到它所占用的数据块，但是 DMU 完全不知道这个对象在文件系统或者存储池中是
+用来存储什么的。当 DMU 读取数据遇到坏块（block pointer 中的校验和与 block pointer
+指向的数据块内容不一致）时，它知道这个数据块在哪儿（具体哪个设备上的哪个地址），
+但是不知道这个数据块是否和别的对象共享，不知道搬动这个数据块的影响，也没法从对象反推出文件系统路径，
+（除了明显开销很高地扫一遍整个存储池）。所以 DMU 在遇到读取错误（普通的读操作或者 scrub/resilver
+操作中）时，只能选择在同样的地址，原地写入数据块的备份（如果能找到或者推算出备份的话）。&lt;/p&gt;
+&lt;p&gt;或许有人会疑惑，既然从 SPA 无法根据数据地址反推出对象，在 DMU 也无法根据对象反推出文件，那么
+zfs 在遇到数据损坏时是如何在诊断信息中给出损坏的文件路径的呢？这其实基于 ZPL 的一个黑魔法：
+&lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick"&gt;在 dnode 记录父级 dnode 的编号&lt;/a&gt;
+。因为是个黑魔法，这个记录不总是对的，所以只能用于诊断信息，不能基于这个实现别的文件系统功能。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zap"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;ZAP&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Attribute Processor&lt;/p&gt;
+&lt;p&gt;在 DMU 提供的「对象」抽象基础上提供紧凑的 name/value 映射存储，
+从而文件夹内容列表、文件扩展属性之类的都是基于 ZAP 来存。 ZAP 在内部分为两种存储表达：
+microZAP 和 fatZAP 。&lt;/p&gt;
+&lt;p&gt;一个 microZAP 占用一整块数据块，能存 name 长度小于 50 字符并且 value 是 uint64_t 的表项，
+每个表项 64 字节。 fatZAP 则是个树状结构，能存更多更复杂的东西。可见 microZAP
+非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。&lt;/p&gt;
+&lt;p&gt;在 &lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=526"&gt;ZFS First Mount by Mark Shellenbaum&lt;/a&gt;
+中提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
+ZAP 来存，然后文件夹内容列表有另一种数据结构 ZDS ，后来常见的文件属性在 ZPL
+有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="dsl"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;DSL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Dataset and Snapshot Layer&lt;/p&gt;
+&lt;p&gt;数据集和快照层，负责创建和管理快照、克隆等数据集类型，跟踪它们的写入大小，最终删除它们。
+由于 DMU 层面已经负责了对象的写时复制语义和对象集的概念，所以 DSL 层面不需要直接接触写文件之类来自 ZPL
+的请求，无论有没有快照对 DMU 层面一样采用写时复制的方式修改文件数据。
+不过在删除快照和克隆之类的时候，则需要 DSL 参与计算没有和别的数据集共享的数据块并且删除它们。&lt;/p&gt;
+&lt;p&gt;DSL 管理数据集时，也负责管理数据集上附加的属性。ZFS 每个数据集有个属性列表，这些用 ZAP 存储，
+DSL 则需要根据数据集的上下级关系，计算出继承的属性，最终指导 ZIO 层面的读写行为。&lt;/p&gt;
+&lt;p&gt;除了管理数据集， DSL 层面也提供了 zfs 中 send/receive 的能力。 ZFS 在 send 时从 DSL
+层找到快照引用到的所有数据块，把它们直接发往管道，在 receive 端则直接接收数据块并重组数据块指针。
+因为 DSL 提供的 send/receive 工作在 DMU 之上，所以在 DSL 看到的数据块是 DMU
+的数据块，下层 SPA 完成的数据压缩、加密、去重等工作，对 DMU 层完全透明。所以在最初的
+send/receive 实现中，假如数据块已经压缩，需要在 send 端经过 SPA 解压，再 receive
+端则重新压缩。最近 ZFS 的 send/receive 逐渐打破 DMU 与 SPA
+的壁垒，支持了直接发送已压缩或加密的数据块的能力。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zil"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;ZIL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Intent Log&lt;/p&gt;
+&lt;p&gt;记录两次完整事务语义提交之间的日志，用来加速实现 fsync 之类的文件事务语义。&lt;/p&gt;
+&lt;p&gt;原本 CoW 的文件系统不需要日志结构来保证文件系统结构的一致性，在 DMU
+保证了对象级别事务语义的前提下，每次完整的 transaction group commit
+都保证了文件系统一致性，挂载时也直接找到最后一个 transaction group 从它开始挂载即可。
+不过在 ZFS 中，做一次完整的 transaction group commit 是个比较耗时的操作，
+在写入文件的数据块之后，还需要更新整个 object set ，然后更新 meta-object set
+，最后更新 uberblock ，为了满足事务语义这些操作没法并行完成，所以整个 pool
+提交一次需要等待好几次磁盘写操作返回，短则一两秒，长则几分钟，
+如果事务中有要删除快照等非常耗时的操作可能还要等更久，在此期间提交的事务没法保证一致。&lt;/p&gt;
+&lt;p&gt;对上层应用程序而言，通常使用 fsync 或者 fdatasync 之类的系统调用，确保文件内容本身的事务一致性。
+如果要让每次 fsync/fdatasync 等待整个 transaction group commit
+完成，那会严重拖慢很多应用程序，而如果它们不等待直接返回，则在突发断电时没有保证一致性。
+从而 ZFS 有了 ZIL ，记录两次 transaction group 的 commit 之间发生的 fsync
+，突然断电后下次 import zpool 时首先找到最近一次 transaction group ，在它基础上重放
+ZIL 中记录的写请求和 fsync 请求，从而满足 fsync API 要求的事务语义。&lt;/p&gt;
+&lt;p&gt;显然对 ZIL 的写操作需要绕过 DMU 直接写入数据块，所以 ZIL 本身是以日志系统的方式组织的，每次写
+ZIL 都是在已经分配的 ZIL 块的末尾添加数据，分配新的 ZIL 块仍然需要经过 DMU
+的空间分配。&lt;/p&gt;
+&lt;p&gt;传统日志型文件系统中对 data 开启日志支持会造成每次文件系统写入操作需要写两次到设备上，
+一次写入日志，再一次覆盖文件系统内容；在
+ZIL 实现中则不需要重复写两次， DMU 让 SPA 写入数据之后 ZIL 可以直接记录新数据块的
+block pointer ，所以使用 ZIL 不会导致传统日志型文件系统中双倍写入放大的问题。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zvol"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id19"&gt;ZVOL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS VOLume&lt;/p&gt;
+&lt;p&gt;有点像 loopback block device ，暴露一个块设备的接口，其上可以创建别的
+FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口，所以在实现完整 ZPL
+之前，一开始就先实现了 ZVOL ，而且
+&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298"&gt;早期 Solaris 没有 thin provisioning storage pool 的时候可以用 ZVOL 模拟很大的块设备，当时 Solaris 的 UFS 团队用它来测试 UFS 对 TB 级存储的支持情况&lt;/a&gt;
+。&lt;/p&gt;
+&lt;p&gt;因为 ZVOL 基于 DMU 上层，所以 DMU 所有的文件系统功能，比如 snapshot / dedup / compression
+都可以用在 ZVOL 上，从而让 ZVOL 上层的传统文件系统也具有类似的功能。并且 ZVOL 也具有了 ARC
+缓存的能力，和 dedup 结合之下，非常适合于在一个宿主机 ZFS
+上提供对虚拟机文件系统镜像的存储，可以节省不少存储空间和内存占用开销。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zpl"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id20"&gt;ZPL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Posix Layer&lt;/p&gt;
+&lt;p&gt;提供符合 POSIX 文件系统语义的抽象，也就是包括文件、目录、软链接、套接字这些抽象以及
+inode 访问时间、权限那些抽象，ZPL 是 ZFS 中对一个普通 FS 而言用户直接接触的部分。
+ZPL 可以说是 ZFS 最复杂的子系统，也是 ZFS 作为一个文件系统而言最关键的部分。&lt;/p&gt;
+&lt;p&gt;ZPL 的实现中直接使用了 ZAP 和 DMU 提供的抽象，比如每个 ZPL 文件用一个 DMU 对象表达，每个
+ZPL 目录用一个 ZAP 对象表达，然后 DMU 对象集对应到 ZPL 下的一个文件系统。
+也就是说 ZPL 负责把操作系统 VFS 抽象层的那些文件系统操作接口，翻译映射到基于 DMU 和 ZAP
+的抽象上。传统 Unix 中的管道、套接字、软链接之类的没有什么数据内容的东西则在 ZPL 直接用 dnode
+实现出来。 ZPL 也需要进一步实现文件权限、所有者、访问日期、扩展属性之类杂七杂八的文件系统功能。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=456"&gt;在 ZFS First Mount by Mark Shellenbaum&lt;/a&gt;
+中介绍了很多在最初实现 ZPL 过程中的坎坷， ZPL 的困难之处在于需要兼容现有应用程序对传统文件系统
+API 的使用方式，所以他们需要大量兼容性测试。视频中讲到非常有意思的一件事是， ZFS
+在设计时不想重复 Solaris UFS 设计中的很多缺陷，于是实现 VFS API 时有诸多取舍和再设计。
+其中他们遇到了 &lt;code class="code"&gt;
+VOP_RWLOCK&lt;/code&gt;
+ ，这个是 UFS 提供的文件级别读写锁。对一些应用尤其是
+NFS 而言，文件读写锁能保证应用层的一致性，而对另一些应用比如数据库而言，
+文件锁的粒度太大造成了性能问题。在设计 ZPL 的时候他们不想在 ZFS 中提供 &lt;code class="code"&gt;
+VOP_RWLOCK&lt;/code&gt;
+
+，这让 NFS 开发者们很难办（要记得 NFS 也是 Solaris 对 Unix 世界贡献的一大发明）。
+最终 ZFS 把 DMU 的内部细节也暴露给了 NFS ，让 NFS 基于 DMU 的对象创建时间（ TXG id
+）而不是文件锁来保证 NFS 的一致性。结果是现在 ZFS 中也有照顾 NFS 的代码，后来也加入了
+Samba/CIFS 的支持，从而在 ZFS 上设置 NFS export 时是通过 ZFS 的机制而非系统原生的 NFS
+export 机制。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="zfs"></category><category term="layered"></category><category term="architecture"></category><category term="SPA"></category><category term="DMU"></category><category term="ZPL"></category><category term="ZIO"></category><category term="VDEV"></category><category term="ARC"></category><category term="ZAP"></category><category term="DSL"></category><category term="ZIL"></category><category term="ZVOL"></category></entry></feed>

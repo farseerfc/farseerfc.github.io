@@ -1,5 +1,718 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all-zh.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-01-05T17:51:00+09:00</updated><entry><title>和萌狼交換問題</title><link href="//farseerfc.me/question-exchange-horo.html" rel="alternate"></link><published>2020-01-05T17:51:00+09:00</published><updated>2020-01-05T17:51:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-01-05:/question-exchange-horo.html</id><summary type="html">&lt;p&gt;很抱歉萌狼很早就提過交換問題的事，被我一直咕咕了許久。 &lt;del&gt;拖延症晚期有藥麼&lt;/del&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all-zh.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-02-04T16:59:00+09:00</updated><entry><title>ZFS 分層架構設計</title><link href="//farseerfc.me/zfs-layered-architecture-design.html" rel="alternate"></link><published>2020-02-04T16:59:00+09:00</published><updated>2020-02-04T16:59:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-02-04:/zfs-layered-architecture-design.html</id><summary type="html">
+&lt;p&gt;ZFS 在設計之初源自於 Sun 內部多次重寫 UFS 的嘗試，背負了重構 Solaris
+諸多內核子系統的重任，從而不同於 Linux 的文件系統只負責文件系統的功能而把其餘功能（比如內存髒頁管理，
+IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux/FreeBSD
+內核已有的子系統有功能重疊。&lt;/p&gt;
+&lt;p&gt;似乎很多關於 ZFS 的視頻演講和幻燈片有講到子系統架構，但是找了半天也沒找到網上關於這個的說明文檔。
+於是寫下這篇筆記試圖從 ZFS 的早期開發歷程開始，記錄一下 ZFS 分層架構中各個子系統之間的分工。
+也有幾段 OpenZFS Summit 視頻佐以記錄那段歷史。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+The Birth of ZFS by Jeff Bonwick&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/dcV2PaMTAJ4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Story Time (Q&amp;amp;A) with Matt and Jeff …&lt;/div&gt;&lt;/div&gt;</summary><content type="html">
+&lt;p&gt;ZFS 在設計之初源自於 Sun 內部多次重寫 UFS 的嘗試，背負了重構 Solaris
+諸多內核子系統的重任，從而不同於 Linux 的文件系統只負責文件系統的功能而把其餘功能（比如內存髒頁管理，
+IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux/FreeBSD
+內核已有的子系統有功能重疊。&lt;/p&gt;
+&lt;p&gt;似乎很多關於 ZFS 的視頻演講和幻燈片有講到子系統架構，但是找了半天也沒找到網上關於這個的說明文檔。
+於是寫下這篇筆記試圖從 ZFS 的早期開發歷程開始，記錄一下 ZFS 分層架構中各個子系統之間的分工。
+也有幾段 OpenZFS Summit 視頻佐以記錄那段歷史。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+The Birth of ZFS by Jeff Bonwick&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/dcV2PaMTAJ4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+Story Time (Q&amp;amp;A) with Matt and Jeff&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/yNKZQBsTX08"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZFS First Mount by Mark Shellenbaum&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/xMH5rCL8S2k"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZFS past &amp;amp; future by Mark Maybee&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/c1ek1tFjhH8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;早期架構&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;早期 ZFS 在開發時大體可以分爲上下三層，分別是 ZPL， DMU 和 SPA ，這三層分別由三組人負責。&lt;/p&gt;
+&lt;p&gt;最初在 Sun 內部帶領 ZFS 開發的是 &lt;a class="reference external" href="https://blogs.oracle.com/bonwick/"&gt;Jeff Bonwick&lt;/a&gt;
+，他首先有了對 ZFS 整體架構的構思，然後遊說 Sun 高層，親自組建起了 ZFS
+開發團隊，招募了當時剛從大學畢業的 &lt;a class="reference external" href="http://open-zfs.org/wiki/User:Mahrens"&gt;Matt Ahrens&lt;/a&gt;
+。作爲和 Sun 高層談妥的條件， Jeff 也必須負責 Solaris 整體的 Storage &amp;amp; Filesystem Team
+，於是他又從 Solaris 的 Storage Team 抽調了 UFS 部分的負責人 Mark Shellenbaum 和
+Mark Maybee 來開發 ZFS 。而如今昔日昇陽已然日落， Jeff
+成立了獨立公司繼續開拓服務器存儲領域， Matt 是 OpenZFS 項目的負責人，兩位 Mark 則留在了
+Sun/Oracle 成爲了 Oracle ZFS 分支的維護者。&lt;/p&gt;
+&lt;p&gt;在開發早期，作爲分工， Jeff 負責 ZFS 設計中最底層的 SPA ，提供多個存儲設備組成的存儲池抽象；
+Matt 負責 ZFS 設計中最至關重要的 DMU 引擎，在塊設備基礎上提供具有事務語義的對象存儲；
+而兩位 Mark 負責 ZFS 設計中直接面向用戶的 ZPL ，在 DMU 基礎上提供完整 POSIX 文件系統語義。
+ZFS 設計中這最初的分工也體現在了 ZFS 現在子系統分層的架構上，繼續影響（增強或者限制） ZFS
+今後發展的方向。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;子系統整體架構&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統（
+我給方框的子系統加上了超鏈接）：&lt;/p&gt;
+&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
+
+&lt;!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ --&gt;
+&lt;!-- Title: ZFS_Layer_Architecture Pages: 1 --&gt;
+&lt;svg class="svg-responsive" height="626pt" viewbox="0.00 0.00 806.50 626.00" width="807pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"&gt;
+&lt;g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 622)"&gt;
+&lt;title&gt;ZFS_Layer_Architecture&lt;/title&gt;
+&lt;polygon fill="#ffffff" points="-4,4 -4,-622 802.5,-622 802.5,4 -4,4" stroke="transparent"&gt;&lt;/polygon&gt;
+&lt;g class="cluster" id="clust4"&gt;
+&lt;title&gt;clusterTOL&lt;/title&gt;
+&lt;g id="a_clust4"&gt;&lt;a xlink:href="#tol" xlink:title="TOL"&gt;
+&lt;polygon fill="none" points="493.5,-355 493.5,-574 583.5,-574 583.5,-355 493.5,-355" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="538.5" y="-558.8"&gt;TOL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;g class="cluster" id="clust9"&gt;
+&lt;title&gt;clusterSPA&lt;/title&gt;
+&lt;g id="a_clust9"&gt;&lt;a xlink:href="#spa" xlink:title="SPA"&gt;
+&lt;polygon fill="none" points="415.5,-64 415.5,-283 649.5,-283 649.5,-64 415.5,-64" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="532.5" y="-267.8"&gt;SPA&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- Filesystem API --&gt;
+&lt;g class="node" id="node1"&gt;
+&lt;title&gt;Filesystem API&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="62.5" y="-596.3"&gt;Filesystem API&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- VFS --&gt;
+&lt;g class="node" id="node5"&gt;
+&lt;title&gt;VFS&lt;/title&gt;
+&lt;ellipse cx="62.5" cy="-525" fill="none" rx="30.5947" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="62.5" y="-521.3"&gt;VFS&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- Filesystem API&amp;#45;&amp;gt;VFS --&gt;
+&lt;g class="edge" id="edge1"&gt;
+&lt;title&gt;Filesystem API-&amp;gt;VFS&lt;/title&gt;
+&lt;path d="M62.5,-581.8446C62.5,-573.3401 62.5,-563.0076 62.5,-553.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="66.0001,-553.2481 62.5,-543.2482 59.0001,-553.2482 66.0001,-553.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- Block device API --&gt;
+&lt;g class="node" id="node2"&gt;
+&lt;title&gt;Block device API&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="437.5" y="-596.3"&gt;Block device API&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zvol/... --&gt;
+&lt;g class="node" id="node6"&gt;
+&lt;title&gt;/dev/zvol/...&lt;/title&gt;
+&lt;ellipse cx="421.5" cy="-525" fill="none" rx="63.8893" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="421.5" y="-521.3"&gt;/dev/zvol/...&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- Block device API&amp;#45;&amp;gt;/dev/zvol/... --&gt;
+&lt;g class="edge" id="edge2"&gt;
+&lt;title&gt;Block device API-&amp;gt;/dev/zvol/...&lt;/title&gt;
+&lt;path d="M433.6268,-581.8446C431.7795,-573.1849 429.5277,-562.6301 427.4684,-552.9768" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="430.8469,-552.0379 425.3375,-542.9882 424.001,-553.4984 430.8469,-552.0379" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZFS Management API (libzfs) --&gt;
+&lt;g class="node" id="node3"&gt;
+&lt;title&gt;ZFS Management API (libzfs)&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="684.5" y="-596.3"&gt;ZFS Management API (libzfs)&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl --&gt;
+&lt;g class="node" id="node7"&gt;
+&lt;title&gt;/dev/zfs ioctl&lt;/title&gt;
+&lt;ellipse cx="684.5" cy="-525" fill="none" rx="69.5877" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="684.5" y="-521.3"&gt;/dev/zfs ioctl&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- ZFS Management API (libzfs)&amp;#45;&amp;gt;/dev/zfs ioctl --&gt;
+&lt;g class="edge" id="edge3"&gt;
+&lt;title&gt;ZFS Management API (libzfs)-&amp;gt;/dev/zfs ioctl&lt;/title&gt;
+&lt;path d="M684.5,-581.8446C684.5,-573.3401 684.5,-563.0076 684.5,-553.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="688.0001,-553.2481 684.5,-543.2482 681.0001,-553.2482 688.0001,-553.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- NFS/Samba API (libshare) --&gt;
+&lt;g class="node" id="node4"&gt;
+&lt;title&gt;NFS/Samba API (libshare)&lt;/title&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="246.5" y="-596.3"&gt;NFS/Samba API (libshare)&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- NFS/CIFS vop_rwlock --&gt;
+&lt;g class="node" id="node8"&gt;
+&lt;title&gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;ellipse cx="225.5" cy="-525" fill="none" rx="114.2798" ry="18" stroke="#000000"&gt;&lt;/ellipse&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="225.5" y="-521.3"&gt;NFS/CIFS vop_rwlock&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- NFS/Samba API (libshare)&amp;#45;&amp;gt;NFS/CIFS vop_rwlock --&gt;
+&lt;g class="edge" id="edge4"&gt;
+&lt;title&gt;NFS/Samba API (libshare)-&amp;gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;path d="M241.4165,-581.8446C238.966,-573.0928 235.9735,-562.4053 233.2473,-552.669" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="236.6034,-551.6741 230.5367,-542.9882 229.8627,-553.5616 236.6034,-551.6741" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- VFS&amp;#45;&amp;gt;NFS/CIFS vop_rwlock --&gt;
+&lt;g class="edge" id="edge5"&gt;
+&lt;title&gt;VFS-&amp;gt;NFS/CIFS vop_rwlock&lt;/title&gt;
+&lt;path d="M93.0625,-525C95.6653,-525 98.2682,-525 100.871,-525" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="100.9106,-528.5001 110.9105,-525 100.9105,-521.5001 100.9106,-528.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZPL --&gt;
+&lt;g class="node" id="node9"&gt;
+&lt;title&gt;ZPL&lt;/title&gt;
+&lt;g id="a_node9"&gt;&lt;a xlink:href="#zpl" xlink:title="ZPL"&gt;
+&lt;polygon fill="none" points="367.5,-471 313.5,-471 313.5,-435 367.5,-435 367.5,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="340.5" y="-449.3"&gt;ZPL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- VFS&amp;#45;&amp;gt;ZPL --&gt;
+&lt;g class="edge" id="edge6"&gt;
+&lt;title&gt;VFS-&amp;gt;ZPL&lt;/title&gt;
+&lt;path d="M86.3025,-513.3546C91.5594,-511.0472 97.1562,-508.7886 102.5,-507 171.7912,-483.808 255.7337,-467.3568 303.1418,-459.0894" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="303.9854,-462.4959 313.2493,-457.3547 302.8013,-455.5968 303.9854,-462.4959" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZVOL --&gt;
+&lt;g class="node" id="node10"&gt;
+&lt;title&gt;ZVOL&lt;/title&gt;
+&lt;g id="a_node10"&gt;&lt;a xlink:href="#zvol" xlink:title="ZVOL"&gt;
+&lt;polygon fill="none" points="483,-471 424,-471 424,-435 483,-435 483,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-449.3"&gt;ZVOL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zvol/...&amp;#45;&amp;gt;ZVOL --&gt;
+&lt;g class="edge" id="edge7"&gt;
+&lt;title&gt;/dev/zvol/...-&amp;gt;ZVOL&lt;/title&gt;
+&lt;path d="M429.575,-506.8314C433.1102,-498.8771 437.336,-489.369 441.2456,-480.5723" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="444.4532,-481.9729 445.3163,-471.4133 438.0565,-479.1299 444.4532,-481.9729" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL --&gt;
+&lt;g class="node" id="node11"&gt;
+&lt;title&gt;DSL&lt;/title&gt;
+&lt;g id="a_node11"&gt;&lt;a xlink:href="#dsl" xlink:title="DSL"&gt;
+&lt;polygon fill="none" points="557.5,-543 503.5,-543 503.5,-507 557.5,-507 557.5,-543" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="530.5" y="-521.3"&gt;DSL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl&amp;#45;&amp;gt;DSL --&gt;
+&lt;g class="edge" id="edge10"&gt;
+&lt;title&gt;/dev/zfs ioctl-&amp;gt;DSL&lt;/title&gt;
+&lt;path d="M614.5895,-525C598.9983,-525 583.4071,-525 567.8159,-525" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="567.5703,-521.5001 557.5703,-525 567.5703,-528.5001 567.5703,-521.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- VDEV --&gt;
+&lt;g class="node" id="node20"&gt;
+&lt;title&gt;VDEV&lt;/title&gt;
+&lt;g id="a_node20"&gt;&lt;a xlink:href="#vdev" xlink:title="VDEV"&gt;
+&lt;polygon fill="none" points="546,-108 487,-108 487,-72 546,-72 546,-108" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="516.5" y="-86.3"&gt;VDEV&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- /dev/zfs ioctl&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge29"&gt;
+&lt;title&gt;/dev/zfs ioctl-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M689.2656,-506.9623C696.0025,-479.8344 707.5,-426.8236 707.5,-381 707.5,-381 707.5,-381 707.5,-234 707.5,-186.6526 686.8759,-174.3079 650.5,-144 623.0063,-121.0926 584.5356,-106.9458 555.8638,-98.9099" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="556.7296,-95.5186 546.165,-96.3181 554.9223,-102.2812 556.7296,-95.5186" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DMU --&gt;
+&lt;g class="node" id="node13"&gt;
+&lt;title&gt;DMU&lt;/title&gt;
+&lt;g id="a_node13"&gt;&lt;a xlink:href="#dmu" xlink:title="DMU"&gt;
+&lt;polygon fill="none" points="555.5,-399 501.5,-399 501.5,-363 555.5,-363 555.5,-399" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-377.3"&gt;DMU&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- NFS/CIFS vop_rwlock&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge15"&gt;
+&lt;title&gt;NFS/CIFS vop_rwlock-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M285.6968,-509.563C314.41,-500.7092 348.5163,-487.9433 376.5,-471 396.6786,-458.7825 395.9728,-448.2337 415.5,-435 439.4387,-418.7766 469.0038,-404.835 491.8877,-395.1832" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="493.3442,-398.3685 501.2501,-391.3152 490.6713,-391.8989 493.3442,-398.3685" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZAP --&gt;
+&lt;g class="node" id="node12"&gt;
+&lt;title&gt;ZAP&lt;/title&gt;
+&lt;g id="a_node12"&gt;&lt;a xlink:href="#zap" xlink:title="ZAP"&gt;
+&lt;polygon fill="none" points="555.5,-471 501.5,-471 501.5,-435 555.5,-435 555.5,-471" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-449.3"&gt;ZAP&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;ZAP --&gt;
+&lt;g class="edge" id="edge8"&gt;
+&lt;title&gt;ZPL-&amp;gt;ZAP&lt;/title&gt;
+&lt;path d="M367.5472,-469.1304C396.6265,-484.3281 444.0019,-502.8552 483.5,-489 490.6397,-486.4955 497.4881,-482.3291 503.5943,-477.7013" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="505.9521,-480.293 511.4185,-471.2173 501.4855,-474.9032 505.9521,-480.293" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge12"&gt;
+&lt;title&gt;ZPL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M367.7478,-440.7581C372.3191,-438.7848 377.0292,-436.8006 381.5,-435 418.7731,-419.9886 462.0037,-404.312 491.8902,-393.7414" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="493.2174,-396.9848 501.4861,-390.3607 490.8913,-390.3825 493.2174,-396.9848" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIL --&gt;
+&lt;g class="node" id="node15"&gt;
+&lt;title&gt;ZIL&lt;/title&gt;
+&lt;g id="a_node15"&gt;&lt;a xlink:href="#zil" xlink:title="ZIL"&gt;
+&lt;polygon fill="none" points="480.5,-327 426.5,-327 426.5,-291 480.5,-291 480.5,-327" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-305.3"&gt;ZIL&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZPL&amp;#45;&amp;gt;ZIL --&gt;
+&lt;g class="edge" id="edge16"&gt;
+&lt;title&gt;ZPL-&amp;gt;ZIL&lt;/title&gt;
+&lt;path d="M354.8115,-434.7623C374.5947,-409.5518 410.4107,-363.9103 433.0226,-335.0952" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="435.8847,-337.1173 439.3047,-327.0896 430.3778,-332.7959 435.8847,-337.1173" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZVOL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge13"&gt;
+&lt;title&gt;ZVOL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M472.4257,-434.8314C481.4857,-426.1337 492.4809,-415.5783 502.3265,-406.1265" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="504.7904,-408.613 509.5804,-399.1628 499.9426,-403.5633 504.7904,-408.613" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL&amp;#45;&amp;gt;ZAP --&gt;
+&lt;g class="edge" id="edge9"&gt;
+&lt;title&gt;DSL-&amp;gt;ZAP&lt;/title&gt;
+&lt;path d="M529.9953,-506.8314C529.7814,-499.131 529.5271,-489.9743 529.2894,-481.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.7879,-481.3122 529.0115,-471.4133 525.7906,-481.5066 532.7879,-481.3122" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- DSL&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge14"&gt;
+&lt;title&gt;DSL-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M545.614,-506.7768C552.8549,-496.8586 560.7524,-483.9858 564.5,-471 568.9365,-455.6274 569.1365,-450.3135 564.5,-435 561.5436,-425.2355 556.1748,-415.6229 550.47,-407.2762" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="553.2129,-405.0973 544.4905,-399.0831 547.5586,-409.2239 553.2129,-405.0973" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZAP&amp;#45;&amp;gt;DMU --&gt;
+&lt;g class="edge" id="edge11"&gt;
+&lt;title&gt;ZAP-&amp;gt;DMU&lt;/title&gt;
+&lt;path d="M528.5,-434.8314C528.5,-427.131 528.5,-417.9743 528.5,-409.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-409.4132 528.5,-399.4133 525.0001,-409.4133 532.0001,-409.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ARC --&gt;
+&lt;g class="node" id="node14"&gt;
+&lt;title&gt;ARC&lt;/title&gt;
+&lt;g id="a_node14"&gt;&lt;a xlink:href="#arc" xlink:title="ARC"&gt;
+&lt;polygon fill="none" points="555.5,-327 501.5,-327 501.5,-291 555.5,-291 555.5,-327" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-305.3"&gt;ARC&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- DMU&amp;#45;&amp;gt;ARC --&gt;
+&lt;g class="edge" id="edge17"&gt;
+&lt;title&gt;DMU-&amp;gt;ARC&lt;/title&gt;
+&lt;path d="M528.5,-362.8314C528.5,-355.131 528.5,-345.9743 528.5,-337.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-337.4132 528.5,-327.4133 525.0001,-337.4133 532.0001,-337.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- MetaSlab --&gt;
+&lt;g class="node" id="node19"&gt;
+&lt;title&gt;MetaSlab&lt;/title&gt;
+&lt;g id="a_node19"&gt;&lt;a xlink:href="#metaslab" xlink:title="MetaSlab"&gt;
+&lt;polygon fill="none" points="641,-180 556,-180 556,-144 641,-144 641,-180" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="598.5" y="-158.3"&gt;MetaSlab&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- DMU&amp;#45;&amp;gt;MetaSlab --&gt;
+&lt;g class="edge" id="edge23"&gt;
+&lt;title&gt;DMU-&amp;gt;MetaSlab&lt;/title&gt;
+&lt;path d="M555.6383,-368.3974C585.2203,-352.9755 630.9457,-323.7894 650.5,-283 663.3726,-256.1483 661.6355,-243.6173 650.5,-216 646.1775,-205.2796 638.5956,-195.4983 630.5361,-187.2948" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="632.7442,-184.5652 623.0801,-180.2228 627.927,-189.644 632.7442,-184.5652" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO --&gt;
+&lt;g class="node" id="node16"&gt;
+&lt;title&gt;ZIO&lt;/title&gt;
+&lt;g id="a_node16"&gt;&lt;a xlink:href="#zio" xlink:title="ZIO"&gt;
+&lt;polygon fill="none" points="555.5,-252 501.5,-252 501.5,-216 555.5,-216 555.5,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="528.5" y="-230.3"&gt;ZIO&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ARC&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge20"&gt;
+&lt;title&gt;ARC-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M528.5,-290.8446C528.5,-282.3401 528.5,-272.0076 528.5,-262.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="532.0001,-262.2481 528.5,-252.2482 525.0001,-262.2482 532.0001,-262.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC --&gt;
+&lt;g class="node" id="node17"&gt;
+&lt;title&gt;L2ARC&lt;/title&gt;
+&lt;g id="a_node17"&gt;&lt;a xlink:href="#l2arc" xlink:title="L2ARC"&gt;
+&lt;polygon fill="none" points="641.5,-252 573.5,-252 573.5,-216 641.5,-216 641.5,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="607.5" y="-230.3"&gt;L2ARC&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ARC&amp;#45;&amp;gt;L2ARC --&gt;
+&lt;g class="edge" id="edge21"&gt;
+&lt;title&gt;ARC-&amp;gt;L2ARC&lt;/title&gt;
+&lt;path d="M554.9972,-290.9209C558.2877,-288.3716 561.5341,-285.6973 564.5,-283 572.1249,-276.0657 579.7661,-267.8645 586.4472,-260.1753" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="589.4807,-262.0092 593.2739,-252.1166 584.1396,-257.4845 589.4807,-262.0092" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIL&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge19"&gt;
+&lt;title&gt;ZIL-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M480.869,-292.5464C484.9519,-289.5928 488.9697,-286.3728 492.5,-283 499.3026,-276.501 505.7319,-268.5881 511.2235,-261.0336" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="514.3671,-262.6436 517.2054,-252.436 508.6211,-258.6456 514.3671,-262.6436" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- SLOG --&gt;
+&lt;g class="node" id="node18"&gt;
+&lt;title&gt;SLOG&lt;/title&gt;
+&lt;g id="a_node18"&gt;&lt;a xlink:href="#slog" xlink:title="SLOG"&gt;
+&lt;polygon fill="none" points="483,-252 424,-252 424,-216 483,-216 483,-252" stroke="#0000ff"&gt;&lt;/polygon&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="453.5" y="-230.3"&gt;SLOG&lt;/text&gt;
+&lt;/a&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;!-- ZIL&amp;#45;&amp;gt;SLOG --&gt;
+&lt;g class="edge" id="edge18"&gt;
+&lt;title&gt;ZIL-&amp;gt;SLOG&lt;/title&gt;
+&lt;path d="M453.5,-290.8446C453.5,-282.3401 453.5,-272.0076 453.5,-262.4964" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="457.0001,-262.2481 453.5,-252.2482 450.0001,-262.2482 457.0001,-262.2481" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO&amp;#45;&amp;gt;MetaSlab --&gt;
+&lt;g class="edge" id="edge24"&gt;
+&lt;title&gt;ZIO-&amp;gt;MetaSlab&lt;/title&gt;
+&lt;path d="M546.164,-215.8314C554.4732,-207.2848 564.5264,-196.9443 573.5918,-187.6198" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="576.1369,-190.023 580.5982,-180.4133 571.1179,-185.1435 576.1369,-190.023" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- ZIO&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge28"&gt;
+&lt;title&gt;ZIO-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M526.9802,-215.7623C524.9334,-191.201 521.2706,-147.2474 518.8628,-118.3541" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="522.3259,-117.7644 518.0075,-108.0896 515.3501,-118.3458 522.3259,-117.7644" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC&amp;#45;&amp;gt;ZIO --&gt;
+&lt;g class="edge" id="edge22"&gt;
+&lt;title&gt;L2ARC-&amp;gt;ZIO&lt;/title&gt;
+&lt;path d="M573.4775,-234C570.8786,-234 568.2797,-234 565.6807,-234" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="565.6563,-230.5001 555.6563,-234 565.6562,-237.5001 565.6563,-230.5001" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- L2ARC&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge26"&gt;
+&lt;title&gt;L2ARC-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M581.9503,-215.8625C570.0905,-206.3385 556.6295,-193.7883 547.5,-180 535.0104,-161.137 527.0138,-136.7121 522.2764,-118.0676" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="525.6279,-117.032 519.9132,-108.1105 518.8171,-118.6485 525.6279,-117.032" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- SLOG&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge25"&gt;
+&lt;title&gt;SLOG-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M461.479,-215.7623C472.3192,-190.9846 491.7938,-146.4714 504.4277,-117.5939" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="507.7841,-118.6541 508.5858,-108.0896 501.371,-115.8483 507.7841,-118.6541" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- MetaSlab&amp;#45;&amp;gt;VDEV --&gt;
+&lt;g class="edge" id="edge27"&gt;
+&lt;title&gt;MetaSlab-&amp;gt;VDEV&lt;/title&gt;
+&lt;path d="M577.8079,-143.8314C567.8052,-135.0485 555.645,-124.3712 544.8001,-114.8489" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="547.0092,-112.1308 537.1854,-108.1628 542.3906,-117.3909 547.0092,-112.1308" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;!-- physical storage devices --&gt;
+&lt;g class="node" id="node21"&gt;
+&lt;title&gt;physical storage devices&lt;/title&gt;
+&lt;path d="M613,-32.7273C613,-34.5331 569.7472,-36 516.5,-36 463.2528,-36 420,-34.5331 420,-32.7273 420,-32.7273 420,-3.2727 420,-3.2727 420,-1.4669 463.2528,0 516.5,0 569.7472,0 613,-1.4669 613,-3.2727 613,-3.2727 613,-32.7273 613,-32.7273" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;path d="M613,-32.7273C613,-30.9214 569.7472,-29.4545 516.5,-29.4545 463.2528,-29.4545 420,-30.9214 420,-32.7273" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="516.5" y="-14.3"&gt;physical storage devices&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- VDEV&amp;#45;&amp;gt;physical storage devices --&gt;
+&lt;g class="edge" id="edge30"&gt;
+&lt;title&gt;VDEV-&amp;gt;physical storage devices&lt;/title&gt;
+&lt;path d="M516.5,-71.8314C516.5,-64.131 516.5,-54.9743 516.5,-46.4166" fill="none" stroke="#000000"&gt;&lt;/path&gt;
+&lt;polygon fill="#000000" points="520.0001,-46.4132 516.5,-36.4133 513.0001,-46.4133 520.0001,-46.4132" stroke="#000000"&gt;&lt;/polygon&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+&lt;p&gt;接下來從底層往上介紹一下各個子系統的全稱和職能。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="spa"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;SPA&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Storage Pool Allocator&lt;/p&gt;
+&lt;p&gt;從內核提供的多個塊設備中抽象出存儲池的子系統。 SPA 進一步分爲 ZIO 和 VDEV 兩大部分和其餘一些小的子系統。&lt;/p&gt;
+&lt;p&gt;SPA 對 DMU 提供的接口不同於傳統的塊設備接口，完全利用了 CoW 文件系統對寫入位置不敏感的特點。
+傳統的塊設備接口通常是寫入時指定一個寫入地址，把緩衝區寫到磁盤指定的位置上，而 DMU 可以讓 SPA
+做兩種操作：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+write&lt;/code&gt;
+ ， DMU 交給 SPA 一個數據塊的內存指針， SPA
+負責找設備寫入這個數據塊，然後返回給 DMU 一個 block pointer 。&lt;/li&gt;
+&lt;li&gt;&lt;code class="code"&gt;
+read&lt;/code&gt;
+ ，DMU 交給 SPA 一個 block pointer ，SPA 讀取設備並返回給 DMU
+完整的數據塊。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也就是說，在 DMU 讓 SPA 寫數據塊時， DMU 還不知道 SPA 會寫入的地方，這完全由 SPA 判斷，
+這一點通常被稱爲 Write Anywhere ，在別的 CoW 文件系統比如 Btrfs 和 WAFL 中也有這個特點。
+反過來 SPA 想要對一個數據塊操作時，也完全不清楚這個數據塊用於什麼目的，屬於什麼文件或者文件系統結構。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="vdev"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;VDEV&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Virtual DEVice&lt;/p&gt;
+&lt;p&gt;作用相當於 Linux 內核的 Device Mapper 層或者 FreeBSD GEOM 層，提供 Stripe/Mirror/RAIDZ
+之類的多設備存儲池管理和抽象。 ZFS 中的 vdev 形成一個樹狀結構，在樹的底層是從內核提供的物理設備，
+其上是虛擬的塊設備。每個虛擬塊設備對上對下都是塊設備接口，除了底層的物理設備之外，位於中間層的
+vdev 需要負責地址映射、容量轉換等計算過程。&lt;/p&gt;
+&lt;p&gt;除了用於存儲數據的 Stripe/Mirror/RAIDZ 之類的 VDEV ，還有一些特殊用途的 VDEV
+，包括提供二級緩存的 L2ARC 設備，以及提供 ZIL 高速日誌的 SLOG 設備。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zio"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;ZIO&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+ZIO Pipeline by George Wilson&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/qkA5HhfzsvM"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;ZFS I/O&lt;/p&gt;
+&lt;p&gt;作用相當於內核的 IO scheduler 和 pagecache write back 機制。
+OpenZFS Summit 有个演讲整理了 ZIO 流水线的工作原理。
+ZIO 內部使用流水線和事件驅動機制，避免讓上層的 ZFS 線程阻塞等待在 IO 操作上。
+ZIO 把一個上層的寫請求轉換成多個寫操作，負責把這些寫操作合併到
+transaction group 提交事務組。 ZIO 也負責將讀寫請求按同步還是異步分成不同的讀寫優先級並實施優先級調度，
+在 &lt;a class="reference external" href="https://github.com/zfsonlinux/zfs/wiki/ZIO-Scheduler"&gt;OpenZFS 項目 wiki 頁有一篇描述 ZIO 調度&lt;/a&gt;
+的細節。&lt;/p&gt;
+&lt;p&gt;除了調度之外， ZIO 層還負責在讀寫流水線中拆解和拼裝數據塊。上層 DMU 交給 SPA 的數據塊有固定大小，
+目前默認是 128KiB ，pool 整體的參數可以調整塊大小在 4KiB 到 8MiB 之間。ZIO
+拿到整塊大小的數據塊之後，在流水線中可以對數據塊做諸如以下操作：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;用壓縮算法，壓縮/解壓數據塊。&lt;/li&gt;
+&lt;li&gt;查詢 dedup table ，對數據塊去重。&lt;/li&gt;
+&lt;li&gt;加密/解密數據塊。&lt;/li&gt;
+&lt;li&gt;計算數據塊的校驗和。&lt;/li&gt;
+&lt;li&gt;如果底層分配器不能分配完整的 128KiB （或 zpool 設置的大小），那麼嘗試分配多個小塊，然後用多個
+512B 的指針間接塊連起多個小塊的，拼裝成一個虛擬的大塊，這個機制叫
+&lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSGangBlocks"&gt;gang block&lt;/a&gt;
+。通常 ZFS 中用到 gang block 時，整個存儲池處於極度空間不足的情況，由 gang block
+造成嚴重性能下降，而 gang block 的意義在於在空間接近要滿的時候也能 CoW
+寫入一些元數據，釋放亟需的存儲空間。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可見經過 ZIO 流水線之後，數據塊不再是統一大小，這使得 ZFS 用在 4K 對齊的磁盤或者 SSD
+上有了一些新的挑戰。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="metaslab"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;MetaSlab&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+MetaSlab Allocation Performance by Paul Dagnelie&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/LZpaTGNvalE"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;MetaSlab 是 ZFS 的塊分配器。 VDEV 把存儲設備抽象成存儲池之後， MetaSlab
+負責實際從存儲設備上分配數據塊，跟蹤記錄可用空間和已用空間。&lt;/p&gt;
+&lt;p&gt;叫 MetaSlab 這個名字是因爲 Jeff 最初同時也給 Solaris 內核寫過
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Slab_allocation"&gt;slab 分配器&lt;/a&gt;
+，一開始設計 SPA 的時候 Jeff 想在 SPA 中也利用 Solaris 的 slab
+分配器對磁盤空間使用類似的分配算法。後來 MetaSlab 逐漸不再使用 slab 算法，只有名字留了下來。&lt;/p&gt;
+&lt;p&gt;MetaSlab 的結構很接近於 FreeBSD UFS 的 cylinder group ，或者 ext2/3/4 的 block group
+，或者 xfs 的 allocation group ，目的都是讓存儲分配策略「局域化」，
+或者說讓近期分配的數據塊的物理地址比較接近。在存儲設備上創建 zpool
+的時候，首先會儘量在存儲設備上分配 200 個左右的 MetaSlab ，隨後給 zpool
+增加設備的話使用接近的 MetaSlab 大小。每個 MetaSlab 是連續的一整塊空間，在 MetaSlab
+內對數據塊空間做分配和釋放。磁盤中存儲的 MetaSlab 的分配情況是按需載入內存的的，系統
+import zpool 時不需要載入所有 MetaSlab 到內存，而只需加載一小部分。當前載入內存的 MetaSlab
+剩餘空間告急時，會載入別的 MetaSlab 嘗試分配，而從某個 MetaSlab 釋放空間不需要載入 MetaSlab
+。&lt;/p&gt;
+&lt;p&gt;OpenZFS Summit 也有一個對 MetaSlab 分配器性能的介紹，可以看到很多分配器內的細節。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="arc"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Adaptive Replacement Cache&lt;/p&gt;
+&lt;p&gt;作用相當於 Linux/Solaris/FreeBSD 中傳統的 page/buffer cache 。
+和傳統 pagecache 使用 LRU (Least Recently Used) 之類的算法剔除緩存頁不同， ARC
+算法試圖在 LRU 和 LFU(Least Frequently Used) 之間尋找平衡，從而複製大文件之類的線性大量
+IO 操作不至於讓緩存失效率猛增。&lt;/p&gt;
+&lt;p&gt;不過 ZFS 採用它自有的 ARC 一個顯著缺點在於，不能和內核已有的 pagecache 機制相互配合，尤其在
+系統內存壓力很大的情況下，內核與 ZFS 無關的其餘部分可能難以通知 ARC 釋放內存。所以 ARC
+是 ZFS 消耗內存的大戶之一（另一個是可選的 dedup table），也是
+&lt;a class="reference external" href="http://open-zfs.org/wiki/Performance_tuning#Adaptive_Replacement_Cache"&gt;ZFS 性能調優&lt;/a&gt;
+的重中之重。&lt;/p&gt;
+&lt;p&gt;當然， ZFS 採用 ARC 不依賴於內核已有的 pagecache 機制除了 LFU 平衡的好處之外，也有別的有利的一面。
+系統中多次讀取因 snapshot 或者 dedup 而共享的數據塊的話，在 ZFS 的 ARC 機制下，同樣的
+block pointer 只會被緩存一次；而傳統的 pagecache 因爲基於 inode 判斷是否有共享，
+所以即使這些文件有共享頁面（比如 btrfs/xfs 的 reflink 形成的），也會多次讀入內存。 Linux
+的 btrfs 和 xfs 在 VFS 層面有共用的 reflink 機制之後，正在努力着手改善這種局面，而 ZFS
+因爲 ARC 所以從最初就避免了這種浪費。&lt;/p&gt;
+&lt;p&gt;和很多傳言所說的不同， ARC 的內存壓力問題不僅在 Linux 內核會有，在 FreeBSD 和
+Solaris/Illumos 上也是同樣，這個在
+&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=997"&gt;ZFS First Mount by Mark Shellenbaum 的問答環節 16:37 左右有提到&lt;/a&gt;
+。其中 Mark Shellenbaum 提到 Matt 覺得讓 ARC 併入現有 pagecache
+子系統的工作量太大，難以實現。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="l2arc"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;L2ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Level 2 Adaptive Replacement Cache&lt;/p&gt;
+&lt;p&gt;這是用 ARC 算法實現的二級緩存，保存於高速存儲設備上。常見用法是給 ZFS pool 配置一塊 SSD
+作爲 L2ARC 高速緩存，減輕內存 ARC 的負擔並增加緩存命中率。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="slog"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;SLOG&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Separate intent LOG&lt;/p&gt;
+&lt;p&gt;SLOG 是額外的日誌記錄設備。 SLOG 之於 ZIL 有點像 L2ARC 之餘 ARC ， L2ARC 是把內存中的
+ARC 放入額外的高速存儲設備，而 SLOG 是把原本和別的數據塊存儲在一起的 ZIL
+放到額外的高速存儲設備。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tol"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;TOL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Transactional Object Layer&lt;/p&gt;
+&lt;p&gt;這一部分子系統在數據塊的基礎上提供一個事務性的對象語義層，這裏事務性是指，
+對對象的修改處於明確的狀態，不會因爲突然斷電之類的原因導致狀態不一致。TOL
+中最主要的部分是 DMU 層。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="dmu"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;DMU&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Data Management Unit&lt;/p&gt;
+&lt;p&gt;在塊的基礎上提供「對象（object）」的抽象。每個「對象」可以是一個文件，或者是別的 ZFS 內部需要記錄的東西。&lt;/p&gt;
+&lt;p&gt;DMU 這個名字最初是 Jeff 想類比於操作系統中內存管理的 MMU(Memory Management Unit)，
+Jeff 希望 ZFS 中增加和刪除文件就像內存分配一樣簡單，增加和移除塊設備就像增加內存一樣簡單，
+由 DMU 負責從存儲池中分配和釋放數據塊，對上提供事務性語義，管理員不需要管理文件存儲在什麼存儲設備上。
+這裏事務性語義指對文件的修改要麼完全成功，要麼完全失敗，不會處於中間狀態，這靠 DMU 的 CoW
+語義實現。&lt;/p&gt;
+&lt;p&gt;DMU 實現了對象級別的 CoW 語義，從而任何經過了 DMU 做讀寫的子系統都具有了 CoW 的特徵，
+這不僅包括文件、文件夾這些 ZPL 層需要的東西，也包括文件系統內部用的 spacemap 之類的設施。
+相反，不經過 DMU 的子系統則可能沒法保證事務語義。這裏一個特例是 ZIL ，一定程度上繞過了 DMU
+直接寫日誌。說一定程度是因爲 ZIL 仍然靠 DMU 來擴展長度，當一個塊寫滿日誌之後需要等 DMU
+分配一個新塊，在分配好的塊內寫日誌則不需要經過 DMU 。所有經過 DMU 子系統的對象都有 CoW
+語義，也意味着 ZFS 中不能對某些文件可選地關閉 CoW ，不能提供數據庫應用的 direct IO 之類的接口。&lt;/p&gt;
+&lt;p&gt;「對象（object）」抽象是 DMU 最重要的抽象，一個對象的大小可變，佔用一個或者多個數據塊（
+默認一個數據塊 128KiB ）。上面提到 SPA 的時候也講了 DMU 和 SPA 之間不同於普通塊設備抽象的接口，這使得 DMU
+按整塊的大小分配空間。當對象使用多個數據塊存儲時， DMU 提供間接塊（indirect block）來引用這些數據塊。
+間接塊很像傳統 Unix 文件系統（Solaris UFS 或者 Linux ext2）中的一級二級三級間接塊，
+一個間接塊存儲很多塊指針（block pointer），多個間接塊形成樹狀結構，最終一個塊指針可以引用到一個對象。
+更現代的文件系統比如 ext4/xfs/btrfs/ntfs 提供了 extent 抽象，可以指向一個連續範圍的存儲塊，
+而 ZFS 不使用類似 extent 的抽象。DMU 採用間接塊而不是 extent
+，使得 ZFS 的空間分配更趨向碎片化，爲了避免碎片化造成的性能影響，需要儘量延遲寫入使得一次寫入能在磁盤上
+儘量連續，這裏 ARC 提供的緩存和 ZIO 提供的流水線對延遲寫入避免碎片有至關重要的幫助。&lt;/p&gt;
+&lt;p&gt;有了「對象（object）」的抽象之後， DMU 進一步實現了「對象集（objectset）」的抽象，
+一個對象集中保存一系列按順序編號的 dnode （ ZFS 中類似 inode 的數據結構），每個 dnode 有足夠空間
+指向一個對象的最多三個塊指針，如果對象需要更多數據塊可以使用間接塊，如果對象很小也可以直接壓縮進
+dnode 。隨後 DSL 又進一步用對象集來實現數據集（dataset）抽象，提供比如文件系統（filesystem
+）、快照（snapshot）、克隆（clone）之類的抽象。一個對象集中的對象可以通過 dnode 編號相互引用，
+就像普通文件系統的硬鏈接引用 inode 編號那樣。&lt;/p&gt;
+&lt;p&gt;上面也提到因爲 SPA 和 DMU 分離， SPA 完全不知道數據塊用於什麼目的；這一點其實對 DMU 也是類似，
+DMU 雖然能從某個對象找到它所佔用的數據塊，但是 DMU 完全不知道這個對象在文件系統或者存儲池中是
+用來存儲什麼的。當 DMU 讀取數據遇到壞塊（block pointer 中的校驗和與 block pointer
+指向的數據塊內容不一致）時，它知道這個數據塊在哪兒（具體哪個設備上的哪個地址），
+但是不知道這個數據塊是否和別的對象共享，不知道搬動這個數據塊的影響，也沒法從對象反推出文件系統路徑，
+（除了明顯開銷很高地掃一遍整個存儲池）。所以 DMU 在遇到讀取錯誤（普通的讀操作或者 scrub/resilver
+操作中）時，只能選擇在同樣的地址，原地寫入數據塊的備份（如果能找到或者推算出備份的話）。&lt;/p&gt;
+&lt;p&gt;或許有人會疑惑，既然從 SPA 無法根據數據地址反推出對象，在 DMU 也無法根據對象反推出文件，那麼
+zfs 在遇到數據損壞時是如何在診斷信息中給出損壞的文件路徑的呢？這其實基於 ZPL 的一個黑魔法：
+&lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick"&gt;在 dnode 記錄父級 dnode 的編號&lt;/a&gt;
+。因爲是個黑魔法，這個記錄不總是對的，所以只能用於診斷信息，不能基於這個實現別的文件系統功能。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zap"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;ZAP&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Attribute Processor&lt;/p&gt;
+&lt;p&gt;在 DMU 提供的「對象」抽象基礎上提供緊湊的 name/value 映射存儲，
+從而文件夾內容列表、文件擴展屬性之類的都是基於 ZAP 來存。 ZAP 在內部分爲兩種存儲表達：
+microZAP 和 fatZAP 。&lt;/p&gt;
+&lt;p&gt;一個 microZAP 佔用一整塊數據塊，能存 name 長度小於 50 字符並且 value 是 uint64_t 的表項，
+每個表項 64 字節。 fatZAP 則是個樹狀結構，能存更多更複雜的東西。可見 microZAP
+非常適合表述一個普通大小的文件夾裏面包含到很多普通文件 inode （ZFS 是 dnode）的引用。&lt;/p&gt;
+&lt;p&gt;在 &lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=526"&gt;ZFS First Mount by Mark Shellenbaum&lt;/a&gt;
+中提到，最初 ZPL 中關於文件的所有屬性（包括訪問時間、權限、大小之類所有文件都有的）都是基於
+ZAP 來存，然後文件夾內容列表有另一種數據結構 ZDS ，後來常見的文件屬性在 ZPL
+有了專用的緊湊數據結構，而 ZDS 則漸漸融入了 ZAP 。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="dsl"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;DSL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Dataset and Snapshot Layer&lt;/p&gt;
+&lt;p&gt;數據集和快照層，負責創建和管理快照、克隆等數據集類型，跟蹤它們的寫入大小，最終刪除它們。
+由於 DMU 層面已經負責了對象的寫時複製語義和對象集的概念，所以 DSL 層面不需要直接接觸寫文件之類來自 ZPL
+的請求，無論有沒有快照對 DMU 層面一樣採用寫時複製的方式修改文件數據。
+不過在刪除快照和克隆之類的時候，則需要 DSL 參與計算沒有和別的數據集共享的數據塊並且刪除它們。&lt;/p&gt;
+&lt;p&gt;DSL 管理數據集時，也負責管理數據集上附加的屬性。ZFS 每個數據集有個屬性列表，這些用 ZAP 存儲，
+DSL 則需要根據數據集的上下級關係，計算出繼承的屬性，最終指導 ZIO 層面的讀寫行爲。&lt;/p&gt;
+&lt;p&gt;除了管理數據集， DSL 層面也提供了 zfs 中 send/receive 的能力。 ZFS 在 send 時從 DSL
+層找到快照引用到的所有數據塊，把它們直接發往管道，在 receive 端則直接接收數據塊並重組數據塊指針。
+因爲 DSL 提供的 send/receive 工作在 DMU 之上，所以在 DSL 看到的數據塊是 DMU
+的數據塊，下層 SPA 完成的數據壓縮、加密、去重等工作，對 DMU 層完全透明。所以在最初的
+send/receive 實現中，假如數據塊已經壓縮，需要在 send 端經過 SPA 解壓，再 receive
+端則重新壓縮。最近 ZFS 的 send/receive 逐漸打破 DMU 與 SPA
+的壁壘，支持了直接發送已壓縮或加密的數據塊的能力。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zil"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;ZIL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Intent Log&lt;/p&gt;
+&lt;p&gt;記錄兩次完整事務語義提交之間的日誌，用來加速實現 fsync 之類的文件事務語義。&lt;/p&gt;
+&lt;p&gt;原本 CoW 的文件系統不需要日誌結構來保證文件系統結構的一致性，在 DMU
+保證了對象級別事務語義的前提下，每次完整的 transaction group commit
+都保證了文件系統一致性，掛載時也直接找到最後一個 transaction group 從它開始掛載即可。
+不過在 ZFS 中，做一次完整的 transaction group commit 是個比較耗時的操作，
+在寫入文件的數據塊之後，還需要更新整個 object set ，然後更新 meta-object set
+，最後更新 uberblock ，爲了滿足事務語義這些操作沒法並行完成，所以整個 pool
+提交一次需要等待好幾次磁盤寫操作返回，短則一兩秒，長則幾分鐘，
+如果事務中有要刪除快照等非常耗時的操作可能還要等更久，在此期間提交的事務沒法保證一致。&lt;/p&gt;
+&lt;p&gt;對上層應用程序而言，通常使用 fsync 或者 fdatasync 之類的系統調用，確保文件內容本身的事務一致性。
+如果要讓每次 fsync/fdatasync 等待整個 transaction group commit
+完成，那會嚴重拖慢很多應用程序，而如果它們不等待直接返回，則在突發斷電時沒有保證一致性。
+從而 ZFS 有了 ZIL ，記錄兩次 transaction group 的 commit 之間發生的 fsync
+，突然斷電後下次 import zpool 時首先找到最近一次 transaction group ，在它基礎上重放
+ZIL 中記錄的寫請求和 fsync 請求，從而滿足 fsync API 要求的事務語義。&lt;/p&gt;
+&lt;p&gt;顯然對 ZIL 的寫操作需要繞過 DMU 直接寫入數據塊，所以 ZIL 本身是以日誌系統的方式組織的，每次寫
+ZIL 都是在已經分配的 ZIL 塊的末尾添加數據，分配新的 ZIL 塊仍然需要經過 DMU
+的空間分配。&lt;/p&gt;
+&lt;p&gt;傳統日誌型文件系統中對 data 開啓日誌支持會造成每次文件系統寫入操作需要寫兩次到設備上，
+一次寫入日誌，再一次覆蓋文件系統內容；在
+ZIL 實現中則不需要重複寫兩次， DMU 讓 SPA 寫入數據之後 ZIL 可以直接記錄新數據塊的
+block pointer ，所以使用 ZIL 不會導致傳統日誌型文件系統中雙倍寫入放大的問題。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zvol"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id19"&gt;ZVOL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS VOLume&lt;/p&gt;
+&lt;p&gt;有點像 loopback block device ，暴露一個塊設備的接口，其上可以創建別的
+FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口，所以在實現完整 ZPL
+之前，一開始就先實現了 ZVOL ，而且
+&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=298"&gt;早期 Solaris 沒有 thin provisioning storage pool 的時候可以用 ZVOL 模擬很大的塊設備，當時 Solaris 的 UFS 團隊用它來測試 UFS 對 TB 級存儲的支持情況&lt;/a&gt;
+。&lt;/p&gt;
+&lt;p&gt;因爲 ZVOL 基於 DMU 上層，所以 DMU 所有的文件系統功能，比如 snapshot / dedup / compression
+都可以用在 ZVOL 上，從而讓 ZVOL 上層的傳統文件系統也具有類似的功能。並且 ZVOL 也具有了 ARC
+緩存的能力，和 dedup 結合之下，非常適合於在一個宿主機 ZFS
+上提供對虛擬機文件系統鏡像的存儲，可以節省不少存儲空間和內存佔用開銷。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="zpl"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id20"&gt;ZPL&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZFS Posix Layer&lt;/p&gt;
+&lt;p&gt;提供符合 POSIX 文件系統語義的抽象，也就是包括文件、目錄、軟鏈接、套接字這些抽象以及
+inode 訪問時間、權限那些抽象，ZPL 是 ZFS 中對一個普通 FS 而言用戶直接接觸的部分。
+ZPL 可以說是 ZFS 最複雜的子系統，也是 ZFS 作爲一個文件系統而言最關鍵的部分。&lt;/p&gt;
+&lt;p&gt;ZPL 的實現中直接使用了 ZAP 和 DMU 提供的抽象，比如每個 ZPL 文件用一個 DMU 對象表達，每個
+ZPL 目錄用一個 ZAP 對象表達，然後 DMU 對象集對應到 ZPL 下的一個文件系統。
+也就是說 ZPL 負責把操作系統 VFS 抽象層的那些文件系統操作接口，翻譯映射到基於 DMU 和 ZAP
+的抽象上。傳統 Unix 中的管道、套接字、軟鏈接之類的沒有什麼數據內容的東西則在 ZPL 直接用 dnode
+實現出來。 ZPL 也需要進一步實現文件權限、所有者、訪問日期、擴展屬性之類雜七雜八的文件系統功能。&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=456"&gt;在 ZFS First Mount by Mark Shellenbaum&lt;/a&gt;
+中介紹了很多在最初實現 ZPL 過程中的坎坷， ZPL 的困難之處在於需要兼容現有應用程序對傳統文件系統
+API 的使用方式，所以他們需要大量兼容性測試。視頻中講到非常有意思的一件事是， ZFS
+在設計時不想重複 Solaris UFS 設計中的很多缺陷，於是實現 VFS API 時有諸多取捨和再設計。
+其中他們遇到了 &lt;code class="code"&gt;
+VOP_RWLOCK&lt;/code&gt;
+ ，這個是 UFS 提供的文件級別讀寫鎖。對一些應用尤其是
+NFS 而言，文件讀寫鎖能保證應用層的一致性，而對另一些應用比如數據庫而言，
+文件鎖的粒度太大造成了性能問題。在設計 ZPL 的時候他們不想在 ZFS 中提供 &lt;code class="code"&gt;
+VOP_RWLOCK&lt;/code&gt;
+
+，這讓 NFS 開發者們很難辦（要記得 NFS 也是 Solaris 對 Unix 世界貢獻的一大發明）。
+最終 ZFS 把 DMU 的內部細節也暴露給了 NFS ，讓 NFS 基於 DMU 的對象創建時間（ TXG id
+）而不是文件鎖來保證 NFS 的一致性。結果是現在 ZFS 中也有照顧 NFS 的代碼，後來也加入了
+Samba/CIFS 的支持，從而在 ZFS 上設置 NFS export 時是通過 ZFS 的機制而非系統原生的 NFS
+export 機制。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="zfs"></category><category term="layered"></category><category term="architecture"></category><category term="SPA"></category><category term="DMU"></category><category term="ZPL"></category><category term="ZIO"></category><category term="VDEV"></category><category term="ARC"></category><category term="ZAP"></category><category term="DSL"></category><category term="ZIL"></category><category term="ZVOL"></category></entry><entry><title>和萌狼交換問題</title><link href="//farseerfc.me/question-exchange-horo.html" rel="alternate"></link><published>2020-01-05T17:51:00+09:00</published><updated>2020-01-05T17:51:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-01-05:/question-exchange-horo.html</id><summary type="html">&lt;p&gt;很抱歉萌狼很早就提過交換問題的事，被我一直咕咕了許久。 &lt;del&gt;拖延症晚期有藥麼&lt;/del&gt;&lt;/p&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;我的提問和萌狼的回答&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://blog.yoitsu.moe/life/question_exchange_farseerfc.html"&gt;可以去萌狼的博客上看呀&lt;/a&gt;&lt;/p&gt;
@@ -348,7 +1061,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
 我就能控制他的鍵盤了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils table borderless"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -376,7 +1089,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -398,7 +1111,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -412,7 +1125,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils table borderless"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -440,7 +1153,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -462,7 +1175,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -481,7 +1194,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -500,7 +1213,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -516,7 +1229,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -550,7 +1263,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -597,7 +1310,7 @@ Brandon Invergo 的博客採用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的點文件&lt;/h2&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -741,7 +1454,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -776,7 +1489,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -793,7 +1506,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -888,7 +1601,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然後接下來就是我承諾的翻譯了&lt;/h2&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -982,7 +1695,7 @@ Tivoization 是 FSF 發明的一個詞，表示 TiVo 的做法。 TiVo
 編制的軟件，從而限制了用戶修改運行軟件的自由。這種做法在 FSF 看來是鑽了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵這種做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1121,7 +1834,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 協議是一個開源軟件協議，和兩句的 BSD 協議功能相同。OpenBSD 項目選擇儘量用 ISC
 協議公開他們新寫的代碼。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -2480,7 +3193,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;經過以上設置之後，一切正常的話，每次對主 repo 推送更新的同時， Travis-CI 就會自動
-拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
+拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中顯示編譯狀態。&lt;/p&gt;
@@ -3031,7 +3744,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -3049,7 +3762,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table last docutils first borderless"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless last table docutils first"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -3065,7 +3778,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last docutils first borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless last table docutils first"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -3083,7 +3796,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="table last docutils first borderless"&gt;
+&lt;td&gt;&lt;table border="0" class="borderless last table docutils first"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -3110,7 +3823,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table last docutils first borderless"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless last table docutils first"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -3132,7 +3845,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last docutils first borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless last table docutils first"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -3332,7 +4045,7 @@ RELATIVE_URLS&lt;/code&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 PlantUML 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;img alt="uml diagram" class="img-responsive uml" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一個Java實現的，
@@ -4106,7 +4819,7 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -4423,7 +5136,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="docutils table borderless"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
