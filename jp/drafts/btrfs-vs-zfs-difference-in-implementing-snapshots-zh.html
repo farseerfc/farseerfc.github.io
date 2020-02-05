@@ -258,27 +258,24 @@ Farseerfcの巣            </a>
                         <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id9">子卷（subvolume）和快照（snapshot）的術語</a></li>
-<li><a class="reference internal" href="#id3" id="id10">於是子卷在存儲介質中是如何記錄的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id11">那麼快照又是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id10">子卷（subvolume）和快照（snapshot）的術語</a></li>
+<li><a class="reference internal" href="#id3" id="id11">於是子卷在存儲介質中是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id12">那麼快照又是如何記錄的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id13">ZFS 設計中和快照相關的一些術語和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id14">數據集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id15">文件系統（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id16">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id17">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id18">書籤（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id19">檢查點（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id13">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id14">ZFS 設計中和快照相關的一些術語和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id15">數據集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id16">文件系統（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id17">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id18">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id19">書籤（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id20">檢查點（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id20">ZFS 的概念與 btrfs 概念的對比</a></li>
-<li><a class="reference internal" href="#id6" id="id21">ZFS 中是如何存儲這些數據集的呢</a><ul>
-<li><a class="reference internal" href="#id7" id="id22">ZFS 的存儲格式概況</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id21">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#id6" id="id22">ZFS 中是如何存儲這些數據集的呢</a></li>
 </ul>
 </li>
 </ul>
@@ -309,7 +306,7 @@ Btrfs 的 reflink ）在另一邊沒有的情況。後來看到了
 只是自己的筆記，所有參閱的資料文檔都是二手資料，沒有深挖過源碼，還參雜了自己的理解，
 於是難免有和事實相違的地方，如有寫錯，還請留言糾正。</p>
 <div class="section" id="btrfs-subvolume-snapshot">
-<h2><a class="toc-backref" href="#id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
+<h2><a class="toc-backref" href="#id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
 <p>先從兩個文件系統中（表面上看起來）比較簡單的 btrfs 的子卷（subvolume）和快照（snapshot）說起。
 關於子卷和快照的常規用法、推薦佈局之類的話題就不細說了，網上能找到很多不錯的資料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 頁</a>
@@ -319,7 +316,7 @@ Btrfs 的 reflink ）在另一邊沒有的情況。後來看到了
 ，這裏不想再討論。這裏假設你用過 btrfs/zfs 至少一個的快照功能，知道它該怎麼用，
 並且想知道更多細節，判斷怎麼用那些功能才合理。</p>
 <div class="section" id="subvolume-snapshot">
-<h3><a class="toc-backref" href="#id9">子卷（subvolume）和快照（snapshot）的術語</a></h3>
+<h3><a class="toc-backref" href="#id10">子卷（subvolume）和快照（snapshot）的術語</a></h3>
 <p>在 btrfs 中，存在於存儲媒介中的只有「子卷」的概念，「快照」只是個創建「子卷」的方式，
 換句話說在 btrfs 的術語裏，子卷（subvolume）是個名詞，而快照（snapshot）是個動詞。
 如果脫離了 btrfs 術語的上下文，或者不精確地稱呼的時候，也經常有文檔把 btrfs
@@ -393,7 +390,7 @@ cp -r --reflink=always</code>
 用快照命令創建出的子卷就是共享一部分元數據。</p>
 </div>
 <div class="section" id="id3">
-<h3><a class="toc-backref" href="#id10">於是子卷在存儲介質中是如何記錄的呢？</a></h3>
+<h3><a class="toc-backref" href="#id11">於是子卷在存儲介質中是如何記錄的呢？</a></h3>
 <p>比如在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Flat">SysadminGuide 這頁的 Flat 佈局</a>
 有個子卷佈局的例子。</p>
 <pre class="code literal-block">
@@ -722,7 +719,7 @@ struct btrfs_inode_item</code>
 ROOT_TREE 中 object_id 爲 258 的子卷。</p>
 </div>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id11">那麼快照又是如何記錄的呢？</a></h3>
+<h3><a class="toc-backref" href="#id12">那麼快照又是如何記錄的呢？</a></h3>
 <p>以上是子卷、目錄、 inode 在 btrfs 中的記錄方式，你可能想知道，如何記錄一個快照呢？
 特別是，如果對一個包含子卷的子卷創建了快照，會得到什麼結果呢？如果我們在上面的佈局基礎上執行：</p>
 <pre class="code bash literal-block">
@@ -998,7 +995,7 @@ btrfs subvolume snapshot</code>
 </div>
 </div>
 <div class="section" id="zfs-filesystem-snapshot-clone">
-<h2><a class="toc-backref" href="#id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
+<h2><a class="toc-backref" href="#id13">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
 <p>Btrfs 給傳統文件系統只增加了子卷的概念，相比之下 ZFS 中類似子卷的概念有好幾個，據我所知有這些：</p>
 <ul class="simple">
 <li>數據集（dataset）</li>
@@ -1014,9 +1011,9 @@ btrfs subvolume snapshot</code>
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。</p>
 <div class="section" id="zfs">
-<h3><a class="toc-backref" href="#id13">ZFS 設計中和快照相關的一些術語和概念</a></h3>
+<h3><a class="toc-backref" href="#id14">ZFS 設計中和快照相關的一些術語和概念</a></h3>
 <div class="section" id="dataset">
-<h4><a class="toc-backref" href="#id14">數據集（dataset）</a></h4>
+<h4><a class="toc-backref" href="#id15">數據集（dataset）</a></h4>
 <p>ZFS 中把文件系統、快照、克隆、zvol 等概念統稱爲數據集（dataset）。
 一些文檔和介紹中把文件系統叫做數據集，大概因爲在 ZFS 中，文件系統是最先創建並且最有用的數據集。</p>
 <p>在 ZFS 的術語中，把底層管理和釋放存儲設備空間的叫做 ZFS 存儲池（pool），
@@ -1034,7 +1031,7 @@ pool_name/​dataset_path@snapshot_name</code>
 層。在 Btrfs 中可以用 loopback 塊設備某種程度上模擬 zvol 的功能。</p>
 </div>
 <div class="section" id="filesystem">
-<h4><a class="toc-backref" href="#id15">文件系統（filesystem）</a></h4>
+<h4><a class="toc-backref" href="#id16">文件系統（filesystem）</a></h4>
 <p>創建了 ZFS 存儲池後，首先要在其中創建文件系統（filesystem），才能在文件系統中存儲文件。
 容易看出 ZFS 文件系統的概念直接對應 btrfs 中的子卷。文件系統（filesystem）這個術語，
 從命名方式來看或許是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 這樣的）傳統的卷管理器
@@ -1051,7 +1048,7 @@ pool_name/​dataset_path@snapshot_name</code>
 <p>上面簡圖中 pool 裏面包含 3 個文件系統，分別是 fs1~3 。</p>
 </div>
 <div class="section" id="snapshot">
-<h4><a class="toc-backref" href="#id16">快照（snapshot）</a></h4>
+<h4><a class="toc-backref" href="#id17">快照（snapshot）</a></h4>
 <p>ZFS 的快照對應 btrfs 的只讀快照，是標記數據集在某一歷史時刻上的只讀狀態。
 和 btrfs 的只讀快照一樣， ZFS 的快照也兼作 send/receive 時的參考點。
 快照隸屬於一個數據集，這說明 ZFS 的文件系統或者 zvol 都可以創建快照。</p>
@@ -1079,7 +1076,7 @@ pool/​fs1@s2</code>
  的路徑直接訪問到 s1 中的內容。</p>
 </div>
 <div class="section" id="clone">
-<h4><a class="toc-backref" href="#id17">克隆（clone）</a></h4>
+<h4><a class="toc-backref" href="#id18">克隆（clone）</a></h4>
 <p>ZFS 的克隆有點像 btrfs 的可寫快照。因爲 ZFS 的快照是只讀的，如果想對快照做寫入，那需要先用
 <code class="code">
 zfs clone</code>
@@ -1094,7 +1091,7 @@ zfs promote</code>
 <p>比如上面簡圖中 fs1 有 c1 的克隆，它依賴於 s2 這個快照，從而 c1 存在的時候就不能刪除掉 s2 。</p>
 </div>
 <div class="section" id="bookmark">
-<h4><a class="toc-backref" href="#id18">書籤（bookmark）</a></h4>
+<h4><a class="toc-backref" href="#id19">書籤（bookmark）</a></h4>
 <p>這是 ZFS 一個比較新的特性，ZFS on Linux 分支從 v0.6.4 開始支持創建書籤的功能。</p>
 <p>書籤特性存在的理由是基於這樣的事實：原本 ZFS 在 send 兩個快照間的差異的時候，比如 send S1 和
 S2 之間的差異，在發送端實際上只需要 S1 中記錄的時間戳（TXG id），而不需要 S1 快照的數據，
@@ -1108,7 +1105,7 @@ S2 之間的差異，在發送端實際上只需要 S1 中記錄的時間戳（T
 有了書籤功能之後，每次將定期的新快照發送到服務器之後，就可以把這個快照轉化成書籤，節省存儲開銷。</p>
 </div>
 <div class="section" id="checkpoint">
-<h4><a class="toc-backref" href="#id19">檢查點（checkpoint）</a></h4>
+<h4><a class="toc-backref" href="#id20">檢查點（checkpoint）</a></h4>
 <p>這也是 ZFS 的新特性， ZFS on Linux 分支從 v0.8.0 開始支持創建檢查點。</p>
 <p>簡而言之，檢查點可以看作是整個存儲池級別的快照，使用檢查點能快速將整個存儲池都恢復到上一個狀態。
 這邊有篇文章介紹 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
@@ -1119,7 +1116,7 @@ degraded 狀態、不能 scrub 到當前存儲池中已經釋放而在檢查點�
 </div>
 </div>
 <div class="section" id="zfs-btrfs">
-<h3><a class="toc-backref" href="#id20">ZFS 的概念與 btrfs 概念的對比</a></h3>
+<h3><a class="toc-backref" href="#id21">ZFS 的概念與 btrfs 概念的對比</a></h3>
 <p>先說書籤和檢查點，因爲這是兩個 btrfs 目前完全沒有的功能。</p>
 <p>書籤功能完全圍繞 ZFS send 的工作原理，而 ZFS send 位於
 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#DSL">ZFS 設計中的 DSL</a>
@@ -1138,7 +1135,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="table docutils field-list" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1151,7 +1148,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="table docutils field-list" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1207,21 +1204,48 @@ cp --reflink=always</code>
 而在 zfs 中只能用普通 cp 複製，會浪費很多存儲空間。</p>
 </div>
 <div class="section" id="id6">
-<h3><a class="toc-backref" href="#id21">ZFS 中是如何存儲這些數據集的呢</a></h3>
-<p>要講到存儲細節，首先需要提一下 ZFS 的分層設計。不像 btrfs 基於現代 Linux
-內核，有許多現有文件系統已經實現好的基礎設施可以利用，並且大體上只用到一種核心數據結構（CoW的B樹）；
-ZFS 則脫胎於 Solaris 的野心勃勃，設計時就分成很多不同的子系統，逐步提升抽象層次，
-並且每個子系統都發明了許多特定需求下的數據結構來描述存儲的信息。</p>
-<p>ZFS 在設計之初背負了重構 Solaris 諸多內核子系統的重任，從而不同於 Linux 的文件系統
-只負責文件系統的功能而把其餘功能（比如內存髒頁管理，IO調度）交給內核更底層的子系統， ZFS
-的整體設計更層次化並更獨立，很多部分可能和 Linux 內核已有的子系統有功能重疊。
-而本文想講的只是 ZFS 中與快照相關的一些部分，於是先從 ZFS 的整體設計上說一下和快照相關的概念位於
-ZFS 設計中的什麼位置。</p>
-<p>和本文內容密切相關的是 ZPL 、 DSL、 DMU 這些 ZFS 子系統。</p>
-<div class="section" id="id7">
-<h4><a class="toc-backref" href="#id22">ZFS 的存儲格式概況</a></h4>
-<p>Sun 曾經寫過一篇 <a class="reference external" href="http://www.giis.co.in/Zfs_ondiskformat.pdf">ZFS 的 On disk format</a>
-對理解 ZFS 如何存儲在磁盤</p>
+<h3><a class="toc-backref" href="#id22">ZFS 中是如何存儲這些數據集的呢</a></h3>
+<p>要講到存儲細節，首先需要 瞭解一下 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html">ZFS 的分層設計</a>
+。不像 btrfs 基於現代 Linux 內核，有許多現有文件系統已經實現好的基礎設施可以利用，
+並且大體上只用到一種核心數據結構（CoW的B樹）； ZFS 則脫胎於 Solaris 的野心勃勃，
+設計時就分成很多不同的子系統，逐步提升抽象層次，
+並且每個子系統都發明了許多特定需求下的數據結構來描述存儲的信息。 在這裏和本文內容密切相關的是
+<a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#zpl">ZPL</a> 、 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#DSL">DSL</a> 、 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zh.html#dmu">DMU</a> 這些 ZFS 子系統。</p>
+<p>Sun 曾經寫過一篇 ZFS 的 <a class="reference external" href="http://www.giis.co.in/Zfs_ondiskformat.pdf">On disk format</a>
+對理解 ZFS 如何存儲在磁盤上很有幫助，雖然這篇文檔是針對 Sun 還在的時候 Solaris 的 ZFS
+，現在 ZFS 的內部已經變化挺大，不過對於理解本文想講的快照的實現方式還具有參考意義。這裏藉助這篇
+ZFS On Disk Format 中的一些圖示來解釋 ZFS 在磁盤上的存儲方式。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="//farseerfc.me/jp/images/zfs-block-pointer.svg">ZFS 中用的 128 字節塊指針</a></div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/jp/images/zfs-block-pointer.svg" type="image/svg+xml">
+zfs-block-pointer.svg</object>
+</div>
+</div>
+<p>要理解 ZFS 的磁盤結構首先想介紹一下 ZFS 中的塊指針（block pointer），結構如右圖所示。
+ZFS 的塊指針用在 ZFS 的許多數據結構之中，當需要從一個地方指向任意另一個地址的時候都會
+插入這樣的一個塊指針結構。大多數文件系統中也有類似的指針結構，比如 btrfs
+中有個8字節大小的邏輯地址（logical address），一般也就是個 4字節 到 16字節
+大小的整數寫着扇區號、塊號或者字節偏移，在 ZFS 中的塊指針則是一個巨大的128字節（不是
+128bit !）的結構體。</p>
+<p>128字節塊指針的開頭是3個數據虛擬地址（DVA, Data Virtual Address），每個 DVA 是 128bit
+，其中記錄這塊數據在什麼設備（vdev）的什麼偏移（offset）上佔用多大（asize)，有 3個
+DVA 槽是用來存儲最多3個不同位置的副本。然後塊指針還記錄了這個塊用什麼校驗算法（ cksum
+）和什麼壓縮算法（comp），壓縮前後的大小（PSIZE/LSIZE），以及256bit的校驗和（checksum）。</p>
+<p>當需要間接塊（indirect block）時，塊指針中記錄了間接塊的層數（lvl），和下層塊指針的數量（fill）。
+一個間接塊就是一個數據塊中包含一個塊指針的數組，當引用的對象很大需要很多塊時，間接塊構成一棵樹狀結構。</p>
+<p>塊指針中還有和本文關係很大的一個值 birth txg ，記錄這個塊指針誕生時的整個 pool 的 TXG id
+。一次 TXG 提交中寫入的數據塊都會有相同的 birth txg ，這個相當於 btrfs 中 generation 的概念。
+實際上現在的 ZFS 塊指針似乎記錄了兩個 birth txg ，分別在圖中的9行和a行的位置，
+<a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSBlockPointers">一個 physical 一個 logical ，用於 dedup 和 device removal</a>。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="//farseerfc.me/jp/images/zfs-metaobjectset.svg">ZFS Meta Object Set</a></div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/jp/images/zfs-metaobjectset.svg" type="image/svg+xml">
+zfs-metaobjectset.svg</object>
+</div>
 </div>
 </div>
 </div>
@@ -1244,7 +1268,7 @@ ZFS 設計中的什麼位置。</p>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7fa22a9b0390> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f2760888ed0> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1493,27 +1517,24 @@ farseerfc に連絡</a>
             <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id8">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id9">子卷（subvolume）和快照（snapshot）的術語</a></li>
-<li><a class="reference internal" href="#id3" id="id10">於是子卷在存儲介質中是如何記錄的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id11">那麼快照又是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id10">子卷（subvolume）和快照（snapshot）的術語</a></li>
+<li><a class="reference internal" href="#id3" id="id11">於是子卷在存儲介質中是如何記錄的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id12">那麼快照又是如何記錄的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id12">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id13">ZFS 設計中和快照相關的一些術語和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id14">數據集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id15">文件系統（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id16">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id17">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id18">書籤（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id19">檢查點（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id13">ZFS 的文件系統（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id14">ZFS 設計中和快照相關的一些術語和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id15">數據集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id16">文件系統（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id17">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id18">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id19">書籤（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id20">檢查點（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id20">ZFS 的概念與 btrfs 概念的對比</a></li>
-<li><a class="reference internal" href="#id6" id="id21">ZFS 中是如何存儲這些數據集的呢</a><ul>
-<li><a class="reference internal" href="#id7" id="id22">ZFS 的存儲格式概況</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id21">ZFS 的概念與 btrfs 概念的對比</a></li>
+<li><a class="reference internal" href="#id6" id="id22">ZFS 中是如何存儲這些數據集的呢</a></li>
 </ul>
 </li>
 </ul>
