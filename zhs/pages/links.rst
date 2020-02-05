@@ -191,3 +191,10 @@
 	:logo: https://avatars3.githubusercontent.com/u/31200881
 
 	把 pacvis 移植到了 Debian 系统上做了 `AptVis <https://melty.land/blog/apt-vis/>`_ ，博客是基于 MDC 的，看起来很漂亮。
+
+.. friend:: szclsya
+	:nick: `szclsya Leo Shen <https://szclsya.me/>`_
+	:logo: https://avatars1.githubusercontent.com/u/10810336
+
+	Leo Shen 的 Hugo 博客，还有个 szclsya 的 nick :del:`似乎还没写什么东西` 每篇都有英语和中文两种呢。似乎也是 AOSC 常客，是 Emacs 用户。
+
