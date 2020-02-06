@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink,SPA,DMU,DSL,ZPL" />
-        <meta name="description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」。或许（在存储领域人尽皆知而在领域外）鲜有人知，在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的 论文 和 发表幻灯片 …" />
+        <meta name="description" content="zfs 这个东西倒是名不符实。叫 z storage stack 明显更符合。 叫 fs 但不做 fs 自然确实会和 btrfs 有很大出入。 我反而以前还好奇为什么 btrfs 不弄 zvol ， 直到我意识到这东西真是一个 fs ，名符奇实。 —— 某不愿透露姓名的 Ext2FSD 开发者 Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Btrfs vs ZFS 实现 snapshot 的差异"/>
         <meta property="og:url" content="//farseerfc.me/jp/zhs/drafts/btrfs-vs-zfs-difference-in-implementing-snapshots.html"/>
-        <meta property="og:description" content="Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」。或许（在存储领域人尽皆知而在领域外）鲜有人知，在 ZFS 之前就有 NetApp 的商业产品 WAFL(Write Anywhere File Layout) 实现了 CoW 语义的文件系统，并且集成了快照和卷管理之类的功能。描述 btrfs 原型设计的 论文 和 发表幻灯片 …"/>
+        <meta property="og:description" content="zfs 这个东西倒是名不符实。叫 z storage stack 明显更符合。 叫 fs 但不做 fs 自然确实会和 btrfs 有很大出入。 我反而以前还好奇为什么 btrfs 不弄 zvol ， 直到我意识到这东西真是一个 fs ，名符奇实。 —— 某不愿透露姓名的 Ext2FSD 开发者 Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs 只是 Linux/GPL 阵营对 ZFS …"/>
         <meta property="article:published_time" content="2020-01-01" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="btrfs" />
@@ -258,24 +258,32 @@ Farseerfcの巣            </a>
                         <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id10">子卷（subvolume）和快照（snapshot）的术语</a></li>
-<li><a class="reference internal" href="#id3" id="id11">于是子卷在存储介质中是如何记录的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id12">那么快照又是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id12">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id13">子卷（subvolume）和快照（snapshot）的术语</a></li>
+<li><a class="reference internal" href="#id3" id="id14">于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id15">那么快照又是如何记录的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id13">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id14">ZFS 设计中和快照相关的一些术语和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id15">数据集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id16">文件系统（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id17">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id18">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id19">书签（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id20">检查点（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id16">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id17">ZFS 设计中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id18">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id19">文件系统（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id20">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id21">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id22">书签（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id23">检查点（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id21">ZFS 的概念与 btrfs 概念的对比</a></li>
-<li><a class="reference internal" href="#id6" id="id22">ZFS 中是如何存储这些数据集的呢</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id24">ZFS 的概念与 btrfs 概念的对比</a></li>
+<li><a class="reference internal" href="#id6" id="id25">ZFS 中是如何存储这些数据集的呢</a><ul>
+<li><a class="reference internal" href="#zfs-block-pointer" id="id26">ZFS 的块指针（block pointer）</a></li>
+<li><a class="reference internal" href="#zpl-mos-meta-object-set" id="id27">ZPL 的元对象集（MOS, Meta Object Set）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id28">咦，创建快照这么简单么？那么删除快照呢？</a><ul>
+<li><a class="reference internal" href="#garbage-collection" id="id29">日志结构文件系统中用的垃圾回收（Garbage Collection）算法</a></li>
 </ul>
 </li>
 </ul>
@@ -283,6 +291,14 @@ Farseerfcの巣            </a>
                         </div>
                     </div>
                 
+<!-- -->
+<blockquote>
+<div class="line-block">
+<div class="line">zfs 这个东西倒是名不符实。叫 z storage stack 明显更符合。 叫 fs 但不做 fs 自然确实会和 btrfs 有很大出入。</div>
+<div class="line">我反而以前还好奇为什么 btrfs 不弄 zvol ， 直到我意识到这东西真是一个 fs ，名符奇实。</div>
+<div class="line">—— 某不愿透露姓名的 Ext2FSD 开发者</div>
+</div>
+</blockquote>
 <p>Btrfs 和 ZFS 都是开源的写时拷贝（Copy on Write, CoW）文件系统，都提供了相似的子卷管理和
 快照(snapshot）的功能。网上有不少文章都评价 ZFS 实现 CoW FS 的创新之处，进而想说「 Btrfs
 只是 Linux/GPL 阵营对 ZFS 的拙劣抄袭」。或许（在存储领域人尽皆知而在领域外）鲜有人知，在
@@ -306,7 +322,7 @@ Btrfs 的 reflink ）在另一边没有的情况。后来看到了
 只是自己的笔记，所有参阅的资料文档都是二手资料，没有深挖过源码，还参杂了自己的理解，
 于是难免有和事实相违的地方，如有写错，还请留言纠正。</p>
 <div class="section" id="btrfs-subvolume-snapshot">
-<h2><a class="toc-backref" href="#id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
+<h2><a class="toc-backref" href="#id12">Btrfs 的子卷（subvolume）和快照（snapshot）</a></h2>
 <p>先从两个文件系统中（表面上看起来）比较简单的 btrfs 的子卷（subvolume）和快照（snapshot）说起。
 关于子卷和快照的常规用法、推荐布局之类的话题就不细说了，网上能找到很多不错的资料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 页</a>
@@ -316,7 +332,7 @@ Btrfs 的 reflink ）在另一边没有的情况。后来看到了
 ，这里不想再讨论。这里假设你用过 btrfs/zfs 至少一个的快照功能，知道它该怎么用，
 并且想知道更多细节，判断怎么用那些功能才合理。</p>
 <div class="section" id="subvolume-snapshot">
-<h3><a class="toc-backref" href="#id10">子卷（subvolume）和快照（snapshot）的术语</a></h3>
+<h3><a class="toc-backref" href="#id13">子卷（subvolume）和快照（snapshot）的术语</a></h3>
 <p>在 btrfs 中，存在于存储媒介中的只有「子卷」的概念，「快照」只是个创建「子卷」的方式，
 换句话说在 btrfs 的术语里，子卷（subvolume）是个名词，而快照（snapshot）是个动词。
 如果脱离了 btrfs 术语的上下文，或者不精确地称呼的时候，也经常有文档把 btrfs
@@ -390,7 +406,7 @@ cp -r --reflink=always</code>
 用快照命令创建出的子卷就是共享一部分元数据。</p>
 </div>
 <div class="section" id="id3">
-<h3><a class="toc-backref" href="#id11">于是子卷在存储介质中是如何记录的呢？</a></h3>
+<h3><a class="toc-backref" href="#id14">于是子卷在存储介质中是如何记录的呢？</a></h3>
 <p>比如在 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Flat">SysadminGuide 这页的 Flat 布局</a>
 有个子卷布局的例子。</p>
 <pre class="code literal-block">
@@ -719,7 +735,7 @@ struct btrfs_inode_item</code>
 ROOT_TREE 中 object_id 为 258 的子卷。</p>
 </div>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id12">那么快照又是如何记录的呢？</a></h3>
+<h3><a class="toc-backref" href="#id15">那么快照又是如何记录的呢？</a></h3>
 <p>以上是子卷、目录、 inode 在 btrfs 中的记录方式，你可能想知道，如何记录一个快照呢？
 特别是，如果对一个包含子卷的子卷创建了快照，会得到什么结果呢？如果我们在上面的布局基础上执行：</p>
 <pre class="code bash literal-block">
@@ -995,7 +1011,7 @@ btrfs subvolume snapshot</code>
 </div>
 </div>
 <div class="section" id="zfs-filesystem-snapshot-clone">
-<h2><a class="toc-backref" href="#id13">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
+<h2><a class="toc-backref" href="#id16">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a></h2>
 <p>Btrfs 给传统文件系统只增加了子卷的概念，相比之下 ZFS 中类似子卷的概念有好几个，据我所知有这些：</p>
 <ul class="simple">
 <li>数据集（dataset）</li>
@@ -1006,14 +1022,14 @@ btrfs subvolume snapshot</code>
 <li>检查点（checkpoint）：从 ZFS on Linux v0.8.0 开始</li>
 </ul>
 <p>梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上图中，假设我们有一个 pool ，其中有 3 个文件系统叫 fs1~fs3 和一个 zvol 叫 zv1
 ，然后文件系统 fs1 有两个快照 s1 和 s2 ，和两个书签 b1 和 b2。pool 整体有两个检查点 cp1 和
 cp2 。这个简图将作为例子在后面介绍这些概念。</p>
 <div class="section" id="zfs">
-<h3><a class="toc-backref" href="#id14">ZFS 设计中和快照相关的一些术语和概念</a></h3>
+<h3><a class="toc-backref" href="#id17">ZFS 设计中和快照相关的一些术语和概念</a></h3>
 <div class="section" id="dataset">
-<h4><a class="toc-backref" href="#id15">数据集（dataset）</a></h4>
+<h4><a class="toc-backref" href="#id18">数据集（dataset）</a></h4>
 <p>ZFS 中把文件系统、快照、克隆、zvol 等概念统称为数据集（dataset）。
 一些文档和介绍中把文件系统叫做数据集，大概因为在 ZFS 中，文件系统是最先创建并且最有用的数据集。</p>
 <p>在 ZFS 的术语中，把底层管理和释放存储设备空间的叫做 ZFS 存储池（pool），
@@ -1031,7 +1047,7 @@ pool_name/​dataset_path@snapshot_name</code>
 层。在 Btrfs 中可以用 loopback 块设备某种程度上模拟 zvol 的功能。</p>
 </div>
 <div class="section" id="filesystem">
-<h4><a class="toc-backref" href="#id16">文件系统（filesystem）</a></h4>
+<h4><a class="toc-backref" href="#id19">文件系统（filesystem）</a></h4>
 <p>创建了 ZFS 存储池后，首先要在其中创建文件系统（filesystem），才能在文件系统中存储文件。
 容易看出 ZFS 文件系统的概念直接对应 btrfs 中的子卷。文件系统（filesystem）这个术语，
 从命名方式来看或许是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 这样的）传统的卷管理器
@@ -1048,7 +1064,7 @@ pool_name/​dataset_path@snapshot_name</code>
 <p>上面简图中 pool 里面包含 3 个文件系统，分别是 fs1~3 。</p>
 </div>
 <div class="section" id="snapshot">
-<h4><a class="toc-backref" href="#id17">快照（snapshot）</a></h4>
+<h4><a class="toc-backref" href="#id20">快照（snapshot）</a></h4>
 <p>ZFS 的快照对应 btrfs 的只读快照，是标记数据集在某一历史时刻上的只读状态。
 和 btrfs 的只读快照一样， ZFS 的快照也兼作 send/receive 时的参考点。
 快照隶属于一个数据集，这说明 ZFS 的文件系统或者 zvol 都可以创建快照。</p>
@@ -1076,7 +1092,7 @@ pool/​fs1@s2</code>
  的路径直接访问到 s1 中的内容。</p>
 </div>
 <div class="section" id="clone">
-<h4><a class="toc-backref" href="#id18">克隆（clone）</a></h4>
+<h4><a class="toc-backref" href="#id21">克隆（clone）</a></h4>
 <p>ZFS 的克隆有点像 btrfs 的可写快照。因为 ZFS 的快照是只读的，如果想对快照做写入，那需要先用
 <code class="code">
 zfs clone</code>
@@ -1091,7 +1107,7 @@ zfs promote</code>
 <p>比如上面简图中 fs1 有 c1 的克隆，它依赖于 s2 这个快照，从而 c1 存在的时候就不能删除掉 s2 。</p>
 </div>
 <div class="section" id="bookmark">
-<h4><a class="toc-backref" href="#id19">书签（bookmark）</a></h4>
+<h4><a class="toc-backref" href="#id22">书签（bookmark）</a></h4>
 <p>这是 ZFS 一个比较新的特性，ZFS on Linux 分支从 v0.6.4 开始支持创建书签的功能。</p>
 <p>书签特性存在的理由是基于这样的事实：原本 ZFS 在 send 两个快照间的差异的时候，比如 send S1 和
 S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（TXG id），而不需要 S1 快照的数据，
@@ -1105,7 +1121,7 @@ S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（T
 有了书签功能之后，每次将定期的新快照发送到服务器之后，就可以把这个快照转化成书签，节省存储开销。</p>
 </div>
 <div class="section" id="checkpoint">
-<h4><a class="toc-backref" href="#id20">检查点（checkpoint）</a></h4>
+<h4><a class="toc-backref" href="#id23">检查点（checkpoint）</a></h4>
 <p>这也是 ZFS 的新特性， ZFS on Linux 分支从 v0.8.0 开始支持创建检查点。</p>
 <p>简而言之，检查点可以看作是整个存储池级别的快照，使用检查点能快速将整个存储池都恢复到上一个状态。
 这边有篇文章介绍 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
@@ -1116,7 +1132,7 @@ degraded 状态、不能 scrub 到当前存储池中已经释放而在检查点�
 </div>
 </div>
 <div class="section" id="zfs-btrfs">
-<h3><a class="toc-backref" href="#id21">ZFS 的概念与 btrfs 概念的对比</a></h3>
+<h3><a class="toc-backref" href="#id24">ZFS 的概念与 btrfs 概念的对比</a></h3>
 <p>先说书签和检查点，因为这是两个 btrfs 目前完全没有的功能。</p>
 <p>书签功能完全围绕 ZFS send 的工作原理，而 ZFS send 位于
 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zhs.html#DSL">ZFS 设计中的 DSL</a>
@@ -1204,7 +1220,7 @@ cp --reflink=always</code>
 而在 zfs 中只能用普通 cp 复制，会浪费很多存储空间。</p>
 </div>
 <div class="section" id="id6">
-<h3><a class="toc-backref" href="#id22">ZFS 中是如何存储这些数据集的呢</a></h3>
+<h3><a class="toc-backref" href="#id25">ZFS 中是如何存储这些数据集的呢</a></h3>
 <p>要讲到存储细节，首先需要 了解一下 <a class="reference external" href="//farseerfc.me/jp/zfs-layered-architecture-design-zhs.html">ZFS 的分层设计</a>
 。不像 btrfs 基于现代 Linux 内核，有许多现有文件系统已经实现好的基础设施可以利用，
 并且大体上只用到一种核心数据结构（CoW的B树）； ZFS 则脱胎于 Solaris 的野心勃勃，
@@ -1215,6 +1231,8 @@ cp --reflink=always</code>
 对理解 ZFS 如何存储在磁盘上很有帮助，虽然这篇文档是针对 Sun 还在的时候 Solaris 的 ZFS
 ，现在 ZFS 的内部已经变化挺大，不过对于理解本文想讲的快照的实现方式还具有参考意义。这里借助这篇
 ZFS On Disk Format 中的一些图示来解释 ZFS 在磁盘上的存储方式。</p>
+<div class="section" id="zfs-block-pointer">
+<h4><a class="toc-backref" href="#id26">ZFS 的块指针（block pointer）</a></h4>
 <div class="panel panel-default">
 <div class="panel-heading">
 <a class="reference external" href="//farseerfc.me/jp/images/zfs-block-pointer.svg">ZFS 中用的 128 字节块指针</a></div>
@@ -1223,8 +1241,10 @@ ZFS On Disk Format 中的一些图示来解释 ZFS 在磁盘上的存储方式�
 zfs-block-pointer.svg</object>
 </div>
 </div>
-<p>要理解 ZFS 的磁盘结构首先想介绍一下 ZFS 中的块指针（block pointer），结构如右图所示。
-ZFS 的块指针用在 ZFS 的许多数据结构之中，当需要从一个地方指向任意另一个地址的时候都会
+<p>要理解 ZFS 的磁盘结构首先想介绍一下 ZFS 中的块指针（block pointer, <code class="code">
+blkptr_t</code>
+
+），结构如右图所示。 ZFS 的块指针用在 ZFS 的许多数据结构之中，当需要从一个地方指向任意另一个地址的时候都会
 插入这样的一个块指针结构。大多数文件系统中也有类似的指针结构，比如 btrfs
 中有个8字节大小的逻辑地址（logical address），一般也就是个 4字节 到 16字节
 大小的整数写着扇区号、块号或者字节偏移，在 ZFS 中的块指针则是一个巨大的128字节（不是
@@ -1238,18 +1258,288 @@ DVA 槽是用来存储最多3个不同位置的副本。然后块指针还记录
 <p>块指针中还有和本文关系很大的一个值 birth txg ，记录这个块指针诞生时的整个 pool 的 TXG id
 。一次 TXG 提交中写入的数据块都会有相同的 birth txg ，这个相当于 btrfs 中 generation 的概念。
 实际上现在的 ZFS 块指针似乎记录了两个 birth txg ，分别在图中的9行和a行的位置，
-<a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSBlockPointers">一个 physical 一个 logical ，用于 dedup 和 device removal</a>。</p>
+<a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSBlockPointers">一个 physical 一个 logical ，用于 dedup 和 device removal</a>
+。值得注意的是块指针里只有 birth txg ，没有引用计数或者别的机制做引用，这对后面要讲的东西很关键。</p>
+</div>
+<div class="section" id="zpl-mos-meta-object-set">
+<h4><a class="toc-backref" href="#id27">ZPL 的元对象集（MOS, Meta Object Set）</a></h4>
+<p>理解块指针和 ZFS 的子系统层级之后，就可以来看看 ZFS 存储在磁盘上的具体结构了。
+因为涉及的数据结构种类比较多，所以先来画一张逻辑上的简图，其中箭头只是某种引用关系不代表块指针，
+方框也不是结构体细节：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: zfs_layout_simple Pages: 1 -->
+<svg class="svg-responsive" height="262pt" viewbox="0.00 0.00 1128.00 262.00" width="1128pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 258)">
+<title>zfs_layout_simple</title>
+<polygon fill="#ffffff" points="-4,4 -4,-258 1124,-258 1124,4 -4,4" stroke="transparent"></polygon>
+<!-- uberblock -->
+<g class="node" id="node1">
+<title>uberblock</title>
+<polygon fill="none" points="0,-184.5 0,-253.5 114,-253.5 114,-184.5 0,-184.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="57" y="-238.3">UBERBLOCK</text>
+<polyline fill="none" points="0,-230.5 114,-230.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="57" y="-215.3">...</text>
+<polyline fill="none" points="0,-207.5 114,-207.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="57" y="-192.3">mos_blkptr</text>
+</g>
+<!-- mos -->
+<g class="node" id="node2">
+<title>mos</title>
+<polygon fill="none" points="186,-115 186,-207 320,-207 320,-115 186,-115" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="253" y="-191.8">Meta Object Set</text>
+<polyline fill="none" points="186,-184 320,-184 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="253" y="-168.8">root dataset</text>
+<polyline fill="none" points="186,-161 320,-161 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="253" y="-145.8">config</text>
+<polyline fill="none" points="186,-138 320,-138 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="253" y="-122.8">...</text>
+</g>
+<!-- uberblock&#45;&gt;mos -->
+<g class="edge" id="edge1">
+<title>uberblock:ub_rootbp-&gt;mos:mos_label</title>
+<path d="M114,-196C142.375,-196 151.8795,-196 175.9792,-196" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="176,-199.5001 186,-196 176,-192.5001 176,-199.5001" stroke="#000000"></polygon>
+</g>
+<!-- root_dataset -->
+<g class="node" id="node3">
+<title>root_dataset</title>
+<polygon fill="none" points="392,-92 392,-184 541,-184 541,-92 392,-92" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="466.5" y="-168.8">ROOT dataset</text>
+<polyline fill="none" points="392,-161 541,-161 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="466.5" y="-145.8">dataset1 directory</text>
+<polyline fill="none" points="392,-138 541,-138 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="466.5" y="-122.8">dataset2 directory</text>
+<polyline fill="none" points="392,-115 541,-115 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="466.5" y="-99.8">...</text>
+</g>
+<!-- mos&#45;&gt;root_dataset -->
+<g class="edge" id="edge2">
+<title>mos:mos_root_dataset-&gt;root_dataset:rd_label</title>
+<path d="M320,-173C348.375,-173 357.8795,-173 381.9792,-173" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="382,-176.5001 392,-173 382,-169.5001 382,-176.5001" stroke="#000000"></polygon>
+</g>
+<!-- ds1_directory -->
+<g class="node" id="node4">
+<title>ds1_directory</title>
+<polygon fill="none" points="613,-.5 613,-161.5 805,-161.5 805,-.5 613,-.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-146.3">DSL Directory</text>
+<polyline fill="none" points="613,-138.5 805,-138.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-123.3">ds1 property ZAP object</text>
+<polyline fill="none" points="613,-115.5 805,-115.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-100.3">ds1 child ZAP object</text>
+<polyline fill="none" points="613,-92.5 805,-92.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-77.3">ds1 dataset (active)</text>
+<polyline fill="none" points="613,-69.5 805,-69.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-54.3">ds1 snapshot1</text>
+<polyline fill="none" points="613,-46.5 805,-46.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-31.3">ds1 snapshot2</text>
+<polyline fill="none" points="613,-23.5 805,-23.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="709" y="-8.3">...</text>
+</g>
+<!-- root_dataset&#45;&gt;ds1_directory -->
+<g class="edge" id="edge3">
+<title>root_dataset:rd_ds1-&gt;ds1_directory:ds1_label</title>
+<path d="M541,-150C569.375,-150 578.8795,-150 602.9792,-150" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="603,-153.5001 613,-150 603,-146.5001 603,-153.5001" stroke="#000000"></polygon>
+</g>
+<!-- ds1_dataset -->
+<g class="node" id="node5">
+<title>ds1_dataset</title>
+<polygon fill="none" points="916,-67 916,-113 1081,-113 1081,-67 916,-67" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="998.5" y="-97.8">ds1 DMU Object Set</text>
+<polyline fill="none" points="916,-90 1081,-90 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="998.5" y="-74.8">...</text>
+</g>
+<!-- ds1_directory&#45;&gt;ds1_dataset -->
+<g class="edge" id="edge4">
+<title>ds1_directory:ds1_dataset-&gt;ds1_dataset:ds1_ds_label</title>
+<path d="M805,-81C851.3776,-81 863.7833,-99.0745 905.2509,-101.6868" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="905.3977,-105.1929 915.5,-102 905.6116,-98.1961 905.3977,-105.1929" stroke="#000000"></polygon>
+</g>
+<!-- ds1_snapshot1 -->
+<g class="node" id="node6">
+<title>ds1_snapshot1</title>
+<polygon fill="none" points="877,-2 877,-48 1120,-48 1120,-2 877,-2" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="998.5" y="-32.8">ds1 snapshot1 DMU Object Set</text>
+<polyline fill="none" points="877,-25 1120,-25 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="998.5" y="-9.8">...</text>
+</g>
+<!-- ds1_directory&#45;&gt;ds1_snapshot1 -->
+<g class="edge" id="edge5">
+<title>ds1_directory:ds1_s1-&gt;ds1_snapshot1:ds1_s1_label</title>
+<path d="M805,-58C834.6875,-58 842.165,-41.3425 866.9941,-37.6987" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="867.2681,-41.1882 877,-37 866.7804,-34.2052 867.2681,-41.1882" stroke="#000000"></polygon>
+</g>
+</g>
+</svg>
+<p>如上简图所示，首先 ZFS pool 级别有个 uberblock ，具体每个 vdev 如何存储和找到这个 uberblock
+今后有空再聊，这里认为整个 zpool 有唯一的一个 uberblock 。从 uberblock 有个指针指向
+Meta Object Set ，它是个 DMU 的对象集，它包含整个 pool 的一些配置信息，和根数据集（root dataset）。
+根数据集再包含整个 pool 中保存的所有顶层数据集，每个数据集有一个 DSL Directory 结构。
+然后从每个数据集的 DSL Directory 可以找到一系列子数据集和一系列快照等结构。最后每个数据集有个 active
+的 DMU 对象集，这是整个文件系统的当前写入点，每个快照也指向一个各自的 DMU 对象集。</p>
+<p>DSL 层的每个数据集的逻辑结构也可以用下面的图表达（来自 ZFS On Disk Format ）：</p>
+<div class="figure">
+<object class="embed-responsive-item" data="//farseerfc.me/jp/images/zfs-dsl-infrastructure.svg" type="image/svg+xml">
+zfs-dsl-infrastructure.svg</object>
+<p class="caption">ZFS On Disk Format 中 4.1 节的 DSL infrastructure</p>
+</div>
 <div class="panel panel-default">
 <div class="panel-heading">
-<a class="reference external" href="//farseerfc.me/jp/images/zfs-metaobjectset.svg">ZFS Meta Object Set</a></div>
+<a class="reference external" href="//farseerfc.me/jp/images/zfs-metaobjectset.svg">ZFS On Disk Format 中 4.2 节的 Meta Object Set</a></div>
 <div class="panel-body">
 <object class="embed-responsive-item" data="//farseerfc.me/jp/images/zfs-metaobjectset.svg" type="image/svg+xml">
 zfs-metaobjectset.svg</object>
 </div>
 </div>
+<p>需要记得 ZFS 中没有类似 btrfs 的 CoW b-tree 这样的统一数据结构，所以上面的这些设施是用各种不同的数据结构表达的。
+尤其每个 Directory 的结构可以包含一个 ZAP 的键值对存储，和一个 DMU 对象。
+可以理解为， DSL 用 DMU 对象集（Objectset）表示一个整数（uinit64_t 的 dnode）到 DMU 对象的映射，
+然后用 ZAP 对象表示一个名字到整数的映射，然后又有很多额外的存储于 DMU 对象中的 DSL 结构体。
+如果我们画出不同的指针和不同的结构体，那么会得到一个稍显复杂的图，见右边「ZFS
+On Disk Format 中 4.2 节的 Meta Object Set」，图中还只画到了 root_dataset 为止。</p>
+<p>看到这里，大概可以理解在 ZFS 中创建一个 ZFS 快照的操作其实很简单：找到数据集的 DSL Directory
+中当前 active 的 DMU 对象集指针，创建一个表示 snapshot 的 DSL dataset 结构，指向那个
+DMU 对象集，然后快照就建好了。因为今后对 active 的写入会写时复制对应的 DMU 对象集，所以
+snapshot 指向的 DMU 对象集不会变化。</p>
 </div>
 </div>
+</div>
+<div class="section" id="id9">
+<h2><a class="toc-backref" href="#id28">咦，创建快照这么简单么？那么删除快照呢？</a></h2>
+<p>按上面的存储格式细节来看， btrfs 和 zfs 中创建快照似乎都挺简单的，利用写时拷贝，创建快照本身没什么复杂操作。</p>
+<p>如果你也听到过别人介绍 CoW 文件系统时这么讲，是不是会觉得似乎哪儿少了点什么。创建快照是挺简单的，
+<strong>直到你开始考虑如何删除快照</strong> ……</p>
+<p>或者不局限在删除单个快照上， CoW 文件系统因为写时拷贝，每修改一个文件内容或者修改一个文件系统结构，
+都是分配新数据块，然后考虑是否要删除这个数据替换的老数据块，此时如何决定老数据块能不能删呢？
+删除快照的时候也是同样，快照是和别的文件系统有共享一部分数据和元数据的，
+所以显然不能把快照引用到的数据块都直接删掉，要考察快照引用的数据块是否还在别的地方被引用着，
+只能删除那些没有被引用的数据。</p>
+<p>深究「如何删快照」这个问题，就能看出 WAFL 、 btrfs 、 ZFS 甚至别的 log-structured
+文件系统间的关键区别，从而也能看到另一个问题的答案：
+<strong>为什么 btrfs 只需要子卷的抽象，而 zfs 搞出了这么多抽象概念？</strong>
+带着这两个疑问，我们来研究一下这些文件系统的块删除算法。</p>
+<div class="section" id="garbage-collection">
+<h3><a class="toc-backref" href="#id29">日志结构文件系统中用的垃圾回收（Garbage Collection）算法</a></h3>
+<p>讲 btrfs 和 zfs 用到的删除算法之前，先讲一下日志结构（log-structured）文件系统中的 GC 算法。
+对熟悉编程的人来说，讲到空间释放算法，大概首先会想到 GC ，因为这里要解决的问题乍看起来很像
+编程语言的内存管理中 GC 想要解决的问题：有很多指针相互指向很多数据结构，找其中没有被引用的垃圾然后释放掉。</p>
+<p>首先要澄清一下 <a class="reference external" href="https://en.wikipedia.org/wiki/Log-structured_file_system">日志结构文件系统（log-structured file system）</a>
+的定义，因为有很多文件系统用日志，而用了日志的不一定是日志结构文件系统。
+在维基百科上有个页面介绍 <a class="reference external" href="https://en.wikipedia.org/wiki/Log-structured_file_system">日志结构文件系统</a>
+，还有个 <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_log-structured_file_systems">列表列出了一些日志结构文件系统</a>
+。通常说，整个文件系统的存储结构都组织成一个大日志的样子，就说这个文件系统是日志结构的，
+这包括很多早期学术研究的文件系统，以及目前 <a class="reference external" href="https://en.wikipedia.org/wiki/Log-structured_File_System_(BSD)">NetBSD 的 LFS</a>
+、Linux 的 <a class="reference external" href="https://en.wikipedia.org/wiki/NILFS">NILFS</a>
+，用在光盘介质上的 <a class="reference external" href="https://en.wikipedia.org/wiki/Universal_Disk_Format">UDF</a>
+，还有一些专门为闪存优化的 <a class="reference external" href="https://en.wikipedia.org/wiki/JFFS">JFFS</a> 、
+<a class="reference external" href="https://en.wikipedia.org/wiki/YAFFS">YAFFS</a> 以及
+<a class="reference external" href="https://en.wikipedia.org/wiki/F2FS">F2FS</a>
+。日志结构文件系统不包括那些用额外日志保证文件系统一致性，但文件系统结构不在日志中的 ext4 、 xfs
+、 ntfs 、 hfs+ 。</p>
+<p>简单来说，日志结构文件系统就是把存储设备当作一个大日志，每次写入数据时都添加在日志末尾，
+然后用写时复制重新写入元数据，最后提交整个文件系统结构。从这个特征上来说，写时拷贝文件系统（CoW
+FS）像 btrfs/zfs 这些在一些人眼中也符合日志结构文件系统的特征，
+所以也有人说写时拷贝文件系统算是日志结构文件系统的一个子类。不过日志结构文件系统的另一大特征是利用
+GC 回收空间，这里是本文要讲的区别，所以在我看来不用 GC 的 btrfs 和 zfs 不算是日志结构文件系统。</p>
+<p>举个例子，比如下图是一个日志结构文件系统的磁盘占用，其中绿色是数据，蓝色是元数据（比如目录结构和
+inode），红色是文件系统级关键数据（比如最后的日志提交点），一开始可能是这样，有9个数据块，
+2个元数据块，1个系统块：</p>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/>
+<p>现在要覆盖 2 和 3 的内容，新写入 n2 和 n3 ，然后修改 10 里面的 inode 变成 n10
+引用这些新数据，然后写入一个新提交 n12 ，用黄色表示不再被引用的垃圾，提交完大概是这样：</p>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/81e358d4.png"/>
+<p>日志结构文件系统需要 GC 比较容易理解，写日志嘛，总得有一个「添加到末尾」的写入点，比如上面图中的
+n12 。空盘上连续往后写而不 GC 总会遇到空间末尾，这时候就要覆盖写空间开头，就很难判断「末尾」在什么地方了。
+这时候 GC 的话，也不能只回收那些不再需要的空间（图中的 o2 和 o3 和 o10
+），因为这样的话剩余空间会很零碎。</p>
+<p>和内存管理时的 GC 不同的一点在于，文件系统的 GC 肯定不能停下整个世界跑 GC
+，也不能把可用空间对半分然后 Mark-and-Sweep ，这些在内存中还尚可的简单策略直接放到文件系统中绝对是性能灾难。</p>
+<p>通常文件系统的 GC 是，先把整个盘分成几个段（segment）或者区域(zone)，术语不同不过表达的概念类似，
+然后 GC 时挑一个老段，扫描文件系统找出目标段中还被引用的数据块，搬运到日志末尾，然后整个释放一段。
+搬运数据块时，也要调整文件系统别的地方对被搬运的数据块的引用。</p>
+<p>物理磁盘上有扇区的概念，通常是512字节到4KiB大小，在文件系统中一般把连续几个物理块作为一个数据块，
+大概 4KiB 到 1MiB 的数量级，然后日志结构文件系统中一个段通常是连续的很多块，数量级来看大约是
+4MiB 到 64MiB 这样的数量级。在数据块之上， ufs/ext4/btrfs/zfs 通常还有 block group 的概念，
+大概是 128MiB 到 1GiB 的大小。可见日志结构文件系统的段，是位于数据块和其它文件系统 block group
+中间的一个大小。</p>
+<p>继续上面的例子，假设上面文件系统的图示中每一列是一个段，想要回收最开头那个段，那么需要搬运还在用的
+1 和 4 到空闲空间，顺带修改引用它们的 n10 ，最后提交：</p>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/888459db.png"/>
+<p>要扫描并释放一整段，需要扫描整个文件系统中别的地方来确定有没有引用到目标段中的地址，
+可见释放一个段是一个 <span class="math">\(O(N)\)</span> 的操作，其中 N 是段的数量，按文件系统的大小增长，
+于是删除快照之类可能要连续释放很多段的操作在日志文件系统中是个 <span class="math">\(O(N^2)\)</span> 甚至更昂贵的操作。
+在文件系统相对比较小而系统内存相对比较大的时候，比如手机上或者PC读写SD卡，大部分元数据块（
+其中包含块指针）都能放入内存缓存起来的话，这个扫描操作的开销还是可以接受的。
+但是对大型存储系统显然扫描并释放空间就不合适了。</p>
+<p>段的抽象用在闪存类存储设备上的一点优势在于，闪存通常也有擦除块的概念，比写入块的大小要小，
+日志结构的文件系统中一个段可以直接对应到闪存的一个擦除块上。所以闪存设备诸如U盘或者 SSD
+通常在底层固件中用日志结构文件系统模拟一个块设备，来做写入平衡。</p>
+<p>基于整段的 GC 还有一个显著缺陷在，需要复制搬运仍然被引用到的块</p>
+</div>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
 
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -1268,7 +1558,7 @@ zfs-metaobjectset.svg</object>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7f2760e141b0> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f7174a56630> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1517,24 +1807,32 @@ farseerfc に連絡</a>
             <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id9">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
-<li><a class="reference internal" href="#subvolume-snapshot" id="id10">子卷（subvolume）和快照（snapshot）的术语</a></li>
-<li><a class="reference internal" href="#id3" id="id11">于是子卷在存储介质中是如何记录的呢？</a></li>
-<li><a class="reference internal" href="#id5" id="id12">那么快照又是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#btrfs-subvolume-snapshot" id="id12">Btrfs 的子卷（subvolume）和快照（snapshot）</a><ul>
+<li><a class="reference internal" href="#subvolume-snapshot" id="id13">子卷（subvolume）和快照（snapshot）的术语</a></li>
+<li><a class="reference internal" href="#id3" id="id14">于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id5" id="id15">那么快照又是如何记录的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id13">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
-<li><a class="reference internal" href="#zfs" id="id14">ZFS 设计中和快照相关的一些术语和概念</a><ul>
-<li><a class="reference internal" href="#dataset" id="id15">数据集（dataset）</a></li>
-<li><a class="reference internal" href="#filesystem" id="id16">文件系统（filesystem）</a></li>
-<li><a class="reference internal" href="#snapshot" id="id17">快照（snapshot）</a></li>
-<li><a class="reference internal" href="#clone" id="id18">克隆（clone）</a></li>
-<li><a class="reference internal" href="#bookmark" id="id19">书签（bookmark）</a></li>
-<li><a class="reference internal" href="#checkpoint" id="id20">检查点（checkpoint）</a></li>
+<li><a class="reference internal" href="#zfs-filesystem-snapshot-clone" id="id16">ZFS 的文件系统（filesystem）、快照（snapshot）、克隆（clone）及其它</a><ul>
+<li><a class="reference internal" href="#zfs" id="id17">ZFS 设计中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#dataset" id="id18">数据集（dataset）</a></li>
+<li><a class="reference internal" href="#filesystem" id="id19">文件系统（filesystem）</a></li>
+<li><a class="reference internal" href="#snapshot" id="id20">快照（snapshot）</a></li>
+<li><a class="reference internal" href="#clone" id="id21">克隆（clone）</a></li>
+<li><a class="reference internal" href="#bookmark" id="id22">书签（bookmark）</a></li>
+<li><a class="reference internal" href="#checkpoint" id="id23">检查点（checkpoint）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id21">ZFS 的概念与 btrfs 概念的对比</a></li>
-<li><a class="reference internal" href="#id6" id="id22">ZFS 中是如何存储这些数据集的呢</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id24">ZFS 的概念与 btrfs 概念的对比</a></li>
+<li><a class="reference internal" href="#id6" id="id25">ZFS 中是如何存储这些数据集的呢</a><ul>
+<li><a class="reference internal" href="#zfs-block-pointer" id="id26">ZFS 的块指针（block pointer）</a></li>
+<li><a class="reference internal" href="#zpl-mos-meta-object-set" id="id27">ZPL 的元对象集（MOS, Meta Object Set）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id28">咦，创建快照这么简单么？那么删除快照呢？</a><ul>
+<li><a class="reference internal" href="#garbage-collection" id="id29">日志结构文件系统中用的垃圾回收（Garbage Collection）算法</a></li>
 </ul>
 </li>
 </ul>
