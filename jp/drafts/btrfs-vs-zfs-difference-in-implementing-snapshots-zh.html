@@ -286,7 +286,7 @@ Farseerfcの巣            </a>
 <li><a class="reference internal" href="#garbage-collection" id="id31">日誌結構文件系統中用的垃圾回收（Garbage Collection）算法</a></li>
 <li><a class="reference internal" href="#wafl" id="id32">WAFL 早期使用的可用空間位圖數組</a></li>
 <li><a class="reference internal" href="#id12" id="id33">ZFS 中關於快照和克隆的空間跟蹤算法</a><ul>
-<li><a class="reference internal" href="#id13" id="id34">🐢烏龜算法：概念上說 ZFS 如何刪快照</a></li>
+<li><a class="reference internal" href="#id13" id="id34">🐢烏龜算法：概念上 ZFS 如何刪快照</a></li>
 </ul>
 </li>
 </ul>
@@ -1156,7 +1156,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="field-list table docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1169,7 +1169,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="field-list table docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1565,9 +1565,31 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 <p>其中 Matt 講到了三個刪除快照的算法，分別可以叫做「🐢烏龜算法」、「🐰兔子算法」、「🐆豹子算法」，
 接下來簡單講講這些算法背後的思想和實現方式。</p>
 <div class="section" id="id13">
-<h4><a class="toc-backref" href="#id34">🐢烏龜算法：概念上說 ZFS 如何刪快照</a></h4>
+<h4><a class="toc-backref" href="#id34">🐢烏龜算法：概念上 ZFS 如何刪快照</a></h4>
 <p>烏龜算法沒有實現在 ZFS 中，不過方便理解 ZFS 在概念上如何考慮快照刪除這個問題，從而幫助理解
 後面的🐰兔子算法和🐆豹子算法。</p>
+<p>要刪除一個快照， ZFS 需要找出這個快照引用到的「獨佔」數據塊，也就是那些不和別的數據集或者快照共享的
+數據塊。 ZFS 刪除快照基於這幾點條件：</p>
+<ol class="arabic simple">
+<li>ZFS 快照是只讀的。創建快照之後無法修改其內容。</li>
+<li>ZFS 的快照是嚴格按時間順序排列的，這裏的時間指 TXG id ，即記錄文件系統提交所屬事務組的嚴格遞增序號。</li>
+<li>ZFS 不存在 reflink 之類的機制，於是某個時間點中刪除掉的數據塊，不可能在比它更後面的快照中「復活」。</li>
+</ol>
+<p>第三點關於 reflink 造成的數據復活現象可能需要解釋一下，比如在（支持 reflink 的） btrfs 中有如下操作：</p>
+<pre class="code bash literal-block">
+btrfs subvolume snapshot -r fs s1
+rm fs/somefile
+btrfs subvolume snapshot -r fs s2
+cp --reflink<span class="o">=</span>always s1/somefile fs/somefile
+btrfs subvolume snapshot -r fs s3
+</pre>
+<p>我們對 fs 創建了 s1 快照，刪除了 fs 中某個文件，創建了 s2 快照，然後用 reflink
+把剛剛刪除的文件從 s1 中複製出來，再創建 s3 。如此操作之後，按時間順序有 s1、s2、s3 三個快照：</p>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f9d109aa.png"/>
+<p>其中只有 s2 不存在 somefile ，而 s1 s3 和當前的 fs 都有，並且都引用到了同一個數據塊。
+於是從時間線來看， somefile 在 s2 中「死」了，又在 s3 中「復活」了。</p>
+<p>而 ZFS (目前還）不支持 reflink ，所以沒法像這樣讓數據塊復活。一旦某個數據塊在某個快照中「死」了，
+就意味着它在隨後的所有快照中都不再被引用到了。</p>
 </div>
 </div>
 </div>
@@ -1646,7 +1668,7 @@ How ZFS snapshots really work And why they perform well (usually)</div>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7fd7e4019630> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f79d0091090> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1923,7 +1945,7 @@ farseerfc に連絡</a>
 <li><a class="reference internal" href="#garbage-collection" id="id31">日誌結構文件系統中用的垃圾回收（Garbage Collection）算法</a></li>
 <li><a class="reference internal" href="#wafl" id="id32">WAFL 早期使用的可用空間位圖數組</a></li>
 <li><a class="reference internal" href="#id12" id="id33">ZFS 中關於快照和克隆的空間跟蹤算法</a><ul>
-<li><a class="reference internal" href="#id13" id="id34">🐢烏龜算法：概念上說 ZFS 如何刪快照</a></li>
+<li><a class="reference internal" href="#id13" id="id34">🐢烏龜算法：概念上 ZFS 如何刪快照</a></li>
 </ul>
 </li>
 </ul>
