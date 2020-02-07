@@ -1023,7 +1023,7 @@ btrfs subvolume snapshot</code>
 <li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
 </ul>
 <p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。</p>
@@ -1152,7 +1152,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="docutils table field-list" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1165,7 +1165,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="docutils table field-list" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1451,10 +1451,10 @@ GC 回收空間，這裏是本文要講的區別，所以在我看來不用 GC �
 <p>舉個例子，比如下圖是一個日誌結構文件系統的磁盤佔用，其中綠色是數據，藍色是元數據（比如目錄結構和
 inode），紅色是文件系統級關鍵數據（比如最後的日誌提交點），一開始可能是這樣，有9個數據塊，
 2個元數據塊，1個系統塊：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/>
 <p>現在要覆蓋 2 和 3 的內容，新寫入 n2 和 n3 ，然後修改 10 裏面的 inode 變成 n10
 引用這些新數據，然後寫入一個新提交 n12 ，用黃色表示不再被引用的垃圾，提交完大概是這樣：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/81e358d4.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/81e358d4.png"/>
 <p>日誌結構文件系統需要 GC 比較容易理解，寫日誌嘛，總得有一個「添加到末尾」的寫入點，比如上面圖中的
 n12 。空盤上連續往後寫而不 GC 總會遇到空間末尾，這時候就要覆蓋寫空間開頭，就很難判斷「末尾」在什麼地方了。
 這時候 GC 的話，也不能只回收那些不再需要的空間（圖中的 o2 和 o3 和 o10
@@ -1471,7 +1471,7 @@ n12 。空盤上連續往後寫而不 GC 總會遇到空間末尾，這時候就
 中間的一個大小。</p>
 <p>繼續上面的例子，假設上面文件系統的圖示中每一列是一個段，想要回收最開頭那個段，那麼需要搬運還在用的
 1 和 4 到空閒空間，順帶修改引用它們的 n10 ，最後提交：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/888459db.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/888459db.png"/>
 <p>要掃描並釋放一整段，需要掃描整個文件系統中別的地方來確定有沒有引用到目標段中的地址，
 可見釋放一個段是一個 <span class="math">\(O(N)\)</span> 的操作，其中 N 是段的數量，按文件系統的大小增長，
 於是刪除快照之類可能要連續釋放很多段的操作在日誌文件系統中是個 <span class="math">\(O(N^2)\)</span> 甚至更昂贵的操作。
@@ -1502,7 +1502,7 @@ GC 算法則排除掉用戶手動標記的快照之後，根據快照創建的�
 的設計早期中考慮既然需要支持快照，那就把記錄數據塊佔用情況的位圖，變成一個快照的數組。
 於是整個文件系統有個 256 大小的快照利用率數組，數組中每個快照記錄自己佔用的數據塊位圖，
 文件系統中最多能容納 255 個快照。</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/94fb9a88.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/94fb9a88.png"/>
 <p>上面每個單元格都是一個 bit ，表示某個快照有沒有引用某個數據塊。</p>
 </div>
 </div>
@@ -1581,7 +1581,7 @@ GC 算法則排除掉用戶手動標記的快照之後，根據快照創建的�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7f4c9505d210> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7f108f85d210> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
