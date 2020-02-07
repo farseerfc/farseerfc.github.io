@@ -11,6 +11,11 @@ ZFS 分层架构设计
 
 .. contents::
 
+
+.. label-warning::
+
+    **2020年2月7日更新过**
+
 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris
 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
 IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD
@@ -20,6 +25,22 @@ IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化�
 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。
 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
 也有几段 OpenZFS Summit 视频佐以记录那段历史。
+
+
+
+早期架构
+---------------------------------------------------------------
+
+早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。
+
+最初在 Sun 内部带领 ZFS 开发的是 `Jeff Bonwick <https://blogs.oracle.com/bonwick/>`_
+，他首先有了对 ZFS 整体架构的构思，然后游说 Sun 高层，亲自组建起了 ZFS
+开发团队，招募了当时刚从大学毕业的 `Matt Ahrens <http://open-zfs.org/wiki/User:Mahrens>`_
+。作为和 Sun 高层谈妥的条件， Jeff 也必须负责 Solaris 整体的 Storage & Filesystem Team
+，于是他又从 Solaris 的 Storage Team 抽调了 UFS 部分的负责人 Mark Shellenbaum 和
+Mark Maybee 来开发 ZFS 。而如今昔日升阳已然日落， Jeff
+成立了独立公司继续开拓服务器存储领域， Matt 是 OpenZFS 项目的负责人，两位 Mark 则留在了
+Sun/Oracle 成为了 Oracle ZFS 分支的维护者。
 
 .. panel-default::
     :title: The Birth of ZFS by Jeff Bonwick
@@ -39,28 +60,14 @@ IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化�
 .. panel-default::
     :title: ZFS past & future by Mark Maybee
 
-    .. youtube:: c1ek1tFjhH8
-
-
-早期架构
----------------------------------------------------------------
-
-早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。
-
-最初在 Sun 内部带领 ZFS 开发的是 `Jeff Bonwick <https://blogs.oracle.com/bonwick/>`_
-，他首先有了对 ZFS 整体架构的构思，然后游说 Sun 高层，亲自组建起了 ZFS
-开发团队，招募了当时刚从大学毕业的 `Matt Ahrens <http://open-zfs.org/wiki/User:Mahrens>`_
-。作为和 Sun 高层谈妥的条件， Jeff 也必须负责 Solaris 整体的 Storage & Filesystem Team
-，于是他又从 Solaris 的 Storage Team 抽调了 UFS 部分的负责人 Mark Shellenbaum 和
-Mark Maybee 来开发 ZFS 。而如今昔日升阳已然日落， Jeff
-成立了独立公司继续开拓服务器存储领域， Matt 是 OpenZFS 项目的负责人，两位 Mark 则留在了
-Sun/Oracle 成为了 Oracle ZFS 分支的维护者。
 
 在开发早期，作为分工， Jeff 负责 ZFS 设计中最底层的 SPA ，提供多个存储设备组成的存储池抽象；
 Matt 负责 ZFS 设计中最至关重要的 DMU 引擎，在块设备基础上提供具有事务语义的对象存储；
 而两位 Mark 负责 ZFS 设计中直接面向用户的 ZPL ，在 DMU 基础上提供完整 POSIX 文件系统语义。
 ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架构上，继续影响（增强或者限制） ZFS
 今后发展的方向。
+
+    .. youtube:: c1ek1tFjhH8
 
 子系统整体架构
 ---------------------------------------------------------------
@@ -400,14 +407,30 @@ ZFS Attribute Processor
 microZAP 和 fatZAP 。
 
 一个 microZAP 占用一整块数据块，能存 name 长度小于 50 字符并且 value 是 uint64_t 的表项，
-每个表项 64 字节。 fatZAP 则是个树状结构，能存更多更复杂的东西。可见 microZAP
-非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。
+每个表项 64 字节。 :del:`fatZAP 则是个树状结构，能存更多更复杂的东西。|fatZAP 是个 on disk 的散利表，指针表中是 64bit 对 name 的 hash ，指向单链表的子节点列表，子节点中的 value 可以是任意类型的数据（不光是 uint64_t ）。`
+
+可见 microZAP 非常适合表述一个普通大小的文件夹里面包含到很多普通文件 inode （ZFS 是 dnode）的引用。
+:del:`|fatZAP 则不光可以用于任意大小的文件夹，还可以表达 ZFS 的配置属性之类的东西，非常灵活。`
 
 在 `ZFS First Mount by Mark Shellenbaum 的8:48左右 <https://youtu.be/xMH5rCL8S2k?t=526>`_
 提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
 ZAP 来存，也就是说每个文件都有个 ZAP ，其中有叫做 size 呀 owner
 之类的键值对，就像是个 JSON 对象那样，这让 ZPL 一开始很容易设计原型并且扩展。然后文件夹内容列表有另一种数据结构
 ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。
+
+.. label-warning::
+
+    **2020年2月7日添加**
+
+抛弃早期用 ZAP 的设计之后， ZPL 中 dnode 保存文件属性的机制成为了一个小的子系统，叫
+`ZFS System Attributes <https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c>`_
+。 SA 的设计也有新旧两代，旧的设计是有
+`固定的一组属性到表项位置的映射 <https://github.com/illumos/illumos-gate/blob/4d7988d6050abba5c1ff60e7fd196e95c22e20f4/usr/src/uts/common/fs/zfs/sa.c#L181-L198>`_
+，后来 `灵活的新设计下的 SA 更有意思 <https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes>`_ 。
+ZFS 认识到，大部分 dnode 的属性都可以用有限的几种属性集来表达，
+比如普通文件有一组类似的属性（权限、所有者之类的）， zvol 有另一组（明显 zvol 不需要很多 ZPL
+文件的属性），整个 ZFS pool 可以「注册」几种固定的属性布局，然后让每个 dnode 引用其中一种布局，
+这样 dnode 保存的属性仍然是可以任意变化的，又不需要在每个 dnode 中都记录所有属性的名字。
 
 DSL
 -----------------
