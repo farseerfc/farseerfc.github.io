@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩 - VDEV</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-vdev.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-02-04T16:59:00+09:00</updated><entry><title>ZFS 分層架構設計</title><link href="//farseerfc.me/zfs-layered-architecture-design.html" rel="alternate"></link><published>2020-02-04T16:59:00+09:00</published><updated>2020-02-04T16:59:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-02-04:/zfs-layered-architecture-design.html</id><summary type="html">
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2020年2月7日更新過&lt;/strong&gt;&lt;/div&gt;
+&lt;strong&gt;2020年2月9日更新過&lt;/strong&gt;&lt;/div&gt;
 &lt;p&gt;ZFS 在設計之初源自於 Sun 內部多次重寫 UFS 的嘗試，背負了重構 Solaris
 諸多內核子系統的重任，從而不同於 Linux 的文件系統只負責文件系統的功能而把其餘功能（比如內存髒頁管理，
 IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux/FreeBSD
@@ -10,11 +10,11 @@ IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化�
 於是寫下這篇筆記試圖從 ZFS 的早期開發歷程開始，記錄一下 ZFS 分層架構中各個子系統之間的分工。
 也有幾段 OpenZFS Summit 視頻佐以記錄那段歷史。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;早期架構&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;早期架構&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;早期 ZFS 在開發時大體可以分爲上下三層，分別是 ZPL， DMU 和 SPA ，這三層分別由三組人負責。&lt;/p&gt;
 &lt;p&gt;最初在 Sun 內部帶領 ZFS …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;div class="label label-warning"&gt;
-&lt;strong&gt;2020年2月7日更新過&lt;/strong&gt;&lt;/div&gt;
+&lt;strong&gt;2020年2月9日更新過&lt;/strong&gt;&lt;/div&gt;
 &lt;p&gt;ZFS 在設計之初源自於 Sun 內部多次重寫 UFS 的嘗試，背負了重構 Solaris
 諸多內核子系統的重任，從而不同於 Linux 的文件系統只負責文件系統的功能而把其餘功能（比如內存髒頁管理，
 IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化並更獨立，很多部分可能和 Linux/FreeBSD
@@ -23,7 +23,7 @@ IO調度）交給內核更底層的子系統， ZFS 的整體設計更層次化�
 於是寫下這篇筆記試圖從 ZFS 的早期開發歷程開始，記錄一下 ZFS 分層架構中各個子系統之間的分工。
 也有幾段 OpenZFS Summit 視頻佐以記錄那段歷史。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;早期架構&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;早期架構&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;早期 ZFS 在開發時大體可以分爲上下三層，分別是 ZPL， DMU 和 SPA ，這三層分別由三組人負責。&lt;/p&gt;
 &lt;p&gt;最初在 Sun 內部帶領 ZFS 開發的是 &lt;a class="reference external" href="https://blogs.oracle.com/bonwick/"&gt;Jeff Bonwick&lt;/a&gt;
 ，他首先有了對 ZFS 整體架構的構思，然後遊說 Sun 高層，親自組建起了 ZFS
@@ -64,7 +64,7 @@ ZFS 設計中這最初的分工也體現在了 ZFS 現在子系統分層的架�
 今後發展的方向。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;子系統整體架構&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;子系統整體架構&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先 ZFS 整體架構如下圖，其中圓圈是 ZFS 給內核層的外部接口，方框是 ZFS 內部子系統（
 我給方框的子系統加上了超鏈接）：&lt;/p&gt;
 &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
@@ -438,7 +438,7 @@ ZFS 設計中這最初的分工也體現在了 ZFS 現在子系統分層的架�
 &lt;p&gt;接下來從底層往上介紹一下各個子系統的全稱和職能。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="spa"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;SPA&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;SPA&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Storage Pool Allocator&lt;/p&gt;
 &lt;p&gt;從內核提供的多個塊設備中抽象出存儲池的子系統。 SPA 進一步分爲 ZIO 和 VDEV 兩大部分和其餘一些小的子系統。&lt;/p&gt;
 &lt;p&gt;SPA 對 DMU 提供的接口不同於傳統的塊設備接口，完全利用了 CoW 文件系統對寫入位置不敏感的特點。
@@ -459,7 +459,7 @@ read&lt;/code&gt;
 反過來 SPA 想要對一個數據塊操作時，也完全不清楚這個數據塊用於什麼目的，屬於什麼文件或者文件系統結構。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="vdev"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;VDEV&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;VDEV&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Virtual DEVice&lt;/p&gt;
 &lt;p&gt;VDEV 在 ZFS 中的作用相當於 Linux 內核的 Device Mapper 層或者 FreeBSD GEOM 層，提供
 Stripe/Mirror/RAIDZ 之類的多設備存儲池管理和抽象。 ZFS 中的 vdev
@@ -470,7 +470,7 @@ vdev 需要負責地址映射、容量轉換等計算過程。&lt;/p&gt;
 ，包括提供二級緩存的 L2ARC 設備，以及提供 ZIL 高速日誌的 SLOG 設備。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="zio"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;ZIO&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;ZIO&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 ZIO Pipeline by George Wilson&lt;/div&gt;
@@ -504,7 +504,7 @@ transaction group 提交事務組。 ZIO 也負責將讀寫請求按同步還是
 上有了一些新的挑戰。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="metaslab"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;MetaSlab&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;MetaSlab&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 MetaSlab Allocation Performance by Paul Dagnelie&lt;/div&gt;
@@ -529,7 +529,7 @@ import zpool 時不需要載入所有 MetaSlab 到內存，而只需加載一小
 &lt;p&gt;OpenZFS Summit 也有一個對 MetaSlab 分配器性能的介紹，可以看到很多分配器內的細節。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="arc"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;ARC&lt;/a&gt;&lt;/h2&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 ELI5: ZFS Caching Explain Like I'm 5: How the ZFS Adaptive Replacement Cache works&lt;/div&gt;
@@ -565,27 +565,27 @@ Solaris/Illumos 上也是同樣，這個在
 中從而提升緩存利用率，並且在有 L2ARC 的情況下也能增加 L2ARC 能存儲的緩存。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="l2arc"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;L2ARC&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;L2ARC&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Level 2 Adaptive Replacement Cache&lt;/p&gt;
 &lt;p&gt;這是用 ARC 算法實現的二級緩存，保存於高速存儲設備上。常見用法是給 ZFS pool 配置一塊 SSD
 作爲 L2ARC 高速緩存，減輕內存 ARC 的負擔並增加緩存命中率。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="slog"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;SLOG&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id12"&gt;SLOG&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Separate intent LOG&lt;/p&gt;
 &lt;p&gt;SLOG 是額外的日誌記錄設備。 SLOG 之於 ZIL 有點像 L2ARC 之餘 ARC ， L2ARC 是把內存中的
 ARC 放入額外的高速存儲設備，而 SLOG 是把原本和別的數據塊存儲在一起的 ZIL
 放到額外的高速存儲設備。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="tol"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;TOL&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;TOL&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Transactional Object Layer&lt;/p&gt;
 &lt;p&gt;這一部分子系統在數據塊的基礎上提供一個事務性的對象語義層，這裏事務性是指，
 對對象的修改處於明確的狀態，不會因爲突然斷電之類的原因導致狀態不一致。TOL
 中最主要的部分是 DMU 層。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="dmu"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;DMU&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;DMU&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Data Management Unit&lt;/p&gt;
 &lt;p&gt;在塊的基礎上提供「對象（object）」的抽象。每個「對象」可以是一個文件，或者是別的 ZFS 內部需要記錄的東西。&lt;/p&gt;
 &lt;p&gt;DMU 這個名字最初是 Jeff 想類比於操作系統中內存管理的 MMU(Memory Management Unit)，
@@ -627,7 +627,7 @@ zfs 在遇到數據損壞時是如何在診斷信息中給出損壞的文件路�
 。因爲是個黑魔法，這個記錄不總是對的，所以只能用於診斷信息，不能基於這個實現別的文件系統功能。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="zap"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;ZAP&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;ZAP&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;ZFS Attribute Processor&lt;/p&gt;
 &lt;p&gt;在 DMU 提供的「對象」抽象基礎上提供緊湊的 name/value 映射存儲，
 從而文件夾內容列表、文件擴展屬性之類的都是基於 ZAP 來存。 ZAP 在內部分爲兩種存儲表達：
@@ -640,21 +640,11 @@ microZAP 和 fatZAP 。&lt;/p&gt;
 提到，最初 ZPL 中關於文件的所有屬性（包括訪問時間、權限、大小之類所有文件都有的）都是基於
 ZAP 來存，也就是說每個文件都有個 ZAP ，其中有叫做 size 呀 owner
 之類的鍵值對，就像是個 JSON 對象那樣，這讓 ZPL 一開始很容易設計原型並且擴展。然後文件夾內容列表有另一種數據結構
-ZDS（ZFS Directory Service），後來常見的文件屬性在 ZPL 有了專用的緊湊數據結構，而 ZDS 則漸漸融入了 ZAP 。&lt;/p&gt;
-&lt;div class="label label-warning"&gt;
-&lt;strong&gt;2020年2月7日添加&lt;/strong&gt;&lt;/div&gt;
-&lt;p&gt;拋棄早期用 ZAP 的設計之後， ZPL 中 dnode 保存文件屬性的機制成爲了一個小的子系統，叫
-&lt;a class="reference external" href="https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c"&gt;ZFS System Attributes&lt;/a&gt;
-。 SA 的設計也有新舊兩代，舊的設計是有
-&lt;a class="reference external" href="https://github.com/illumos/illumos-gate/blob/4d7988d6050abba5c1ff60e7fd196e95c22e20f4/usr/src/uts/common/fs/zfs/sa.c#L181-L198"&gt;固定的一組屬性到表項位置的映射&lt;/a&gt;
-，後來 &lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes"&gt;靈活的新設計下的 SA 更有意思&lt;/a&gt; 。
-ZFS 認識到，大部分 dnode 的屬性都可以用有限的幾種屬性集來表达，
-比如普通文件有一組類似的屬性（權限、所有者之類的）， zvol 有另一組（明顯 zvol 不需要很多 ZPL
-文件的屬性），整個 ZFS pool 可以「註冊」幾種固定的屬性佈局，然後讓每個 dnode 引用其中一種佈局，
-這樣 dnode 保存的屬性仍然是可以任意變化的，又不需要在每個 dnode 中都記錄所有屬性的名字。&lt;/p&gt;
+ZDS（ZFS Directory Service），後來常見的文件屬性在 ZPL 有了專用的緊湊數據結構，而 ZDS 則漸漸融入了 ZAP 。
+&lt;del&gt;&lt;/del&gt;&lt;ins&gt;這些變化詳見下面 ZPL 。&lt;/ins&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="dsl"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;DSL&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;DSL&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Dataset and Snapshot Layer&lt;/p&gt;
 &lt;p&gt;數據集和快照層，負責創建和管理快照、克隆等數據集類型，跟蹤它們的寫入大小，最終刪除它們。
 由於 DMU 層面已經負責了對象的寫時複製語義和對象集的概念，所以 DSL 層面不需要直接接觸寫文件之類來自 ZPL
@@ -671,7 +661,7 @@ send/receive 實現中，假如數據塊已經壓縮，需要在 send 端經過 
 的壁壘，支持了直接發送已壓縮或加密的數據塊的能力。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="zil"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;ZIL&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;ZIL&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;ZFS Intent Log&lt;/p&gt;
 &lt;p&gt;記錄兩次完整事務語義提交之間的日誌，用來加速實現 fsync 之類的文件事務語義。&lt;/p&gt;
 &lt;p&gt;原本 CoW 的文件系統不需要日誌結構來保證文件系統結構的一致性，在 DMU
@@ -697,7 +687,7 @@ ZIL 實現中則不需要重複寫兩次， DMU 讓 SPA 寫入數據之後 ZIL �
 block pointer ，所以使用 ZIL 不會導致傳統日誌型文件系統中雙倍寫入放大的問題。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="zvol"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id19"&gt;ZVOL&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;ZVOL&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;ZFS VOLume&lt;/p&gt;
 &lt;p&gt;有點像 loopback block device ，暴露一個塊設備的接口，其上可以創建別的
 FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口，所以在實現完整 ZPL
@@ -710,7 +700,7 @@ FS 。對 ZFS 而言實現 ZVOL 的意義在於它是比文件更簡單的接口
 上提供對虛擬機文件系統鏡像的存儲，可以節省不少存儲空間和內存佔用開銷。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="zpl"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id20"&gt;ZPL&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id19"&gt;ZPL&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;ZFS Posix Layer&lt;/p&gt;
 &lt;p&gt;提供符合 POSIX 文件系統語義的抽象，也就是包括文件、目錄、軟鏈接、套接字這些抽象以及
 inode 訪問時間、權限那些抽象，ZPL 是 ZFS 中對一個普通 FS 而言用戶直接接觸的部分。
@@ -720,6 +710,22 @@ ZPL 目錄用一個 ZAP 對象表達，然後 DMU 對象集對應到 ZPL 下的�
 也就是說 ZPL 負責把操作系統 VFS 抽象層的那些文件系統操作接口，翻譯映射到基於 DMU 和 ZAP
 的抽象上。傳統 Unix 中的管道、套接字、軟鏈接之類的沒有什麼數據內容的東西則在 ZPL 直接用 dnode
 實現出來。 ZPL 也需要進一步實現文件權限、所有者、訪問日期、擴展屬性之類雜七雜八的文件系統功能。&lt;/p&gt;
+&lt;div class="label label-warning"&gt;
+&lt;strong&gt;2020年2月9日添加&lt;/strong&gt;&lt;/div&gt;
+&lt;p&gt;繼續上述 ZAP 格式變化的討論，在 ZPL 拋棄早期用 ZAP 的設計之後， ZPL 中 znode （ZPL 擴展的 dnode）
+保存文件屬性的機制成爲了一個小的子系統，叫
+&lt;a class="reference external" href="https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c"&gt;ZFS System Attributes&lt;/a&gt;
+。 SA 的設計照顧了舊版 ZPL znode 格式兼容問題，有新舊兩代格式。舊版 znode
+格式是固定偏移位置存取屬性的 SA ，因此透過預先註冊好的描述舊版 znode 格式的固定映射表，
+SA 依然能用同樣的代碼路徑存取舊版的 znode 。而後來
+&lt;a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes"&gt;靈活的新設計下的 SA 更有意思&lt;/a&gt;
+，ZFS 認識到，大部分 dnode 的屬性都可以用有限的幾種屬性集來表达，
+比如普通文件有一組類似的屬性（權限、所有者之類的）， zvol 有另一組（明顯 zvol 不需要很多 ZPL
+文件的屬性）， ZFS 可以「註冊」幾種固定的屬性佈局，然後讓每個 znode 引用其中一種佈局，
+這樣 znode 保存的屬性仍然是可以任意變化的，又不需要在每個 znode 中都記錄所有屬性的名字。
+SA 的出現提升了 ZPL 的可擴展性。 ZPL 爲了應付不同的操作系統之間文件系統 API 的差異，可以使用
+SA 在 znode 之中加入針對不同操作系統和應用場景的屬性。例如，在支持 NFSv4 ACL 的操作系統上，ZFS
+既可以用現有方式把 DACL ACEs 放在獨立於文件對象的單獨對象中，也可以把 DACL ACEs 放在 SA 內。&lt;/p&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=456"&gt;在 ZFS First Mount by Mark Shellenbaum&lt;/a&gt;
 中介紹了很多在最初實現 ZPL 過程中的坎坷， ZPL 的困難之處在於需要兼容現有應用程序對傳統文件系統
 API 的使用方式，所以他們需要大量兼容性測試。視頻中講到非常有意思的一件事是， ZFS

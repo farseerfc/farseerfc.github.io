@@ -14,7 +14,7 @@
 
 <span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
 
-    <span class="gs">**2020年2月7日更新过**</span>
+    <span class="gs">**2020年2月9日更新过**</span>
 
 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris
 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
@@ -418,20 +418,8 @@ microZAP 和 fatZAP 。
 ZAP 来存，也就是说每个文件都有个 ZAP ，其中有叫做 size 呀 owner
 之类的键值对，就像是个 JSON 对象那样，这让 ZPL 一开始很容易设计原型并且扩展。然后文件夹内容列表有另一种数据结构
 ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。
+<span class="na">:del:</span><span class="nv">`|这些变化详见下面 ZPL 。`</span>
 
-<span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
-
-    <span class="gs">**2020年2月7日添加**</span>
-
-抛弃早期用 ZAP 的设计之后， ZPL 中 dnode 保存文件属性的机制成为了一个小的子系统，叫
-<span class="s">`ZFS System Attributes </span><span class="si">&lt;https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c&gt;</span><span class="s">`_</span>
-。 SA 的设计也有新旧两代，旧的设计是有
-<span class="s">`固定的一组属性到表项位置的映射 </span><span class="si">&lt;https://github.com/illumos/illumos-gate/blob/4d7988d6050abba5c1ff60e7fd196e95c22e20f4/usr/src/uts/common/fs/zfs/sa.c#L181-L198&gt;</span><span class="s">`_</span>
-，后来 <span class="s">`灵活的新设计下的 SA 更有意思 </span><span class="si">&lt;https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes&gt;</span><span class="s">`_</span> 。
-ZFS 认识到，大部分 dnode 的属性都可以用有限的几种属性集来表达，
-比如普通文件有一组类似的属性（权限、所有者之类的）， zvol 有另一组（明显 zvol 不需要很多 ZPL
-文件的属性），整个 ZFS pool 可以「注册」几种固定的属性布局，然后让每个 dnode 引用其中一种布局，
-这样 dnode 保存的属性仍然是可以任意变化的，又不需要在每个 dnode 中都记录所有属性的名字。
 
 <span class="gh">DSL</span>
 <span class="gh">-----------------</span>
@@ -518,6 +506,25 @@ ZPL 目录用一个 ZAP 对象表达，然后 DMU 对象集对应到 ZPL 下的�
 也就是说 ZPL 负责把操作系统 VFS 抽象层的那些文件系统操作接口，翻译映射到基于 DMU 和 ZAP
 的抽象上。传统 Unix 中的管道、套接字、软链接之类的没有什么数据内容的东西则在 ZPL 直接用 dnode
 实现出来。 ZPL 也需要进一步实现文件权限、所有者、访问日期、扩展属性之类杂七杂八的文件系统功能。
+
+<span class="p">..</span> <span class="ow">label-warning</span><span class="p">::</span>
+
+    <span class="gs">**2020年2月9日添加**</span>
+
+继续上述 ZAP 格式变化的讨论，在 ZPL 抛弃早期用 ZAP 的设计之后， ZPL 中 znode （ZPL 扩展的 dnode）
+保存文件属性的机制成为了一个小的子系统，叫
+<span class="s">`ZFS System Attributes </span><span class="si">&lt;https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c&gt;</span><span class="s">`_</span>
+。 SA 的设计照顾了旧版 ZPL znode 格式兼容问题，有新旧两代格式。旧版 znode
+格式是固定偏移位置存取属性的 SA ，因此透过预先注册好的描述旧版 znode 格式的固定映射表，
+SA 依然能用同样的代码路径存取旧版的 znode 。而后来
+<span class="s">`灵活的新设计下的 SA 更有意思 </span><span class="si">&lt;https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes&gt;</span><span class="s">`_</span>
+，ZFS 认识到，大部分 dnode 的属性都可以用有限的几种属性集来表达，
+比如普通文件有一组类似的属性（权限、所有者之类的）， zvol 有另一组（明显 zvol 不需要很多 ZPL
+文件的属性）， ZFS 可以「注册」几种固定的属性布局，然后让每个 znode 引用其中一种布局，
+这样 znode 保存的属性仍然是可以任意变化的，又不需要在每个 znode 中都记录所有属性的名字。
+SA 的出现提升了 ZPL 的可扩展性。 ZPL 为了应付不同的操作系统之间文件系统 API 的差异，可以使用
+SA 在 znode 之中加入针对不同操作系统和应用场景的属性。例如，在支持 NFSv4 ACL 的操作系统上，ZFS
+既可以用现有方式把 DACL ACEs 放在独立于文件对象的单独对象中，也可以把 DACL ACEs 放在 SA 内。
 
 <span class="s">`在 ZFS First Mount by Mark Shellenbaum </span><span class="si">&lt;https://youtu.be/xMH5rCL8S2k?t=456&gt;</span><span class="s">`_</span>
 中介绍了很多在最初实现 ZPL 过程中的坎坷， ZPL 的困难之处在于需要兼容现有应用程序对传统文件系统

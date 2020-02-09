@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="zfs,layered,architecture,SPA,DMU,ZPL,ZIO,VDEV,ARC,ZAP,DSL,ZIL,ZVOL" />
-        <meta name="description" content="2020年2月7日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …" />
+        <meta name="description" content="2020年2月9日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="ZFS 分层架构设计"/>
         <meta property="og:url" content="//farseerfc.me/zhs/zfs-layered-architecture-design.html"/>
-        <meta property="og:description" content="2020年2月7日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …"/>
+        <meta property="og:description" content="2020年2月9日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …"/>
         <meta property="article:published_time" content="2020-02-04" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="zfs" />
@@ -266,29 +266,29 @@ Farseerfc的小窝            </a>
                         <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id5">早期架构</a></li>
-<li><a class="reference internal" href="#id2" id="id6">子系统整体架构</a></li>
-<li><a class="reference internal" href="#spa" id="id7">SPA</a></li>
-<li><a class="reference internal" href="#vdev" id="id8">VDEV</a></li>
-<li><a class="reference internal" href="#zio" id="id9">ZIO</a></li>
-<li><a class="reference internal" href="#metaslab" id="id10">MetaSlab</a></li>
-<li><a class="reference internal" href="#arc" id="id11">ARC</a></li>
-<li><a class="reference internal" href="#l2arc" id="id12">L2ARC</a></li>
-<li><a class="reference internal" href="#slog" id="id13">SLOG</a></li>
-<li><a class="reference internal" href="#tol" id="id14">TOL</a></li>
-<li><a class="reference internal" href="#dmu" id="id15">DMU</a></li>
-<li><a class="reference internal" href="#zap" id="id16">ZAP</a></li>
-<li><a class="reference internal" href="#dsl" id="id17">DSL</a></li>
-<li><a class="reference internal" href="#zil" id="id18">ZIL</a></li>
-<li><a class="reference internal" href="#zvol" id="id19">ZVOL</a></li>
-<li><a class="reference internal" href="#zpl" id="id20">ZPL</a></li>
+<li><a class="reference internal" href="#id1" id="id4">早期架构</a></li>
+<li><a class="reference internal" href="#id2" id="id5">子系统整体架构</a></li>
+<li><a class="reference internal" href="#spa" id="id6">SPA</a></li>
+<li><a class="reference internal" href="#vdev" id="id7">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id8">ZIO</a></li>
+<li><a class="reference internal" href="#metaslab" id="id9">MetaSlab</a></li>
+<li><a class="reference internal" href="#arc" id="id10">ARC</a></li>
+<li><a class="reference internal" href="#l2arc" id="id11">L2ARC</a></li>
+<li><a class="reference internal" href="#slog" id="id12">SLOG</a></li>
+<li><a class="reference internal" href="#tol" id="id13">TOL</a></li>
+<li><a class="reference internal" href="#dmu" id="id14">DMU</a></li>
+<li><a class="reference internal" href="#zap" id="id15">ZAP</a></li>
+<li><a class="reference internal" href="#dsl" id="id16">DSL</a></li>
+<li><a class="reference internal" href="#zil" id="id17">ZIL</a></li>
+<li><a class="reference internal" href="#zvol" id="id18">ZVOL</a></li>
+<li><a class="reference internal" href="#zpl" id="id19">ZPL</a></li>
 </ul>
 </div>
                         </div>
                     </div>
                 
 <div class="label label-warning">
-<strong>2020年2月7日更新过</strong></div>
+<strong>2020年2月9日更新过</strong></div>
 <p>ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris
 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理，
 IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD
@@ -297,7 +297,7 @@ IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化�
 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。
 也有几段 OpenZFS Summit 视频佐以记录那段历史。</p>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id5">早期架构</a></h2>
+<h2><a class="toc-backref" href="#id4">早期架构</a></h2>
 <p>早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。</p>
 <p>最初在 Sun 内部带领 ZFS 开发的是 <a class="reference external" href="https://blogs.oracle.com/bonwick/">Jeff Bonwick</a>
 ，他首先有了对 ZFS 整体架构的构思，然后游说 Sun 高层，亲自组建起了 ZFS
@@ -338,7 +338,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
 今后发展的方向。</p>
 </div>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id6">子系统整体架构</a></h2>
+<h2><a class="toc-backref" href="#id5">子系统整体架构</a></h2>
 <p>首先 ZFS 整体架构如下图，其中圆圈是 ZFS 给内核层的外部接口，方框是 ZFS 内部子系统（
 我给方框的子系统加上了超链接）：</p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -712,7 +712,7 @@ ZFS 设计中这最初的分工也体现在了 ZFS 现在子系统分层的架�
 <p>接下来从底层往上介绍一下各个子系统的全称和职能。</p>
 </div>
 <div class="section" id="spa">
-<h2><a class="toc-backref" href="#id7">SPA</a></h2>
+<h2><a class="toc-backref" href="#id6">SPA</a></h2>
 <p>Storage Pool Allocator</p>
 <p>从内核提供的多个块设备中抽象出存储池的子系统。 SPA 进一步分为 ZIO 和 VDEV 两大部分和其余一些小的子系统。</p>
 <p>SPA 对 DMU 提供的接口不同于传统的块设备接口，完全利用了 CoW 文件系统对写入位置不敏感的特点。
@@ -733,7 +733,7 @@ read</code>
 反过来 SPA 想要对一个数据块操作时，也完全不清楚这个数据块用于什么目的，属于什么文件或者文件系统结构。</p>
 </div>
 <div class="section" id="vdev">
-<h2><a class="toc-backref" href="#id8">VDEV</a></h2>
+<h2><a class="toc-backref" href="#id7">VDEV</a></h2>
 <p>Virtual DEVice</p>
 <p>VDEV 在 ZFS 中的作用相当于 Linux 内核的 Device Mapper 层或者 FreeBSD GEOM 层，提供
 Stripe/Mirror/RAIDZ 之类的多设备存储池管理和抽象。 ZFS 中的 vdev
@@ -744,7 +744,7 @@ vdev 需要负责地址映射、容量转换等计算过程。</p>
 ，包括提供二级缓存的 L2ARC 设备，以及提供 ZIL 高速日志的 SLOG 设备。</p>
 </div>
 <div class="section" id="zio">
-<h2><a class="toc-backref" href="#id9">ZIO</a></h2>
+<h2><a class="toc-backref" href="#id8">ZIO</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 ZIO Pipeline by George Wilson</div>
@@ -778,7 +778,7 @@ transaction group 提交事务组。 ZIO 也负责将读写请求按同步还是
 上有了一些新的挑战。</p>
 </div>
 <div class="section" id="metaslab">
-<h2><a class="toc-backref" href="#id10">MetaSlab</a></h2>
+<h2><a class="toc-backref" href="#id9">MetaSlab</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 MetaSlab Allocation Performance by Paul Dagnelie</div>
@@ -803,7 +803,7 @@ import zpool 时不需要载入所有 MetaSlab 到内存，而只需加载一小
 <p>OpenZFS Summit 也有一个对 MetaSlab 分配器性能的介绍，可以看到很多分配器内的细节。</p>
 </div>
 <div class="section" id="arc">
-<h2><a class="toc-backref" href="#id11">ARC</a></h2>
+<h2><a class="toc-backref" href="#id10">ARC</a></h2>
 <div class="panel panel-default">
 <div class="panel-heading">
 ELI5: ZFS Caching Explain Like I'm 5: How the ZFS Adaptive Replacement Cache works</div>
@@ -839,27 +839,27 @@ Solaris/Illumos 上也是同样，这个在
 中从而提升缓存利用率，并且在有 L2ARC 的情况下也能增加 L2ARC 能存储的缓存。</p>
 </div>
 <div class="section" id="l2arc">
-<h2><a class="toc-backref" href="#id12">L2ARC</a></h2>
+<h2><a class="toc-backref" href="#id11">L2ARC</a></h2>
 <p>Level 2 Adaptive Replacement Cache</p>
 <p>这是用 ARC 算法实现的二级缓存，保存于高速存储设备上。常见用法是给 ZFS pool 配置一块 SSD
 作为 L2ARC 高速缓存，减轻内存 ARC 的负担并增加缓存命中率。</p>
 </div>
 <div class="section" id="slog">
-<h2><a class="toc-backref" href="#id13">SLOG</a></h2>
+<h2><a class="toc-backref" href="#id12">SLOG</a></h2>
 <p>Separate intent LOG</p>
 <p>SLOG 是额外的日志记录设备。 SLOG 之于 ZIL 有点像 L2ARC 之余 ARC ， L2ARC 是把内存中的
 ARC 放入额外的高速存储设备，而 SLOG 是把原本和别的数据块存储在一起的 ZIL
 放到额外的高速存储设备。</p>
 </div>
 <div class="section" id="tol">
-<h2><a class="toc-backref" href="#id14">TOL</a></h2>
+<h2><a class="toc-backref" href="#id13">TOL</a></h2>
 <p>Transactional Object Layer</p>
 <p>这一部分子系统在数据块的基础上提供一个事务性的对象语义层，这里事务性是指，
 对对象的修改处于明确的状态，不会因为突然断电之类的原因导致状态不一致。TOL
 中最主要的部分是 DMU 层。</p>
 </div>
 <div class="section" id="dmu">
-<h2><a class="toc-backref" href="#id15">DMU</a></h2>
+<h2><a class="toc-backref" href="#id14">DMU</a></h2>
 <p>Data Management Unit</p>
 <p>在块的基础上提供「对象（object）」的抽象。每个「对象」可以是一个文件，或者是别的 ZFS 内部需要记录的东西。</p>
 <p>DMU 这个名字最初是 Jeff 想类比于操作系统中内存管理的 MMU(Memory Management Unit)，
@@ -901,7 +901,7 @@ zfs 在遇到数据损坏时是如何在诊断信息中给出损坏的文件路�
 。因为是个黑魔法，这个记录不总是对的，所以只能用于诊断信息，不能基于这个实现别的文件系统功能。</p>
 </div>
 <div class="section" id="zap">
-<h2><a class="toc-backref" href="#id16">ZAP</a></h2>
+<h2><a class="toc-backref" href="#id15">ZAP</a></h2>
 <p>ZFS Attribute Processor</p>
 <p>在 DMU 提供的「对象」抽象基础上提供紧凑的 name/value 映射存储，
 从而文件夹内容列表、文件扩展属性之类的都是基于 ZAP 来存。 ZAP 在内部分为两种存储表达：
@@ -914,21 +914,11 @@ microZAP 和 fatZAP 。</p>
 提到，最初 ZPL 中关于文件的所有属性（包括访问时间、权限、大小之类所有文件都有的）都是基于
 ZAP 来存，也就是说每个文件都有个 ZAP ，其中有叫做 size 呀 owner
 之类的键值对，就像是个 JSON 对象那样，这让 ZPL 一开始很容易设计原型并且扩展。然后文件夹内容列表有另一种数据结构
-ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。</p>
-<div class="label label-warning">
-<strong>2020年2月7日添加</strong></div>
-<p>抛弃早期用 ZAP 的设计之后， ZPL 中 dnode 保存文件属性的机制成为了一个小的子系统，叫
-<a class="reference external" href="https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c">ZFS System Attributes</a>
-。 SA 的设计也有新旧两代，旧的设计是有
-<a class="reference external" href="https://github.com/illumos/illumos-gate/blob/4d7988d6050abba5c1ff60e7fd196e95c22e20f4/usr/src/uts/common/fs/zfs/sa.c#L181-L198">固定的一组属性到表项位置的映射</a>
-，后来 <a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes">灵活的新设计下的 SA 更有意思</a> 。
-ZFS 认识到，大部分 dnode 的属性都可以用有限的几种属性集来表达，
-比如普通文件有一组类似的属性（权限、所有者之类的）， zvol 有另一组（明显 zvol 不需要很多 ZPL
-文件的属性），整个 ZFS pool 可以「注册」几种固定的属性布局，然后让每个 dnode 引用其中一种布局，
-这样 dnode 保存的属性仍然是可以任意变化的，又不需要在每个 dnode 中都记录所有属性的名字。</p>
+ZDS（ZFS Directory Service），后来常见的文件属性在 ZPL 有了专用的紧凑数据结构，而 ZDS 则渐渐融入了 ZAP 。
+<del></del><ins>这些变化详见下面 ZPL 。</ins></p>
 </div>
 <div class="section" id="dsl">
-<h2><a class="toc-backref" href="#id17">DSL</a></h2>
+<h2><a class="toc-backref" href="#id16">DSL</a></h2>
 <p>Dataset and Snapshot Layer</p>
 <p>数据集和快照层，负责创建和管理快照、克隆等数据集类型，跟踪它们的写入大小，最终删除它们。
 由于 DMU 层面已经负责了对象的写时复制语义和对象集的概念，所以 DSL 层面不需要直接接触写文件之类来自 ZPL
@@ -945,7 +935,7 @@ send/receive 实现中，假如数据块已经压缩，需要在 send 端经过 
 的壁垒，支持了直接发送已压缩或加密的数据块的能力。</p>
 </div>
 <div class="section" id="zil">
-<h2><a class="toc-backref" href="#id18">ZIL</a></h2>
+<h2><a class="toc-backref" href="#id17">ZIL</a></h2>
 <p>ZFS Intent Log</p>
 <p>记录两次完整事务语义提交之间的日志，用来加速实现 fsync 之类的文件事务语义。</p>
 <p>原本 CoW 的文件系统不需要日志结构来保证文件系统结构的一致性，在 DMU
@@ -971,7 +961,7 @@ ZIL 实现中则不需要重复写两次， DMU 让 SPA 写入数据之后 ZIL �
 block pointer ，所以使用 ZIL 不会导致传统日志型文件系统中双倍写入放大的问题。</p>
 </div>
 <div class="section" id="zvol">
-<h2><a class="toc-backref" href="#id19">ZVOL</a></h2>
+<h2><a class="toc-backref" href="#id18">ZVOL</a></h2>
 <p>ZFS VOLume</p>
 <p>有点像 loopback block device ，暴露一个块设备的接口，其上可以创建别的
 FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口，所以在实现完整 ZPL
@@ -984,7 +974,7 @@ FS 。对 ZFS 而言实现 ZVOL 的意义在于它是比文件更简单的接口
 上提供对虚拟机文件系统镜像的存储，可以节省不少存储空间和内存占用开销。</p>
 </div>
 <div class="section" id="zpl">
-<h2><a class="toc-backref" href="#id20">ZPL</a></h2>
+<h2><a class="toc-backref" href="#id19">ZPL</a></h2>
 <p>ZFS Posix Layer</p>
 <p>提供符合 POSIX 文件系统语义的抽象，也就是包括文件、目录、软链接、套接字这些抽象以及
 inode 访问时间、权限那些抽象，ZPL 是 ZFS 中对一个普通 FS 而言用户直接接触的部分。
@@ -994,6 +984,22 @@ ZPL 目录用一个 ZAP 对象表达，然后 DMU 对象集对应到 ZPL 下的�
 也就是说 ZPL 负责把操作系统 VFS 抽象层的那些文件系统操作接口，翻译映射到基于 DMU 和 ZAP
 的抽象上。传统 Unix 中的管道、套接字、软链接之类的没有什么数据内容的东西则在 ZPL 直接用 dnode
 实现出来。 ZPL 也需要进一步实现文件权限、所有者、访问日期、扩展属性之类杂七杂八的文件系统功能。</p>
+<div class="label label-warning">
+<strong>2020年2月9日添加</strong></div>
+<p>继续上述 ZAP 格式变化的讨论，在 ZPL 抛弃早期用 ZAP 的设计之后， ZPL 中 znode （ZPL 扩展的 dnode）
+保存文件属性的机制成为了一个小的子系统，叫
+<a class="reference external" href="https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/sa.c">ZFS System Attributes</a>
+。 SA 的设计照顾了旧版 ZPL znode 格式兼容问题，有新旧两代格式。旧版 znode
+格式是固定偏移位置存取属性的 SA ，因此透过预先注册好的描述旧版 znode 格式的固定映射表，
+SA 依然能用同样的代码路径存取旧版的 znode 。而后来
+<a class="reference external" href="https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSSystemAttributes">灵活的新设计下的 SA 更有意思</a>
+，ZFS 认识到，大部分 dnode 的属性都可以用有限的几种属性集来表达，
+比如普通文件有一组类似的属性（权限、所有者之类的）， zvol 有另一组（明显 zvol 不需要很多 ZPL
+文件的属性）， ZFS 可以「注册」几种固定的属性布局，然后让每个 znode 引用其中一种布局，
+这样 znode 保存的属性仍然是可以任意变化的，又不需要在每个 znode 中都记录所有属性的名字。
+SA 的出现提升了 ZPL 的可扩展性。 ZPL 为了应付不同的操作系统之间文件系统 API 的差异，可以使用
+SA 在 znode 之中加入针对不同操作系统和应用场景的属性。例如，在支持 NFSv4 ACL 的操作系统上，ZFS
+既可以用现有方式把 DACL ACEs 放在独立于文件对象的单独对象中，也可以把 DACL ACEs 放在 SA 内。</p>
 <p><a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=456">在 ZFS First Mount by Mark Shellenbaum</a>
 中介绍了很多在最初实现 ZPL 过程中的坎坷， ZPL 的困难之处在于需要兼容现有应用程序对传统文件系统
 API 的使用方式，所以他们需要大量兼容性测试。视频中讲到非常有意思的一件事是， ZFS
@@ -1755,22 +1761,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <div class="toc" id="">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#id1" id="id5">早期架构</a></li>
-<li><a class="reference internal" href="#id2" id="id6">子系统整体架构</a></li>
-<li><a class="reference internal" href="#spa" id="id7">SPA</a></li>
-<li><a class="reference internal" href="#vdev" id="id8">VDEV</a></li>
-<li><a class="reference internal" href="#zio" id="id9">ZIO</a></li>
-<li><a class="reference internal" href="#metaslab" id="id10">MetaSlab</a></li>
-<li><a class="reference internal" href="#arc" id="id11">ARC</a></li>
-<li><a class="reference internal" href="#l2arc" id="id12">L2ARC</a></li>
-<li><a class="reference internal" href="#slog" id="id13">SLOG</a></li>
-<li><a class="reference internal" href="#tol" id="id14">TOL</a></li>
-<li><a class="reference internal" href="#dmu" id="id15">DMU</a></li>
-<li><a class="reference internal" href="#zap" id="id16">ZAP</a></li>
-<li><a class="reference internal" href="#dsl" id="id17">DSL</a></li>
-<li><a class="reference internal" href="#zil" id="id18">ZIL</a></li>
-<li><a class="reference internal" href="#zvol" id="id19">ZVOL</a></li>
-<li><a class="reference internal" href="#zpl" id="id20">ZPL</a></li>
+<li><a class="reference internal" href="#id1" id="id4">早期架构</a></li>
+<li><a class="reference internal" href="#id2" id="id5">子系统整体架构</a></li>
+<li><a class="reference internal" href="#spa" id="id6">SPA</a></li>
+<li><a class="reference internal" href="#vdev" id="id7">VDEV</a></li>
+<li><a class="reference internal" href="#zio" id="id8">ZIO</a></li>
+<li><a class="reference internal" href="#metaslab" id="id9">MetaSlab</a></li>
+<li><a class="reference internal" href="#arc" id="id10">ARC</a></li>
+<li><a class="reference internal" href="#l2arc" id="id11">L2ARC</a></li>
+<li><a class="reference internal" href="#slog" id="id12">SLOG</a></li>
+<li><a class="reference internal" href="#tol" id="id13">TOL</a></li>
+<li><a class="reference internal" href="#dmu" id="id14">DMU</a></li>
+<li><a class="reference internal" href="#zap" id="id15">ZAP</a></li>
+<li><a class="reference internal" href="#dsl" id="id16">DSL</a></li>
+<li><a class="reference internal" href="#zil" id="id17">ZIL</a></li>
+<li><a class="reference internal" href="#zvol" id="id18">ZVOL</a></li>
+<li><a class="reference internal" href="#zpl" id="id19">ZPL</a></li>
 </ul>
 </div>
             </div>
