@@ -292,10 +292,11 @@ Table of Contents                        </div>
 <li><a class="reference internal" href="#id29" id="id54">生存日誌：ZFS 如何管理克隆的空間佔用</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id30" id="id55">3.4   btrfs 的空間跟蹤算法：反向引用</a><ul>
-<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id56">ZFS 的 dedup vs btrfs 的 reflink</a></li>
+<li><a class="reference internal" href="#id30" id="id55">3.4   btrfs 的空間跟蹤算法：引用計數與反向引用</a><ul>
+<li><a class="reference internal" href="#btrfs-extent-tree" id="id56">btrfs 的 EXTENT_TREE 和引用計數</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id57">3.5   ZFS 的 dedup vs btrfs 的 reflink</a></li>
 </ul>
 </li>
 </ul>
@@ -1045,7 +1046,7 @@ btrfs subvolume snapshot</code>
 <li>檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始</li>
 </ul>
 <p>梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。</p>
@@ -1475,10 +1476,10 @@ GC 回收空間，這裏是本文要講的區別，所以在我看來不用 GC �
 <p>舉個例子，比如下圖是一個日誌結構文件系統的磁盤佔用，其中綠色是數據，藍色是元數據（比如目錄結構和
 inode），紅色是文件系統級關鍵數據（比如最後的日誌提交點），一開始可能是這樣，有9個數據塊，
 2個元數據塊，1個系統塊：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/>
 <p>現在要覆蓋 2 和 3 的內容，新寫入 n2 和 n3 ，再刪除 4 號的內容 ，然後修改 10 裏面的 inode 變成 n10
 引用這些新數據，然後寫入一個新提交 n12 ，用黃色表示不再被引用的垃圾，提交完大概是這樣：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/a0eb592f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/a0eb592f.png"/>
 <p>日誌結構文件系統需要 GC 比較容易理解，寫日誌嘛，總得有一個「添加到末尾」的寫入點，比如上面圖中的
 n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空間末尾，這時候就要覆蓋寫空間開頭，
 就很難判斷「末尾」在什麼地方，而下一次寫入需要在哪裏了。
@@ -1500,7 +1501,7 @@ n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空
 又不利於利用整個可用空間，這裏的抉擇有個平衡點。</p>
 <p>繼續上面的例子，假設上面文件系統的圖示中每一列的4塊是一個段，想要回收最開頭那個段，
 那麼需要搬運還在用的 1 到空閒空間，順帶修改引用它的 n10 ，最後提交 n12 ：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ba5b5955.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ba5b5955.png"/>
 <p>要掃描並釋放一整段，需要掃描整個文件系統中別的元數據（圖中的 n12 和 n10 和
 11）來確定有沒有引用到目標段中的地址，可見釋放一個段是一個 <span class="math">\(O(N)\)</span> 的操作，其中 N
 是元數據段的數量，按文件系統的大小增長，
@@ -1539,7 +1540,7 @@ GC 算法則排除掉用戶手動標記的快照之後，根據快照創建的�
 的設計早期中考慮既然需要支持快照，那就把記錄數據塊佔用情況的位圖，變成快照的數組。
 於是整個文件系統有個 256 大小的快照利用率數組，數組中每個快照記錄自己佔用的數據塊位圖，
 文件系統中最多能容納 255 個快照。</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/08c1b975.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/08c1b975.png"/>
 <p>上面每個單元格都是一個二進制位，表示某個快照有沒有引用某個數據塊。有這樣一個位圖的數組之後，
 就可以直接掃描位圖判斷出某個數據塊是否已經佔用，可以找出尚未被佔用的數據塊用作空間分配，
 也可以方便地計算每個快照引用的空間大小或者獨佔的空間大小，估算刪除快照後可以釋放的空間。</p>
@@ -1605,9 +1606,9 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 </pre></div>
 <p>我們對 fs 創建了 s1 快照，刪除了 fs 中某個文件，創建了 s2 快照，然後用 reflink
 把剛剛刪除的文件從 s1 中複製出來，再創建 s3 。如此操作之後，按時間順序有 s1、s2、s3 三個快照：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/fe4409ee.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/fe4409ee.png"/>
 <p>其中只有 s2 不存在 somefile ，而 s1 、 s3 和當前的 fs 都有，並且都引用到了同一個數據塊。
-於是從時間線來�������， somefile 的數據塊在 s2 中「死���了，又在 s3 中「復活」了。</p>
+於是從時間線來�����������， somefile 的數據塊在 s2 中「死���了，又在 s3 中「復活」了。</p>
 <p>而 ZFS (目前還）不支持 reflink ，所以沒法像這樣讓數據塊復活。一旦某個數據塊在某個快照中「死」了，
 就意味着它在隨後的所有快照中都不再被引用到了。</p>
 <p>ZFS 的快照具有的上述三點條件，使得 ZFS 的快照刪除算法可以基於 birth time
@@ -1650,7 +1651,7 @@ CoW 了新的子節點。</li>
 <p>🐰兔子算法爲每個數據集（文件系統或快照）增加了一個數據結構，叫死亡列表（dead list），
 記錄 <strong>前一個快照中還活着，而當前數據集中死掉了的數據塊指針</strong>
 ，換句話說就是在本數據集中「殺掉」的數據塊。舉例畫圖大概是這樣</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ab76244a.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ab76244a.png"/>
 <p>上圖中有三個快照和一個文件系統，共 4 個數據集。每個數據集維護自己的死亡列表，
 死亡列表中是那些在該數據集中被刪掉的數據塊。於是🐰兔子算法把🐢烏龜算法所做的操作分成了兩部分，
 一部分在文件系統刪除數據時記錄死亡列表，另一部分在刪除快照時根據死亡列表釋放需要釋放的塊。</p>
@@ -1695,7 +1696,7 @@ CoW 了新的子節點。</li>
 都需要掃描死亡列表中的塊指針，根據指針中記錄的 birth txg 做判斷是否能直接釋放或是需要保留到另一個快照的死亡列表。
 於是🐆豹子算法的思路是，在死亡列表中記錄塊指針時，就把其中的塊指針按 birth txg 分成子列表（sublist）。</p>
 <p>比如上面🐰兔子算法中那4個死亡列表，可以這樣拆成子列表：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/34b39b01.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/34b39b01.png"/>
 <p>這樣拆成子列表之後，每次從死亡列表中釋放數據塊都能根據出生時間找到對應的子列表，
 然後連續釋放整個子列表。每次合併死亡列表時，也能直接用單鏈表穿起需要合併的子列表，不需要複製塊指針。</p>
 <p>死亡列表並不在跟蹤快照的獨佔大小，而是在跟蹤快照所需負責刪除的數據塊大小，
@@ -1733,7 +1734,7 @@ OpenZFS Summit 2017 有個演講 <a class="reference external" href="https://www
 <p>克隆不光要記錄新數據塊的誕生，還要記錄新數據塊可能的死亡，所以磁盤上保存的生存日誌雖然叫 livelist
 ，但不像死亡列表那樣是列表的形式，而是日誌的形式，而內存中保存的生存日誌則組織成了棵
 <a class="reference external" href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91">自平衡樹（AVLTree）</a> 來加速查找。</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/7f244754.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/7f244754.png"/>
 <p>磁盤上存儲的生存日誌如上圖，每個表項記錄它是分配（A）或者刪除（F）一個數據塊，同時記錄數據塊的地址。
 這些記錄在一般情況下直接記錄在日誌末尾，隨着對克隆的寫入操作而不斷增長，長到一定程度則從內存中的
 AVL Tree 直接輸出一個新的生存日誌替代掉舊的，合併其中對應的分配和刪除操作。</p>
@@ -1743,7 +1744,7 @@ Sara Hartse 的演講 Fast Clone Deletion 中繼續解釋了其中的細節和�
 </div>
 </div>
 <div class="section" id="id30">
-<h3><a class="toc-backref" href="#id55">3.4   btrfs 的空間跟蹤算法：反向引用</a></h3>
+<h3><a class="toc-backref" href="#id55">3.4   btrfs 的空間跟蹤算法：引用計數與反向引用</a></h3>
 <p>理解了 ZFS 中根據 birth txg 管理快照和克隆的算法之後，可以發現它們基於的假設難以用於 WAFL
 和 btrfs 。 ZFS 嚴格區分文件系統、快照、克隆，並且不存在 reflink ，從而可以用 birth txg
 判斷數據塊是否需要保留，而 WAFL 和 btrfs 中不存在 ZFS 的那些數據集分工，又想支持 reflink
@@ -1751,17 +1752,21 @@ Sara Hartse 的演講 Fast Clone Deletion 中繼續解釋了其中的細節和�
 <p>讓我們回到一開始日誌結構文件系統中基於垃圾回收（GC）的思路上來，作爲程序員來看，
 當垃圾回收的性能不足時，很自然的思路是：引用計數（reference counting）。
 編程語言中用引用計數作爲內存管理策略的缺陷是：強引用不能成環，
-這在文件系統中看起來不是很嚴重的問題，文件系統總體上看是個樹狀結構，
-有很多指針類型也方便區分強弱引用。</p>
+這在文件系統中看起來不是很嚴重的問題，文件系統總體上看是個樹狀結構，或者就算有共享的數據也是個
+上下層級分明的有向圖，很少會使用成環的指針，以及文件系統記錄指針的時候也都會區分指針的類型，
+根據指針類型可以分出強弱引用。</p>
+<div class="section" id="btrfs-extent-tree">
+<h4><a class="toc-backref" href="#id56">btrfs 的 EXTENT_TREE 和引用計數</a></h4>
 <p>btrfs 中就是用引用計數的方式跟蹤和管理數據塊的。引用計數本身不能保存在 FS_TREE
 或者指向的數據塊中，因爲這個計數需要能夠變化，對只讀快照來說整個 FS_TREE 都是只讀的。
-計算機領域中的所有問題都可以靠增加一層抽象來解決， btrfs 中關於數據塊的引用計數用一個單獨的
-CoW B樹來記錄，叫做 EXTENT_TREE ，保存於 ROOT_TREE 中的 2 號對象位置。
-btrfs 中每個數據塊都是按 extent 的形式分配的，extent 是一塊連續的存儲空間而非 zfs
+所以這裏增加一層抽象， btrfs 中關於數據塊的引用計數用一個單獨的 CoW B樹來記錄，叫做
+EXTENT_TREE ，保存於 ROOT_TREE 中的 2 號對象位置。</p>
+<p>btrfs 中每個數據塊都是按 <a class="reference external" href="https://en.wikipedia.org/wiki/Extent_(file_systems)">extent</a>
+的形式分配的，extent 是一塊連續的存儲空間，而非 zfs
 中的固定大小，記錄數據塊的存儲位置和長度，以及這裏所說的引用計數。
 所以本文最開始講 <a class="reference internal" href="#btrfs">Btrfs 的子卷和快照</a> 中舉例的那個平坦佈局，如果畫上 EXTENT_TREE
-大概像是下圖這樣，其中每個粗箭頭是一個數據塊指針，指向磁盤中的邏輯地址，細箭頭則是指向
-EXTENT_TREE 中這塊數據塊的描述：</p>
+大概像是下圖這樣，其中每個粗箭頭是一個數據塊指針，指向磁盤中的邏輯地址，細箭頭則是對應的
+EXTENT_TREE 中關於這塊數據塊的描述：</p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -1769,10 +1774,10 @@ EXTENT_TREE 中這塊數據塊的描述：</p>
 <!-- Generated by graphviz version 2.40.1 (20161225.0304)
  -->
 <!-- Title: Flat_layout_extents_on_disk Pages: 1 -->
-<svg class="svg-responsive" height="599pt" viewbox="0.00 0.00 1219.00 598.88" width="1219pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg class="svg-responsive" height="599pt" viewbox="0.00 0.00 1280.00 598.88" width="1280pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 594.8766)">
 <title>Flat_layout_extents_on_disk</title>
-<polygon fill="#ffffff" points="-4,4 -4,-594.8766 1215,-594.8766 1215,4 -4,4" stroke="transparent"></polygon>
+<polygon fill="#ffffff" points="-4,4 -4,-594.8766 1276,-594.8766 1276,4 -4,4" stroke="transparent"></polygon>
 <!-- superblock -->
 <g class="node" id="node1">
 <title>superblock</title>
@@ -1910,26 +1915,26 @@ EXTENT_TREE 中這塊數據塊的描述：</p>
 <!-- extent_tree -->
 <g class="node" id="node8">
 <title>extent_tree</title>
-<polygon fill="none" points="995,-338.5 995,-568.5 1211,-568.5 1211,-338.5 995,-338.5" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-553.3">EXTENT_TREE</text>
-<polyline fill="none" points="995,-545.5 1211,-545.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-530.3"> </text>
-<polyline fill="none" points="995,-522.5 1211,-522.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-507.3">extent 0x10000: ref 1 gen 8</text>
-<polyline fill="none" points="995,-499.5 1211,-499.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-484.3">extent 0x10100: ref 1 gen 8</text>
-<polyline fill="none" points="995,-476.5 1211,-476.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-461.3">extent 0x10200: ref 1 gen 8</text>
-<polyline fill="none" points="995,-453.5 1211,-453.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-438.3">extent 0x10300: ref 1 gen 6</text>
-<polyline fill="none" points="995,-430.5 1211,-430.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-415.3">extent 0x10400: ref 1 gen 6</text>
-<polyline fill="none" points="995,-407.5 1211,-407.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-392.3">extent 0x10500: ref 1 gen 6</text>
-<polyline fill="none" points="995,-384.5 1211,-384.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-369.3">extent 0x10600: ref 1 gen 7</text>
-<polyline fill="none" points="995,-361.5 1211,-361.5 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1103" y="-346.3">...</text>
+<polygon fill="none" points="995,-338.5 995,-568.5 1272,-568.5 1272,-338.5 995,-338.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-553.3">EXTENT_TREE</text>
+<polyline fill="none" points="995,-545.5 1272,-545.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-530.3"> </text>
+<polyline fill="none" points="995,-522.5 1272,-522.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-507.3">0x2000 len=0x1000 : ref=1 gen=8</text>
+<polyline fill="none" points="995,-499.5 1272,-499.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-484.3">0x3000 len=0x1000 : ref=1 gen=8</text>
+<polyline fill="none" points="995,-476.5 1272,-476.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-461.3">0x11000 len=0x1000 : ref=1 gen=8</text>
+<polyline fill="none" points="995,-453.5 1272,-453.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-438.3">0x12000 len=0x1000 : ref=1 gen=6</text>
+<polyline fill="none" points="995,-430.5 1272,-430.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-415.3">0x13000 len=0x1000 : ref=1 gen=6</text>
+<polyline fill="none" points="995,-407.5 1272,-407.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-392.3">0x14000 len=0x1000 : ref=1 gen=6</text>
+<polyline fill="none" points="995,-384.5 1272,-384.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-369.3">0x15000 len=0x1000 : ref=1 gen=7</text>
+<polyline fill="none" points="995,-361.5 1272,-361.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1133.5" y="-346.3">...</text>
 </g>
 <!-- roottree&#45;&gt;extent_tree -->
 <g class="edge" id="edge7">
@@ -1976,8 +1981,8 @@ EXTENT_TREE 中這塊數據塊的描述：</p>
 <!-- extent_tree&#45;&gt;extent_tree -->
 <g class="edge" id="edge9">
 <title>extent_tree:extent_extent-&gt;extent_tree:label</title>
-<path d="M994.8132,-483.7521C908.2355,-483.7746 819,-493.1362 819,-523 819,-551.6972 901.4002,-561.4627 984.6607,-562.2018" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="984.7974,-565.7024 994.8132,-562.2479 984.8292,-558.7025 984.7974,-565.7024" stroke="#000000"></polygon>
+<path d="M994.6922,-483.8069C898.1723,-484.611 803,-494.4106 803,-523 803,-550.5843 891.5981,-560.6768 984.5214,-562.0745" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="984.652,-565.5762 994.6922,-562.1931 984.7337,-558.5767 984.652,-565.5762" stroke="#000000"></polygon>
 </g>
 </g>
 </svg>
@@ -1986,9 +1991,17 @@ EXTENT_TREE 中這塊數據塊的描述：</p>
 字段描述這個數據塊有多少引用。不過 ROOT_TREE 、 EXTENT_TREE 和別的一些數據結構本身不是寫時拷貝的，
 這些數據結構對應的 extent 的引用計數總是 1 ；從 FS_TREE 開始的所有樹節點都可以寫時複製，
 這包括所有子卷的元數據和文件數據，這些數據塊對應的 extent 的引用計數可以大於 1 表示有多處引用。</p>
-<p>EXTENT_TREE 按數據塊的邏輯地址索引，意味着讀取文件系統內容的時候不需要經過 EXTENT_TREE
-，直接從塊指針記錄的邏輯地址可以找到數據塊，只有在刪除數據塊或者增加 reflink 的時候需要讀取
-EXTENT_TREE 修改其中記錄的引用計數。</p>
+<p>EXTENT_TREE 按數據塊的邏輯地址索引，包括了起始地址和長度，所以 EXTENT_TREE 也兼任 btrfs
+的空間利用統計，充當別的文件系統中 block bitmap 的指責。比如上面例子中的 extent_tree 就表示
+<code class="code">
+[0x2000,0x4000) [0x11000,0x16000)</code>
+ 這兩段連續的空間是已用空間，
+剩下的空間按定義則是可用空間。爲了加速空間分配器， btrfs 也有額外的
+free space cache 記錄在 ROOT_TREE 的 10 號位置 free_space_tree 中，不過在 btrfs
+中這個 free_space_tree 記錄的信息只是緩存，必要時可以通過 <code class="code">
+btrfs check --clear-space-cache</code>
+
+扔掉這個緩存重新掃描 extent_tree 並重建可用空間。</p>
 <p>但是 btrfs 中通過引用計數管理子卷的一點反直覺之處在於，創建快照的操作，
 理論上要修改所有引用到的數據塊的計數，這顯然很影響創建快照的性能。
 所以 btrfs 採取的策略是在快照創建時只增加快照的 FS_TREE 頂層元數據塊的引用。
@@ -2191,13 +2204,14 @@ sn1/​file1, sn1/​file2, sn2/​file1, sn2/​file2, fs/​file1</code>
 單純從 extent 的引用計數難以看出整個文件系統所有子卷中有多少副本。
 所以在上圖中每一個單向的箭頭，在 btrfs 中都有記錄一條反向引用，
 通過反向引用記錄能反過來從被指針指向的位置找回到記錄指針的地方。</p>
-<p>反向引用（backref）是 btrfs 中非常關鍵的機制，在
-<a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Resolving_Extent_Backrefs">btrfs kernel wiki 專門有一篇頁面講</a>
-它的原理和實現方式。</p>
-<div class="section" id="zfs-dedup-vs-btrfs-reflink">
-<h4><a class="toc-backref" href="#id56">ZFS 的 dedup vs btrfs 的 reflink</a></h4>
-<p>上面討論了 ZFS 的快照和克隆如何跟蹤數據塊</p>
+<p>反向引用（backref）是 btrfs 中非常關鍵的機制，在 btrfs kernel wiki 專門有一篇頁面
+<a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Resolving_Extent_Backrefs">Resolving Extent Backrefs</a>
+解釋它的原理和實現方式。</p>
 </div>
+</div>
+<div class="section" id="zfs-dedup-vs-btrfs-reflink">
+<h3><a class="toc-backref" href="#id57">3.5   ZFS 的 dedup vs btrfs 的 reflink</a></h3>
+<p>上面討論了 ZFS 的快照和克隆如何跟蹤數據塊</p>
 </div>
 </div>
 <script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -2275,7 +2289,7 @@ sn1/​file1, sn1/​file2, sn2/​file1, sn2/​file2, fs/​file1</code>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7fcd107baa50> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7fe5b3cd2870> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -2598,10 +2612,11 @@ Table of Contents</h4>
 <li><a class="reference internal" href="#id29" id="id54">生存日誌：ZFS 如何管理克隆的空間佔用</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id30" id="id55">3.4   btrfs 的空間跟蹤算法：反向引用</a><ul>
-<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id56">ZFS 的 dedup vs btrfs 的 reflink</a></li>
+<li><a class="reference internal" href="#id30" id="id55">3.4   btrfs 的空間跟蹤算法：引用計數與反向引用</a><ul>
+<li><a class="reference internal" href="#btrfs-extent-tree" id="id56">btrfs 的 EXTENT_TREE 和引用計數</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id57">3.5   ZFS 的 dedup vs btrfs 的 reflink</a></li>
 </ul>
 </li>
 </ul>
