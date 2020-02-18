@@ -258,49 +258,52 @@ Table of Contents                        </div>
                         <div class="toc" id="">
 <p class="topic-title">目录</p>
 <ul class="auto-toc simple">
-<li><a class="reference internal" href="#btrfs" id="id33">1   Btrfs 的子卷和快照</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id4" id="id34">1.1   子卷和快照的术语</a></li>
-<li><a class="reference internal" href="#id5" id="id35">1.2   于是子卷在存储介质中是如何记录的呢？</a></li>
-<li><a class="reference internal" href="#id7" id="id36">1.3   那么快照又是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#btrfs" id="id32">1   Btrfs 的子卷和快照</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id4" id="id33">1.1   子卷和快照的术语</a></li>
+<li><a class="reference internal" href="#id5" id="id34">1.2   于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id7" id="id35">1.3   那么快照又是如何记录的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs" id="id37">2   ZFS 的文件系统、快照、克隆及其它</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id8" id="id38">2.1   ZFS 设计中和快照相关的一些术语和概念</a><ul>
-<li><a class="reference internal" href="#id9" id="id39">数据集</a></li>
-<li><a class="reference internal" href="#id10" id="id40">文件系统</a></li>
-<li><a class="reference internal" href="#id11" id="id41">快照</a></li>
-<li><a class="reference internal" href="#id12" id="id42">克隆</a></li>
-<li><a class="reference internal" href="#id13" id="id43">书签</a></li>
-<li><a class="reference internal" href="#id14" id="id44">检查点</a></li>
+<li><a class="reference internal" href="#zfs" id="id36">2   ZFS 的文件系统、快照、克隆及其它</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id8" id="id37">2.1   ZFS 设计中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#id9" id="id38">数据集</a></li>
+<li><a class="reference internal" href="#id10" id="id39">文件系统</a></li>
+<li><a class="reference internal" href="#id11" id="id40">快照</a></li>
+<li><a class="reference internal" href="#id12" id="id41">克隆</a></li>
+<li><a class="reference internal" href="#id13" id="id42">书签</a></li>
+<li><a class="reference internal" href="#id14" id="id43">检查点</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id45">2.2   ZFS 的概念与 btrfs 概念的对比</a></li>
-<li><a class="reference internal" href="#id15" id="id46">2.3   ZFS 中是如何存储这些数据集的呢</a><ul>
-<li><a class="reference internal" href="#id18" id="id47">ZFS 的块指针</a></li>
-<li><a class="reference internal" href="#id19" id="id48">ZPL 的元对象集</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id20" id="id49">3   创建快照这么简单么？那么删除快照呢？</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id21" id="id50">3.1   日志结构文件系统中用的垃圾回收算法</a></li>
-<li><a class="reference internal" href="#wafl" id="id51">3.2   WAFL 早期使用的可用空间位图数组</a></li>
-<li><a class="reference internal" href="#id24" id="id52">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a><ul>
-<li><a class="reference internal" href="#id26" id="id53">🐢乌龟算法：概念上 ZFS 如何删快照</a></li>
-<li><a class="reference internal" href="#id27" id="id54">🐰兔子算法：死亡列表算法（ZFS早期）</a></li>
-<li><a class="reference internal" href="#id28" id="id55">🐆豹子算法：死亡列表的子列表</a></li>
-<li><a class="reference internal" href="#id29" id="id56">生存日志：ZFS 如何管理克隆的空间占用</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id30" id="id57">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a><ul>
-<li><a class="reference internal" href="#extent-tree" id="id58">EXTENT_TREE 和引用计数</a></li>
-<li><a class="reference internal" href="#back-reference" id="id59">反向引用（back reference）</a></li>
-<li><a class="reference internal" href="#id32" id="id60">遍历反向引用</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id44">2.2   ZFS 的概念与 btrfs 概念的对比</a></li>
+<li><a class="reference internal" href="#id15" id="id45">2.3   ZFS 中是如何存储这些数据集的呢</a><ul>
+<li><a class="reference internal" href="#id18" id="id46">ZFS 的块指针</a></li>
+<li><a class="reference internal" href="#id19" id="id47">ZPL 的元对象集</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id61">4   ZFS 的 dedup vs btrfs 的 reflink</a></li>
+<li><a class="reference internal" href="#id20" id="id48">3   创建快照这么简单么？那么删除快照呢？</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id21" id="id49">3.1   日志结构文件系统中用的垃圾回收算法</a></li>
+<li><a class="reference internal" href="#wafl" id="id50">3.2   WAFL 早期使用的可用空间位图数组</a></li>
+<li><a class="reference internal" href="#id24" id="id51">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a><ul>
+<li><a class="reference internal" href="#id26" id="id52">🐢乌龟算法：概念上 ZFS 如何删快照</a></li>
+<li><a class="reference internal" href="#id27" id="id53">🐰兔子算法：死亡列表算法（ZFS早期）</a></li>
+<li><a class="reference internal" href="#id28" id="id54">🐆豹子算法：死亡列表的子列表</a></li>
+<li><a class="reference internal" href="#id29" id="id55">生存日志：ZFS 如何管理克隆的空间占用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id30" id="id56">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a><ul>
+<li><a class="reference internal" href="#extent-tree" id="id57">EXTENT_TREE 和引用计数</a></li>
+<li><a class="reference internal" href="#back-reference" id="id58">反向引用（back reference）</a></li>
+<li><a class="reference internal" href="#backref-walking" id="id59">遍历反向引用(backref walking)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#btrfs-vs-zfs-dedup" id="id60">4   btrfs vs ZFS 的 dedup 现状</a><ul class="auto-toc">
+<li><a class="reference internal" href="#zfs-dedup" id="id61">4.1   ZFS 是如何实现 dedup 的？</a></li>
+</ul>
+</li>
 </ul>
 </div>
                         </div>
@@ -337,7 +340,7 @@ ZFS 之前就有 <a class="reference external" href="https://en.wikipedia.org/wi
 只是自己的笔记，所有参阅的资料文档都是二手资料，没有深挖过源码，还参杂了自己的理解，
 于是难免有和事实相违的地方，如有写错，还请留言纠正。</p>
 <div class="section" id="btrfs">
-<h2><a class="toc-backref" href="#id33">1   Btrfs 的子卷和快照</a></h2>
+<h2><a class="toc-backref" href="#id32">1   Btrfs 的子卷和快照</a></h2>
 <p>先从两个文件系统中（表面上看起来）比较简单的 btrfs 的子卷（subvolume）和快照（snapshot）说起。
 关于子卷和快照的常规用法、推荐布局之类的话题就不细说了，网上能找到很多不错的资料，比如
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/SysadminGuide#Subvolumes">btrfs wiki 的 SysadminGuide 页</a>
@@ -347,7 +350,7 @@ ZFS 之前就有 <a class="reference external" href="https://en.wikipedia.org/wi
 ，这里不想再讨论。这里假设你用过 btrfs/zfs 至少一个的快照功能，知道它该怎么用，
 并且想知道更多细节，判断怎么用那些功能才合理。</p>
 <div class="section" id="id4">
-<h3><a class="toc-backref" href="#id34">1.1   子卷和快照的术语</a></h3>
+<h3><a class="toc-backref" href="#id33">1.1   子卷和快照的术语</a></h3>
 <p>在 btrfs 中，存在于存储媒介中的只有「子卷」的概念，「快照」只是个创建「子卷」的方式，
 换句话说在 btrfs 的术语里，子卷（subvolume）是个名词，而快照（snapshot）是个动词。
 如果脱离了 btrfs 术语的上下文，或者不精确地称呼的时候，也经常有文档把 btrfs
@@ -421,7 +424,7 @@ cp -r --reflink=always</code>
 用快照命令创建出的子卷就是共享一部分元数据。</p>
 </div>
 <div class="section" id="id5">
-<h3><a class="toc-backref" href="#id35">1.2   于是子卷在存储介质中是如何记录的呢？</a></h3>
+<h3><a class="toc-backref" href="#id34">1.2   于是子卷在存储介质中是如何记录的呢？</a></h3>
 <p>首先要说明， btrfs 中大部分长度可变的数据结构都是
 <a class="reference external" href="https://www.usenix.org/legacy/events/lsf07/tech/rodeh.pdf">CoW B-tree</a>
 ，一种经过修改适合写时拷贝的B树结构，所以在
@@ -852,7 +855,7 @@ struct btrfs_inode_item</code>
 ROOT_TREE 中 object_id 为 258 的子卷。</p>
 </div>
 <div class="section" id="id7">
-<h3><a class="toc-backref" href="#id36">1.3   那么快照又是如何记录的呢？</a></h3>
+<h3><a class="toc-backref" href="#id35">1.3   那么快照又是如何记录的呢？</a></h3>
 <p>以上是子卷、目录、 inode 在 btrfs 中的记录方式，你可能想知道，如何记录一个快照呢？
 特别是，如果对一个包含子卷的子卷创建了快照，会得到什么结果呢？如果我们在上面的布局基础上执行：</p>
 <div class="highlight"><pre><span class="code-line"><span></span>btrfs subvolume snapshot toplevel toplevel/toplevel@s1</span>
@@ -1135,7 +1138,7 @@ btrfs subvolume snapshot</code>
 </div>
 </div>
 <div class="section" id="zfs">
-<h2><a class="toc-backref" href="#id37">2   ZFS 的文件系统、快照、克隆及其它</a></h2>
+<h2><a class="toc-backref" href="#id36">2   ZFS 的文件系统、快照、克隆及其它</a></h2>
 <p>Btrfs 给传统文件系统只增加了子卷的概念，相比之下 ZFS 中类似子卷的概念有好几个，据我所知有这些：</p>
 <ul class="simple">
 <li>数据集（dataset）</li>
@@ -1151,9 +1154,9 @@ btrfs subvolume snapshot</code>
 ，然后文件系统 fs1 有两个快照 s1 和 s2 ，和两个书签 b1 和 b2。pool 整体有两个检查点 cp1 和
 cp2 。这个简图将作为例子在后面介绍这些概念。</p>
 <div class="section" id="id8">
-<h3><a class="toc-backref" href="#id38">2.1   ZFS 设计中和快照相关的一些术语和概念</a></h3>
+<h3><a class="toc-backref" href="#id37">2.1   ZFS 设计中和快照相关的一些术语和概念</a></h3>
 <div class="section" id="id9">
-<h4><a class="toc-backref" href="#id39">数据集</a></h4>
+<h4><a class="toc-backref" href="#id38">数据集</a></h4>
 <p>ZFS 中把文件系统、快照、克隆、zvol 等概念统称为数据集（dataset）。
 一些文档和介绍中把文件系统叫做数据集，大概因为在 ZFS 中，文件系统是最先创建并且最有用的数据集。</p>
 <p>在 ZFS 的术语中，把底层管理和释放存储设备空间的叫做 ZFS 存储池（pool），
@@ -1171,7 +1174,7 @@ pool_name/​dataset_path@snapshot_name</code>
 层。在 Btrfs 中可以用 loopback 块设备某种程度上模拟 zvol 的功能。</p>
 </div>
 <div class="section" id="id10">
-<h4><a class="toc-backref" href="#id40">文件系统</a></h4>
+<h4><a class="toc-backref" href="#id39">文件系统</a></h4>
 <p>创建了 ZFS 存储池后，首先要在其中创建文件系统（filesystem），才能在文件系统中存储文件。
 容易看出 ZFS 文件系统的概念直接对应 btrfs 中的子卷。文件系统（filesystem）这个术语，
 从命名方式来看或许是想要和（像 Solaris 的 SVM 或者 Linux 的 LVM 这样的）传统的卷管理器
@@ -1188,7 +1191,7 @@ pool_name/​dataset_path@snapshot_name</code>
 <p>上面简图中 pool 里面包含 3 个文件系统，分别是 fs1~3 。</p>
 </div>
 <div class="section" id="id11">
-<h4><a class="toc-backref" href="#id41">快照</a></h4>
+<h4><a class="toc-backref" href="#id40">快照</a></h4>
 <p>ZFS 的快照对应 btrfs 的只读快照，是标记数据集在某一历史时刻上的只读状态。
 和 btrfs 的只读快照一样， ZFS 的快照也兼作 send/receive 时的参考点。
 快照隶属于一个数据集，这说明 ZFS 的文件系统或者 zvol 都可以创建快照。</p>
@@ -1216,7 +1219,7 @@ pool/​fs1@s2</code>
  的路径直接访问到 s1 中的内容。</p>
 </div>
 <div class="section" id="id12">
-<h4><a class="toc-backref" href="#id42">克隆</a></h4>
+<h4><a class="toc-backref" href="#id41">克隆</a></h4>
 <p>ZFS 的克隆（clone）有点像 btrfs 的可写快照。因为 ZFS 的快照是只读的，如果想对快照做写入，那需要先用
 <code class="code">
 zfs clone</code>
@@ -1231,7 +1234,7 @@ zfs promote</code>
 <p>比如上面简图中 fs1 有 c1 的克隆，它依赖于 s2 这个快照，从而 c1 存在的时候就不能删除掉 s2 。</p>
 </div>
 <div class="section" id="id13">
-<h4><a class="toc-backref" href="#id43">书签</a></h4>
+<h4><a class="toc-backref" href="#id42">书签</a></h4>
 <p>这是 ZFS 一个比较新的特性，ZFS on Linux 分支从 v0.6.4 开始支持创建书签的功能。</p>
 <p>书签（bookmark）特性存在的理由是基于这样的事实：原本 ZFS 在 send 两个快照间的差异的时候，比如 send S1 和
 S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（TXG id），而不需要 S1 快照的数据，
@@ -1245,7 +1248,7 @@ S2 之间的差异，在发送端实际上只需要 S1 中记录的时间戳（T
 有了书签功能之后，每次将定期的新快照发送到服务器之后，就可以把这个快照转化成书签，节省存储开销。</p>
 </div>
 <div class="section" id="id14">
-<h4><a class="toc-backref" href="#id44">检查点</a></h4>
+<h4><a class="toc-backref" href="#id43">检查点</a></h4>
 <p>这也是 ZFS 的新特性， ZFS on Linux 分支从 v0.8.0 开始支持创建检查点。</p>
 <p>简而言之，检查点（checkpoint）可以看作是整个存储池级别的快照，使用检查点能快速将整个存储池都恢复到上一个状态。
 这边有篇文章介绍 <a class="reference external" href="https://sdimitro.github.io/post/zpool-checkpoint/">ZFS checkpoint 功能的背景、用法和限制</a>
@@ -1256,7 +1259,7 @@ degraded 状态、不能 scrub 到当前存储池中已经释放而在检查点�
 </div>
 </div>
 <div class="section" id="zfs-btrfs">
-<h3><a class="toc-backref" href="#id45">2.2   ZFS 的概念与 btrfs 概念的对比</a></h3>
+<h3><a class="toc-backref" href="#id44">2.2   ZFS 的概念与 btrfs 概念的对比</a></h3>
 <p>先说书签和检查点，因为这是两个 btrfs 目前完全没有的功能。</p>
 <p>书签功能完全围绕 ZFS send 的工作原理，而 ZFS send 位于
 <a class="reference external" href="//farseerfc.me/en/zfs-layered-architecture-design-zhs.html#DSL">ZFS 设计中的 DSL</a>
@@ -1275,7 +1278,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 <p>检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。</p>
 <p>除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="field-list table docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1288,7 +1291,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 </tbody>
 </table>
 <p>对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="field-list table docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1344,7 +1347,7 @@ cp --reflink=always</code>
 而在 zfs 中只能用普通 cp 复制，会浪费很多存储空间。</p>
 </div>
 <div class="section" id="id15">
-<h3><a class="toc-backref" href="#id46">2.3   ZFS 中是如何存储这些数据集的呢</a></h3>
+<h3><a class="toc-backref" href="#id45">2.3   ZFS 中是如何存储这些数据集的呢</a></h3>
 <p>要讲到存储细节，首先需要 了解一下 <a class="reference external" href="//farseerfc.me/en/zfs-layered-architecture-design-zhs.html">ZFS 的分层设计</a>
 。不像 btrfs 基于现代 Linux 内核，有许多现有文件系统已经实现好的基础设施可以利用，
 并且大体上只用到一种核心数据结构（CoW的B树）； ZFS 则脱胎于 Solaris 的野心勃勃，
@@ -1356,7 +1359,7 @@ cp --reflink=always</code>
 ，现在 ZFS 的内部已经变化挺大，不过对于理解本文想讲的快照的实现方式还具有参考意义。这里借助这篇
 ZFS On Disk Format 中的一些图示来解释 ZFS 在磁盘上的存储方式。</p>
 <div class="section" id="id18">
-<h4><a class="toc-backref" href="#id47">ZFS 的块指针</a></h4>
+<h4><a class="toc-backref" href="#id46">ZFS 的块指针</a></h4>
 <div class="panel panel-default">
 <div class="panel-heading">
 <a class="reference external" href="//farseerfc.me/en/images/zfs-block-pointer.svg">ZFS 中用的 128 字节块指针</a></div>
@@ -1386,7 +1389,7 @@ DVA 槽是用来存储最多3个不同位置的副本。然后块指针还记录
 。值得注意的是块指针里只有 birth txg ，没有引用计数或者别的机制做引用，这对后面要讲的东西很关键。</p>
 </div>
 <div class="section" id="id19">
-<h4><a class="toc-backref" href="#id48">ZPL 的元对象集</a></h4>
+<h4><a class="toc-backref" href="#id47">ZPL 的元对象集</a></h4>
 <p>理解块指针和 ZFS 的子系统层级之后，就可以来看看 ZFS 存储在磁盘上的具体结构了。
 因为涉及的数据结构种类比较多，所以先来画一张逻辑上的简图，其中箭头只是某种引用关系不代表块指针，
 方框也不是结构体细节：</p>
@@ -1536,7 +1539,7 @@ snapshot 指向的 DMU 对象集不会变化。</p>
 </div>
 </div>
 <div class="section" id="id20">
-<h2><a class="toc-backref" href="#id49">3   创建快照这么简单么？那么删除快照呢？</a></h2>
+<h2><a class="toc-backref" href="#id48">3   创建快照这么简单么？那么删除快照呢？</a></h2>
 <p>按上面的存储格式细节来看， btrfs 和 zfs 中创建快照似乎都挺简单的，利用写时拷贝，创建快照本身没什么复杂操作。</p>
 <p>如果你也听到过别人介绍 CoW 文件系统时这么讲，是不是会觉得似乎哪儿少了点什么。创建快照是挺简单的，
 <strong>直到你开始考虑如何删除快照</strong> ……</p>
@@ -1550,7 +1553,7 @@ snapshot 指向的 DMU 对象集不会变化。</p>
 <strong>为什么 btrfs 只需要子卷的抽象，而 zfs 搞出了这么多抽象概念？</strong>
 带着这两个疑问，我们来研究一下这些文件系统的块删除算法。</p>
 <div class="section" id="id21">
-<h3><a class="toc-backref" href="#id50">3.1   日志结构文件系统中用的垃圾回收算法</a></h3>
+<h3><a class="toc-backref" href="#id49">3.1   日志结构文件系统中用的垃圾回收算法</a></h3>
 <p>讲 btrfs 和 zfs 用到的删除算法之前，先讲一下日志结构（log-structured）文件系统中的垃圾回收（
 GC, Garbage Collection）算法。对熟悉编程的人来说，讲到空间释放算法，大概首先会想到 GC
 ，因为这里要解决的问题乍看起来很像编程语言的内存管理中 GC
@@ -1631,7 +1634,7 @@ GC 算法则排除掉用户手动标记的快照之后，根据快照创建的�
 。</p>
 </div>
 <div class="section" id="wafl">
-<h3><a class="toc-backref" href="#id51">3.2   WAFL 早期使用的可用空间位图数组</a></h3>
+<h3><a class="toc-backref" href="#id50">3.2   WAFL 早期使用的可用空间位图数组</a></h3>
 <p>从日志结构文件系统使用 GC 的困境中可以看出，文件系统级别实际更合适的，
 可能不是在运行期依赖扫描元数据来计算空间利用率的 GC
 ，而是在创建快照时或者写入数据时就预先记录下快照的空间利用情况，
@@ -1671,7 +1674,7 @@ back reference 的论文，叫
 ，可以推测在新一代 WAFL 的设计中可能使用了类似 btrfs backref 的实现方式，接下来会详细介绍。</p>
 </div>
 <div class="section" id="id24">
-<h3><a class="toc-backref" href="#id52">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a></h3>
+<h3><a class="toc-backref" href="#id51">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a></h3>
 <div class="panel panel-default">
 <div class="panel-heading">
 How ZFS snapshots really work And why they perform well (usually)</div>
@@ -1681,14 +1684,14 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 </div>
 </div>
 <p>OpenZFS 的项目领导者，同时也是最初设计 ZFS 中 DMU 子系统的作者 Matt Ahrens 在 DMU 和 DSL
-中设计并实现了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
+中设计并�����现了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
 比如右侧就是他在 BSDCan 2019 做的演讲
 <a class="reference external" href="https://youtu.be/NXg86uBDSqI">How ZFS snapshots really work And why they perform well (usually)</a>
 的 YouTube 视频。</p>
 <p>其中 Matt 讲到了三个删除快照的算法，分别可以叫做「🐢乌龟算法」、「🐰兔子算法」、「🐆豹子算法」，
 接下来简单讲讲这些算法背后的思想和实现方式。</p>
 <div class="section" id="id26">
-<h4><a class="toc-backref" href="#id53">🐢乌龟算法：概念上 ZFS 如何删快照</a></h4>
+<h4><a class="toc-backref" href="#id52">🐢乌龟算法：概念上 ZFS 如何删快照</a></h4>
 <p>乌龟算法没有实现在 ZFS 中，不过方便理解 ZFS 在概念上如何考虑快照删除这个问题，从而帮助理解
 后面的🐰兔子算法和🐆豹子算法。</p>
 <p>要删除一个快照， ZFS 需要找出这个快照引用到的「独占」数据块，也就是那些不和别的数据集或者快照共享的
@@ -1709,7 +1712,7 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 把刚刚删除的文件从 s1 中复制出来，再创建 s3 。如此操作之后，按时间顺序有 s1、s2、s3 三个快照：</p>
 <img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/fe4409ee.png"/>
 <p>其中只有 s2 不存在 somefile ，而 s1 、 s3 和当前的 fs 都有，并且都引用到了同一个数据块。
-于是从时间线来�������������， somefile 的数据块在 s2 中「死���了，又在 s3 中「复活」了。</p>
+于是从时间线来看， somefile 的数据块在 s2 中「死掉」了，又在 s3 中「复活」了。</p>
 <p>而 ZFS (目前还）不支持 reflink ，所以没法像这样让数据块复活。一旦某个数据块在某个快照中「死」了，
 就意味着它在随后的所有快照中都不再被引用到了。</p>
 <p>ZFS 的快照具有的上述三点条件，使得 ZFS 的快照删除算法可以基于 birth time
@@ -1743,7 +1746,7 @@ CoW 了新的子节点。</li>
 之后创建的数据块的指针，重要的是这些读都是在整个文件系统范围内的随机读操作，所以速度非常慢……</p>
 </div>
 <div class="section" id="id27">
-<h4><a class="toc-backref" href="#id54">🐰兔子算法：死亡列表算法（ZFS早期）</a></h4>
+<h4><a class="toc-backref" href="#id53">🐰兔子算法：死亡列表算法（ZFS早期）</a></h4>
 <p>可以粗略地认为🐢乌龟算法算是用 birth txg 优化代码路径的 GC 算法，利用了一部分元数据中的 birth txg
 信息来避免扫描所有元数据，但是概念上仍然是在扫描元数据找出快照的独占数据块，
 而非记录和跟踪快照的数据块，在最坏的情况下仍然可能需要扫描几乎所有元数据。</p>
@@ -1792,7 +1795,7 @@ CoW 了新的子节点。</li>
 的盘会有 32GiB 拿来存放这些块指针，将高于用位图数组所需的存储量。</p>
 </div>
 <div class="section" id="id28">
-<h4><a class="toc-backref" href="#id55">🐆豹子算法：死亡列表的子列表</a></h4>
+<h4><a class="toc-backref" href="#id54">🐆豹子算法：死亡列表的子列表</a></h4>
 <p>🐆豹子算法是 ZFS 后来在 2009 年左右实现的算法。在🐰兔子算法中就可以看到，每次删除快照操作死亡列表的时候，
 都需要扫描死亡列表中的块指针，根据指针中记录的 birth txg 做判断是否能直接释放或是需要保留到另一个快照的死亡列表。
 于是🐆豹子算法的思路是，在死亡列表中记录块指针时，就把其中的块指针按 birth txg 分成子列表（sublist）。</p>
@@ -1811,7 +1814,7 @@ CoW 了新的子节点。</li>
 在文件系统中删除数据块或者快照时，这个归属信息跟着共享数据块转移到别的快照中，直到最终被释放掉。</p>
 </div>
 <div class="section" id="id29">
-<h4><a class="toc-backref" href="#id56">生存日志：ZFS 如何管理克隆的空间占用</a></h4>
+<h4><a class="toc-backref" href="#id55">生存日志：ZFS 如何管理克隆的空间占用</a></h4>
 <div class="panel panel-default">
 <div class="panel-heading">
 Fast Clone Deletion by Sara Hartse</div>
@@ -1845,7 +1848,7 @@ Sara Hartse 的演讲 Fast Clone Deletion 中继续解释了其中的细节和�
 </div>
 </div>
 <div class="section" id="id30">
-<h3><a class="toc-backref" href="#id57">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a></h3>
+<h3><a class="toc-backref" href="#id56">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a></h3>
 <p>理解了 ZFS 中根据 birth txg 管理快照和克隆的算法之后，可以发现它们基于的假设难以用于 WAFL
 和 btrfs 。 ZFS 严格区分文件系统、快照、克隆，并且不存在 reflink ，从而可以用 birth txg
 判断数据块是否需要保留，而 WAFL 和 btrfs 中不存在 ZFS 的那些数据集分工，又想支持 reflink
@@ -1857,7 +1860,7 @@ Sara Hartse 的演讲 Fast Clone Deletion 中继续解释了其中的细节和�
 上下层级分明的有向图，很少会使用成环的指针，以及文件系统记录指针的时候也都会区分指针的类型，
 根据指针类型可以分出强弱引用。</p>
 <div class="section" id="extent-tree">
-<h4><a class="toc-backref" href="#id58">EXTENT_TREE 和引用计数</a></h4>
+<h4><a class="toc-backref" href="#id57">EXTENT_TREE 和引用计数</a></h4>
 <p>btrfs 中就是用引用计数的方式跟踪和管理数据块的。引用计数本身不能保存在 FS_TREE
 或者指向的数据块中，因为这个计数需要能够变化，对只读快照来说整个 FS_TREE 都是只读的。
 所以这里增加一层抽象， btrfs 中关于数据块的引用计数用一个单独的 CoW B树来记录，叫做
@@ -2324,7 +2327,7 @@ reflink 其实就是 reference counted link 嘛），普通读写下也只需要
 3 ，而文件系统中一共有 5 个路径能访问到该文件。可见从区块根据引用计数反推子卷归属信息不是那么一目了然的。</p>
 </div>
 <div class="section" id="back-reference">
-<h4><a class="toc-backref" href="#id59">反向引用（back reference）</a></h4>
+<h4><a class="toc-backref" href="#id58">反向引用（back reference）</a></h4>
 <p>单纯从区块的引用计数难以看出整个文件系统所有子卷中有多少副本。
 也就是说单有引用计数的一个数字还不够，需要记录具体反向的从区块往引用源头指的引用，这种结构在
 btrfs 中叫做「反向引用（back reference，简称 backref）」。所以在上图中每一个单向的箭头，在
@@ -2332,31 +2335,6 @@ btrfs 中都有记录一条反向引用，通过反向引用记录能反过来�
 <p>反向引用（backref）是 btrfs 中非常关键的机制，在 btrfs kernel wiki 专门有一篇页面
 <a class="reference external" href="https://btrfs.wiki.kernel.org/index.php/Resolving_Extent_Backrefs">Resolving Extent Backrefs</a>
 解释它的原理和实现方式。</p>
-<p>EXTENT_TREE 中每个 extent 记录都同时记录了引用到这个区块的反向引用列表。反向引用有两种记录方式：</p>
-<ol class="arabic simple">
-<li>普通反向引用（Normal back references）。记录这个指针来源所在是哪颗B树、 B树中的对象 id 和对象偏移。<ul>
-<li>对文件区块而言，就是记录文件所在子卷、inode、和文件内容的偏移。</li>
-<li>对子卷的树节点区块而言，就是记录该区块的上级树节点在哪个子卷和哪个 key 开始。</li>
-</ul>
-</li>
-<li>共享反向引用（Shared back references）。记录这个指针来源区块的逻辑地址。<ul>
-<li>无论对文件区块而言，还是对子卷的树节点区块而言，都是直接记录了保存这个区块指针的上层树节点的逻辑地址。</li>
-</ul>
-</li>
-</ol>
-<p>有两种记录方式是因为它们各有性能上的优缺点：</p>
-<dl class="docutils">
-<dt>普通反向引用</dt>
-<dd>因为通过对象编号记录，所以当树节点 CoW 时不需要改变，
-从而在普通的读写和快照之类的操作下有更好的性能，
-但是在解析反向引用时需要额外一次树查找。
-同时因为这个额外查找，普通反向引用也叫间接反向引用。</dd>
-<dt>共享反向引用</dt>
-<dd>因为直接记录了逻辑地址，所以当这个地址的节点被 CoW 的时候也许有调整这里记录的地址。
-在普通的读写和快照操作下会影响性能，但是在解析反向引用时更快。</dd>
-</dl>
-<p>通常创建出来的引用是普通反向引用，在一些条件下普通反向引用会变成共享反向引用，
-共享反向引用不会变回普通反向引用。</p>
 <p>对上面的引用计数的例子画出反向引用的指针大概是这样：</p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -2365,152 +2343,140 @@ btrfs 中都有记录一条反向引用，通过反向引用记录能反过来�
 <!-- Generated by graphviz version 2.40.1 (20161225.0304)
  -->
 <!-- Title: btrfs_reflink_backref Pages: 1 -->
-<svg class="svg-responsive" height="655pt" viewbox="0.00 0.00 1298.00 655.42" width="1298pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 651.4203)">
+<svg class="svg-responsive" height="531pt" viewbox="0.00 0.00 881.00 531.18" width="881pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 527.1753)">
 <title>btrfs_reflink_backref</title>
-<polygon fill="#ffffff" points="-4,4 -4,-651.4203 1294,-651.4203 1294,4 -4,4" stroke="transparent"></polygon>
+<polygon fill="#ffffff" points="-4,4 -4,-527.1753 877,-527.1753 877,4 -4,4" stroke="transparent"></polygon>
 <!-- root -->
 <g class="node" id="node1">
 <title>root</title>
-<polygon fill="none" points="0,-351.9986 0,-443.9986 110,-443.9986 110,-351.9986 0,-351.9986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-428.7986">ROOT_TREE</text>
-<polyline fill="none" points="0,-420.9986 110,-420.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-405.7986">sn1</text>
-<polyline fill="none" points="0,-397.9986 110,-397.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-382.7986">sn2</text>
-<polyline fill="none" points="0,-374.9986 110,-374.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-359.7986">fs</text>
+<polygon fill="none" points="0,-272.5 0,-364.5 110,-364.5 110,-272.5 0,-272.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-349.3">ROOT_TREE</text>
+<polyline fill="none" points="0,-341.5 110,-341.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-326.3">sn1</text>
+<polyline fill="none" points="0,-318.5 110,-318.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-303.3">sn2</text>
+<polyline fill="none" points="0,-295.5 110,-295.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-280.3">fs</text>
 </g>
 <!-- sn1 -->
 <g class="node" id="node2">
 <title>sn1</title>
-<polygon fill="none" points="182,-366.9986 182,-412.9986 297,-412.9986 297,-366.9986 182,-366.9986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-397.7986">FS_TREE sn1</text>
-<polyline fill="none" points="182,-389.9986 297,-389.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-374.7986">leaf_node</text>
+<polygon fill="none" points="182,-316.5 182,-362.5 297,-362.5 297,-316.5 182,-316.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-347.3">FS_TREE sn1</text>
+<polyline fill="none" points="182,-339.5 297,-339.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-324.3">leaf_node</text>
 </g>
 <!-- root&#45;&gt;sn1 -->
 <g class="edge" id="edge1">
 <title>root:sn1-&gt;sn1:label</title>
-<path d="M110,-409.9986C138.5496,-409.9986 147.7642,-403.7084 171.9333,-402.2833" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="172.103,-405.78 182,-401.9986 171.905,-398.7828 172.103,-405.78" stroke="#000000" stroke-width="2"></polygon>
+<path d="M110,-330.5C139.6875,-330.5 147.165,-347.1575 171.9941,-350.8013" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="171.7804,-354.2948 182,-351.5 172.2681,-347.3118 171.7804,-354.2948" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- sn2 -->
 <g class="node" id="node3">
 <title>sn2</title>
-<polygon fill="none" points="945,-418.9986 945,-464.9986 1060,-464.9986 1060,-418.9986 945,-418.9986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1002.5" y="-449.7986">FS_TREE sn2</text>
-<polyline fill="none" points="945,-441.9986 1060,-441.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1002.5" y="-426.7986">leaf_node</text>
+<polygon fill="none" points="182,-251.5 182,-297.5 297,-297.5 297,-251.5 182,-251.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-282.3">FS_TREE sn2</text>
+<polyline fill="none" points="182,-274.5 297,-274.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-259.3">leaf_node</text>
 </g>
 <!-- root&#45;&gt;sn2 -->
 <g class="edge" id="edge2">
 <title>root:sn2-&gt;sn2:label</title>
-<path d="M110,-385.9986C159.5092,-385.9986 141.0856,-443.1208 182,-470.9986 343.7961,-581.2414 405.8462,-581.0133 599,-612.9986 719.1417,-632.8934 770.6593,-679.0001 873,-612.9986 935.0094,-573.0075 874.0123,-465.2415 934.6645,-454.8128" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="935.3058,-458.2732 945,-453.9986 934.756,-451.2948 935.3058,-458.2732" stroke="#000000" stroke-width="2"></polygon>
+<path d="M110,-306.5C139.5791,-306.5 147.2379,-290.6357 172.0219,-287.1654" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="172.2551,-290.6578 182,-286.5 171.7892,-283.6733 172.2551,-290.6578" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- fs -->
 <g class="node" id="node4">
 <title>fs</title>
-<polygon fill="none" points="951.5,-156.9986 951.5,-202.9986 1053.5,-202.9986 1053.5,-156.9986 951.5,-156.9986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1002.5" y="-187.7986">FS_TREE fs</text>
-<polyline fill="none" points="951.5,-179.9986 1053.5,-179.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1002.5" y="-164.7986">leaf_node</text>
+<polygon fill="none" points="188.5,-186.5 188.5,-232.5 290.5,-232.5 290.5,-186.5 188.5,-186.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-217.3">FS_TREE fs</text>
+<polyline fill="none" points="188.5,-209.5 290.5,-209.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-194.3">leaf_node</text>
 </g>
 <!-- root&#45;&gt;fs -->
 <g class="edge" id="edge3">
 <title>root:fs-&gt;fs:label</title>
-<path d="M110,-362.9986C263.6531,-362.9986 239.2454,-216.2971 369,-133.9986 462.9801,-74.3905 490.0008,-57.4609 599,-34.9986 718.2715,-10.4194 769.4096,29.0238 873,-34.9986 936.2519,-74.0904 879.3714,-181.2897 941.4493,-191.2537" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="941.2686,-194.7498 951.5,-191.9986 941.7861,-187.769 941.2686,-194.7498" stroke="#000000" stroke-width="2"></polygon>
+<path d="M110,-283.5C150.6377,-283.5 145.4268,-231.6984 178.1842,-222.795" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="179.0138,-226.2184 188.5,-221.5 178.1419,-219.2729 179.0138,-226.2184" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- extent -->
 <g class="node" id="node7">
 <title>extent</title>
-<polygon fill="none" points="599,-74.4986 599,-603.4986 873,-603.4986 873,-74.4986 599,-74.4986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-588.2986">EXTENT_TREE extent_tree</text>
-<polyline fill="none" points="599,-580.4986 873,-580.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-565.2986">root_tree : ref 1</text>
-<polyline fill="none" points="599,-557.4986 873,-557.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-542.2986"> </text>
-<polyline fill="none" points="599,-534.4986 873,-534.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-519.2986">sn1 fs_tree : ref 1</text>
-<polyline fill="none" points="599,-511.4986 873,-511.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-496.2986">backref ROOT_TREE sn1</text>
-<polyline fill="none" points="599,-488.4986 873,-488.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-473.2986"> </text>
-<polyline fill="none" points="599,-465.4986 873,-465.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-450.2986">sn2 fs_tree : ref 1</text>
-<polyline fill="none" points="599,-442.4986 873,-442.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-427.2986">backref ROOT_TREE sn2</text>
-<polyline fill="none" points="599,-419.4986 873,-419.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-404.2986"> </text>
-<polyline fill="none" points="599,-396.4986 873,-396.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-381.2986">sn1 sn2 leaf_node: ref 2</text>
-<polyline fill="none" points="599,-373.4986 873,-373.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-358.2986">backref sn1 FS_TREE node</text>
-<polyline fill="none" points="599,-350.4986 873,-350.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-335.2986">backref sn2 FS_TREE node</text>
-<polyline fill="none" points="599,-327.4986 873,-327.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-312.2986"> </text>
-<polyline fill="none" points="599,-304.4986 873,-304.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-289.2986">fs fs_tree : ref 1</text>
-<polyline fill="none" points="599,-281.4986 873,-281.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-266.2986">backref ROOT_TREE fs</text>
-<polyline fill="none" points="599,-258.4986 873,-258.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-243.2986"> </text>
-<polyline fill="none" points="599,-235.4986 873,-235.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-220.2986">fs leaf_node : ref 1</text>
-<polyline fill="none" points="599,-212.4986 873,-212.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-197.2986">backref fs FS_TREE node</text>
-<polyline fill="none" points="599,-189.4986 873,-189.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-174.2986"> </text>
-<polyline fill="none" points="599,-166.4986 873,-166.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-151.2986">file1 : ref 3</text>
-<polyline fill="none" points="599,-143.4986 873,-143.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-128.2986">backref FS_TREE sn leaf_node file1</text>
-<polyline fill="none" points="599,-120.4986 873,-120.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-105.2986">backref FS_TREE sn leaf_node file2</text>
-<polyline fill="none" points="599,-97.4986 873,-97.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-82.2986">backref FS_TREE fs leaf_node file1</text>
+<polygon fill="none" points="599,-20 599,-411 873,-411 873,-20 599,-20" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-395.8">EXTENT_TREE extent_tree</text>
+<polyline fill="none" points="599,-388 873,-388 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-372.8">root_tree : ref 1</text>
+<polyline fill="none" points="599,-365 873,-365 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-349.8">sn1 fs_tree : ref 1</text>
+<polyline fill="none" points="599,-342 873,-342 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-326.8">backref ROOT_TREE sn1</text>
+<polyline fill="none" points="599,-319 873,-319 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-303.8">sn2 fs_tree : ref 1</text>
+<polyline fill="none" points="599,-296 873,-296 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-280.8">backref ROOT_TREE sn2</text>
+<polyline fill="none" points="599,-273 873,-273 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-257.8">sn1 sn2 leaf_node: ref 2</text>
+<polyline fill="none" points="599,-250 873,-250 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-234.8">backref sn1 FS_TREE node</text>
+<polyline fill="none" points="599,-227 873,-227 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-211.8">backref sn2 FS_TREE node</text>
+<polyline fill="none" points="599,-204 873,-204 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-188.8">fs fs_tree : ref 1</text>
+<polyline fill="none" points="599,-181 873,-181 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-165.8">backref ROOT_TREE fs</text>
+<polyline fill="none" points="599,-158 873,-158 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-142.8">fs leaf_node : ref 1</text>
+<polyline fill="none" points="599,-135 873,-135 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-119.8">backref fs FS_TREE node</text>
+<polyline fill="none" points="599,-112 873,-112 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-96.8">file1 : ref 3</text>
+<polyline fill="none" points="599,-89 873,-89 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-73.8">backref sn FS_TREE leaf_node file1</text>
+<polyline fill="none" points="599,-66 873,-66 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-50.8">backref sn FS_TREE leaf_node file2</text>
+<polyline fill="none" points="599,-43 873,-43 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="736" y="-27.8">backref fs FS_TREE leaf_node file1</text>
 </g>
 <!-- root&#45;&gt;extent -->
 <!-- snleaf -->
 <g class="node" id="node5">
 <title>snleaf</title>
-<polygon fill="none" points="369,-143.4986 369,-212.4986 527,-212.4986 527,-143.4986 369,-143.4986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-197.2986">FS_TREE leaf_node</text>
-<polyline fill="none" points="369,-189.4986 527,-189.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-174.2986">file1</text>
-<polyline fill="none" points="369,-166.4986 527,-166.4986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-151.2986">file2</text>
+<polygon fill="none" points="369,-66 369,-135 527,-135 527,-66 369,-66" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-119.8">FS_TREE leaf_node</text>
+<polyline fill="none" points="369,-112 527,-112 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-96.8">file1</text>
+<polyline fill="none" points="369,-89 527,-89 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-73.8">file2</text>
 </g>
 <!-- sn1&#45;&gt;snleaf -->
 <g class="edge" id="edge4">
 <title>sn1:leaf-&gt;snleaf:label</title>
-<path d="M297,-377.9986C378.2769,-377.9986 292.1456,-215.8827 359.0359,-201.9509" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="359.3784,-205.4342 369,-200.9986 358.7123,-198.4659 359.3784,-205.4342" stroke="#000000" stroke-width="2"></polygon>
+<path d="M297,-327.5C389.3923,-327.5 281.9198,-139.1262 358.6977,-124.4095" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.3466,-127.8659 369,-123.5 358.7309,-120.8931 359.3466,-127.8659" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- sn1&#45;&gt;extent -->
 <!-- sn2&#45;&gt;snleaf -->
 <g class="edge" id="edge5">
 <title>sn2:leaf-&gt;snleaf:label</title>
-<path d="M945,-429.9986C779.6517,-429.9986 1000.7325,-169.996 873,-64.9986 825.963,-26.3337 651.1638,-33.5917 599,-64.9986 543.6121,-98.3466 589.7182,-190.1778 537.1524,-200.1221" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="536.6618,-196.6513 527,-200.9986 537.264,-203.6254 536.6618,-196.6513" stroke="#000000" stroke-width="2"></polygon>
+<path d="M297,-262.5C362.7688,-262.5 306.3617,-138.2874 358.7675,-124.7017" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.4765,-128.1425 369,-123.5 358.66,-121.1903 359.4765,-128.1425" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- sn2&#45;&gt;extent -->
 <!-- fsleaf -->
 <g class="node" id="node6">
 <title>fsleaf</title>
-<polygon fill="none" points="1132,-132.9986 1132,-178.9986 1290,-178.9986 1290,-132.9986 1132,-132.9986" stroke="#000000"></polygon>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1211" y="-163.7986">FS_TREE leaf_node</text>
-<polyline fill="none" points="1132,-155.9986 1290,-155.9986 " stroke="#000000"></polyline>
-<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="1211" y="-140.7986">file1</text>
+<polygon fill="none" points="369,-.5 369,-46.5 527,-46.5 527,-.5 369,-.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-31.3">FS_TREE leaf_node</text>
+<polyline fill="none" points="369,-23.5 527,-23.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-8.3">file1</text>
 </g>
 <!-- fs&#45;&gt;fsleaf -->
 <g class="edge" id="edge6">
 <title>fs:leaf-&gt;fsleaf:label</title>
-<path d="M1053.5,-167.9986C1084.7092,-167.9986 1094.9802,-167.9986 1121.7727,-167.9986" fill="none" stroke="#000000" stroke-width="2"></path>
-<polygon fill="#000000" points="1122,-171.4987 1132,-167.9986 1122,-164.4987 1122,-171.4987" stroke="#000000" stroke-width="2"></polygon>
+<path d="M290.5,-197.5C366.7574,-197.5 296.2794,-50.3315 358.7804,-36.5345" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.4034,-39.9894 369,-35.5 358.6983,-33.025 359.4034,-39.9894" stroke="#000000" stroke-width="2"></polygon>
 </g>
 <!-- fs&#45;&gt;extent -->
 <!-- snleaf&#45;&gt;extent -->
@@ -2521,69 +2487,378 @@ btrfs 中都有记录一条反向引用，通过反向引用记录能反过来�
 <!-- extent&#45;&gt;root -->
 <g class="edge" id="edge7">
 <title>extent:br1-&gt;root:label</title>
-<path d="M599,-499.9986C413.6475,-499.9986 355.5599,-559.0564 182,-493.9986 146.2562,-480.6002 150.6765,-441.0596 120.1378,-434.0628" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="120.3108,-430.5618 110,-432.9986 119.5799,-437.5236 120.3108,-430.5618" stroke="#000000"></polygon>
+<path d="M599,-330.5C539.4494,-330.5 579.2106,-414.8587 527,-443.5 459.783,-480.3735 251.0999,-476.7111 182,-443.5 139.2574,-422.9568 157.8497,-363.3142 120.2,-354.5742" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="120.3116,-351.0667 110,-353.5 119.5784,-358.0282 120.3116,-351.0667" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;root -->
 <g class="edge" id="edge8">
 <title>extent:br2-&gt;root:label</title>
-<path d="M599,-430.9986C534.6122,-430.9986 273.4387,-470.2487 182,-455.9986 152.438,-451.3915 145.0684,-436.7469 120.078,-433.5985" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="120.1903,-430.0991 110,-432.9986 119.7743,-437.0867 120.1903,-430.0991" stroke="#000000"></polygon>
+<path d="M599,-284.5C550.5005,-284.5 569.3488,-342.8616 527,-366.5 436.4674,-417.0339 400.3159,-396.8027 297,-405.5 246.069,-409.7875 230.6319,-421.2253 182,-405.5 147.9627,-394.4939 148.904,-360.7293 120.0001,-354.4952" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="120.2975,-351.0076 110,-353.5 119.6042,-357.9732 120.2975,-351.0076" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;root -->
 <g class="edge" id="edge11">
 <title>extent:br5-&gt;root:label</title>
-<path d="M599,-269.9986C448.5354,-269.9986 442.3618,-384.1457 297,-422.9986 220.0478,-443.5667 195.3429,-433.9252 120.4065,-433.0587" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="120.0201,-429.5565 110,-432.9986 119.9796,-436.5564 120.0201,-429.5565" stroke="#000000"></polygon>
+<path d="M599,-169.5C437.2729,-169.5 451.6981,-325.3392 297,-372.5 248.1103,-387.4044 232.6864,-379.0752 182,-372.5 152.8975,-368.7247 144.817,-356.7055 120.2855,-354.0309" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="120.1671,-350.5202 110,-353.5 119.8063,-357.5109 120.1671,-350.5202" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;sn1 -->
 <g class="edge" id="edge9">
 <title>extent:br3-&gt;sn1:label</title>
-<path d="M599,-361.9986C467.0433,-361.9986 434.0465,-399.9931 307.1152,-401.9225" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="306.9734,-398.4234 297,-401.9986 307.0261,-405.4232 306.9734,-398.4234" stroke="#000000"></polygon>
+<path d="M599,-238.5C590.9003,-238.5 357.8128,-330.9061 306.6491,-348.5932" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="305.5654,-345.2642 297,-351.5 307.5846,-351.9667 305.5654,-345.2642" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;sn2 -->
 <g class="edge" id="edge10">
 <title>extent:br4-&gt;sn2:label</title>
-<path d="M873,-338.9986C929.5332,-338.9986 890.348,-440.0728 934.9164,-452.7071" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="934.6363,-456.1997 945,-453.9986 935.5257,-449.2564 934.6363,-456.1997" stroke="#000000"></polygon>
+<path d="M599,-215.5C464.6192,-215.5 436.286,-282.9403 307.2904,-286.365" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="306.9532,-282.869 297,-286.5 307.0451,-289.8684 306.9532,-282.869" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;fs -->
 <g class="edge" id="edge12">
 <title>extent:br6-&gt;fs:label</title>
-<path d="M873,-200.9986C904.4136,-200.9986 914.3404,-193.7969 941.2217,-192.2778" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="941.5988,-195.7689 951.5,-191.9986 941.4086,-188.7715 941.5988,-195.7689" stroke="#000000"></polygon>
+<path d="M599,-123.5C565.6667,-123.5 559.0831,-135.4563 527,-144.5 456.9534,-164.245 437.6774,-163.4207 369,-187.5 336.6245,-198.8513 329.7175,-217.4007 300.743,-220.9153" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="300.2843,-217.4357 290.5,-221.5 300.6832,-224.4244 300.2843,-217.4357" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;snleaf -->
 <g class="edge" id="edge13">
 <title>extent:br7-&gt;snleaf:label</title>
-<path d="M599,-131.9986C558.4869,-131.9986 568.9116,-189.6488 537.1534,-199.5574" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="536.4089,-196.1279 527,-200.9986 537.3926,-203.0585 536.4089,-196.1279" stroke="#000000"></polygon>
+<path d="M599,-77.5C564.735,-77.5 564.6023,-114.9543 537.0037,-122.2696" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="536.4979,-118.8054 527,-123.5 537.3525,-125.753 536.4979,-118.8054" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;snleaf -->
 <g class="edge" id="edge14">
 <title>extent:br8-&gt;snleaf:label</title>
-<path d="M599,-108.9986C550.9315,-108.9986 574.6566,-187.8491 537.245,-199.5535" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="536.4131,-196.1361 527,-200.9986 537.3909,-203.0675 536.4131,-196.1361" stroke="#000000"></polygon>
+<path d="M599,-54.5C558.4869,-54.5 568.9116,-112.1502 537.1534,-122.0588" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="536.4089,-118.6293 527,-123.5 537.3926,-125.5599 536.4089,-118.6293" stroke="#000000"></polygon>
 </g>
 <!-- extent&#45;&gt;fsleaf -->
 <g class="edge" id="edge15">
 <title>extent:br9-&gt;fsleaf:label</title>
-<path d="M873,-85.9986C886.6484,-85.9986 1075.0682,-153.0543 1122.1689,-165.8892" fill="none" stroke="#000000"></path>
-<polygon fill="#000000" points="1121.4882,-169.3227 1132,-167.9986 1122.9568,-162.4785 1121.4882,-169.3227" stroke="#000000"></polygon>
+<path d="M599,-31.5C570.5812,-31.5 561.1494,-34.6451 537.0323,-35.3576" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="536.9493,-31.8584 527,-35.5 537.0487,-38.8577 536.9493,-31.8584" stroke="#000000"></polygon>
 </g>
 </g>
 </svg>
+<p>EXTENT_TREE 中每个 extent 记录都同时记录了引用到这个区块的反向引用列表。反向引用有两种记录方式：</p>
+<ol class="arabic simple">
+<li>普通反向引用（Normal back references）。记录这个指针来源所在是哪颗B树、 B树中的对象 id 和对象偏移。<ul>
+<li>对文件区块而言，就是记录文件所在子卷、inode、和文件内容的偏移。</li>
+<li>对子卷的树节点区块而言，就是记录该区块的上级树节点在哪个B树的哪个位置开始。</li>
+</ul>
+</li>
+<li>共享反向引用（Shared back references）。记录这个指针来源区块的逻辑地址。<ul>
+<li>无论对文件区块而言，还是对子卷的树节点区块而言，都是直接记录了保存这个区块指针的上层树节点的逻辑地址。</li>
+</ul>
+</li>
+</ol>
+<p>有两种记录方式是因为它们各有性能上的优缺点：</p>
+<dl class="docutils">
+<dt>普通反向引用</dt>
+<dd>因为通过对象编号记录，所以当树节点 CoW 改变了地址时不需要改变，
+从而在普通的读写和快照之类的操作下有更好的性能，
+但是在解析反向引用时需要额外一次树查找。
+同时因为这个额外查找，普通反向引用也叫间接反向引用。</dd>
+<dt>共享反向引用</dt>
+<dd>因为直接记录了逻辑地址，所以当这个地址的节点被 CoW 的时候也许有调整这里记录的地址。
+在普通的读写和快照操作下，调整地址会增加写入从而影响性能，但是在解析反向引用时更快。</dd>
+</dl>
+<p>通常通过普通写入、快照、 reflink 等方式创建出来的引用是普通反向引用，
+由于普通反向引用记录了包含它的B树，从而可以说绑在了某棵树比如某个子卷上，
+当这个普通反向引用指向的对象不再存在，而这个反向引用还在通过别的途径共享时，
+这个普通反向引用会变成共享反向引用；共享反向引用在存在期间不会变回普通反向引用。</p>
+<p>比如上图反向引用的例子中，我们先假设所有画出的反向引用都是普通反向引用，于是图中标为 file1
+引用数为 3 的那个区块有 3 条反向引用记录，其中前两条都指向 sn1 里面的文件，分别是 sn1/file1
+和 sn1/file2 ，然后 sn1 和 sn2 共享了 FS_TREE 的叶子节点。</p>
+<p>假设这时我们删除 sn1/file2，执行了代码 <code class="code">
+rm sn1/​file2</code>
+ 之后：</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: btrfs_reflink_shared_backref Pages: 1 -->
+<svg class="svg-responsive" height="545pt" viewbox="0.00 0.00 890.00 545.10" width="890pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g class="graph" id="graph0" transform="scale(1 1) rotate(0) translate(4 541.0957)">
+<title>btrfs_reflink_shared_backref</title>
+<polygon fill="#ffffff" points="-4,4 -4,-541.0957 886,-541.0957 886,4 -4,4" stroke="transparent"></polygon>
+<!-- root -->
+<g class="node" id="node1">
+<title>root</title>
+<polygon fill="none" points="0,-375.5 0,-467.5 110,-467.5 110,-375.5 0,-375.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-452.3">ROOT_TREE</text>
+<polyline fill="none" points="0,-444.5 110,-444.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-429.3">sn1</text>
+<polyline fill="none" points="0,-421.5 110,-421.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-406.3">sn2</text>
+<polyline fill="none" points="0,-398.5 110,-398.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="55" y="-383.3">fs</text>
+</g>
+<!-- sn1 -->
+<g class="node" id="node2">
+<title>sn1</title>
+<polygon fill="none" points="182,-419.5 182,-465.5 297,-465.5 297,-419.5 182,-419.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-450.3">FS_TREE sn1</text>
+<polyline fill="none" points="182,-442.5 297,-442.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-427.3">leaf_node</text>
+</g>
+<!-- root&#45;&gt;sn1 -->
+<g class="edge" id="edge1">
+<title>root:sn1-&gt;sn1:label</title>
+<path d="M110,-433.5C139.6875,-433.5 147.165,-450.1575 171.9941,-453.8013" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="171.7804,-457.2948 182,-454.5 172.2681,-450.3118 171.7804,-457.2948" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- sn2 -->
+<g class="node" id="node3">
+<title>sn2</title>
+<polygon fill="none" points="182,-354.5 182,-400.5 297,-400.5 297,-354.5 182,-354.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-385.3">FS_TREE sn2</text>
+<polyline fill="none" points="182,-377.5 297,-377.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-362.3">leaf_node</text>
+</g>
+<!-- root&#45;&gt;sn2 -->
+<g class="edge" id="edge2">
+<title>root:sn2-&gt;sn2:label</title>
+<path d="M110,-409.5C139.5791,-409.5 147.2379,-393.6357 172.0219,-390.1654" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="172.2551,-393.6578 182,-389.5 171.7892,-386.6733 172.2551,-393.6578" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- fs -->
+<g class="node" id="node4">
+<title>fs</title>
+<polygon fill="none" points="188.5,-250.5 188.5,-296.5 290.5,-296.5 290.5,-250.5 188.5,-250.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-281.3">FS_TREE fs</text>
+<polyline fill="none" points="188.5,-273.5 290.5,-273.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="239.5" y="-258.3">leaf_node</text>
+</g>
+<!-- root&#45;&gt;fs -->
+<g class="edge" id="edge3">
+<title>root:fs-&gt;fs:label</title>
+<path d="M110,-386.5C163.0775,-386.5 135.9169,-298.4687 178.3378,-286.777" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="179.0145,-290.2196 188.5,-285.5 178.1416,-283.2742 179.0145,-290.2196" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- extent -->
+<g class="node" id="node8">
+<title>extent</title>
+<polygon fill="none" points="599,-39 599,-476 882,-476 882,-39 599,-39" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-460.8">EXTENT_TREE extent_tree</text>
+<polyline fill="none" points="599,-453 882,-453 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-437.8">root_tree : ref 1</text>
+<polyline fill="none" points="599,-430 882,-430 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-414.8">sn1 fs_tree : ref 1</text>
+<polyline fill="none" points="599,-407 882,-407 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-391.8">backref ROOT_TREE sn1</text>
+<polyline fill="none" points="599,-384 882,-384 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-368.8">sn2 fs_tree : ref 1</text>
+<polyline fill="none" points="599,-361 882,-361 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-345.8">backref ROOT_TREE sn2</text>
+<polyline fill="none" points="599,-338 882,-338 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-322.8">sn1 sn2 leaf_node: ref 2</text>
+<polyline fill="none" points="599,-315 882,-315 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-299.8">backref sn1 FS_TREE node</text>
+<polyline fill="none" points="599,-292 882,-292 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-276.8">backref sn2 FS_TREE node</text>
+<polyline fill="none" points="599,-269 882,-269 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-253.8">fs fs_tree : ref 1</text>
+<polyline fill="none" points="599,-246 882,-246 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-230.8">backref ROOT_TREE fs</text>
+<polyline fill="none" points="599,-223 882,-223 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-207.8">fs leaf_node : ref 1</text>
+<polyline fill="none" points="599,-200 882,-200 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-184.8">backref fs FS_TREE node</text>
+<polyline fill="none" points="599,-177 882,-177 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-161.8">file1 : ref 3</text>
+<polyline fill="none" points="599,-154 882,-154 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-138.8">backref FS_TREE leaf_node file1</text>
+<polyline fill="none" points="599,-131 882,-131 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-115.8">backref FS_TREE leaf_node file2</text>
+<polyline fill="none" points="599,-108 882,-108 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-92.8">backref fs FS_TREE leaf_node file1</text>
+<polyline fill="none" points="599,-85 882,-85 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-69.8">backref sn1 FS_TREE leaf_node file1</text>
+<polyline fill="none" points="599,-62 882,-62 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="740.5" y="-46.8"> </text>
+</g>
+<!-- root&#45;&gt;extent -->
+<!-- sn1leaf -->
+<g class="node" id="node5">
+<title>sn1leaf</title>
+<polygon fill="none" points="369,-.5 369,-46.5 527,-46.5 527,-.5 369,-.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-31.3">FS_TREE leaf_node</text>
+<polyline fill="none" points="369,-23.5 527,-23.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-8.3">file1</text>
+</g>
+<!-- sn1&#45;&gt;sn1leaf -->
+<g class="edge" id="edge4">
+<title>sn1:leaf-&gt;sn1leaf:label</title>
+<path d="M297,-430.5C471.7886,-430.5 202.0422,-51.535 358.5979,-35.9916" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.1764,-39.4682 369,-35.5 358.8459,-32.476 359.1764,-39.4682" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- sn1&#45;&gt;extent -->
+<!-- snleaf -->
+<g class="node" id="node6">
+<title>snleaf</title>
+<polygon fill="none" points="369,-131 369,-200 527,-200 527,-131 369,-131" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-184.8">FS_TREE leaf_node</text>
+<polyline fill="none" points="369,-177 527,-177 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-161.8">file1</text>
+<polyline fill="none" points="369,-154 527,-154 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-138.8">file2</text>
+</g>
+<!-- sn2&#45;&gt;snleaf -->
+<g class="edge" id="edge5">
+<title>sn2:leaf-&gt;snleaf:label</title>
+<path d="M297,-365.5C378.2769,-365.5 292.1456,-203.3841 359.0359,-189.4523" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.3784,-192.9356 369,-188.5 358.7123,-185.9674 359.3784,-192.9356" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- sn2&#45;&gt;extent -->
+<!-- fsleaf -->
+<g class="node" id="node7">
+<title>fsleaf</title>
+<polygon fill="none" points="369,-65.5 369,-111.5 527,-111.5 527,-65.5 369,-65.5" stroke="#000000"></polygon>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-96.3">FS_TREE leaf_node</text>
+<polyline fill="none" points="369,-88.5 527,-88.5 " stroke="#000000"></polyline>
+<text fill="#000000" font-family="Times,serif" font-size="14.00" text-anchor="middle" x="448" y="-73.3">file1</text>
+</g>
+<!-- fs&#45;&gt;fsleaf -->
+<g class="edge" id="edge6">
+<title>fs:leaf-&gt;fsleaf:label</title>
+<path d="M290.5,-261.5C366.3764,-261.5 296.6069,-115.24 358.8289,-101.5281" fill="none" stroke="#000000" stroke-width="2"></path>
+<polygon fill="#000000" points="359.4027,-104.988 369,-100.5 358.6987,-98.0235 359.4027,-104.988" stroke="#000000" stroke-width="2"></polygon>
+</g>
+<!-- fs&#45;&gt;extent -->
+<!-- snleaf&#45;&gt;extent -->
+<!-- snleaf&#45;&gt;extent -->
+<!-- snleaf&#45;&gt;extent -->
+<!-- fsleaf&#45;&gt;extent -->
+<!-- fsleaf&#45;&gt;extent -->
+<!-- extent&#45;&gt;root -->
+<g class="edge" id="edge7">
+<title>extent:br1-&gt;root:label</title>
+<path d="M599,-395.5C455.6896,-395.5 438.0201,-482.9811 297,-508.5 246.7057,-517.6012 230.6319,-524.2253 182,-508.5 147.9627,-497.4939 148.904,-463.7293 120.0001,-457.4952" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="120.2975,-454.0076 110,-456.5 119.6042,-460.9732 120.2975,-454.0076" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;root -->
+<g class="edge" id="edge8">
+<title>extent:br2-&gt;root:label</title>
+<path d="M599,-349.5C562.1754,-349.5 561.0771,-376.5429 527,-390.5 459.7603,-418.0396 435.9507,-404.2651 369,-432.5 334.6567,-446.9835 332.9302,-465.5875 297,-475.5 247.7295,-489.0929 232.6864,-482.0752 182,-475.5 152.8975,-471.7247 144.817,-459.7055 120.2855,-457.0309" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="120.1671,-453.5202 110,-456.5 119.8063,-460.5109 120.1671,-453.5202" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;root -->
+<g class="edge" id="edge11">
+<title>extent:br5-&gt;root:label</title>
+<path d="M599,-234.5C575.0266,-234.5 201.4027,-331.4196 182,-345.5 137.3828,-377.8785 164.8238,-447.1059 119.9762,-455.6329" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="119.6593,-452.1471 110,-456.5 120.2656,-459.1208 119.6593,-452.1471" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;sn1 -->
+<g class="edge" id="edge9">
+<title>extent:br3-&gt;sn1:label</title>
+<path d="M599,-303.5C561.2641,-303.5 560.9856,-332.0995 527,-348.5 459.9018,-380.8797 435.2953,-370.5066 369,-404.5 337.718,-420.5401 335.9877,-448.344 307.3243,-453.6215" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="306.6672,-450.1647 297,-454.5 307.2608,-457.1395 306.6672,-450.1647" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;sn2 -->
+<g class="edge" id="edge10">
+<title>extent:br4-&gt;sn2:label</title>
+<path d="M599,-280.5C582.6957,-280.5 358.7767,-371.5706 306.7887,-387.2234" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="305.9472,-383.8256 297,-389.5 307.5329,-390.6436 305.9472,-383.8256" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;fs -->
+<g class="edge" id="edge12">
+<title>extent:br6-&gt;fs:label</title>
+<path d="M599,-188.5C565.6667,-188.5 559.0831,-200.4563 527,-209.5 456.9534,-229.245 437.8061,-228.7911 369,-252.5 336.7126,-263.6255 329.5927,-281.5423 300.7039,-284.9356" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="300.2914,-281.453 290.5,-285.5 300.6781,-288.4423 300.2914,-281.453" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;sn1leaf -->
+<g class="edge" id="edge16">
+<title>extent:br10-&gt;sn1leaf:label</title>
+<path d="M599,-73.5C566.4915,-73.5 563.4859,-42.8268 536.9702,-36.5963" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="537.3227,-33.114 527,-35.5 536.5575,-40.0721 537.3227,-33.114" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;snleaf -->
+<g class="edge" id="edge13">
+<title>extent:br7-&gt;snleaf:label</title>
+<path d="M599,-142.5C564.735,-142.5 564.6023,-179.9543 537.0037,-187.2696" fill="none" stroke="#000000" stroke-dasharray="5,2"></path>
+<polygon fill="#000000" points="536.4979,-183.8054 527,-188.5 537.3525,-190.753 536.4979,-183.8054" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;snleaf -->
+<g class="edge" id="edge14">
+<title>extent:br8-&gt;snleaf:label</title>
+<path d="M599,-119.5C558.4869,-119.5 568.9116,-177.1502 537.1534,-187.0588" fill="none" stroke="#000000" stroke-dasharray="5,2"></path>
+<polygon fill="#000000" points="536.4089,-183.6293 527,-188.5 537.3926,-190.5599 536.4089,-183.6293" stroke="#000000"></polygon>
+</g>
+<!-- extent&#45;&gt;fsleaf -->
+<g class="edge" id="edge15">
+<title>extent:br9-&gt;fsleaf:label</title>
+<path d="M599,-96.5C570.5812,-96.5 561.1494,-99.6451 537.0323,-100.3576" fill="none" stroke="#000000"></path>
+<polygon fill="#000000" points="536.9493,-96.8584 527,-100.5 537.0487,-103.8577 536.9493,-96.8584" stroke="#000000"></polygon>
+</g>
+</g>
+</svg>
+<p>那么 sn1 会 CoW 那个和 sn2 共享的叶子节点，有了新的属于 sn1 的叶子，从而断开了原本 file1
+中对这个共享叶子节点的两个普通反向引用，转化成共享反向引用（图中用虚线箭头描述），
+并且插入了一个新的普通反向引用指向新的 sn1 的叶子节点。</p>
 </div>
-<div class="section" id="id32">
-<h4><a class="toc-backref" href="#id60">遍历反向引用</a></h4>
-<p>有了反向引用记录之后</p>
+<div class="section" id="backref-walking">
+<h4><a class="toc-backref" href="#id59">遍历反向引用(backref walking)</a></h4>
+<p>有了反向引用记录之后，可以给定一个逻辑地址，从 EXTENT_TREE 中找到地址的区块记录，
+然后从区块记录中的反向引用记录一步步往回遍历，直到遇到 ROOT_TREE
+，最终确定这个逻辑地址的区块在整个文件系统中有多少路径能访问它。
+这个遍历反向引用的操作，在 btrfs 文档和代码中被称作 backref walking 。</p>
+<p>比如还是上面的反向引用图例中 sn1 和 sn2 完全共享叶子节点的那个例子，通过 backref walking
+，我们能从 file1 所记录的 3 个反向引用，推出全部 5 个可能的访问路径。</p>
+<p>backref walking 作为很多功能的基础设施，从 btrfs 相当早期（3.3内核）就有，很多 btrfs
+的功能实际依赖 backref walking 的正确性。列举一些需要 backref walking 来实现的功能：</p>
+<ol class="arabic">
+<li><p class="first">qgroup</p>
+<p>btrfs 的子卷没有记录子卷的磁盘占用开销，靠引用计数来删除子卷，所以也不需要详细统计子卷的占用。
+不过有些场合下，统计子卷占用很有用。由于 reflink 的存在，显然子卷占用不能靠累计加减法算出来，
+所以有了 qgroup 和 quota 功能，用来统计子卷占用空间。为了实现 qgroup ，需要 backref
+walking 来计算区块共享的情况。</p>
+</li>
+<li><p class="first">send</p>
+<p>btrfs send 在计算子卷间的差异时，也通过 backref walking 寻找能 reflink
+的区块，从而避免传输数据。</p>
+</li>
+<li><p class="first">balance/scrub</p>
+<p>balance 和 scrub 都会调整区块的地址，通过 backref walking
+能找到所有引用到这个地址的位置并正确修改地址。</p>
+</li>
+</ol>
+<p>可见 backref walking 的能力对 btrfs 的许多功能都非常重要。不过 backref walking
+根据区块共享的情况也可能导致挺大的运行期开销，包括算法时间上的和内存占用方面的。
+比如某个子卷中有 100 个文件通过 reflink 共享了同一个区块，然后对这个子卷做了 100 个快照，
+那么对这一个共享区块的 backref walking 结果可能解析出 10000 个路径。可见随着使用 reflink
+和快照， backref walking 的开销可能爆炸式增长。</p>
+<p>值得再强调的是，在没有开启 qgroup 的前提下，正常创建删除快照或reflink
+，正常写入和覆盖区块之类的文件系统操作，只需要引用计数就足够，不需要动用
+backref walking 这样的重型武器。</p>
 </div>
 </div>
 </div>
-<div class="section" id="zfs-dedup-vs-btrfs-reflink">
-<h2><a class="toc-backref" href="#id61">4   ZFS 的 dedup vs btrfs 的 reflink</a></h2>
-<p>上面讨论了 ZFS 的快照和克隆如何跟踪数据块</p>
+<div class="section" id="btrfs-vs-zfs-dedup">
+<h2><a class="toc-backref" href="#id60">4   btrfs vs ZFS 的 dedup 现状</a></h2>
+<p>上面讨论 ZFS 的快照和克隆如何跟踪数据块时，故意避开了 ZFS 的 dedup 功能，因为要讲 dedup
+可能需要先理解引用计数在文件系统中的用法，而 btrfs 正好用了引用计数。
+于是我们再回来 ZFS 这边，看看 ZFS 的 dedup 是具体如何运作的。</p>
+<p>稍微了解过 btrfs 和 ZFS 两者的人，或许有不少 btrfs 用户都眼馋 ZFS 有 in-band dedup
+的能力，可以在写入数据块的同时就去掉重复数据，而 btrfs 只能「退而求其次」地选择第三方 dedup
+方案，用外部工具扫描已经写入的数据，将其中重复的部分改为 reflink 。又或许有不少 btrfs
+用户以为 zfs 的 dedup 就是在内存和磁盘中维护一个类似
+<a class="reference external" href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom filter</a>
+的结构，然后根据结果对数据块增加 reflink ，从而 zfs 内部大概一定有类似 reflink
+的东西，进一步质疑为什么 btrfs 还迟迟没有实现这样一个 Bloom filter 。
+或许还有 ZFS 用户有疑惑，
+<a class="reference external" href="https://github.com/zfsonlinux/zfs/issues/405">为什么 ZFS 还没有暴露出 reflink 的用户空间接口</a>
+，或者既然 ZFS 已经有了 dedup ，
+<a class="reference external" href="https://github.com/zfsonlinux/zfs/issues/2554">能不能临时开关 dedup 来提供类似 reflink 式的共享数据块</a>
+而避免长期开 dedup 的巨大开销。</p>
+<p>看过上面 <a class="reference internal" href="#id24">ZFS 中关于快照和克隆的空间跟踪算法</a> 之后我们会发现，其实 ZFS 中并没有
+能对应 btrfs reflink 的功能，而是根据数据块指针中的 birth txg
+来跟踪快照和克隆的共享数据块的。这引来更多疑惑：</p>
+<div class="section" id="zfs-dedup">
+<h3><a class="toc-backref" href="#id61">4.1   ZFS 是如何实现 dedup 的？</a></h3>
+</div>
 </div>
 <script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
@@ -2660,7 +2935,7 @@ btrfs 中都有记录一条反向引用，通过反向引用记录能反过来�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7f56fd07fbd0> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7f622dd4ad50> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -2949,49 +3224,52 @@ Table of Contents</h4>
             <div class="toc" id="">
 <p class="topic-title">目录</p>
 <ul class="auto-toc simple">
-<li><a class="reference internal" href="#btrfs" id="id33">1   Btrfs 的子卷和快照</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id4" id="id34">1.1   子卷和快照的术语</a></li>
-<li><a class="reference internal" href="#id5" id="id35">1.2   于是子卷在存储介质中是如何记录的呢？</a></li>
-<li><a class="reference internal" href="#id7" id="id36">1.3   那么快照又是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#btrfs" id="id32">1   Btrfs 的子卷和快照</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id4" id="id33">1.1   子卷和快照的术语</a></li>
+<li><a class="reference internal" href="#id5" id="id34">1.2   于是子卷在存储介质中是如何记录的呢？</a></li>
+<li><a class="reference internal" href="#id7" id="id35">1.3   那么快照又是如何记录的呢？</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs" id="id37">2   ZFS 的文件系统、快照、克隆及其它</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id8" id="id38">2.1   ZFS 设计中和快照相关的一些术语和概念</a><ul>
-<li><a class="reference internal" href="#id9" id="id39">数据集</a></li>
-<li><a class="reference internal" href="#id10" id="id40">文件系统</a></li>
-<li><a class="reference internal" href="#id11" id="id41">快照</a></li>
-<li><a class="reference internal" href="#id12" id="id42">克隆</a></li>
-<li><a class="reference internal" href="#id13" id="id43">书签</a></li>
-<li><a class="reference internal" href="#id14" id="id44">检查点</a></li>
+<li><a class="reference internal" href="#zfs" id="id36">2   ZFS 的文件系统、快照、克隆及其它</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id8" id="id37">2.1   ZFS 设计中和快照相关的一些术语和概念</a><ul>
+<li><a class="reference internal" href="#id9" id="id38">数据集</a></li>
+<li><a class="reference internal" href="#id10" id="id39">文件系统</a></li>
+<li><a class="reference internal" href="#id11" id="id40">快照</a></li>
+<li><a class="reference internal" href="#id12" id="id41">克隆</a></li>
+<li><a class="reference internal" href="#id13" id="id42">书签</a></li>
+<li><a class="reference internal" href="#id14" id="id43">检查点</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-btrfs" id="id45">2.2   ZFS 的概念与 btrfs 概念的对比</a></li>
-<li><a class="reference internal" href="#id15" id="id46">2.3   ZFS 中是如何存储这些数据集的呢</a><ul>
-<li><a class="reference internal" href="#id18" id="id47">ZFS 的块指针</a></li>
-<li><a class="reference internal" href="#id19" id="id48">ZPL 的元对象集</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id20" id="id49">3   创建快照这么简单么？那么删除快照呢？</a><ul class="auto-toc">
-<li><a class="reference internal" href="#id21" id="id50">3.1   日志结构文件系统中用的垃圾回收算法</a></li>
-<li><a class="reference internal" href="#wafl" id="id51">3.2   WAFL 早期使用的可用空间位图数组</a></li>
-<li><a class="reference internal" href="#id24" id="id52">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a><ul>
-<li><a class="reference internal" href="#id26" id="id53">🐢乌龟算法：概念上 ZFS 如何删快照</a></li>
-<li><a class="reference internal" href="#id27" id="id54">🐰兔子算法：死亡列表算法（ZFS早期）</a></li>
-<li><a class="reference internal" href="#id28" id="id55">🐆豹子算法：死亡列表的子列表</a></li>
-<li><a class="reference internal" href="#id29" id="id56">生存日志：ZFS 如何管理克隆的空间占用</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id30" id="id57">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a><ul>
-<li><a class="reference internal" href="#extent-tree" id="id58">EXTENT_TREE 和引用计数</a></li>
-<li><a class="reference internal" href="#back-reference" id="id59">反向引用（back reference）</a></li>
-<li><a class="reference internal" href="#id32" id="id60">遍历反向引用</a></li>
+<li><a class="reference internal" href="#zfs-btrfs" id="id44">2.2   ZFS 的概念与 btrfs 概念的对比</a></li>
+<li><a class="reference internal" href="#id15" id="id45">2.3   ZFS 中是如何存储这些数据集的呢</a><ul>
+<li><a class="reference internal" href="#id18" id="id46">ZFS 的块指针</a></li>
+<li><a class="reference internal" href="#id19" id="id47">ZPL 的元对象集</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#zfs-dedup-vs-btrfs-reflink" id="id61">4   ZFS 的 dedup vs btrfs 的 reflink</a></li>
+<li><a class="reference internal" href="#id20" id="id48">3   创建快照这么简单么？那么删除快照呢？</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id21" id="id49">3.1   日志结构文件系统中用的垃圾回收算法</a></li>
+<li><a class="reference internal" href="#wafl" id="id50">3.2   WAFL 早期使用的可用空间位图数组</a></li>
+<li><a class="reference internal" href="#id24" id="id51">3.3   ZFS 中关于快照和克隆的空间跟踪算法</a><ul>
+<li><a class="reference internal" href="#id26" id="id52">🐢乌龟算法：概念上 ZFS 如何删快照</a></li>
+<li><a class="reference internal" href="#id27" id="id53">🐰兔子算法：死亡列表算法（ZFS早期）</a></li>
+<li><a class="reference internal" href="#id28" id="id54">🐆豹子算法：死亡列表的子列表</a></li>
+<li><a class="reference internal" href="#id29" id="id55">生存日志：ZFS 如何管理克隆的空间占用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id30" id="id56">3.4   btrfs 的空间跟踪算法：引用计数与反向引用</a><ul>
+<li><a class="reference internal" href="#extent-tree" id="id57">EXTENT_TREE 和引用计数</a></li>
+<li><a class="reference internal" href="#back-reference" id="id58">反向引用（back reference）</a></li>
+<li><a class="reference internal" href="#backref-walking" id="id59">遍历反向引用(backref walking)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#btrfs-vs-zfs-dedup" id="id60">4   btrfs vs ZFS 的 dedup 现状</a><ul class="auto-toc">
+<li><a class="reference internal" href="#zfs-dedup" id="id61">4.1   ZFS 是如何实现 dedup 的？</a></li>
+</ul>
+</li>
 </ul>
 </div>
             </div>
