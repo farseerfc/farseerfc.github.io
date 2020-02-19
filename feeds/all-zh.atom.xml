@@ -851,7 +851,7 @@ btrfs subvolume snapshot&lt;/code&gt;
 &lt;li&gt;檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
 &lt;p&gt;上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。&lt;/p&gt;
@@ -980,7 +980,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="docutils field-list table" frame="void" rules="none"&gt;
+&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -993,7 +993,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="docutils field-list table" frame="void" rules="none"&gt;
+&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1282,10 +1282,10 @@ GC 回收空間，這裏是本文要講的區別，所以在我看來不用 GC �
 &lt;p&gt;舉個例子，比如下圖是一個日誌結構文件系統的磁盤佔用，其中綠色是數據，藍色是元數據（比如目錄結構和
 inode），紅色是文件系統級關鍵數據（比如最後的日誌提交點），一開始可能是這樣，有9個數據塊，
 2個元數據塊，1個系統塊：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
 &lt;p&gt;現在要覆蓋 2 和 3 的內容，新寫入 n2 和 n3 ，再刪除 4 號的內容 ，然後修改 10 裏面的 inode 變成 n10
 引用這些新數據，然後寫入一個新提交 n12 ，用黃色表示不再被引用的垃圾，提交完大概是這樣：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
 &lt;p&gt;日誌結構文件系統需要 GC 比較容易理解，寫日誌嘛，總得有一個「添加到末尾」的寫入點，比如上面圖中的
 n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空間末尾，這時候就要覆蓋寫空間開頭，
 就很難判斷「末尾」在什麼地方，而下一次寫入需要在哪裏了。
@@ -1307,7 +1307,7 @@ n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空
 又不利於利用整個可用空間，這裏的抉擇有個平衡點。&lt;/p&gt;
 &lt;p&gt;繼續上面的例子，假設上面文件系統的圖示中每一列的4塊是一個段，想要回收最開頭那個段，
 那麼需要搬運還在用的 1 到空閒空間，順帶修改引用它的 n10 ，最後提交 n12 ：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
 &lt;p&gt;要掃描並釋放一整段，需要掃描整個文件系統中別的元數據（圖中的 n12 和 n10 和
 11）來確定有沒有引用到目標段中的地址，可見釋放一個段是一個 &lt;span class="math"&gt;\(O(N)\)&lt;/span&gt; 的操作，其中 N
 是元數據段的數量，按文件系統的大小增長，
@@ -1346,7 +1346,7 @@ GC 算法則排除掉用戶手動標記的快照之後，根據快照創建的�
 的設計早期中考慮既然需要支持快照，那就把記錄數據塊佔用情況的位圖，變成快照的數組。
 於是整個文件系統有個 256 大小的快照利用率數組，數組中每個快照記錄自己佔用的數據塊位圖，
 文件系統中最多能容納 255 個快照。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
 &lt;p&gt;上面每個單元格都是一個二進制位，表示某個快照有沒有引用某個數據塊。有這樣一個位圖的數組之後，
 就可以直接掃描位圖判斷出某個數據塊是否已經佔用，可以找出尚未被佔用的數據塊用作空間分配，
 也可以方便地計算每個快照引用的空間大小或者獨佔的空間大小，估算刪除快照後可以釋放的空間。&lt;/p&gt;
@@ -1412,7 +1412,7 @@ How ZFS snapshots really work And why they perform well (usually)&lt;/div&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;我們對 fs 創建了 s1 快照，刪除了 fs 中某個文件，創建了 s2 快照，然後用 reflink
 把剛剛刪除的文件從 s1 中複製出來，再創建 s3 。如此操作之後，按時間順序有 s1、s2、s3 三個快照：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f91316de.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f91316de.png"/&gt;
 &lt;p&gt;其中只有 s2 不存在 somefile ，而 s1 、 s3 和當前的 fs 都有，並且都引用到了同一個數據塊。
 於是從時間線來看， somefile 的數據塊在 s2 中「死掉」了，又在 s3 中「復活」了。&lt;/p&gt;
 &lt;p&gt;而 ZFS (目前還）不支持 reflink ，所以沒法像這樣讓數據塊復活。一旦某個數據塊在某個快照中「死」了，
@@ -1457,7 +1457,7 @@ CoW 了新的子節點。&lt;/li&gt;
 &lt;p&gt;🐰兔子算法爲每個數據集（文件系統或快照）增加了一個數據結構，叫死亡列表（dead list），
 記錄 &lt;strong&gt;前一個快照中還活着，而當前數據集中死掉了的數據塊指針&lt;/strong&gt;
 ，換句話說就是在本數據集中「殺掉」的數據塊。舉例畫圖大概是這樣&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ab76244a.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ab76244a.png"/&gt;
 &lt;p&gt;上圖中有三個快照和一個文件系統，共 4 個數據集。每個數據集維護自己的死亡列表，
 死亡列表中是那些在該數據集中被刪掉的數據塊。於是🐰兔子算法把🐢烏龜算法所做的操作分成了兩部分，
 一部分在文件系統刪除數據時記錄死亡列表，另一部分在刪除快照時根據死亡列表釋放需要釋放的塊。&lt;/p&gt;
@@ -1502,7 +1502,7 @@ CoW 了新的子節點。&lt;/li&gt;
 都需要掃描死亡列表中的塊指針，根據指針中記錄的 birth txg 做判斷是否能直接釋放或是需要保留到另一個快照的死亡列表。
 於是🐆豹子算法的思路是，在死亡列表中記錄塊指針時，就把其中的塊指針按 birth txg 分成子列表（sublist）。&lt;/p&gt;
 &lt;p&gt;比如上面🐰兔子算法中那4個死亡列表，可以這樣拆成子列表：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/34b39b01.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/34b39b01.png"/&gt;
 &lt;p&gt;這樣拆成子列表之後，每次從死亡列表中釋放數據塊都能根據出生時間找到對應的子列表，
 然後連續釋放整個子列表。每次合併死亡列表時，也能直接用單鏈表穿起需要合併的子列表，不需要複製塊指針。&lt;/p&gt;
 &lt;p&gt;死亡列表並不在跟蹤快照的獨佔大小，而是在跟蹤快照所需負責刪除的數據塊大小，
@@ -1540,7 +1540,7 @@ OpenZFS Summit 2017 有個演講 &lt;a class="reference external" href="https://
 &lt;p&gt;克隆不光要記錄新數據塊的誕生，還要記錄新數據塊可能的死亡，所以磁盤上保存的生存日誌雖然叫 livelist
 ，但不像死亡列表那樣是列表的形式，而是日誌的形式，而內存中保存的生存日誌則組織成了棵
 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91"&gt;自平衡樹（AVLTree）&lt;/a&gt; 來加速查找。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/7f244754.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/7f244754.png"/&gt;
 &lt;p&gt;磁盤上存儲的生存日誌如上圖，每個表項記錄它是分配（A）或者刪除（F）一個數據塊，同時記錄數據塊的地址。
 這些記錄在一般情況下直接記錄在日誌末尾，隨着對克隆的寫入操作而不斷增長，長到一定程度則從內存中的
 AVL Tree 直接輸出一個新的生存日誌替代掉舊的，合併其中對應的分配和刪除操作。&lt;/p&gt;
@@ -2631,7 +2631,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備中的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -2726,7 +2726,7 @@ reflink 的數量。這將會暴露出 backref walking 這樣的基礎設施中�
 &lt;h2&gt;&lt;a class="toc-backref" href="#id65"&gt;5   結論和展望&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;不知不覺圍繞 btrfs 和 zfs 的快照功能寫了一大篇，前前後後寫了一個半月，
 文中提及的很多細節我自己也沒有自信，如果有錯誤還請指出。&lt;/p&gt;
-&lt;p&gt;稍微列舉一些我覺得比較重要的結論，算是 TLDR; 的 takeaway notes 吧：&lt;/p&gt;
+&lt;p&gt;稍微列舉一些我覺得比較重要的結論，算是 TL;DR 的 takeaway notes 吧：&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;ZFS 的快照非常輕量。完全可以每小時一個快照，每天24小時，每年365天不間斷地創建快照，
 實際似乎也有公司是這樣用的。如此頻繁的快照不同於 NILFS2
@@ -2775,10 +2775,9 @@ ZFS 的 &lt;a class="reference external" href="//farseerfc.me/zfs-layered-archit
 &lt;a class="reference external" href="https://youtu.be/xMH5rCL8S2k?t=1037"&gt;Mark Shellenbaum 在 OpenZFS developer summit 2016&lt;/a&gt;
 也曾說過這樣的話：&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Q: Are there any things that we that we have regretted we did?&lt;/p&gt;
-&lt;p&gt;A: I guess not so much on the ZPL, but with the way block pointers maybe weren't
-fully virtualized, you know that things like that.&lt;/p&gt;
-&lt;/blockquote&gt;
+(Q: Are there any things that we that we have regretted we did?)
+A: I guess not so much on the ZPL, but with the way block pointers maybe weren't
+fully virtualized, you know that things like that.&lt;/blockquote&gt;
 &lt;p&gt;以及 ZFS 的最初的作者 &lt;a class="reference external" href="https://youtu.be/yNKZQBsTX08?t=2"&gt;Jeff 在 OpenZFS developer summit 2015&lt;/a&gt;
 也曾說過：&lt;/p&gt;
 &lt;blockquote&gt;
@@ -3948,7 +3947,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
 我就能控制他的鍵盤了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -3976,7 +3975,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -3998,7 +3997,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4012,7 +4011,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4040,7 +4039,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4062,7 +4061,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4081,7 +4080,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4100,7 +4099,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4116,7 +4115,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4150,7 +4149,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4197,7 +4196,7 @@ Brandon Invergo 的博客採用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的點文件&lt;/h2&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4341,7 +4340,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4376,7 +4375,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4393,7 +4392,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4488,7 +4487,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然後接下來就是我承諾的翻譯了&lt;/h2&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4582,7 +4581,7 @@ Tivoization 是 FSF 發明的一個詞，表示 TiVo 的做法。 TiVo
 編制的軟件，從而限制了用戶修改運行軟件的自由。這種做法在 FSF 看來是鑽了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵這種做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4721,7 +4720,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 協議是一個開源軟件協議，和兩句的 BSD 協議功能相同。OpenBSD 項目選擇儘量用 ISC
 協議公開他們新寫的代碼。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5311,7 +5310,7 @@ provides&lt;/code&gt;
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的繪圖模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，沒有混成器的時候 X 是這樣畫圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 繪圖，
 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
@@ -5323,7 +5322,7 @@ GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進�
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的繪圖模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，沒有混成器的時候 X 是這樣畫圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 繪圖，
 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
@@ -5374,7 +5373,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;/ol&gt;
 &lt;p&gt;有了 Composite 擴展，一個 X 程序就可以調用這些 API 實現混成器。
 這裏有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教學解釋如何使用 Composite 擴展&lt;/a&gt; 。開啓了混成的 X 是這樣繪圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/18f7774d.png"/&gt;
 &lt;p&gt;整個 X 的混成器模型與 Mac OS X 的混成器模型相比，有如下幾點顯著的區別：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，對混成的繪製方式和繪製普通窗口一樣。
@@ -5609,12 +5608,12 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技術，簡單地說，就是每個窗口並非直接輸出到顯示設備，而是把內容輸出到 (Display) PostScript
 格式交給窗口管理器，然後窗口管理器再在需要的時候把 PostScript 用軟件解釋器解釋成位圖顯示在屏幕上。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/8d293c10.png"/&gt;
 &lt;p&gt;比起讓窗口直接繪製，這種方案在滾動和移動窗口的時候不需要重新渲染保存好的 DPS ，
 所以能實現實時渲染。到了實現 Mac OS X 的時候，爲了同時兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考慮到 Adobe 對蘋果收取的高昂的 Display PostScript 授權費，
 Mac OS X 的 Quartz 技術在矢量圖的 PDF 描述模型和最終渲染之間又插入了一層抽象：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5807c26a.png"/&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Mission Control&lt;/div&gt;
@@ -5724,7 +5723,7 @@ Longhorn 中的 Wobbly 效果&lt;/div&gt;
 並且跳票推遲多年之後的 Windows Vista 中實現了完整的混成器
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager"&gt;Desktop Window Manager (DWM)&lt;/a&gt;
 。整個 DWM 的架構和 Mac OS X 上看到的很像：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/1763baf6.png"/&gt;
 &lt;p&gt;和 Mac OS X 的情況類似， Windows Vista 之後的應用程序有兩套主要的繪圖庫，一套是從早期
 Win32API 就沿用至今的 GDI（以及GDI+），另一套是隨着 Longhorn 計劃開發出的 WPF 。
 WPF 的所有用戶界面控件都繪製在 DirectX 貼圖上，所以使用了 WPF 的程序也可以看作是
@@ -6080,7 +6079,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;經過以上設置之後，一切正常的話，每次對主 repo 推送更新的同時， Travis-CI 就會自動
-拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
+拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中顯示編譯狀態。&lt;/p&gt;
@@ -6631,7 +6630,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -6649,7 +6648,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless table docutils first last"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="docutils last first table borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -6665,7 +6664,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless table docutils first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils last first table borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6683,7 +6682,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="borderless table docutils first last"&gt;
+&lt;td&gt;&lt;table border="0" class="docutils last first table borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6710,7 +6709,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless table docutils first last"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="docutils last first table borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -6732,7 +6731,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless table docutils first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils last first table borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -6932,7 +6931,7 @@ RELATIVE_URLS&lt;/code&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 PlantUML 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;img alt="uml diagram" class="img-responsive uml" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一個Java實現的，
@@ -6962,7 +6961,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/973a8424.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;plantuml 是繪製UML的，除此之外還有一個類似的工具是繪製一般的 &lt;ruby&gt;&lt;rb&gt;流程圖&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -7158,7 +7157,7 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="table footnote docutils" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -7706,7 +7705,7 @@ TTY 裏 telnet 也不會亂的樣子。&lt;/p&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -8023,7 +8022,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="docutils borderless table"&gt;
+&lt;table border="0" class="borderless docutils table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -8397,7 +8396,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table footnote docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -8414,7 +8413,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table footnote docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -8743,13 +8742,13 @@ type&lt;/code&gt;
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="table footnote docutils" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="table footnote docutils" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
