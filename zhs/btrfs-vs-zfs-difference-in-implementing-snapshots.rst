@@ -696,7 +696,7 @@ DVA 槽是用来存储最多3个不同位置的副本。然后块指针还记录
 `一个 physical 一个 logical ，用于 dedup 和 device removal <https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSBlockPointers>`_
 。值得注意的是块指针里只有 birth txg ，没有引用计数或者别的机制做引用，这对后面要讲的东西很关键。
 
-ZPL 的元对象集
+DSL 的元对象集
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 理解块指针和 ZFS 的子系统层级之后，就可以来看看 ZFS 存储在磁盘上的具体结构了。
@@ -1012,7 +1012,7 @@ ZFS 中关于快照和克隆的空间跟踪算法
 
 
 OpenZFS 的项目领导者，同时也是最初设计 ZFS 中 DMU 子系统的作者 Matt Ahrens 在 DMU 和 DSL
-中设计并实现了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
+中设计并实���了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
 比如右侧就是他在 BSDCan 2019 做的演讲 
 `How ZFS snapshots really work And why they perform well (usually) <https://youtu.be/NXg86uBDSqI>`_
 的 YouTube 视频。
@@ -1131,13 +1131,14 @@ ZFS 的快照具有的上述三点条件，使得 ZFS 的快照删除算法可�
 
 创建新快照时，将当前文件系统（图中 fs1）的死亡列表交给快照，文件系统可以初始化一个空列表。
 
-删除快照时，我们有被删除的快照 s 和前一个快照 ps 、后一个快照 ns ，需要读入后一个快照 ns 的死亡列表：
+删除快照时，我们有被删除的快照 s 和前一个快照 ps 、后一个快照 ns ，需要读入当前快照 s
+和后一个快照 ns 的死亡列表：
 
 1. 对 s.deadlist 中的每个指针 bp
 
    - 复制 bp 到 ns.deadlist
 
-2. 对 ns.deadlist 中的每个指针 bp
+2. 对 ns.deadlist 中的每个指针 bp （其中包含了上一步复制来的）
 
    - 如果 bp.birth > ps.birth ，释放 bp 的空间
    - 否则保留 bp 
@@ -1372,10 +1373,28 @@ EXTENT_TREE 中关于这块区块的描述：
         postgres:label -> extent_tree:extent_postgres;
     }
 
+
+.. panel-default::
+    :title: btrfs 中关于 :code:`chattr +C` 关闭了 CoW 的文件的处理
+
+
+    .. label-warning::
+
+        **2020年2月20日补充**
+
+    这里从 EXTENT_TREE 的记录可以看出，每个区块都有引用计数记录。对用 :code:`chattr +C`
+    关闭了 CoW 的文件而言，文件数据同样还是有引用计数，可以和别的文件或者快照共享文件数据的。
+    这里的特殊处理在于，每此写入一个 nocow 的文件的时候，考察这个文件指向区块的引用计数，
+    如果引用计数 >1 ，表示这个文件的区块发生过 reflink ，那会对文件内容做一次 CoW 断开
+    reflink 并写入新位置；如果引用计数 =1 ，那么直接原地写入文件内容而不 CoW 。于是
+    nocow 的文件仍然能得到 reflink 和 snapshot 的功能，
+    使用这些功能仍然会造成文件碎片并伴随性能损失，只是在引用计数为 1 的时候不发生 CoW 。
+
+
 包括 ROOT_TREE 和 EXTENT_TREE 在内，btrfs 中所有分配的区块（extent）都在 EXTENT_TREE
 中有对应的记录，按区块的逻辑地址索引。从而给定一个区块，能从 EXTENT_TREE 中找到 ref
-字段描述这个区块有多少引用。不过 ROOT_TREE 、 EXTENT_TREE 和别的一些数据结构本身不是引用计数的，
-这些数据结构对应的区块的引用计数总是 1 ，不会和别的树共享区块；从 FS_TREE
+字段描述这个区块有多少引用。不过 ROOT_TREE 、 EXTENT_TREE 和别的一些 pool-wide
+数据结构本身不依赖引用计数的，这些数据结构对应的区块的引用计数总是 1 ，不会和别的树共享区块；从 FS_TREE
 开始的所有树节点都可以共享区块，这包括所有子卷的元数据和文件数据，这些区块对应的引用计数可以大于
 1 表示有多处引用。
 
@@ -1493,7 +1512,7 @@ EXTENT_TREE 按地址排序也比较紧凑，所以删除算法的随机读写�
 `ZFS 还有 async_destroy 优化 <https://www.delphix.com/blog/delphix-engineering/performance-zfs-destroy>`_
 可能有些帮助)。
 
-只有引用计数就足够完成快照的创建、删除之类的功能，也能支持 reflink 了（仔细回想，
+只需要引用计数就足够完成快照的创建、删除之类的功能，也能支持 reflink 了（仔细回想，
 reflink 其实就是 reference counted link 嘛），普通读写下也只需要引用计数。
 但是只有引用计数不足以知道区块的归属，不能用引用计数统计每个子卷分别占用多少空间，
 独占多少区块而又共享多少区块。上面的例子就可以看出，所有文件都指向同一个区块，该区块的引用计数为
@@ -1617,12 +1636,13 @@ EXTENT_TREE 中每个 extent 记录都同时记录了引用到这个区块的反
 
 有两种记录方式是因为它们各有性能上的优缺点：
 
-普通反向引用
+:普通反向引用:
     因为通过对象编号记录，所以当树节点 CoW 改变了地址时不需要调整地址，
     从而在普通的读写和快照之类的操作下有更好的性能，
     但是在解析反向引用时需要额外一次树查找。
     同时因为这个额外查找，普通反向引用也叫间接反向引用。
-共享反向引用
+
+:共享反向引用:
     因为直接记录了逻辑地址，所以当这个地址的节点被 CoW 的时候也需要调整这里记录的地址。
     在普通的读写和快照操作下，调整地址会增加写入从而影响性能，但是在解析反向引用时更快。
 
@@ -1754,9 +1774,9 @@ backref walking 作为很多功能的基础设施，从 btrfs 相当早期（3.3
 
    btrfs 的子卷没有记录子卷的磁盘占用开销，靠引用计数来删除子卷，
    所以也不需要详细统计子卷的空间占用情况。不过对一些用户的使用场景，可能需要统计子卷空间占用。由于
-   reflink 的存在，子卷占用不能靠累计加减法的方式算出来，所以 btrfs 有了 qgroup 和 quota
-   功能，用来统计子卷或者别的管理粒度下的占用空间情况。为了实现 qgroup ，需要
-   backref walking 来计算区块共享的情况。
+   可能存在的共享元数据和数据，子卷占用不能靠累计加减法的方式算出来，所以 btrfs 有了
+   qgroup 和 quota 功能，用来统计子卷或者别的管理粒度下的占用空间情况。为了实现 qgroup
+   ，需要 backref walking 来计算区块共享的情况。
 
 2. send
 
@@ -1782,23 +1802,26 @@ backref walking 作为很多功能的基础设施，从 btrfs 相当早期（3.3
     reflink-aware defrag 也是基于 backref walking ，根据区块引用的碎片程度，整理碎片而某种程度上保持
     reflink 。btrfs 曾经实现了这个，但是因为 bug 太多不久就取消了相关功能，目前这个工作处于停滞阶段。
 
-可见 backref walking 的能力对 btrfs 的许多功能都非常重要。不过 backref walking
+可见 backref walking 的能力对 btrfs 的许多功能都非常重要（不像 ZPL 的
+`dnode 中记录的 parent dnode 那样只用于诊断信息<https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick>`_
+）。不过 backref walking
 根据区块共享的情况的不同，也可能导致挺大的运行期开销，包括算法时间上的和内存占用方面的开销。
 比如某个子卷中有 100 个文件通过 reflink 共享了同一个区块，然后对这个子卷做了 100 个快照，
 那么对这一个共享区块的 backref walking 结果可能解析出 10000 个路径。可见随着使用 reflink
 和快照， backref walking 的开销可能爆炸式增长。最近 btrfs 邮件列表也有一些用户汇报，在大量子卷
 和通过 reflink 做过 dedup 的 btrfs 文件系统上 send 快照时，可能导致内核分配大量内存甚至
-panic 的情形，在 5.5 内核中 btrfs send 试图控制 send 时 clone reference 的数量上限。
+panic 的情形，在 5.5 内核中 btrfs send 试图控制 send 时 clone reference
+的数量上限来缓解这种边角问题。
 
 值得再强调的是，在没有开启 qgroup 的前提下，正常创建删除快照或 reflink
-，正常写入和覆盖区块之类的文件系统操作，只需要引用计数就足够，不需要动用
-backref walking 这样的重型武器。
+，正常写入和覆盖区块之类的文件系统操作，只需要引用计数就足够，虽然可能需要调整反向引用记录（
+尤其是共享反向引用的地址），但是不需要动用 backref walking 这样的重型武器。
 
 ZFS vs btrfs 的 dedup 功能现状
 -------------------------------------------------------------------
 
 上面讨论 ZFS 的快照和克隆如何跟踪数据块时，故意避开了 ZFS 的 dedup 功能，因为要讲 dedup
-可能需要先理解引用计数在文件系统中的用法，而 btrfs 正好用了引用计数。
+可能需要先理解引用计数在文件系统中的作用，而 btrfs 正好用了引用计数。
 于是我们再回来 ZFS 这边，看看 ZFS 的 dedup 是具体如何运作的。
 
 稍微了解过 btrfs 和 ZFS 两者的人，或许有不少 btrfs 用户都眼馋 ZFS 有 in-band dedup
@@ -1807,12 +1830,12 @@ ZFS vs btrfs 的 dedup 功能现状
 用户以为 zfs 的 dedup 就是在内存和磁盘中维护一个类似
 `Bloom filter <https://en.wikipedia.org/wiki/Bloom_filter>`_
 的结构，然后根据结果对数据块增加 reflink ，从而 zfs 内部大概一定有类似 reflink
-的东西，进一步质疑为什么 btrfs 还迟迟没有实现这样一个 Bloom filter 。
-或许还有 ZFS 用户有疑惑，
+的设施，进一步质疑为什么 btrfs 还迟迟没有实现这样一个 Bloom filter 。
+或许还有从 btrfs 转移到 ZFS 的用户有疑惑，
 `为什么 ZFS 还没有暴露出 reflink 的用户空间接口 <https://github.com/zfsonlinux/zfs/issues/405>`_
 ，或者既然 ZFS 已经有了 dedup ，
 `能不能临时开关 dedup 来提供类似 reflink 式的共享数据块 <https://github.com/zfsonlinux/zfs/issues/2554>`_
-而避免长期开 dedup 的巨大开销。
+而避免 ZFS 长期开 dedup 导致的巨大性能开销。
 
 看过上面 `ZFS 中关于快照和克隆的空间跟踪算法`_ 之后我们会发现，其实 ZFS 中并没有
 能对应 btrfs reflink 的功能，而是根据数据块指针中的 birth txg
@@ -1844,7 +1867,7 @@ Chris 的博客也有两篇文章《
 》介绍了他对此的认识，在这里我也尝试来总结一下 ZFS dedup 特性如何工作。
 
 ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
-叫 DeDup Table 简称 DDT 。DDT 目前是存储设备中的一个 hash table ，因为是存储池级别的元数据，
+叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：
 
 +------------+---------------------------+-----------+
@@ -1868,7 +1891,8 @@ DDT 中对每个数据块存有3个东西：数据块的 checksum 、DVA （就�
 DDT 调整引用计数。
 
 除了 DDT 之外，文件系统中记录的块指针中也有个特殊标志位记录这个块是否经过了 DDT
-。子卷、克隆或者文件系统正常删除数据块的时候，根据块指针中的标志位判断是否需要检查和调整 DDT 。
+。读取数据不需要经过 DDT ，但是子卷、克隆或者文件系统正常删除数据块的时候，
+需要根据块指针中的标志位判断是否需要检查和调整 DDT 。
 
 从而关于 dedup 的实现可以得知以下一些特点：
 
@@ -1876,7 +1900,7 @@ DDT 调整引用计数。
   dedup 时删除块并不需要立刻写入，只需要记录在内存中并在 MOS 提交的时候调整磁盘占用情况即可。
 - 只有开启 dedup 期间写入的数据块才会参与 dedup 。对已经有数据的存储池，后来开启的 dedup
   不会影响已经写好的数据，从而即使后来新的写入与之前的写入有重复也得不到 dedup 效果。
-  DDT 中没有记录的数据块不会被 dedup 。换句话说 DDT 中那些引用计数为 1
+  DDT 中没有记录的数据块不会参与 dedup 。换句话说 DDT 中那些引用计数为 1
   的记录也是必须存在的，否则这些数据块没有机会参与 dedup 。
 - 关闭 dedup 之后，只要 DDT 中还存有数据，那么对这些数据的删除操作仍然有性能影响。
 
@@ -1888,12 +1912,13 @@ DDT 调整引用计数。
 
 乍看起来 DDT 貌似挺像 btrfs 的 EXTENT_TREE ，但是本质上 EXTENT_TREE 是根据区块地址排序的，
 而 DDT 因为是个 hashtable 所以是根据 checksum 排序的。并且 EXTENT_TREE
-中记录的区块可以是任意大小，而 DDT 中记录的数据块是固定大小的。这些区别都非常影响操作 DDT 时的性能。
+中记录的区块可以是任意大小，而 DDT 中记录的数据块是固定大小的，所以碎片不严重的情况下 DDT 要比
+EXTENT_TREE 多记录很多数据块。这些区别都非常影响操作 DDT 时的性能。
 
 DDT 本身是个 DMU_ 对象，所以对 DDT 的读写也是经过 DMU_ 的 CoW 读写，从而也经过 ARC_
-的缓存。想要有比较合理的 dedup 性能，需要整个 DDT 都尽量保存在内存 ARC_ 或者 L2ARC_ 缓存中，
-于是 dedup 特性也有了非常占用内存的特点。每个 DDT 表相需要大概 192 字节来描述一个数据块（
-默认 128KiB），由此可以估算一下平均每 2TiB 的数据需要 3GiB 的内存来支持 dedup 的功能。
+的缓存。想要有比较合理的 dedup 性能，需要整个 DDT 都尽量保持在内存 ARC_ 或者 L2ARC_ 缓存中，
+于是 dedup 特性也有了非常占用内存的特点。每个 DDT 表项需要大概 192 字节来描述一个（
+默认 128KiB 大小的）数据块，由此可以估算一下平均每 2TiB 的数据需要 3GiB 的内存来支持 dedup 的功能。
 
 Matt 的视频中后面讲到优化 ZFS dedup 的一些思路，大体上未来 ZFS 可以做这些优化：
 
@@ -1901,14 +1926,22 @@ Matt 的视频中后面讲到优化 ZFS dedup 的一些思路，大体上未来 
    尽量保持在内存中，并且绕过 DMU_ 减少写入放大。
 2. 给 DDT 表项瘦身，从192字节缩减到接近64字节。
 3. 当遇到内存压力时，从 DDT 中随机剔除掉引用计数为 1 的表项。被剔除的表项没有了未来参与 dedup
-   的可能性，但是能减轻内存压力。剔除引用计数为 1 的表项还可以维持数据块的归属信息（转换成没有
-   dedup 的形式），但是引用计数更高的表项没法剔除。
+   的可能性，但是能减轻内存压力。剔除引用计数为 1 的表项仍然可以维持数据块的归属信息（
+   处理上当作是没有 dedup 的形式），但是引用计数更高的表项没法剔除。
 
 .. _ARC: {filename}./zfs-layered-architecture-design.zhs.rst#arc
 .. _L2ARC: {filename}./zfs-layered-architecture-design.zhs.rst#l2arc
 .. _ZIL: {filename}./zfs-layered-architecture-design.zhs.rst#zil
 
-这些优化策略目的是想让 dedup 的性能损失能让更多使用场景接受。
+这些优化策略目的是想让 dedup 的性能损失能让更多使用场景接受。不过因为缺乏开发者意愿，
+目前这些策略还只是计划，没有实现在 ZFS 的代码中。
+
+因为以上特点， ZFS 目前 dedup 特性的适用场景极为有限，只有在 IO 带宽、内存大小都非常充裕，
+并且可以预见到很多重复的数据的时候适合。听说过的 ZFS dedup
+的成功案例是，比如提供虚拟机服务的服务商，在宿主文件系统上用 ZFS 的 zvol
+寄宿虚拟机的磁盘镜像，客户在虚拟机内使用其它文件系统。大部分客户可能用类似版本的操作系统，
+从而宿主机整体来看有很多 dedup 的潜质。不过这种应用场景下，服务商很可能偏向选择 CephFS
+这样的分布式文件系统提供虚拟机镜像存储，而不是 ZFS 这样局限在单系统上的本地文件系统。
 
 btrfs 的 dedup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1923,10 +1956,10 @@ reflink 的正常思路就够了。在
 不过实现正确性上问题不大，迟迟没有办法合并进主线内核的原因更多是性能上的问题。
 
 如果 btrfs 有了 in-band dedup 这样系统性的 dedup 方案，那么不可避免地会增加文件系统中使用
-reflink 的数量。这将会暴露出 backref walking 这样的基础设施中许多潜在的边角情况。
+reflink 的数量。这将会暴露出 backref walking 这样的基础设施中许多潜在的边角情况下的性能瓶颈。
 前面解释过 backref walking 操作是个挺大开销的操作，并且开销随着快照和 reflink
 的使用而爆炸式增长。直到最近的 btrfs 更新仍然在试图优化和改善现有 backref walking
-的性能问题，可以预测 btrfs 的 dedup 将需要等待这方面更加成熟。
+的性能问题，可以预测 btrfs 的内建 dedup 支持将需要等待这方面更加成熟。
 
 结论和展望
 -------------------------------------------------------------------
@@ -1936,12 +1969,13 @@ reflink 的数量。这将会暴露出 backref walking 这样的基础设施中�
 
 稍微列举一些我觉得比较重要的结论，算是 TL;DR 的 takeaway notes 吧：
 
-- ZFS 的快照非常轻量。完全可以每小时一个快照，每天24小时，每年365天不间断地创建快照，
-  实际似乎也有公司是这样用的。如此频繁的快照不同于 NILFS2
-  等文件系统提供的连续快照，但是也没有那些日志结构文件系统实现连续快照所需的 GC 开销。
-  并且 ZFS 可以没有额外开销地给出快照等数据集的空间占用之类的信息。
-- btrfs 的快照相对也很轻量，比 LVM 和 dm-thin 的快照好过很多，但是不如 ZFS 的快照轻。
-  btrfs 要得知子卷的空间占用情况需要开启 qgroup 特性，这会有一些额外性能损失。
+- ZFS 的快照非常轻量。完全可以像 NILFS2 的连续快照那样，每小时一个快照，每天24小时，每年
+  365天不间断地创建快照，实际似乎也有公司是这样用的。如此频繁的快照不同于 NILFS2
+  等文件系统提供的连续快照，但是也没有那些日志结构文件系统实现连续快照所需承担的巨大 GC 开销。
+  并且 ZFS 可以没有额外开销地算出快照等数据集的空间占用之类的信息。
+- btrfs 的快照相对也很轻量，比 LVM 和 dm-thin 的快照轻便很多，但是不如 ZFS 的快照轻，因为
+  btrfs 有维护反向引用的开销。 btrfs 要得知子卷的空间占用情况需要开启 qgroup
+  特性，这会对一些需要 backref walking 的操作有一些额外性能损失。
 - btrfs 对快照和 reflink 没有限制，日常桌面系统下使用也不太会遇到性能问题。
   不过系统性地（自动化地）大量使用快照和 reflink ，在一些操作下可能会有性能问题，值得注意。
 - 因为没有 reflink ， ZFS 的数据集划分需要一些前期计划。 ZFS 中共享元数据的方式只有快照，
@@ -1949,15 +1983,19 @@ reflink 的数量。这将会暴露出 backref walking 这样的基础设施中�
   btrfs 有 reflink ，于是这里有很多自由度，即便前期计划不够详细也可以通过 reflink
   相对快速调整子卷结构。
 - dedup 在 zfs 和 btrfs 都是个喜忧参半的特性，开启前要仔细评估可能的性能损失。ZFS dedup
-  的成功案例是，比如提供虚拟机服务的服务商，在宿主文件系统上用 ZFS 的 zvol
-  寄宿虚拟机的磁盘镜像，客户在虚拟机内使用其它文件系统。大部分客户可能用类似版本的操作系统，
-  从而宿主机整体来看有很多 dedup 的潜质。
+  的成功案例是，比如虚拟机服务的服务商，在宿主文件系统上用 ZFS
+  寄宿虚拟机的磁盘镜像，客户在虚拟机可能用类似版本的操作系统，从而宿主机整体来看有很多 dedup
+  的潜质。一般桌面场景下 dedup 的收益不明显，反而有巨大内存和IO带宽开销。
 - 相比 btrfs ，ZFS 更严格地遵守 CoW 文件系统「仅写一次」的特点，甚至就算遇到了数据块损坏，
-  修复数据块的时候也只能在原位写入。 btrfs 因为有 backref 所以在这方面灵活很多。
+  修复数据块的时候也只能在原位写入。 btrfs 因为有反向引用所以在这方面灵活很多。
+- ZFS 不支持对单个文件关闭 CoW ，所有文件（以及所有 zvol）都经过 DMU_ 层有 CoW
+  语义，这对一些应用场景有性能影响。btrfs 可以对单个文件关闭 CoW ，但是关闭 CoW
+  同时也丢失了写文件的事务性语义。
 - ZFS 不支持碎片整理，靠 ARC 加大缓存来解决碎片带来的性能问题。 btrfs 有 defrag
   ，但是目前的实现会切断 reflink 。
 
-最后关于 ZFS 没有 reflink 也没有 backref 的情况，想引用几段话。
+
+最后关于 ZFS 没有 reflink 也没有反向引用的情况，想引用几段话。
 
 FreeBSD 的发起人之一，FreeBSD 的 FFS 维护者，
 `Kirk McKusick 曾经在 OpenZFS developer summit 2015 <https://youtu.be/IQp_FglfzUQ?t=2619>`_
@@ -1978,8 +2016,8 @@ FreeBSD 的发起人之一，FreeBSD 的 FFS 维护者，
     to that paper and if any of you are contemplating that you should read the
     paper because if nothing else it's a great paper.
 
-Kirk McKusick 呼吁 ZFS 开发者们考虑在 ZFS 中实现 backref
-基础设施，从而可能在未来获得更多有用的特性。
+Kirk McKusick 呼吁 ZFS 开发者们考虑在 ZFS 中实现类似 backref
+的基础设施，从而可能在未来获得更多有用的特性。
 
 和 ZFS 实现 backref 相关的一点是目前 ZFS 的块指针的组织结构。对此
 ZFS 的 ZPL_ 层原作者之一的
@@ -2005,8 +2043,8 @@ ZFS 这些开发者元老们都希望 ZFS 能有某种类似 backref 的机制�
 关于这一点，ZFS 最重要的作者 Matt 如何看的呢？ Matt 近期似乎没有发表过看法，但是熟悉 ZFS
 的人可能听到过 Matt 一直在计划的另一项 ZFS 特性中看出些端倪，叫 BP rewrite
 ，或者 BP virtualization 。从 Matt 还在 Sun 的时候开始，就试图在 ZFS 中实现
-BP rewrite ，提供某种系统性的基础设施，能够快速地找到并改写大量数据块指针。
-在网上搜索很多 ZFS 功能的细节，最终都会带到关于 BP rewrite 的讨论（甚至可以说论战）中。
+BP rewrite 特性，提供某种系统性的基础设施，能够快速地找到并改写大量数据块指针。
+在网上搜索很多 ZFS 功能的实现细节，最终都会带到关于 BP rewrite 的讨论（甚至可以说论战）中。
 Matt 最近给 OpenZFS 实现的两项功能，
 `toplevel vdev removal 和 raidz expansion <https://www.youtube.com/watch?v=Njt82e_3qVo>`_
 如果有 BP rewrite 将会容易很多，而他们目前是在没有 BP rewrite 的前提下，通过一连串额外抽象实现的。
