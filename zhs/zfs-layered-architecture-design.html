@@ -23,7 +23,7 @@
 <link rel="canonical" href="//farseerfc.me/zhs/zfs-layered-architecture-design.html">
 
         <meta name="author" content="farseerfc" />
-        <meta name="keywords" content="zfs,layered,architecture,SPA,DMU,ZPL,ZIO,VDEV,ARC,ZAP,DSL,ZIL,ZVOL" />
+        <meta name="keywords" content="FS笔记,zfs,layered,architecture,SPA,DMU,ZPL,ZIO,VDEV,ARC,ZAP,DSL,ZIL,ZVOL" />
         <meta name="description" content="2020年2月9日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …" />
 
         <meta property="og:site_name" content="Farseerfc的小窝" />
@@ -33,6 +33,7 @@
         <meta property="og:description" content="2020年2月9日更新过 ZFS 在设计之初源自于 Sun 内部多次重写 UFS 的尝试，背负了重构 Solaris 诸多内核子系统的重任，从而不同于 Linux 的文件系统只负责文件系统的功能而把其余功能（比如内存脏页管理， IO调度）交给内核更底层的子系统， ZFS 的整体设计更层次化并更独立，很多部分可能和 Linux/FreeBSD 内核已有的子系统有功能重叠。 似乎很多关于 ZFS 的视频演讲和幻灯片有讲到子系统架构，但是找了半天也没找到网上关于这个的说明文档。 于是写下这篇笔记试图从 ZFS 的早期开发历程开始，记录一下 ZFS 分层架构中各个子系统之间的分工。 也有几段 OpenZFS Summit 视频佐以记录那段历史。 早期架构 早期 ZFS 在开发时大体可以分为上下三层，分别是 ZPL， DMU 和 SPA ，这三层分别由三组人负责。 最初在 Sun 内部带领 ZFS …"/>
         <meta property="article:published_time" content="2020-02-04" />
             <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="FS笔记" />
             <meta property="article:tag" content="zfs" />
             <meta property="article:tag" content="layered" />
             <meta property="article:tag" content="architecture" />
@@ -238,6 +239,7 @@ Farseerfc的小窝            </a>
     <a href="//farseerfc.me/zhs/zfs-layered-architecture-design.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
 
 <small><span><a href="//farseerfc.me/zhs/zfs-layered-architecture-design.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="zfs-layered-architecture-design" data-disqus-url="http://farseerfc.me/zhs/zfs-layered-architecture-design.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/zhs/tag/fsbi-ji.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS笔记</a>
 	<a href="//farseerfc.me/zhs/tag/zfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> zfs</a>
 	<a href="//farseerfc.me/zhs/tag/layered.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> layered</a>
 	<a href="//farseerfc.me/zhs/tag/architecture.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> architecture</a>
@@ -1220,6 +1222,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/fsbi-ji.html">
+                    FS笔记 <sup> 2</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/btrfs.html">
                     btrfs <sup> 1</sup>
@@ -1703,11 +1710,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/zhs/tag/repository.html">
                     repository <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/zhs/tag/sjtu.html">
-                    sjtu <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">

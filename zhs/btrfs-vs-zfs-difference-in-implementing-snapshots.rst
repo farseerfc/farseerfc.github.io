@@ -5,7 +5,7 @@ Btrfs vs ZFS 实现 snapshot 的差异
 :translation_id: btrfs-vs-zfs-difference-in-implementing-snapshots
 :lang: zhs
 :date: 2020-02-19 15:45
-:tags: btrfs, zfs, cow, snapshot, clone, subvolume, dedup, reflink, SPA, DMU, DSL, ZPL
+:tags: FS笔记, btrfs, zfs, cow, snapshot, clone, subvolume, dedup, reflink, SPA, DMU, DSL, ZPL
 :series: FS笔记
 :issueid: 93
 
