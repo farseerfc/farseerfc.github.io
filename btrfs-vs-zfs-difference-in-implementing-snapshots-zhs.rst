@@ -13,7 +13,6 @@ Btrfs vs ZFS 实现 snapshot 的差异
     :depth: 2
 
 .. contents:: 目录
-    :depth: 3
 
 ..
 
@@ -1012,7 +1011,7 @@ ZFS 中关于快照和克隆的空间跟踪算法
 
 
 OpenZFS 的项目领导者，同时也是最初设计 ZFS 中 DMU 子系统的作者 Matt Ahrens 在 DMU 和 DSL
-中设计并实���了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
+中设计并实�����了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
 比如右侧就是他在 BSDCan 2019 做的演讲 
 `How ZFS snapshots really work And why they perform well (usually) <https://youtu.be/NXg86uBDSqI>`_
 的 YouTube 视频。
@@ -1384,7 +1383,7 @@ EXTENT_TREE 中关于这块区块的描述：
 
     这里从 EXTENT_TREE 的记录可以看出，每个区块都有引用计数记录。对用 :code:`chattr +C`
     关闭了 CoW 的文件而言，文件数据同样还是有引用计数，可以和别的文件或者快照共享文件数据的。
-    这里的特殊处理在于，每此写入一个 nocow 的文件的时候，考察这个文件指向区块的引用计数，
+    这里的特殊处理在于，每次写入一个 nocow 的文件的时候，考察这个文件指向区块的引用计数，
     如果引用计数 >1 ，表示这个文件的区块发生过 reflink ，那会对文件内容做一次 CoW 断开
     reflink 并写入新位置；如果引用计数 =1 ，那么直接原地写入文件内容而不 CoW 。于是
     nocow 的文件仍然能得到 reflink 和 snapshot 的功能，
@@ -1803,7 +1802,7 @@ backref walking 作为很多功能的基础设施，从 btrfs 相当早期（3.3
     reflink 。btrfs 曾经实现了这个，但是因为 bug 太多不久就取消了相关功能，目前这个工作处于停滞阶段。
 
 可见 backref walking 的能力对 btrfs 的许多功能都非常重要（不像 ZPL 的
-`dnode 中记录的 parent dnode 那样只用于诊断信息<https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick>`_
+`dnode 中记录的 parent dnode 那样只用于诊断信息 <https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSPathLookupTrick>`_
 ）。不过 backref walking
 根据区块共享的情况的不同，也可能导致挺大的运行期开销，包括算法时间上的和内存占用方面的开销。
 比如某个子卷中有 100 个文件通过 reflink 共享了同一个区块，然后对这个子卷做了 100 个快照，
