@@ -23,7 +23,7 @@
 <link rel="canonical" href="//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html">
 
         <meta name="author" content="farseerfc" />
-        <meta name="keywords" content="FS筆記,btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink,SPA,DMU,DSL,ZPL" />
+        <meta name="keywords" content="FS筆記,FS notes,btrfs,zfs,cow,snapshot,clone,subvolume,dedup,reflink,SPA,DMU,DSL,ZPL" />
         <meta name="description" content="zfs 這個東西倒是名不符實。叫 z storage stack 明顯更符合。 叫 fs 但不做 fs 自然確實會和 btrfs 有很大出入。 我反而以前還好奇為什麼 btrfs 不弄 zvol ， 直到我意識到這東西真是一個 fs ，名符奇實。 —— 某不愿透露姓名的 Ext2FSD 開發者 Btrfs 和 ZFS 都是開源的寫時拷貝（Copy on Write, CoW）文件系統，都提供了相似的子卷管理和 快照(snapshot）的功能。網上有不少文章都評價 ZFS 實現 CoW FS 的創新之處，進而想說「 Btrfs 只是 Linux/GPL 陣營對 ZFS …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
@@ -34,6 +34,7 @@
         <meta property="article:published_time" content="2020-02-19" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS筆記" />
+            <meta property="article:tag" content="FS notes" />
             <meta property="article:tag" content="btrfs" />
             <meta property="article:tag" content="zfs" />
             <meta property="article:tag" content="cow" />
@@ -239,6 +240,7 @@ Farseerfc的小窩            </a>
 
 <small><span><a href="//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="btrfs-vs-zfs-difference-in-implementing-snapshots" data-disqus-url="http://farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
 	<a href="//farseerfc.me/tag/fsbi-ji.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS筆記</a>
+	<a href="//farseerfc.me/tag/fs-notes.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS notes</a>
 	<a href="//farseerfc.me/tag/btrfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> btrfs</a>
 	<a href="//farseerfc.me/tag/zfs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> zfs</a>
 	<a href="//farseerfc.me/tag/cow.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> cow</a>
@@ -1176,7 +1178,7 @@ pool_name/​dataset_path@snapshot_name</code>
  這樣來稱呼。
 存儲池中的數據集一同共享可用的存儲空間，每個數據集單獨跟蹤自己所消耗掉的存儲空間。</p>
 <p>數據集之間有類似文件夾的層級父子關係，這一點有用的地方在於可以在父級數據集上設定一些 ZFS 參數，
-這些參數可以被子級數據集基礎，從而通過層級關係可以方便地微調 ZFS 參數。在 btrfs
+這些參數可以被子級數據集繼承，從而通過層級關係可以方便地微調 ZFS 參數。在 btrfs
 中目前還沒有類似的屬性繼承的功能。</p>
 <p>zvol 的概念和本文關係不大，可以參考我上一篇 <a class="reference external" href="//farseerfc.me/zfs-layered-architecture-design.html#ZVOL">ZFS 子系統筆記中 ZVOL 的說明</a>
 。用 zvol 能把 ZFS 當作一個傳統的卷管理器，繞開 ZFS
@@ -1288,7 +1290,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 <p>檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。</p>
 <p>除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="field-list docutils table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1301,7 +1303,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。</
 </tbody>
 </table>
 <p>對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="field-list docutils table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1694,7 +1696,7 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 </div>
 </div>
 <p>OpenZFS 的項目領導者，同時也是最初設計 ZFS 中 DMU 子系統的作者 Matt Ahrens 在 DMU 和 DSL
-中設計並實�����了 ZFS 獨特的快照的空間跟蹤算法。他也在很多地方發表演講，講過這個算法的思路和細節，
+中設計並實現了 ZFS 獨特的快照的空間跟蹤算法。他也在很多地方發表演講，講過這個算法的思路和細節，
 比如右側就是他在 BSDCan 2019 做的演講
 <a class="reference external" href="https://youtu.be/NXg86uBDSqI">How ZFS snapshots really work And why they perform well (usually)</a>
 的 YouTube 視頻。</p>
@@ -2603,7 +2605,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 </li>
 </ol>
 <p>有兩種記錄方式是因爲它們各有性能上的優缺點：</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="field-list docutils table" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -2966,7 +2968,7 @@ Chris 的博客也有兩篇文章《
 <p>ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：</p>
-<table border="0" class="docutils table borderless">
+<table border="0" class="table docutils borderless">
 <colgroup>
 <col width="24%"/>
 <col width="54%"/>
@@ -3403,6 +3405,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/tag/fsbi-ji.html">
                     FS筆記 <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/fs-notes.html">
+                    FS notes <sup> 2</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -3883,11 +3890,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/mining.html">
                     mining <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/repository.html">
-                    repository <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">
