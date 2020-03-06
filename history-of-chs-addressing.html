@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>柱面-磁頭-扇區尋址的一些舊事 - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/history-of-chs-addressing.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="FS筆記,FS notes,CHS,cylinder,head,sector,LBA,SMR,4Kn" />
+        <meta name="description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="柱面-磁頭-扇區尋址的一些舊事"/>
+        <meta property="og:url" content="//farseerfc.me/history-of-chs-addressing.html"/>
+        <meta property="og:description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …"/>
+        <meta property="article:published_time" content="2020-03-06" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="FS筆記" />
+            <meta property="article:tag" content="FS notes" />
+            <meta property="article:tag" content="CHS" />
+            <meta property="article:tag" content="cylinder" />
+            <meta property="article:tag" content="head" />
+            <meta property="article:tag" content="sector" />
+            <meta property="article:tag" content="LBA" />
+            <meta property="article:tag" content="SMR" />
+            <meta property="article:tag" content="4Kn" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/history-of-chs-addressing.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">柱面-磁頭-扇區尋址的一些舊事 - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切換導航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                                 關於
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                         關於
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">歸檔</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
+                <li class="active">柱面-磁頭-扇區尋址的一些舊事</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        柱面-磁頭-扇區尋址的一些舊事
+                        <a href="//farseerfc.me/history-of-chs-addressing.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 柱面-磁頭-扇區尋址的一些舊事 的永久鏈接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-03-06T15:45:00+09:00"><i class="fa fa-calendar"></i> 2020年03月06日(週五)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/history-of-chs-addressing.html">繁體</a></li><li><a href="//farseerfc.me/zhs/history-of-chs-addressing.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/history-of-chs-addressing.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/history-of-chs-addressing.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/history-of-chs-addressing.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/history-of-chs-addressing.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="history-of-chs-addressing" data-disqus-url="http://farseerfc.me/history-of-chs-addressing.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/fsbi-ji.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS筆記</a>
+	<a href="//farseerfc.me/tag/fs-notes.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS notes</a>
+	<a href="//farseerfc.me/tag/chs.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> CHS</a>
+	<a href="//farseerfc.me/tag/cylinder.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> cylinder</a>
+	<a href="//farseerfc.me/tag/head.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> head</a>
+	<a href="//farseerfc.me/tag/sector.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> sector</a>
+	<a href="//farseerfc.me/tag/lba.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> LBA</a>
+	<a href="//farseerfc.me/tag/smr.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> SMR</a>
+	<a href="//farseerfc.me/tag/4kn.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> 4Kn</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目錄                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+<p class="topic-title">目錄</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id3" id="id7">柱面、磁頭、扇區以及相關術語</a></li>
+<li><a class="reference internal" href="#chs" id="id8">物理 CHS 尋址</a></li>
+<li><a class="reference internal" href="#id4" id="id9">邏輯 CHS 尋址</a></li>
+<li><a class="reference internal" href="#zone-bit-recoding-zbr" id="id10">區位記錄（Zone bit recoding, ZBR）</a></li>
+<li><a class="reference internal" href="#chs-lba" id="id11">從 CHS 到 LBA</a></li>
+<li><a class="reference internal" href="#shingled-magnetic-recording-smr" id="id12">疊瓦磁記錄（Shingled Magnetic Recording, SMR）</a></li>
+<li><a class="reference internal" href="#kib" id="id13">4KiB 扇區大小</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<p>在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。
+更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像
+<a class="reference external" href="https://en.wikipedia.org/wiki/MiniDisc">MiniDisc</a> 、
+<a class="reference external" href="https://en.wikipedia.org/wiki/DVD-RAM">DVD-RAM</a>
+等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。</p>
+<p>這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是
+柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。
+大部分內容來自維基百科 <a class="reference external" href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Cylinder-head-sector 詞條</a>
+這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。</p>
+<div class="section" id="id3">
+<h2><a class="toc-backref" href="#id7">柱面、磁頭、扇區以及相關術語</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+磁盤示意圖（來自維基百科 <a class="reference external" href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Cylinder-head-sector 詞條</a> ）</div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/images/chs-illustrate-trans.svg" type="image/svg+xml">
+chs-illustrate-trans.svg</object>
+</div>
+</div>
+<p>如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)，
+然後有一條磁頭臂(actuator arm)插入磁碟片間的位置，加上一組控制芯片（controller）。
+每個磁碟片有上下兩面塗有磁性材質，磁頭臂上有一組磁頭（head），每個磁頭對應磁盤的一個面，
+所以比如一個 3 碟的硬盤會有 6 個磁頭。</p>
+<p>每個磁碟片上定義了很多同心圓的磁頭軌道，叫做磁道（track），磁道位於盤面上不同半徑的位置，
+通過旋轉磁碟臂能讓磁頭移動到特定的半徑上，從而讓讀寫磁頭在不同的磁道間跳轉。
+不同磁頭上同磁道的同心圓共同組成一個柱面（cylinder），或者說移動磁碟臂能選定磁盤中的一個柱面。
+磁道上按等角度切分成多個小段，叫做扇區（sector），每個扇區是讀寫數據時採用的最小單元。
+早期在 IBM 大型機之類上使用的硬盤的扇區大小比較小，到 IBM PC
+開始個人計算機用的硬盤扇區基本被統一到 512 字節。現代硬盤內部可能採用 Advanced Format
+使用 4K 字節扇區。</p>
+<p>在早期軟盤和硬盤的尋址方式被稱作「柱面-磁頭-扇區尋址」，簡稱 CHS 尋址，
+是因爲這三個參數是軟件交給硬件定位到某個具體扇區單元時使用的參數。
+首先柱面參數讓磁頭臂移動到某個半徑上，尋址到某個柱面，然後激活某個磁頭，然後隨着盤面旋轉，
+磁頭定位到某個扇區上。</p>
+<p>「柱面-磁頭-扇區」這個尋址方式，聽起來可能不太符合直覺，尤其是柱面的概念。直覺上，
+可能更合理的尋址方式是「盤片-盤面-磁道-扇區」，而柱面在這裏是同磁道不同盤片盤面構成的一個集合。
+不過理解了磁盤的機械結構的話，柱面的概念就比較合理了，尋址時先驅動磁頭臂旋轉，
+磁頭臂上多個磁頭一起飛到某個磁道上，從而運動磁頭臂的動作定義了一個柱面。
+柱面和磁頭（CH）組合起來能定位到某個特定的磁道，畫張圖大概如下圖所示：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>上圖中值得注意的是磁道的編號方式，我用相同的顏色畫出了相同的磁道。因爲按照 CHS
+的順序尋址，所以先定位柱面，然後選定磁頭。磁盤上按半徑從外向內定義柱面的編號，最外圈的磁道位於
+0號柱面，由0號磁頭開始。隨着柱面編號增加，逐步從外圈定位到內圈。</p>
+</div>
+<div class="section" id="chs">
+<h2><a class="toc-backref" href="#id8">物理 CHS 尋址</a></h2>
+<p>以上術語中，柱面號和磁頭號直接對應了硬盤上的物理組成部分，所以通過在物理 CHS
+尋址方式下，通過扇區地址的寫法能對應到扇區的具體物理位置。之所以這樣描述扇區，
+是因爲早期的軟盤和硬盤驅動器沒有內置的控制芯片，可以完全由宿主系統執行驅動程序驅動。</p>
+<p>在 IBM PC 上，驅動軟盤和硬盤的是 CPU 執行位於主板
+<a class="reference external" href="https://zh.wikipedia.org/wiki/BIOS">BIOS (Basic Input/Output System)</a>
+中的程序，具體來說操作系統（比如DOS）和應用程序調用 <a class="reference external" href="https://en.wikipedia.org/wiki/INT_13H">INT 13H</a>
+中斷，通過 AH=02H/03H 選擇讀/寫操作，BIOS 在中斷表中註冊的 13H 中斷處理程序執行在 CPU
+上完成讀寫請求。調用 INT 13H 讀寫扇區的時候，CPU 先通過 INT 13H AH=0CH
+控制硬盤的磁頭臂旋轉到特定磁道上，然後選定具體磁頭，讓磁頭保持在磁道上讀數據，
+通過忙輪訓的方式等待要讀寫的扇區旋轉到磁頭下方，從而讀到所需扇區的數據。在 DOS 之後的操作系統，
+比如早期的 Windows 和 Linux 和 BSD 能以覆蓋中斷程序入口表的方式提供升級版本的這些操作替代
+BIOS 的程序。</p>
+<p>以上過程中可以看出兩點觀察：</p>
+<ol class="arabic simple">
+<li>CHS 尋址下，跨磁道的尋址（不同 CH 值），和磁道內的尋址（同 CH 不同 S
+），是本質上不同的操作。跨磁道的尋址有移動磁頭臂的動作，會比磁道內尋址花費更多時間。</li>
+<li>通過扇區號的磁道內尋址是個忙輪訓操作，需要佔用完整 CPU
+週期。這也隱含扇區號在一個磁道內的物理排列不必是連續的。</li>
+</ol>
+<p>實際上扇區號的物理排列的確不是連續的，每個物理扇區中除了用512字節記錄扇區本身的數據，
+還有扇區的開始記錄和結束記錄，寫有扇區編號和扇區校驗碼。每讀到一個扇區， CPU
+可能需要做一些額外操作（比如計算比對校驗、寫入內存緩衝區、調整內存段頁映射）
+後纔能繼續讀下一個扇區，如果物理排列上連續編號扇區，可能等 CPU
+做完這些事情後磁頭已經旋轉到之後幾個扇區上了。所以出廠時做磁盤低級格式化的時候，
+會跳躍着給扇區編號，給 CPU 留足處理時間。比如下圖：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>上圖中假設有3個柱面，每個柱面6個磁頭，每個磁道內11個扇區，並且畫出了三種不同的扇區編號跳轉情況，
+分別是磁道內的扇區跳轉（+3），柱面內的磁頭跳轉（+5），以及柱面間跳轉（+10）。
+實際磁盤上的柱面數、扇區數要多很多，尋址時需要跳轉的距離也可能更長，這裏只是舉例說明。
+圖中和實際情況相同的是，柱面號和磁頭號從 0 開始編號，而扇區號從 1 開始編號，
+所以做邏輯地址換算的時候要考慮編號差異。</p>
+<p>早期 IBM PC 的 BIOS 使用 24bit 的 CHS 地址，其中 10bit 柱面(C)、 8bit 磁頭(H)、
+6bit 扇區(S)。從而用物理 CHS 尋址方式的軟盤和硬盤驅動器最多可以尋址 1024 個柱面，256 個磁頭，
+63 個扇區，其中扇區數因爲從 1 開始編號所以少了 1 個可尋址範圍。比如 3.5 吋高密度（HD）軟盤有雙面，
+出廠時每面 80 磁道，每磁道 18 扇區，從而能算出 1,474,560 字節的容量。</p>
+<p>如此跳躍編號扇區之後，不是總能給磁道中所有扇區編號，可能在磁道的末尾位置留幾個沒有使用的扇區空間，
+這些是磁道內的保留扇區，可以在發現壞扇區後使用這些隱藏扇區作爲替代扇區。當然讀寫替代扇區的時候
+因爲扇區尋址不連續可能會有一定性能損失。</p>
+<p>因爲物理 CHS 尋址下，磁盤由 CPU 執行驅動程序來驅動，所以以上扇區跳躍的長短實際是由 CPU
+的速度等因素決定的，理論上 CPU 越快，跳躍間隔可以越短，從而磁盤讀寫速度也能加快。磁盤出廠時，
+廠商並不知道使用磁盤的計算機會是怎樣的性能，所以只能保守地根據最慢的 CPU 比如 IBM 初代 PC 搭配的
+8086 的速度來決定跳躍間隔。所以在當年早期玩家們流傳着這樣一個操作：買到新硬盤，
+或者升級了電腦配置之後，對硬盤做一次 <a class="reference external" href="https://en.wikipedia.org/wiki/Disk_formatting#Low-level_formatting_(LLF)_of_hard_disks">低級格式化(Low level formating)</a>
+，聰明的低級格式化程序能智能安排扇區編號，提升硬盤讀寫速度，也能跳過已知壞道位置繼續編號，
+甚至可能將更多保留扇區暴露成可用扇區。這對現代有硬盤控制器的硬盤而言已經沒有意義了。</p>
+</div>
+<div class="section" id="id4">
+<h2><a class="toc-backref" href="#id9">邏輯 CHS 尋址</a></h2>
+<p>隨着硬盤容量不斷增加， BIOS 中用來 CHS 尋址的地址空間逐漸不夠用了。早期 24bit 地址按 <cite>C H S</cite>
+的順序分爲 <cite>10 8 6</cite> 的位數，用 8bit 來尋址磁頭最多可以有 256 個磁頭，而只有 10bit
+來尋址柱面，就只能有 1024 個柱面。最初 IBM 這麼劃分是因爲早期用於 IBM 大型機之類的硬盤可以有
+厚厚一疊的盤片組，同樣的尋址方式就直接用於了 IBM PC 。而 PC 用的硬盤迫於硬盤倉空間大小，
+有厚度限制，硬盤中物理盤面可能只有四五個盤片，硬盤容量增加主要是增加盤片表面的數據密度而非增加盤片數量。</p>
+<p>於是逐漸地，硬盤廠商開始對 CHS 尋址的地址空間做一些手腳。比如最初的簡單想法是重新定義 CH
+，將一些磁頭數挪用做柱面數。從而有了邏輯 CHS 尋址，其中 CH 是固定一組，通過簡單換算從 CH
+值找到物理的柱面和磁頭數。結合 CH 而不映射 S 的優勢在於，從操作系統和文件系統來看依然能根據邏輯
+CHS 地址估算出地址跳轉所需大概的時間，只是原本一次切換磁頭的動作可能變成一次短距離的切換柱面。</p>
+<p>此時的操作系統和文件系統已經開始出現針對 CHS 尋址特點的優化方式，
+儘量減少跨磁道的尋址能一定程度提升讀寫速度，跨磁道時的磁道間距離也會影響尋道時間，
+文件系統可能會根據CHS地址來安排數據結構，優化這些尋址時間。</p>
+<p>即便使用沒有針對 CHS 尋址方式優化過的操作系統和文件系統，比如侷限在早期 Windows 和 FAT
+系文件系統上，早期這些桌面系統用戶們仍然能自己優化磁盤讀寫性能：通過分區。
+分區是硬盤上連續的一段空間，早期由於 BIOS 和 bootloader 的一些技術限制，
+每個分區必須對齊到柱面大小上。早期 PC 玩家們通過把一個大硬盤切分成多個小分區，
+使用時儘量保持近期讀寫針對同一個分區，就可以減少尋址時的額外開銷，改善讀寫速度。</p>
+<p>於是隱含地，CHS 尋址導致底層硬盤和上層操作系統之間有一層性能約定： <strong>連續讀寫保證最快的讀寫速度</strong>
+。硬盤實現 CHS 尋址時，調整扇區編號方式讓連續的 CHS 地址有最快讀寫速度，文件系統也根據這個約定，
+按照 CHS 地址的跳躍來估算讀寫速度耗時並針對性優化。</p>
+</div>
+<div class="section" id="zone-bit-recoding-zbr">
+<h2><a class="toc-backref" href="#id10">區位記錄（Zone bit recoding, ZBR）</a></h2>
+<p>以上物理 CHS 尋址，其實依賴一個假設： <strong>每個磁道上有同樣數量的扇區</strong> 。早期硬盤上也的確遵循這個假設，
+所以我們上面的圖示裏纔能把一個盤面上的扇區展開成一張長方形的表格，因爲每個磁道的扇區數是一樣的。
+實際上當時的硬盤都是恆定角速度（constant angular velocity, CAV）的方式讀寫，無論磁頭在哪兒，
+盤片都旋轉保持恆定的轉速，所以對磁頭來說在單位時間內轉過的角度影響讀寫二進制位的數量，
+而磁頭掃過的面積在這裏沒有影響。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+區位記錄（來自維基百科 <a class="reference external" href="https://en.wikipedia.org/wiki/Zone_bit_recording">Zone bit recording 詞條</a> ）</div>
+<div class="panel-body">
+<object class="embed-responsive-item" data="//farseerfc.me/images/DiskStructure.svg" type="image/svg+xml">
+DiskStructure.svg</object>
+</div>
+</div>
+<p>不過隨着硬盤容量增加，盤面的數據密度也隨之增加，單位面積中理論能容納的二進制位數量有限。
+理論上，如果保持相同密度的話，盤片外圈能比內圈容納更多數據。因此硬盤廠商們開始在盤面上將軌道劃分出
+區塊（zone），外圈區塊中的軌道可以比內圈區塊中的軌道多放入一些扇區。這種方式下生產出的硬盤叫
+區位記錄硬盤（Zone bit recoding, ZBR），相對的傳統固定軌道中扇區數的硬盤就被叫做恆定角速度（CAV）
+硬盤。</p>
+<p>如右圖所示，區位記錄在硬盤上將多個柱面組合成一個區塊，區塊內的磁道有相同數量的扇區，
+而不同區塊的磁道可以有不同數量的扇區，外圈區塊比內圈區塊有更多扇區。</p>
+<p>顯然要支持 ZBR ，物理 CHS 尋址方式不再有效，於是 ZBR
+硬盤將原本簡單的地址換算電路升級爲更複雜的磁盤控制器芯片，替代 CPU
+來驅動硬盤，把來自文件系統的邏輯 CHS 地址通過換算轉換到物理 CHS 地址，並且驅動磁頭做跳轉和尋址。
+從而有了獨立的控制芯片之後，硬盤讀寫扇區的速度不再受 CPU 速度影響。有了完整的邏輯-物理地址轉換後，
+邏輯扇區編號不再對應物理扇區編號，上述編號跳轉和壞扇區處理之類的事情都由磁盤控制芯片代爲完成。
+從而 CHS 地址已經喪失了物理意義，只留下 <strong>連續讀寫保證最快的讀寫速度</strong> 這樣的性能約定。</p>
+<p>有了 ZBR 之後，硬盤讀寫速度也不再恆定，雖然仍然保持恆定轉速，但是讀寫外圈磁道時單位時間掃過的扇區
+多於讀寫內圈磁道時掃過的扇區。所以 ZBR 硬盤的低端地址比高端地址有更快的讀寫速度，
+通過硬盤測速軟件能觀察到階梯狀的「掉速」現象。</p>
+<p>邏輯地址轉換也會造成邏輯 CHS 尋址能訪問到的扇區數少於物理 CHS 尋址的現象，
+磁盤中扇區被重新編號後可能有一些扇區剩餘，於是 ZBR 硬盤的出廠低級格式化可能會均分這些訪問不到的扇區
+給每個磁道作爲保留扇區，留作壞扇區後備。</p>
+<p>另外有了獨立磁盤控制器芯片之後，扇區內的校驗算法也不再受制於 BIOS INT 13H 接口。
+原本 BIOS 的 INT 13H 接口定義了每個扇區 512 字節，額外配有 4 字節校驗， 32bit
+的校驗碼對 4096bit 的數據來說，只能允許一些簡單的校驗算法，比如
+<a class="reference external" href="https://en.wikipedia.org/wiki/Hamming_code">漢明碼</a> 對 4096bit 的數據需要 13bit
+的校驗，突破了校驗算法限制後硬盤可以在物理扇區中放更多校驗位，使用更複雜的
+<a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code">ECC</a> 算法，提供更強的容錯性。</p>
+<p>通過 ZBR ，邏輯 CHS 尋址不再侷限在具體每磁道扇區數等物理限制上，但是仍然侷限在 CHS 總位數。
+24bit 的 CHS 地址能尋址 <span class="math">\(1024*256*63 = 16515072\)</span> 個扇區，也就是 8064MiB 的空間。
+於是早期很多操作系統有 7.8G 硬盤大小的限制。後來 ATA/IDE 標準提升了 CHS 尋址數量，從 24bit
+到 28bit 到 32bit ，不過在系統引導早期仍然依賴 BIOS 最基本的 24bit CHS
+尋址能力，於是那時候安裝系統時要求引導程序裝在前 8G 範圍內也是這個原因。</p>
+</div>
+<div class="section" id="chs-lba">
+<h2><a class="toc-backref" href="#id11">從 CHS 到 LBA</a></h2>
+<p>隨着硬盤大小不斷提升，無論是操作系統軟件層，還是硬盤廠商硬件層，都逐漸意識到邏輯 CHS
+尋址是兩邊相互欺騙對方的騙局：文件系統根據假的 CHS 地址的提示苦苦優化，而硬盤控制器又要把物理
+CHS 模擬到假的 CHS 地址上以兼容 BIOS 和操作系統。和 CS 領域太多別的事情一樣，
+CHS 尋址過早地暴露出太多底層抽象細節，而上層軟件又轉而依賴於這些暴露出的細節進行優化，
+底層細節的變動使得上層優化不再是有意義的優化。</p>
+<p>於是 <a class="reference external" href="https://en.wikipedia.org/wiki/Parallel_ATA">ATA 標準</a> 引入了
+<a class="reference external" href="https://en.wikipedia.org/wiki/Logical_block_addressing">邏輯塊尋址（Logical Block Addressing, LBA）</a>
+來替代 CHS 尋址，解決其中的混亂。LBA 的思路其實就是邏輯 CHS 尋址的簡單換算，因爲
+CHS 尋址下 S 從 1 開始計算，而 LBA 使用連續扇區編號，從 0 開始編號，所以換算公式如下：</p>
+<div class="math">
+\begin{equation*}
+LBA 地址 = ( C \times 磁頭數 + H ) \times 每磁道扇區數 + ( S - 1 )
+\end{equation*}
+</div>
+<p>使用 LBA 尋址，操作系統和文件系統直接尋址一個連續地址空間中的扇區號，
+不應該關心柱面和磁頭之類的物理參數，將這些物理細節交由磁盤控制器。
+對操作系統和文件系統這些上層軟件而言，LBA尋址的抽象仍然保證了 <strong>連續讀寫提供最快的讀寫速度</strong>
+，文件系統仍然會嘗試根據 LBA 地址優化，儘量連續讀寫從而減少尋道時間。</p>
+<p>從 CHS 尋址切換到 LBA 尋址，需要硬盤和操作系統兩方面的努力，所以很長一段時間，
+硬盤同時支持兩種尋址方式，在控制器內部做轉換。最後需要放棄支持的是深植了 CHS 尋址的 BIOS
+，使用 BIOS 引導的 MBR 引導程序還在用 CHS 尋址方式讀取數據加載操作系統，直到大家都切換到 UEFI 。</p>
+</div>
+<div class="section" id="shingled-magnetic-recording-smr">
+<h2><a class="toc-backref" href="#id12">疊瓦磁記錄（Shingled Magnetic Recording, SMR）</a></h2>
+<p>逐漸從歷史講到了現在，隨着硬盤記錄密度的不斷增加，硬盤廠商們也在不斷發明新技術嘗試突破磁盤記錄的物理極限。
+因爲有了在硬盤上獨立的控制器，並且切換到了邏輯塊地址（LBA）的尋址方式，
+操作系統大部分時候不用再關心底層硬盤的物理技術革新，比如垂直寫入技術（perpendicular magnetic
+recording, PMR）將磁頭記錄方式從水平轉換成垂直記錄，增加了記錄密度，但不影響尋址方式。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+疊瓦磁記錄（來自 <a class="reference external" href="https://ieeexplore.ieee.org/document/4782114">The Feasibility of Magnetic Recording at 10 Terabits Per Square Inch on Conventional Media</a> ）</div>
+<div class="panel-body">
+<img alt="smr.png" class="img-responsive" src="//farseerfc.me/images/smr.png"/>
+</div>
+</div>
+<p>不過技術革新中也有影響尋址方式的技術，比如
+<a class="reference external" href="https://en.wikipedia.org/wiki/Shingled_magnetic_recording">疊瓦磁記錄技術（Shingled Magnetic Recording, SMR）</a>
+。SMR 試圖讓相鄰磁道的寫入有部分重疊，從而增加記錄密度。有了重疊之後，讀取磁道還是能隨機定位，
+而寫入磁道會破壞它後面疊加上的磁道，所以寫入磁道必須嚴格按地址順序寫入。爲了滿足隨機順序寫入的需要，
+SMR 硬盤把連續的幾個磁道組織成區塊（zone），在一個區塊內必須按順序寫入。
+這裏的區塊可以和區位記錄（ZBR）是同樣的區塊，也可以獨立於 ZBR 做不同大小的區塊分割。</p>
+<p>這種區塊內連續寫入的要求，很像是 SSD 這種基於閃存介質的記錄方式， SMR 硬盤也同樣像 SSD
+一樣在磁盤控制器內引入 <a class="reference external" href="//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html#id21">日誌結構式的記錄方式，採用類似的 GC 算法</a>
+，收到隨機寫入請求的時候，在區塊間執行 GC 搬運數據塊，對操作系統提供可以任意寫入的抽象接口。</p>
+<p>當然這種類似閃存介質的 FTL 的抽象有對讀寫性能的直接影響。SMR 硬盤可以將這些細節完全隱藏起來（
+Device Managed），或者完全暴露給宿主系統（Host Managed
+），或者隱藏細節的同時在宿主想查詢的時候提供細節（Host Aware）。和 SSD
+一樣，消費級的 SMR 硬盤通常選擇隱藏細節只在需要的時候暴露，完全暴露細節的設備通常只在企業服務器級別
+的產品中看到。</p>
+<p>可以期待，隨着 SMR 硬盤的逐漸普及，文件系統設計中也將更多考慮 SMR 的特性加以優化。這些優化可能參考
+對 SSD 的優化（比如儘量連續寫入），但是又不能完全照搬（比如 SSD 需要考慮寫平衡而 SMR
+硬盤不需要，比如 SSD 不用擔心隨機尋道時間而 SMR 硬盤需要）。這些對現在和未來文件系統的設計提供了更多挑戰。</p>
+</div>
+<div class="section" id="kib">
+<h2><a class="toc-backref" href="#id13">4KiB 扇區大小</a></h2>
+<p>不侷限於硬盤，存儲設備發展中另一個方向是增加扇區大小。如前所述，在應用於 PC
+之前的硬盤設計也曾有過比 512 字節更小的扇區大小，而自從 PC 普及之後 512 字節扇區逐漸成爲主流，
+甚至到了揮之不去的地步。隨着硬盤容量提升，直接尋址 512 字節的扇區顯得不再那麼高效，
+文件系統內部也早已把多個扇區合併成一個邏輯簇（cluster）或者塊（block），按簇或塊的粒度管理。
+在底層硬件同樣也是按照 512 字節大小劃分扇區，每個扇區都要獨立計算校驗，如果能增大扇區大小到比如
+4KiB，將能更經濟地安排扇區校驗碼，從而得到更多可用容量。可見 512 字節扇區大小這一設計，和
+CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努力維護的謊言。</p>
+<p>硬盤物理扇區提升爲 4KiB 大小的設計，叫做「
+<a class="reference external" href="https://en.wikipedia.org/wiki/Advanced_Format">先進格式化（Advanced Format）</a>
+」，這樣的硬盤叫做先進格式化硬盤（AFD）。在此基礎上，硬盤控制器可以提供模擬 512 字節扇區的模擬層，
+叫做 512e ，也可以直接提供 4K 大小的扇區給操作系統，叫做 4K native (4Kn)。
+操作系統和文件系統要儘量避免依賴 512e 以提供最優性能，支持 4Kn 扇區尋址也是現在和未來
+文件系統設計中一個重要挑戰。</p>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        Btrfs vs ZFS 實現 snapshot 的差異
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+這篇文章是 "FS筆記" 系列文章的第 3 篇：                  </h4>
+                </div>
+                <ul class="list-group">
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zfs-layered-architecture-design.html' style="text-align:left">ZFS 分層架構設計</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html' style="text-align:left">Btrfs vs ZFS 實現 snapshot 的差異</a></li>
+                        <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/history-of-chs-addressing.html' style="text-align:left">柱面-磁頭-扇區尋址的一些舊事</a></li>
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+請用你的 GitHub 賬戶登錄並在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/94#new_comment_field" target="_blank">這篇文章的 Issue 頁下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/94#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言於 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/94/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'history-of-chs-addressing';
+                        var disqus_url = 'http://farseerfc.me/history-of-chs-addressing.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/pages/about.html">
+關於 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/pages/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">標籤雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fsbi-ji.html">
+                    FS筆記 <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fs-notes.html">
+                    FS notes <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chs.html">
+                    CHS <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cylinder.html">
+                    cylinder <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/head.html">
+                    head <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sector.html">
+                    sector <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/lba.html">
+                    LBA <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/smr.html">
+                    SMR <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/4kn.html">
+                    4Kn <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/btrfs.html">
+                    btrfs <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zfs.html">
+                    zfs <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cow.html">
+                    cow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/snapshot.html">
+                    snapshot <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/clone.html">
+                    clone <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subvolume.html">
+                    subvolume <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dedup.html">
+                    dedup <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/reflink.html">
+                    reflink <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/spa.html">
+                    SPA <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dmu.html">
+                    DMU <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dsl.html">
+                    DSL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zpl.html">
+                    ZPL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/layered.html">
+                    layered <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/architecture.html">
+                    architecture <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zio.html">
+                    ZIO <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/vdev.html">
+                    VDEV <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/arc.html">
+                    ARC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zap.html">
+                    ZAP <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zil.html">
+                    ZIL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zvol.html">
+                    ZVOL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/friend.html">
+                    friend <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/horo.html">
+                    horo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/life.html">
+                    life <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    linux <sup> 9</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/raspberrypi.html">
+                    raspberrypi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usbip.html">
+                    usbip <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb.html">
+                    usb <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/forward.html">
+                    forward <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/translate.html">
+                    translate <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chouyaku.html">
+                    chouyaku <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kimi.html">
+                    kimi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sae.html">
+                    sae <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/inakerya.html">
+                    inakerya <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ting-yi.html">
+                    聽譯 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dotfiles.html">
+                    dotfiles <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stow.html">
+                    stow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stdio.html">
+                    stdio <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/tty.html">
+                    tty <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/unix.html">
+                    unix <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ugh.html">
+                    ugh <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ncurses.html">
+                    ncurses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/termcap.html">
+                    termcap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/terminfo.html">
+                    terminfo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kde5.html">
+                    kde5 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/plasma.html">
+                    plasma <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub倉庫</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目錄</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+<p class="topic-title">目錄</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id3" id="id7">柱面、磁頭、扇區以及相關術語</a></li>
+<li><a class="reference internal" href="#chs" id="id8">物理 CHS 尋址</a></li>
+<li><a class="reference internal" href="#id4" id="id9">邏輯 CHS 尋址</a></li>
+<li><a class="reference internal" href="#zone-bit-recoding-zbr" id="id10">區位記錄（Zone bit recoding, ZBR）</a></li>
+<li><a class="reference internal" href="#chs-lba" id="id11">從 CHS 到 LBA</a></li>
+<li><a class="reference internal" href="#shingled-magnetic-recording-smr" id="id12">疊瓦磁記錄（Shingled Magnetic Recording, SMR）</a></li>
+<li><a class="reference internal" href="#kib" id="id13">4KiB 扇區大小</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2020 farseerfc
+            &middot; 通過            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

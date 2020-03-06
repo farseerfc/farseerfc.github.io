@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Farseerfc的小窩 - farseerfc</title><link>//farseerfc.me/</link><description></description><lastBuildDate>Wed, 19 Feb 2020 15:45:00 +0900</lastBuildDate><item><title>Btrfs vs ZFS 實現 snapshot 的差異</title><link>//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html</link><description>
+<rss version="2.0"><channel><title>Farseerfc的小窩 - farseerfc</title><link>//farseerfc.me/</link><description></description><lastBuildDate>Fri, 06 Mar 2020 15:45:00 +0900</lastBuildDate><item><title>柱面-磁頭-扇區尋址的一些舊事</title><link>//farseerfc.me/history-of-chs-addressing.html</link><description>
+&lt;p&gt;在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。
+更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/MiniDisc"&gt;MiniDisc&lt;/a&gt; 、
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/DVD-RAM"&gt;DVD-RAM&lt;/a&gt;
+等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。&lt;/p&gt;
+&lt;p&gt;這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是
+柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。
+大部分內容來自維基百科 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Cylinder-head-sector"&gt;Cylinder-head-sector 詞條&lt;/a&gt;
+這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。&lt;/p&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;柱面、磁頭、扇區以及相關術語&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+磁盤示意圖（來自維基百科 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Cylinder-head-sector"&gt;Cylinder-head-sector 詞條&lt;/a&gt; ）&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;object class="embed-responsive-item" data="//farseerfc.me/images/chs-illustrate-trans.svg" type="image/svg+xml"&gt;
+chs-illustrate-trans.svg&lt;/object&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)，
+然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …&lt;/p&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">farseerfc</dc:creator><pubDate>Fri, 06 Mar 2020 15:45:00 +0900</pubDate><guid isPermaLink="false">tag:farseerfc.me,2020-03-06:/history-of-chs-addressing.html</guid><category>tech</category><category>FS筆記</category><category>FS notes</category><category>CHS</category><category>cylinder</category><category>head</category><category>sector</category><category>LBA</category><category>SMR</category><category>4Kn</category></item><item><title>Btrfs vs ZFS 實現 snapshot 的差異</title><link>//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html</link><description>
 &lt;!-- --&gt;
 &lt;blockquote&gt;
 &lt;div class="line-block"&gt;
@@ -498,7 +519,7 @@ Detector，似乎我要給井上研做的就是這個。想更多瞭解Xiao的�
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils table footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
