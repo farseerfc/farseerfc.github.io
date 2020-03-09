@@ -154,9 +154,9 @@ DiskStructure.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;不过随着硬盘容量增加，盘面的数据密度也随之增加，单位面积中理论能容纳的二进制位数量有限。
-理论上，如果保持相同密度的话，盘片外圈能比内圈容纳更多数据。因此硬盘厂商们开始在盘面上将轨道划分出
-区块（zone），外圈区块中的轨道可以比内圈区块中的轨道多放入一些扇区。这种方式下生产出的硬盘叫
-区位记录硬盘（Zone bit recoding, ZBR），相对的传统固定轨道中扇区数的硬盘就被叫做恒定角速度（CAV）
+理论上，如果保持相同密度的话，盘片外圈能比内圈容纳更多数据。因此硬盘厂商们开始在盘面上将磁道划分出
+区块（zone），外圈区块中的磁道可以比内圈区块中的磁道多放入一些扇区。这种方式下生产出的硬盘叫
+区位记录硬盘（Zone bit recoding, ZBR），相对的传统固定磁道中扇区数的硬盘就被叫做恒定角速度（CAV）
 硬盘。&lt;/p&gt;
 &lt;p&gt;如右图所示，区位记录在硬盘上将多个柱面组合成一个区块，区块内的磁道有相同数量的扇区，
 而不同区块的磁道可以有不同数量的扇区，外圈区块比内圈区块有更多扇区。&lt;/p&gt;
@@ -197,7 +197,7 @@ CHS 寻址过早地暴露出太多底层抽象细节，而上层软件又转而�
 CHS 寻址下 S 从 1 开始计算，而 LBA 使用连续扇区编号，从 0 开始编号，所以换算公式如下：&lt;/p&gt;
 &lt;div class="math"&gt;
 \begin{equation*}
-LBA 地址 = ( C \times 磁头数 + H ) \times 每磁道扇区数 + ( S - 1 )
+LBA 地址 = ( C \times 磁头数 + H ) \times 扇区数 + ( S - 1 )
 \end{equation*}
 &lt;/div&gt;
 &lt;p&gt;使用 LBA 寻址，操作系统和文件系统直接寻址一个连续地址空间中的扇区号，
@@ -208,7 +208,7 @@ LBA 地址 = ( C \times 磁头数 + H ) \times 每磁道扇区数 + ( S - 1 )
 硬盘同时支持两种寻址方式，在控制器内部做转换。最后需要放弃支持的是深植了 CHS 寻址的 BIOS
 ，使用 BIOS 引导的 MBR 引导程序还在用 CHS 寻址方式读取数据加载操作系统，直到大家都切换到 UEFI 。&lt;/p&gt;
 &lt;p&gt;并且随着硬盘使用 LBA 寻址，导致上层软件很难预测底层硬件实际切换柱面切换磁头之类的时机，
-潜在得导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
+潜在地导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
 还开始负责维护一块盘内缓冲区，实现盘内的 IO 队列。缓冲区的存在允许磁盘控制器同时接收更多来自上层软件
 的读写请求，转换成实际物理布局参数，并根据磁盘物理布局来调整读写顺序，增加总体吞吐率。
 当然有缓冲区的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
@@ -229,8 +229,10 @@ recording, PMR）将磁头记录方式从水平转换成垂直记录，增加了
 &lt;/div&gt;
 &lt;p&gt;不过技术革新中也有影响寻址方式的技术，比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Shingled_magnetic_recording"&gt;叠瓦磁记录技术（Shingled Magnetic Recording, SMR）&lt;/a&gt;
-。SMR 试图让相邻磁道的写入有部分重叠，从而增加记录密度。有了重叠之后，读取磁道还是能随机定位，
-而写入磁道会破坏它后面叠加上的磁道，所以写入磁道必须严格按地址顺序写入。为了满足随机顺序写入的需要，
+。 SMR 技术基于一个技术事实：物理上磁头的写入头（write head）需要比读取头(read head
+)占用更大面积，如果按照写入头的物理极限放置磁记录，那么对于读取头会有很多空间浪费。从而
+SMR 试图让相邻磁道的写入有部分重叠，从而增加记录密度。即便重叠了相邻磁道，读取磁道还是能随机定位，
+而写入磁道会覆盖它后面叠加上的磁道，所以写入磁道必须严格按地址顺序写入。为了满足随机顺序写入的需要，
 SMR 硬盘把连续的几个磁道组织成区块（zone），在一个区块内必须按顺序写入。
 这里的区块可以和区位记录（ZBR）是同样的区块，也可以独立于 ZBR 做不同大小的区块分割。&lt;/p&gt;
 &lt;p&gt;这种区块内连续写入的要求，很像是 SSD 这种基于闪存介质的记录方式， SMR 硬盘也同样像 SSD
@@ -238,8 +240,8 @@ SMR 硬盘把连续的几个磁道组织成区块（zone），在一个区块内
 ，收到随机写入请求的时候，在区块间执行 GC 搬运数据块，对操作系统提供可以任意写入的抽象接口。&lt;/p&gt;
 &lt;p&gt;当然这种类似闪存介质的 FTL 的抽象有对读写性能的直接影响。SMR 硬盘可以将这些细节完全隐藏起来（
 Device Managed），或者完全暴露给宿主系统（Host Managed
-），或者隐藏细节的同时在宿主想查询的时候提供细节（Host Aware）。和 SSD
-一样，消费级的 SMR 硬盘通常选择隐藏细节只在需要的时候暴露，完全暴露细节的设备通常只在企业服务器级别
+），或者在读写时隐藏细节的同时在宿主想查询的时候提供接口查询（Host Aware）。和 SSD
+一样，消费级的 SMR 硬盘通常选择隐藏细节只在被询问时暴露，完全暴露细节的设备通常只在企业服务器级别
 的产品中看到。&lt;/p&gt;
 &lt;p&gt;可以期待，随着 SMR 硬盘的逐渐普及，文件系统设计中也将更多考虑 SMR 的特性加以优化。这些优化可能参考
 对 SSD 的优化（比如尽量连续写入），但是又不能完全照搬（比如 SSD 需要考虑写平衡而 SMR
@@ -261,8 +263,36 @@ CHS 寻址一样，逐渐成为了操作系统和硬盘厂商彼此间互相努�
 操作系统和文件系统要尽量避免依赖 512e 以提供最优性能，支持 4Kn 扇区寻址也是现在和未来
 文件系统设计中一个重要挑战。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="dual-actuator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;双磁头臂（Dual Actuator）&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+双磁头臂（来自 &lt;a class="reference external" href="http://www.digitalpreservation.gov/meetings/DSA2018/Day_1/5_TO_P2-2_Trantham_Disk_Trends.pdf"&gt;Seagate Storage Update - LOC Designing Storage Architecture for Digital Collections&lt;/a&gt; ）&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="DualActuator-Opposed.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Opposed.jpeg"/&gt;
+&lt;img alt="DualActuator-Split.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Split.jpeg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;除了提升容量，硬盘发展的另一个方向是提升读写速度。通过上述 CHS 寻址方式可见，
+传统方式下提升硬盘读写速度有两种方式：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;提升磁记录密度&lt;/li&gt;
+&lt;li&gt;提升（磁头臂和盘片）转速&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;第一种方式提升记录密度，在增加容量的同时也能提升硬盘读写速度，所以是长久以来硬盘厂商的主要方式。
+第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400 rpm 现在最高能到 15000rpm
+附近，高速旋转的盘片就像一个螺旋桨一样，外圈线速度已经到了接近声速，很难再往上提升。
+以及盘片转速影响连续读写速度，而磁头臂转速影响寻道速度，高速寻道对磁头臂旋转有极高精度要求。&lt;/p&gt;
+&lt;p&gt;所以长久以来，衡量硬盘速度有两项指标：连续读写速度和每秒操作数(IOPS)，随着容量提升，
+也在提升连续读写速度，但是很难提升 IOPS ，相对而言随机寻道所需的开销越来越昂贵。&lt;/p&gt;
+&lt;p&gt;目前硬盘厂商们在尝试一种新的方式提升硬盘 IOPS ：增加一条磁头臂。一个硬盘驱动器内封入两组甚至多组
+磁头臂，每个磁头臂能独立旋转，从而能独立寻址定位。这样的硬盘叫双/多磁头臂（Dual/Multi Actuator）硬盘。&lt;/p&gt;
+&lt;p&gt;从操作系统角度来看，双磁头臂硬盘更像是一根连接线上接有等容量的两个独立驱动器，
+可以在盘内控制器上组 RAID0 ，或者把两个磁头臂都暴露给操作系统，由操作系统组 RAID0
+或更智能地使用独立寻址的能力。&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="tl-dr"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;结论（TL;DR）和预告&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;结论（TL;DR）和预告&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;软件层面的优化与硬件层面的革新一直是一组矛盾。长久以来文件系统和硬盘设备在关于寻址方式的磨合中，
 逐渐演化出一条真理，也是我文中一直在强调的： &lt;strong&gt;连续读写提供最快的读写速度&lt;/strong&gt;
 。文件系统总是能根据底层设备暴露出的一些抽象泄漏，比如物理 CHS 布局，比如 512 字节扇区大小，

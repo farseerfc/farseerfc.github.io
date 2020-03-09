@@ -154,9 +154,9 @@ DiskStructure.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;不过随着硬盘容量增加，盘面的数据密度也随之增加，单位面积中理论能容纳的二进制位数量有限。
-理论上，如果保持相同密度的话，盘片外圈能比内圈容纳更多数据。因此硬盘厂商们开始在盘面上将轨道划分出
-区块（zone），外圈区块中的轨道可以比内圈区块中的轨道多放入一些扇区。这种方式下生产出的硬盘叫
-区位记录硬盘（Zone bit recoding, ZBR），相对的传统固定轨道中扇区数的硬盘就被叫做恒定角速度（CAV）
+理论上，如果保持相同密度的话，盘片外圈能比内圈容纳更多数据。因此硬盘厂商们开始在盘面上将磁道划分出
+区块（zone），外圈区块中的磁道可以比内圈区块中的磁道多放入一些扇区。这种方式下生产出的硬盘叫
+区位记录硬盘（Zone bit recoding, ZBR），相对的传统固定磁道中扇区数的硬盘就被叫做恒定角速度（CAV）
 硬盘。&lt;/p&gt;
 &lt;p&gt;如右图所示，区位记录在硬盘上将多个柱面组合成一个区块，区块内的磁道有相同数量的扇区，
 而不同区块的磁道可以有不同数量的扇区，外圈区块比内圈区块有更多扇区。&lt;/p&gt;
@@ -197,7 +197,7 @@ CHS 寻址过早地暴露出太多底层抽象细节，而上层软件又转而�
 CHS 寻址下 S 从 1 开始计算，而 LBA 使用连续扇区编号，从 0 开始编号，所以换算公式如下：&lt;/p&gt;
 &lt;div class="math"&gt;
 \begin{equation*}
-LBA 地址 = ( C \times 磁头数 + H ) \times 每磁道扇区数 + ( S - 1 )
+LBA 地址 = ( C \times 磁头数 + H ) \times 扇区数 + ( S - 1 )
 \end{equation*}
 &lt;/div&gt;
 &lt;p&gt;使用 LBA 寻址，操作系统和文件系统直接寻址一个连续地址空间中的扇区号，
@@ -208,7 +208,7 @@ LBA 地址 = ( C \times 磁头数 + H ) \times 每磁道扇区数 + ( S - 1 )
 硬盘同时支持两种寻址方式，在控制器内部做转换。最后需要放弃支持的是深植了 CHS 寻址的 BIOS
 ，使用 BIOS 引导的 MBR 引导程序还在用 CHS 寻址方式读取数据加载操作系统，直到大家都切换到 UEFI 。&lt;/p&gt;
 &lt;p&gt;并且随着硬盘使用 LBA 寻址，导致上层软件很难预测底层硬件实际切换柱面切换磁头之类的时机，
-潜在得导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
+潜在地导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
 还开始负责维护一块盘内缓冲区，实现盘内的 IO 队列。缓冲区的存在允许磁盘控制器同时接收更多来自上层软件
 的读写请求，转换成实际物理布局参数，并根据磁盘物理布局来调整读写顺序，增加总体吞吐率。
 当然有缓冲区的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
@@ -229,8 +229,10 @@ recording, PMR）将磁头记录方式从水平转换成垂直记录，增加了
 &lt;/div&gt;
 &lt;p&gt;不过技术革新中也有影响寻址方式的技术，比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Shingled_magnetic_recording"&gt;叠瓦磁记录技术（Shingled Magnetic Recording, SMR）&lt;/a&gt;
-。SMR 试图让相邻磁道的写入有部分重叠，从而增加记录密度。有了重叠之后，读取磁道还是能随机定位，
-而写入磁道会破坏它后面叠加上的磁道，所以写入磁道必须严格按地址顺序写入。为了满足随机顺序写入的需要，
+。 SMR 技术基于一个技术事实：物理上磁头的写入头（write head）需要比读取头(read head
+)占用更大面积，如果按照写入头的物理极限放置磁记录，那么对于读取头会有很多空间浪费。从而
+SMR 试图让相邻磁道的写入有部分重叠，从而增加记录密度。即便重叠了相邻磁道，读取磁道还是能随机定位，
+而写入磁道会覆盖它后面叠加上的磁道，所以写入磁道必须严格按地址顺序写入。为了满足随机顺序写入的需要，
 SMR 硬盘把连续的几个磁道组织成区块（zone），在一个区块内必须按顺序写入。
 这里的区块可以和区位记录（ZBR）是同样的区块，也可以独立于 ZBR 做不同大小的区块分割。&lt;/p&gt;
 &lt;p&gt;这种区块内连续写入的要求，很像是 SSD 这种基于闪存介质的记录方式， SMR 硬盘也同样像 SSD
@@ -238,8 +240,8 @@ SMR 硬盘把连续的几个磁道组织成区块（zone），在一个区块内
 ，收到随机写入请求的时候，在区块间执行 GC 搬运数据块，对操作系统提供可以任意写入的抽象接口。&lt;/p&gt;
 &lt;p&gt;当然这种类似闪存介质的 FTL 的抽象有对读写性能的直接影响。SMR 硬盘可以将这些细节完全隐藏起来（
 Device Managed），或者完全暴露给宿主系统（Host Managed
-），或者隐藏细节的同时在宿主想查询的时候提供细节（Host Aware）。和 SSD
-一样，消费级的 SMR 硬盘通常选择隐藏细节只在需要的时候暴露，完全暴露细节的设备通常只在企业服务器级别
+），或者在读写时隐藏细节的同时在宿主想查询的时候提供接口查询（Host Aware）。和 SSD
+一样，消费级的 SMR 硬盘通常选择隐藏细节只在被询问时暴露，完全暴露细节的设备通常只在企业服务器级别
 的产品中看到。&lt;/p&gt;
 &lt;p&gt;可以期待，随着 SMR 硬盘的逐渐普及，文件系统设计中也将更多考虑 SMR 的特性加以优化。这些优化可能参考
 对 SSD 的优化（比如尽量连续写入），但是又不能完全照搬（比如 SSD 需要考虑写平衡而 SMR
@@ -261,8 +263,36 @@ CHS 寻址一样，逐渐成为了操作系统和硬盘厂商彼此间互相努�
 操作系统和文件系统要尽量避免依赖 512e 以提供最优性能，支持 4Kn 扇区寻址也是现在和未来
 文件系统设计中一个重要挑战。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="dual-actuator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;双磁头臂（Dual Actuator）&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+双磁头臂（来自 &lt;a class="reference external" href="http://www.digitalpreservation.gov/meetings/DSA2018/Day_1/5_TO_P2-2_Trantham_Disk_Trends.pdf"&gt;Seagate Storage Update - LOC Designing Storage Architecture for Digital Collections&lt;/a&gt; ）&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="DualActuator-Opposed.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Opposed.jpeg"/&gt;
+&lt;img alt="DualActuator-Split.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Split.jpeg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;除了提升容量，硬盘发展的另一个方向是提升读写速度。通过上述 CHS 寻址方式可见，
+传统方式下提升硬盘读写速度有两种方式：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;提升磁记录密度&lt;/li&gt;
+&lt;li&gt;提升（磁头臂和盘片）转速&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;第一种方式提升记录密度，在增加容量的同时也能提升硬盘读写速度，所以是长久以来硬盘厂商的主要方式。
+第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400 rpm 现在最高能到 15000rpm
+附近，高速旋转的盘片就像一个螺旋桨一样，外圈线速度已经到了接近声速，很难再往上提升。
+以及盘片转速影响连续读写速度，而磁头臂转速影响寻道速度，高速寻道对磁头臂旋转有极高精度要求。&lt;/p&gt;
+&lt;p&gt;所以长久以来，衡量硬盘速度有两项指标：连续读写速度和每秒操作数(IOPS)，随着容量提升，
+也在提升连续读写速度，但是很难提升 IOPS ，相对而言随机寻道所需的开销越来越昂贵。&lt;/p&gt;
+&lt;p&gt;目前硬盘厂商们在尝试一种新的方式提升硬盘 IOPS ：增加一条磁头臂。一个硬盘驱动器内封入两组甚至多组
+磁头臂，每个磁头臂能独立旋转，从而能独立寻址定位。这样的硬盘叫双/多磁头臂（Dual/Multi Actuator）硬盘。&lt;/p&gt;
+&lt;p&gt;从操作系统角度来看，双磁头臂硬盘更像是一根连接线上接有等容量的两个独立驱动器，
+可以在盘内控制器上组 RAID0 ，或者把两个磁头臂都暴露给操作系统，由操作系统组 RAID0
+或更智能地使用独立寻址的能力。&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="tl-dr"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;结论（TL;DR）和预告&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;结论（TL;DR）和预告&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;软件层面的优化与硬件层面的革新一直是一组矛盾。长久以来文件系统和硬盘设备在关于寻址方式的磨合中，
 逐渐演化出一条真理，也是我文中一直在强调的： &lt;strong&gt;连续读写提供最快的读写速度&lt;/strong&gt;
 。文件系统总是能根据底层设备暴露出的一些抽象泄漏，比如物理 CHS 布局，比如 512 字节扇区大小，
@@ -481,9 +511,9 @@ DiskStructure.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;不過隨着硬盤容量增加，盤面的數據密度也隨之增加，單位面積中理論能容納的二進制位數量有限。
-理論上，如果保持相同密度的話，盤片外圈能比內圈容納更多數據。因此硬盤廠商們開始在盤面上將軌道劃分出
-區塊（zone），外圈區塊中的軌道可以比內圈區塊中的軌道多放入一些扇區。這種方式下生產出的硬盤叫
-區位記錄硬盤（Zone bit recoding, ZBR），相對的傳統固定軌道中扇區數的硬盤就被叫做恆定角速度（CAV）
+理論上，如果保持相同密度的話，盤片外圈能比內圈容納更多數據。因此硬盤廠商們開始在盤面上將磁道劃分出
+區塊（zone），外圈區塊中的磁道可以比內圈區塊中的磁道多放入一些扇區。這種方式下生產出的硬盤叫
+區位記錄硬盤（Zone bit recoding, ZBR），相對的傳統固定磁道中扇區數的硬盤就被叫做恆定角速度（CAV）
 硬盤。&lt;/p&gt;
 &lt;p&gt;如右圖所示，區位記錄在硬盤上將多個柱面組合成一個區塊，區塊內的磁道有相同數量的扇區，
 而不同區塊的磁道可以有不同數量的扇區，外圈區塊比內圈區塊有更多扇區。&lt;/p&gt;
@@ -524,7 +554,7 @@ CHS 尋址過早地暴露出太多底層抽象細節，而上層軟件又轉而�
 CHS 尋址下 S 從 1 開始計算，而 LBA 使用連續扇區編號，從 0 開始編號，所以換算公式如下：&lt;/p&gt;
 &lt;div class="math"&gt;
 \begin{equation*}
-LBA 地址 = ( C \times 磁頭數 + H ) \times 每磁道扇區數 + ( S - 1 )
+LBA 地址 = ( C \times 磁頭數 + H ) \times 扇區數 + ( S - 1 )
 \end{equation*}
 &lt;/div&gt;
 &lt;p&gt;使用 LBA 尋址，操作系統和文件系統直接尋址一個連續地址空間中的扇區號，
@@ -535,7 +565,7 @@ LBA 地址 = ( C \times 磁頭數 + H ) \times 每磁道扇區數 + ( S - 1 )
 硬盤同時支持兩種尋址方式，在控制器內部做轉換。最後需要放棄支持的是深植了 CHS 尋址的 BIOS
 ，使用 BIOS 引導的 MBR 引導程序還在用 CHS 尋址方式讀取數據加載操作系統，直到大家都切換到 UEFI 。&lt;/p&gt;
 &lt;p&gt;並且隨着硬盤使用 LBA 尋址，導致上層軟件很難預測底層硬件實際切換柱面切換磁頭之類的時機，
-潛在得導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
+潛在地導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
 還開始負責維護一塊盤內緩衝區，實現盤內的 IO 隊列。緩衝區的存在允許磁盤控制器同時接收更多來自上層軟件
 的讀寫請求，轉換成實際物理佈局參數，並根據磁盤物理佈局來調整讀寫順序，增加總體吞吐率。
 當然有緩衝區的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
@@ -556,8 +586,10 @@ recording, PMR）將磁頭記錄方式從水平轉換成垂直記錄，增加了
 &lt;/div&gt;
 &lt;p&gt;不過技術革新中也有影響尋址方式的技術，比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Shingled_magnetic_recording"&gt;疊瓦磁記錄技術（Shingled Magnetic Recording, SMR）&lt;/a&gt;
-。SMR 試圖讓相鄰磁道的寫入有部分重疊，從而增加記錄密度。有了重疊之後，讀取磁道還是能隨機定位，
-而寫入磁道會破壞它後面疊加上的磁道，所以寫入磁道必須嚴格按地址順序寫入。爲了滿足隨機順序寫入的需要，
+。 SMR 技術基於一個技術事實：物理上磁頭的寫入頭（write head）需要比讀取頭(read head
+)佔用更大面積，如果按照寫入頭的物理極限放置磁記錄，那麼對於讀取頭會有很多空間浪費。從而
+SMR 試圖讓相鄰磁道的寫入有部分重疊，從而增加記錄密度。即便重疊了相鄰磁道，讀取磁道還是能隨機定位，
+而寫入磁道會覆蓋它後面疊加上的磁道，所以寫入磁道必須嚴格按地址順序寫入。爲了滿足隨機順序寫入的需要，
 SMR 硬盤把連續的幾個磁道組織成區塊（zone），在一個區塊內必須按順序寫入。
 這裏的區塊可以和區位記錄（ZBR）是同樣的區塊，也可以獨立於 ZBR 做不同大小的區塊分割。&lt;/p&gt;
 &lt;p&gt;這種區塊內連續寫入的要求，很像是 SSD 這種基於閃存介質的記錄方式， SMR 硬盤也同樣像 SSD
@@ -565,8 +597,8 @@ SMR 硬盤把連續的幾個磁道組織成區塊（zone），在一個區塊內
 ，收到隨機寫入請求的時候，在區塊間執行 GC 搬運數據塊，對操作系統提供可以任意寫入的抽象接口。&lt;/p&gt;
 &lt;p&gt;當然這種類似閃存介質的 FTL 的抽象有對讀寫性能的直接影響。SMR 硬盤可以將這些細節完全隱藏起來（
 Device Managed），或者完全暴露給宿主系統（Host Managed
-），或者隱藏細節的同時在宿主想查詢的時候提供細節（Host Aware）。和 SSD
-一樣，消費級的 SMR 硬盤通常選擇隱藏細節只在需要的時候暴露，完全暴露細節的設備通常只在企業服務器級別
+），或者在讀寫時隱藏細節的同時在宿主想查詢的時候提供接口查詢（Host Aware）。和 SSD
+一樣，消費級的 SMR 硬盤通常選擇隱藏細節只在被詢問時暴露，完全暴露細節的設備通常只在企業服務器級別
 的產品中看到。&lt;/p&gt;
 &lt;p&gt;可以期待，隨着 SMR 硬盤的逐漸普及，文件系統設計中也將更多考慮 SMR 的特性加以優化。這些優化可能參考
 對 SSD 的優化（比如儘量連續寫入），但是又不能完全照搬（比如 SSD 需要考慮寫平衡而 SMR
@@ -588,8 +620,36 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
 操作系統和文件系統要儘量避免依賴 512e 以提供最優性能，支持 4Kn 扇區尋址也是現在和未來
 文件系統設計中一個重要挑戰。&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="dual-actuator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;雙磁頭臂（Dual Actuator）&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+雙磁頭臂（來自 &lt;a class="reference external" href="http://www.digitalpreservation.gov/meetings/DSA2018/Day_1/5_TO_P2-2_Trantham_Disk_Trends.pdf"&gt;Seagate Storage Update - LOC Designing Storage Architecture for Digital Collections&lt;/a&gt; ）&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="DualActuator-Opposed.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Opposed.jpeg"/&gt;
+&lt;img alt="DualActuator-Split.jpeg" class="img-responsive" src="//farseerfc.me/zhs/images/DualActuator-Split.jpeg"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;除了提升容量，硬盤發展的另一個方向是提升讀寫速度。通過上述 CHS 尋址方式可見，
+傳統方式下提升硬盤讀寫速度有兩種方式：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;提升磁記錄密度&lt;/li&gt;
+&lt;li&gt;提升（磁頭臂和盤片）轉速&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;第一種方式提升記錄密度，在增加容量的同時也能提升硬盤讀寫速度，所以是長久以來硬盤廠商的主要方式。
+第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400 rpm 現在最高能到 15000rpm
+附近，高速旋轉的盤片就像一個螺旋槳一樣，外圈線速度已經到了接近聲速，很難再往上提升。
+以及盤片轉速影響連續讀寫速度，而磁頭臂轉速影響尋道速度，高速尋道對磁頭臂旋轉有極高精度要求。&lt;/p&gt;
+&lt;p&gt;所以長久以來，衡量硬盤速度有兩項指標：連續讀寫速度和每秒操作數(IOPS)，隨着容量提升，
+也在提升連續讀寫速度，但是很難提升 IOPS ，相對而言隨機尋道所需的開銷越來越昂貴。&lt;/p&gt;
+&lt;p&gt;目前硬盤廠商們在嘗試一種新的方式提升硬盤 IOPS ：增加一條磁頭臂。一個硬盤驅動器內封入兩組甚至多組
+磁頭臂，每個磁頭臂能獨立旋轉，從而能獨立尋址定位。這樣的硬盤叫雙/多磁頭臂（Dual/Multi Actuator）硬盤。&lt;/p&gt;
+&lt;p&gt;從操作系統角度來看，雙磁頭臂硬盤更像是一根連接線上接有等容量的兩個獨立驅動器，
+可以在盤內控制器上組 RAID0 ，或者把兩個磁頭臂都暴露給操作系統，由操作系統組 RAID0
+或更智能地使用獨立尋址的能力。&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="tl-dr"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;結論（TL;DR）和預告&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;結論（TL;DR）和預告&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;軟件層面的優化與硬件層面的革新一直是一組矛盾。長久以來文件系統和硬盤設備在關於尋址方式的磨合中，
 逐漸演化出一條真理，也是我文中一直在強調的： &lt;strong&gt;連續讀寫提供最快的讀寫速度&lt;/strong&gt;
 。文件系統總是能根據底層設備暴露出的一些抽象泄漏，比如物理 CHS 佈局，比如 512 字節扇區大小，
@@ -1578,7 +1638,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1591,7 +1651,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -2893,7 +2953,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3256,7 +3316,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -4473,7 +4533,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -4486,7 +4546,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -5788,7 +5848,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="docutils table field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -6151,7 +6211,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -8517,7 +8577,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
 我就能控制他的鍵盤了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless docutils"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8545,7 +8605,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8567,7 +8627,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8581,7 +8641,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;虽说只要不在意就可以了　却一句不剩全收集了起来&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless docutils"&gt;
+&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8609,7 +8669,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8631,7 +8691,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8650,7 +8710,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8669,7 +8729,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8685,7 +8745,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8719,7 +8779,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8737,7 +8797,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="听译"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless docutils"&gt;
+</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="听译"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8765,7 +8825,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8787,7 +8847,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8801,7 +8861,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless docutils"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8829,7 +8889,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8851,7 +8911,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8870,7 +8930,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8889,7 +8949,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8905,7 +8965,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8939,7 +8999,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8986,7 +9046,7 @@ Brandon Invergo 的博客采用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的点文件&lt;/h2&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9130,7 +9190,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9165,7 +9225,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9182,7 +9242,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9241,7 +9301,7 @@ Brandon Invergo 的博客採用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的點文件&lt;/h2&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9385,7 +9445,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9420,7 +9480,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9437,7 +9497,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9532,7 +9592,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然后接下来就是我承诺的翻译了&lt;/h2&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9626,7 +9686,7 @@ Tivoization 是 FSF 发明的一个词，表示 TiVo 的做法。 TiVo
 编制的软件，从而限制了用户修改运行软件的自由。这种做法在 FSF 看来是钻了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵这种做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9765,7 +9825,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 协议是一个开源软件协议，和两句的 BSD 协议功能相同。OpenBSD 项目选择尽量用 ISC
 协议公开他们新写的代码。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9865,7 +9925,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然後接下來就是我承諾的翻譯了&lt;/h2&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9959,7 +10019,7 @@ Tivoization 是 FSF 發明的一個詞，表示 TiVo 的做法。 TiVo
 編制的軟件，從而限制了用戶修改運行軟件的自由。這種做法在 FSF 看來是鑽了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵這種做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -10098,7 +10158,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 協議是一個開源軟件協議，和兩句的 BSD 協議功能相同。OpenBSD 項目選擇儘量用 ISC
 協議公開他們新寫的代碼。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -14033,7 +14093,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -14051,7 +14111,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -14067,7 +14127,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14085,7 +14145,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14112,7 +14172,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -14134,7 +14194,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -14560,7 +14620,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -14804,7 +14864,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -14822,7 +14882,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -14838,7 +14898,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14856,7 +14916,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14883,7 +14943,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -14905,7 +14965,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="docutils first borderless table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -15331,7 +15391,7 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -16390,7 +16450,7 @@ After rendering&lt;/div&gt;
 &lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
 中存在的问题。他们首先确定修改是事后修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027个修改）&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -16707,7 +16767,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -17006,7 +17066,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -17323,7 +17383,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -18121,7 +18181,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -18138,7 +18198,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -18158,7 +18218,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -18175,7 +18235,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -19133,13 +19193,13 @@ type&lt;/code&gt;
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -19256,13 +19316,13 @@ debug into it and make minor modifications.&lt;/p&gt;
 &lt;p&gt;So I started searching for Static Blog Engine in Python on Github. The author of the great framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; , &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; ,
 wrote a &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; , but it's not well developed. &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; seems to be complete enough, but it use &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;MarkDown&lt;/a&gt; as its default markup
 language, and the design of its homepage is too fashion to be used as blog. Finally I found &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; .&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id3" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id3" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Such as the difference between Python 2.x and 3.x , and also difference in C-API of implementations of &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; , &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; , &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; , &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; .&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id4" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id4" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Yes, we have &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; and &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; , but all these are package manager, running in a perticular Python implementation. Python implementation itself don't need a manager. Version issue of Python largely have been solved by lightweight converters such as &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; and &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; , you don't need to store multiple implementations of Python in your disk for different packages. Yes you can use  &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; if you need to preserve stablility but this is another story.&lt;/td&gt;&lt;/tr&gt;
@@ -19382,13 +19442,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 &lt;p&gt;実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; それとも &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 両方も Unix/Linux/MacOSX しか実行できないらしいです。ギークとしたの皆は絶対に Windows つかっじゃいけないんですか？（本当かも……）。&lt;/p&gt;
 &lt;p&gt;残りは Ruby と Python の争いです。私は &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; に詳しくない、比べると &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; のほうが私に向いています。それに、どっちでも &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; を依存しシンタックス・ハイライトをしているから、 Rubyist 達も少なくとも Python を入れなきゃダメみたいです。 私の好みは一切の Ruby コンポーネントを頼らず、 C 拡張もない純粋な Python の実現がほしいです。&lt;/p&gt;
 &lt;p&gt;そこから Github に Python で実現した静的ブログ・エンジンを探し始めた。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; の作者である &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 氏が書いた &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; が素晴らしいが、あんまり他人に使われていないようです。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; は多く使われているけれと、ホームページにブログの感じがみえないです。最後に &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; を見かけました。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;例えば Python 2.x と 3.x の間にあまりにも巨大なる差、それと &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; など各実現間に微妙な違いがあります。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;はい、こっちに &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; とか &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; があります、ですがそれらはパッケージ管理、特定なPython環境を入れた後の話です。Python自身はまだ管理する必要がないです。 Python のバージョン問題も &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; とか &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; のようなツールで変換すればいいです、違うソフトを実行するためたくさんの Python バージョンを残る必要はないです。もしバージョンの違いが気にするなら &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; を使うのも構わないが、それも別のことです。&lt;/td&gt;&lt;/tr&gt;
@@ -19504,13 +19564,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;

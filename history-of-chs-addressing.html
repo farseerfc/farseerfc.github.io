@@ -265,7 +265,8 @@ Farseerfc的小窩            </a>
 <li><a class="reference internal" href="#chs-lba" id="id11">從 CHS 到 LBA</a></li>
 <li><a class="reference internal" href="#shingled-magnetic-recording-smr" id="id12">疊瓦磁記錄（Shingled Magnetic Recording, SMR）</a></li>
 <li><a class="reference internal" href="#kib" id="id13">4KiB 扇區大小</a></li>
-<li><a class="reference internal" href="#tl-dr" id="id14">結論（TL;DR）和預告</a></li>
+<li><a class="reference internal" href="#dual-actuator" id="id14">雙磁頭臂（Dual Actuator）</a></li>
+<li><a class="reference internal" href="#tl-dr" id="id15">結論（TL;DR）和預告</a></li>
 </ul>
 </div>
                         </div>
@@ -404,9 +405,9 @@ DiskStructure.svg</object>
 </div>
 </div>
 <p>不過隨着硬盤容量增加，盤面的數據密度也隨之增加，單位面積中理論能容納的二進制位數量有限。
-理論上，如果保持相同密度的話，盤片外圈能比內圈容納更多數據。因此硬盤廠商們開始在盤面上將軌道劃分出
-區塊（zone），外圈區塊中的軌道可以比內圈區塊中的軌道多放入一些扇區。這種方式下生產出的硬盤叫
-區位記錄硬盤（Zone bit recoding, ZBR），相對的傳統固定軌道中扇區數的硬盤就被叫做恆定角速度（CAV）
+理論上，如果保持相同密度的話，盤片外圈能比內圈容納更多數據。因此硬盤廠商們開始在盤面上將磁道劃分出
+區塊（zone），外圈區塊中的磁道可以比內圈區塊中的磁道多放入一些扇區。這種方式下生產出的硬盤叫
+區位記錄硬盤（Zone bit recoding, ZBR），相對的傳統固定磁道中扇區數的硬盤就被叫做恆定角速度（CAV）
 硬盤。</p>
 <p>如右圖所示，區位記錄在硬盤上將多個柱面組合成一個區塊，區塊內的磁道有相同數量的扇區，
 而不同區塊的磁道可以有不同數量的扇區，外圈區塊比內圈區塊有更多扇區。</p>
@@ -447,7 +448,7 @@ CHS 尋址過早地暴露出太多底層抽象細節，而上層軟件又轉而�
 CHS 尋址下 S 從 1 開始計算，而 LBA 使用連續扇區編號，從 0 開始編號，所以換算公式如下：</p>
 <div class="math">
 \begin{equation*}
-LBA 地址 = ( C \times 磁頭數 + H ) \times 每磁道扇區數 + ( S - 1 )
+LBA 地址 = ( C \times 磁頭數 + H ) \times 扇區數 + ( S - 1 )
 \end{equation*}
 </div>
 <p>使用 LBA 尋址，操作系統和文件系統直接尋址一個連續地址空間中的扇區號，
@@ -458,7 +459,7 @@ LBA 地址 = ( C \times 磁頭數 + H ) \times 每磁道扇區數 + ( S - 1 )
 硬盤同時支持兩種尋址方式，在控制器內部做轉換。最後需要放棄支持的是深植了 CHS 尋址的 BIOS
 ，使用 BIOS 引導的 MBR 引導程序還在用 CHS 尋址方式讀取數據加載操作系統，直到大家都切換到 UEFI 。</p>
 <p>並且隨着硬盤使用 LBA 尋址，導致上層軟件很難預測底層硬件實際切換柱面切換磁頭之類的時機，
-潛在得導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
+潛在地導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
 還開始負責維護一塊盤內緩衝區，實現盤內的 IO 隊列。緩衝區的存在允許磁盤控制器同時接收更多來自上層軟件
 的讀寫請求，轉換成實際物理佈局參數，並根據磁盤物理佈局來調整讀寫順序，增加總體吞吐率。
 當然有緩衝區的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
@@ -479,8 +480,10 @@ recording, PMR）將磁頭記錄方式從水平轉換成垂直記錄，增加了
 </div>
 <p>不過技術革新中也有影響尋址方式的技術，比如
 <a class="reference external" href="https://en.wikipedia.org/wiki/Shingled_magnetic_recording">疊瓦磁記錄技術（Shingled Magnetic Recording, SMR）</a>
-。SMR 試圖讓相鄰磁道的寫入有部分重疊，從而增加記錄密度。有了重疊之後，讀取磁道還是能隨機定位，
-而寫入磁道會破壞它後面疊加上的磁道，所以寫入磁道必須嚴格按地址順序寫入。爲了滿足隨機順序寫入的需要，
+。 SMR 技術基於一個技術事實：物理上磁頭的寫入頭（write head）需要比讀取頭(read head
+)佔用更大面積，如果按照寫入頭的物理極限放置磁記錄，那麼對於讀取頭會有很多空間浪費。從而
+SMR 試圖讓相鄰磁道的寫入有部分重疊，從而增加記錄密度。即便重疊了相鄰磁道，讀取磁道還是能隨機定位，
+而寫入磁道會覆蓋它後面疊加上的磁道，所以寫入磁道必須嚴格按地址順序寫入。爲了滿足隨機順序寫入的需要，
 SMR 硬盤把連續的幾個磁道組織成區塊（zone），在一個區塊內必須按順序寫入。
 這裏的區塊可以和區位記錄（ZBR）是同樣的區塊，也可以獨立於 ZBR 做不同大小的區塊分割。</p>
 <p>這種區塊內連續寫入的要求，很像是 SSD 這種基於閃存介質的記錄方式， SMR 硬盤也同樣像 SSD
@@ -488,8 +491,8 @@ SMR 硬盤把連續的幾個磁道組織成區塊（zone），在一個區塊內
 ，收到隨機寫入請求的時候，在區塊間執行 GC 搬運數據塊，對操作系統提供可以任意寫入的抽象接口。</p>
 <p>當然這種類似閃存介質的 FTL 的抽象有對讀寫性能的直接影響。SMR 硬盤可以將這些細節完全隱藏起來（
 Device Managed），或者完全暴露給宿主系統（Host Managed
-），或者隱藏細節的同時在宿主想查詢的時候提供細節（Host Aware）。和 SSD
-一樣，消費級的 SMR 硬盤通常選擇隱藏細節只在需要的時候暴露，完全暴露細節的設備通常只在企業服務器級別
+），或者在讀寫時隱藏細節的同時在宿主想查詢的時候提供接口查詢（Host Aware）。和 SSD
+一樣，消費級的 SMR 硬盤通常選擇隱藏細節只在被詢問時暴露，完全暴露細節的設備通常只在企業服務器級別
 的產品中看到。</p>
 <p>可以期待，隨着 SMR 硬盤的逐漸普及，文件系統設計中也將更多考慮 SMR 的特性加以優化。這些優化可能參考
 對 SSD 的優化（比如儘量連續寫入），但是又不能完全照搬（比如 SSD 需要考慮寫平衡而 SMR
@@ -511,8 +514,36 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
 操作系統和文件系統要儘量避免依賴 512e 以提供最優性能，支持 4Kn 扇區尋址也是現在和未來
 文件系統設計中一個重要挑戰。</p>
 </div>
+<div class="section" id="dual-actuator">
+<h2><a class="toc-backref" href="#id14">雙磁頭臂（Dual Actuator）</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+雙磁頭臂（來自 <a class="reference external" href="http://www.digitalpreservation.gov/meetings/DSA2018/Day_1/5_TO_P2-2_Trantham_Disk_Trends.pdf">Seagate Storage Update - LOC Designing Storage Architecture for Digital Collections</a> ）</div>
+<div class="panel-body">
+<img alt="DualActuator-Opposed.jpeg" class="img-responsive" src="//farseerfc.me/images/DualActuator-Opposed.jpeg"/>
+<img alt="DualActuator-Split.jpeg" class="img-responsive" src="//farseerfc.me/images/DualActuator-Split.jpeg"/>
+</div>
+</div>
+<p>除了提升容量，硬盤發展的另一個方向是提升讀寫速度。通過上述 CHS 尋址方式可見，
+傳統方式下提升硬盤讀寫速度有兩種方式：</p>
+<ol class="arabic simple">
+<li>提升磁記錄密度</li>
+<li>提升（磁頭臂和盤片）轉速</li>
+</ol>
+<p>第一種方式提升記錄密度，在增加容量的同時也能提升硬盤讀寫速度，所以是長久以來硬盤廠商的主要方式。
+第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400 rpm 現在最高能到 15000rpm
+附近，高速旋轉的盤片就像一個螺旋槳一樣，外圈線速度已經到了接近聲速，很難再往上提升。
+以及盤片轉速影響連續讀寫速度，而磁頭臂轉速影響尋道速度，高速尋道對磁頭臂旋轉有極高精度要求。</p>
+<p>所以長久以來，衡量硬盤速度有兩項指標：連續讀寫速度和每秒操作數(IOPS)，隨着容量提升，
+也在提升連續讀寫速度，但是很難提升 IOPS ，相對而言隨機尋道所需的開銷越來越昂貴。</p>
+<p>目前硬盤廠商們在嘗試一種新的方式提升硬盤 IOPS ：增加一條磁頭臂。一個硬盤驅動器內封入兩組甚至多組
+磁頭臂，每個磁頭臂能獨立旋轉，從而能獨立尋址定位。這樣的硬盤叫雙/多磁頭臂（Dual/Multi Actuator）硬盤。</p>
+<p>從操作系統角度來看，雙磁頭臂硬盤更像是一根連接線上接有等容量的兩個獨立驅動器，
+可以在盤內控制器上組 RAID0 ，或者把兩個磁頭臂都暴露給操作系統，由操作系統組 RAID0
+或更智能地使用獨立尋址的能力。</p>
+</div>
 <div class="section" id="tl-dr">
-<h2><a class="toc-backref" href="#id14">結論（TL;DR）和預告</a></h2>
+<h2><a class="toc-backref" href="#id15">結論（TL;DR）和預告</a></h2>
 <p>軟件層面的優化與硬件層面的革新一直是一組矛盾。長久以來文件系統和硬盤設備在關於尋址方式的磨合中，
 逐漸演化出一條真理，也是我文中一直在強調的： <strong>連續讀寫提供最快的讀寫速度</strong>
 。文件系統總是能根據底層設備暴露出的一些抽象泄漏，比如物理 CHS 佈局，比如 512 字節扇區大小，
@@ -1329,7 +1360,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 <li><a class="reference internal" href="#chs-lba" id="id11">從 CHS 到 LBA</a></li>
 <li><a class="reference internal" href="#shingled-magnetic-recording-smr" id="id12">疊瓦磁記錄（Shingled Magnetic Recording, SMR）</a></li>
 <li><a class="reference internal" href="#kib" id="id13">4KiB 扇區大小</a></li>
-<li><a class="reference internal" href="#tl-dr" id="id14">結論（TL;DR）和預告</a></li>
+<li><a class="reference internal" href="#dual-actuator" id="id14">雙磁頭臂（Dual Actuator）</a></li>
+<li><a class="reference internal" href="#tl-dr" id="id15">結論（TL;DR）和預告</a></li>
 </ul>
 </div>
             </div>
