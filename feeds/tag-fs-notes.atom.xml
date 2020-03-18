@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩 - FS notes</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-fs-notes.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-03-21T15:45:00+09:00</updated><entry><title>SSD 就是大U盤？聊聊閃存類存儲的轉換層</title><link href="//farseerfc.me/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-21T15:45:00+09:00</published><updated>2020-03-21T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-21:/flash-storage-ftl-layer.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩 - FS notes</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-fs-notes.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-03-18T15:45:00+09:00</updated><entry><title>SSD 就是大U盤？聊聊閃存類存儲的轉換層</title><link href="//farseerfc.me/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-18T15:45:00+09:00</published><updated>2020-03-18T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-18:/flash-storage-ftl-layer.html</id><summary type="html">
 &lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/history-of-chs-addressing.html"&gt;「柱面-磁頭-扇區尋址的一些舊事」&lt;/a&gt;
 整理了一下我對磁盤類存儲設備（包括軟盤、硬盤，不包括光盤、磁帶）的一些理解，
 算是爲以後討論文件系統作鋪墊；這篇整理一下我對閃存類存儲設備的理解。&lt;/p&gt;
@@ -354,7 +354,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 &lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;6   TL;DR 低端 vs 高端&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;標題中的疑問「SSD就是大U盤？」相信看到這裏已經有一些解答了。
 即使 SSD 和U盤中可以採用類似的 NAND Flash 存儲芯片，由於他們很可能採用不同的 FTL
-策略，導致在讀寫性能和可靠性方面都有不同的表現。&lt;/p&gt;
+策略，導致在讀寫性能和可靠性方面都有不同的表現。（何況他們可能採用不同品質的 Flash ）。&lt;/p&gt;
 &lt;p&gt;如果不想細看全文，這裏整理一張表，列出「高端」閃存盤和「低端」閃存盤可能採取的不同策略。
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
@@ -402,6 +402,8 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;p&gt;介紹完閃存類存儲，下篇來講講文件系統的具體磁盤佈局，考察一下常見文件系統如何使用 HDD/SSD
+這些不同讀寫特性的設備。&lt;/p&gt;
 &lt;/div&gt;
 &lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
@@ -520,7 +522,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不過理解了磁盤的機械結構的話，柱面的概念就比較合理了，尋址時先驅動磁頭臂旋轉，
 磁頭臂上多個磁頭一起飛到某個磁道上，從而運動磁頭臂的動作定義了一個柱面。
 柱面和磁頭（CH）組合起來能定位到某個特定的磁道，畫張圖大概如下圖所示：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中值得注意的是磁道的編號方式，我用相同的顏色畫出了相同的磁道。因爲按照 CHS
 的順序尋址，所以先定位柱面，然後選定磁頭。磁盤上按半徑從外向內定義柱面的編號，最外圈的磁道位於
@@ -553,7 +555,7 @@ BIOS 的程序。&lt;/p&gt;
 後纔能繼續讀下一個扇區，如果物理排列上連續編號扇區，可能等 CPU
 做完這些事情後磁頭已經旋轉到之後幾個扇區上了。所以出廠時做磁盤低級格式化的時候，
 會跳躍着給扇區編號，給 CPU 留足處理時間。比如下圖：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中假設有3個柱面，每個柱面6個磁頭，每個磁道內11個扇區，並且畫出了三種不同的扇區編號跳轉情況，
 分別是磁道內的扇區跳轉（+3），柱面內的磁頭跳轉（+5），以及柱面間跳轉（+10）。

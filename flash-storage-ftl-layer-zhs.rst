@@ -4,7 +4,7 @@ SSD 就是大U盘？聊聊闪存类存储的转换层
 :slug: flash-storage-ftl-layer
 :translation_id: flash-storage-ftl-layer
 :lang: zhs
-:date: 2020-03-21 15:45
+:date: 2020-03-18 15:45
 :tags: FS笔记, FS notes, FTL, SSD, USB stick, eMMC, MMC, SD Card
 :series: FS笔记
 :issueid: 95
@@ -402,7 +402,7 @@ TL;DR 低端 vs 高端
 
 标题中的疑问「SSD就是大U盘？」相信看到这里已经有一些解答了。
 即使 SSD 和U盘中可以采用类似的 NAND Flash 存储芯片，由于他们很可能采用不同的 FTL
-策略，导致在读写性能和可靠性方面都有不同的表现。
+策略，导致在读写性能和可靠性方面都有不同的表现。（何况他们可能采用不同品质的 Flash ）。
 
 如果不想细看全文，这里整理一张表，列出「高端」闪存盘和「低端」闪存盘可能采取的不同策略。
 实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
@@ -451,3 +451,6 @@ TL;DR 低端 vs 高端
 .. |p7| replace:: 写入单元模式
 .. |l7| replace:: TLC
 .. |h7| replace:: 长期存储 MLC， 模拟 SLC 日志
+
+介绍完闪存类存储，下篇来讲讲文件系统的具体磁盘布局，考察一下常见文件系统如何使用 HDD/SSD
+这些不同读写特性的设备。

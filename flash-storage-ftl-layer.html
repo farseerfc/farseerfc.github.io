@@ -31,7 +31,7 @@
         <meta property="og:title" content="SSD 就是大U盤？聊聊閃存類存儲的轉換層"/>
         <meta property="og:url" content="//farseerfc.me/flash-storage-ftl-layer.html"/>
         <meta property="og:description" content="上篇 「柱面-磁頭-扇區尋址的一些舊事」 整理了一下我對磁盤類存儲設備（包括軟盤、硬盤，不包括光盤、磁帶）的一些理解， 算是爲以後討論文件系統作鋪墊；這篇整理一下我對閃存類存儲設備的理解。 這裏想要討論的閃存類存儲是指 SSD 、SD卡、U盤、手機內置閃存等基於 NAND 又有閃存轉換層的存儲設備（下文簡稱閃存盤），但不包括裸 NAND 設備、3D Xpoint （Intel Optane）等相近物理結構但是沒有類似的閃存轉換層的存儲設備。 閃存類存儲設備這幾年發展迅猛，SD卡和U盤早就替代軟盤成爲數據交換的主流， SSD 大有替代硬盤的趨勢。 因爲發展迅速，所以其底層技術變革很快，不同於磁盤類存儲技術有很多公開資料可以獲取， 閃存類存儲的技術細節通常是廠商們的祕密，互聯網上能找到很多外圍資料， 但是關於其如何運作的細節卻很少提到。所以我想先整理一篇筆記，記下我蒐集到的資料，加上我自己的理解。 本文大部分信息來源是 Optimizing Linux with cheap flash drives 和 A Summary on …"/>
-        <meta property="article:published_time" content="2020-03-21" />
+        <meta property="article:published_time" content="2020-03-18" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS筆記" />
             <meta property="article:tag" content="FS notes" />
@@ -217,7 +217,7 @@ Farseerfc的小窩            </a>
                 <div class="panel-body">
 <div class="post-info">
     <span class="published">
-        <time datetime="2020-03-21T15:45:00+09:00"><i class="fa fa-calendar"></i> 2020年03月21日(週六)</time>
+        <time datetime="2020-03-18T15:45:00+09:00"><i class="fa fa-calendar"></i> 2020年03月18日(週三)</time>
     </span>
 
 
@@ -621,7 +621,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 <h2><a class="toc-backref" href="#id28">6   TL;DR 低端 vs 高端</a></h2>
 <p>標題中的疑問「SSD就是大U盤？」相信看到這裏已經有一些解答了。
 即使 SSD 和U盤中可以採用類似的 NAND Flash 存儲芯片，由於他們很可能採用不同的 FTL
-策略，導致在讀寫性能和可靠性方面都有不同的表現。</p>
+策略，導致在讀寫性能和可靠性方面都有不同的表現。（何況他們可能採用不同品質的 Flash ）。</p>
 <p>如果不想細看全文，這裏整理一張表，列出「高端」閃存盤和「低端」閃存盤可能採取的不同策略。
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
@@ -669,6 +669,8 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 </tr>
 </tbody>
 </table>
+<p>介紹完閃存類存儲，下篇來講講文件系統的具體磁盤佈局，考察一下常見文件系統如何使用 HDD/SSD
+這些不同讀寫特性的設備。</p>
 </div>
 <script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",

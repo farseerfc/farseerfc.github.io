@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - tech</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-03-21T15:45:00+09:00</updated><entry><title>SSD 就是大U盘？聊聊闪存类存储的转换层</title><link href="//farseerfc.me/zhs/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-21T15:45:00+09:00</published><updated>2020-03-21T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-21:/zhs/flash-storage-ftl-layer.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - tech</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tech.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-03-18T15:45:00+09:00</updated><entry><title>SSD 就是大U盘？聊聊闪存类存储的转换层</title><link href="//farseerfc.me/zhs/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-18T15:45:00+09:00</published><updated>2020-03-18T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-18:/zhs/flash-storage-ftl-layer.html</id><summary type="html">
 &lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/zhs/history-of-chs-addressing.html"&gt;「柱面-磁头-扇区寻址的一些旧事」&lt;/a&gt;
 整理了一下我对磁盘类存储设备（包括软盘、硬盘，不包括光盘、磁带）的一些理解，
 算是为以后讨论文件系统作铺垫；这篇整理一下我对闪存类存储设备的理解。&lt;/p&gt;
@@ -354,7 +354,7 @@ discard 不光影响文件系统写入性能，还可能发送大量被设备忽
 &lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;6   TL;DR 低端 vs 高端&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;标题中的疑问「SSD就是大U盘？」相信看到这里已经有一些解答了。
 即使 SSD 和U盘中可以采用类似的 NAND Flash 存储芯片，由于他们很可能采用不同的 FTL
-策略，导致在读写性能和可靠性方面都有不同的表现。&lt;/p&gt;
+策略，导致在读写性能和可靠性方面都有不同的表现。（何况他们可能采用不同品质的 Flash ）。&lt;/p&gt;
 &lt;p&gt;如果不想细看全文，这里整理一张表，列出「高端」闪存盘和「低端」闪存盘可能采取的不同策略。
 实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
 比如有些标明着「为视频优化」之类宣传标语的「外置SSD」，对消费者来说可能会觉得为视频优化的话一定性能好，
@@ -402,6 +402,8 @@ discard 不光影响文件系统写入性能，还可能发送大量被设备忽
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;p&gt;介绍完闪存类存储，下篇来讲讲文件系统的具体磁盘布局，考察一下常见文件系统如何使用 HDD/SSD
+这些不同读写特性的设备。&lt;/p&gt;
 &lt;/div&gt;
 &lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
@@ -520,7 +522,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不过理解了磁盘的机械结构的话，柱面的概念就比较合理了，寻址时先驱动磁头臂旋转，
 磁头臂上多个磁头一起飞到某个磁道上，从而运动磁头臂的动作定义了一个柱面。
 柱面和磁头（CH）组合起来能定位到某个特定的磁道，画张图大概如下图所示：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中值得注意的是磁道的编号方式，我用相同的颜色画出了相同的磁道。因为按照 CHS
 的顺序寻址，所以先定位柱面，然后选定磁头。磁盘上按半径从外向内定义柱面的编号，最外圈的磁道位于
@@ -553,7 +555,7 @@ BIOS 的程序。&lt;/p&gt;
 后才能继续读下一个扇区，如果物理排列上连续编号扇区，可能等 CPU
 做完这些事情后磁头已经旋转到之后几个扇区上了。所以出厂时做磁盘低级格式化的时候，
 会跳跃着给扇区编号，给 CPU 留足处理时间。比如下图：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中假设有3个柱面，每个柱面6个磁头，每个磁道内11个扇区，并且画出了三种不同的扇区编号跳转情况，
 分别是磁道内的扇区跳转（+3），柱面内的磁头跳转（+5），以及柱面间跳转（+10）。
@@ -6493,7 +6495,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -6509,7 +6511,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6527,7 +6529,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
+&lt;td&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6554,7 +6556,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -6576,7 +6578,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -6776,7 +6778,7 @@ RELATIVE_URLS&lt;/code&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 PlantUML 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;img alt="uml diagram" class="img-responsive uml" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一个Java实现的，
@@ -7002,7 +7004,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -7481,7 +7483,7 @@ TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -7498,7 +7500,7 @@ TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -7827,13 +7829,13 @@ type&lt;/code&gt;
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
