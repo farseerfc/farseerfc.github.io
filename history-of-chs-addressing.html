@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="FS筆記,FS notes,CHS,cylinder,head,sector,LBA,SMR,4Kn" />
-        <meta name="description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …" />
+        <meta name="description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(platter)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …" />
 
         <meta property="og:site_name" content="Farseerfc的小窩" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="柱面-磁頭-扇區尋址的一些舊事"/>
         <meta property="og:url" content="//farseerfc.me/history-of-chs-addressing.html"/>
-        <meta property="og:description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …"/>
+        <meta property="og:description" content="在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像 MiniDisc 、 DVD-RAM 等存儲設備也從未能挑戰過硬盤的地位。硬盤作爲主要存儲設備，自然也影響了文件系統的設計。 這篇筆記稍微聊一聊硬盤這種存儲設備的尋址方式對早期文件系統設計的一些影響，特別是 柱面-磁頭-扇區尋址（Cylinder-head-sector addressing, 簡稱CHS尋址）的起源和發展。 大部分內容來自維基百科 Cylinder-head-sector 詞條 這裏只是記錄筆記。現今的硬盤已經不再採用 CHS 尋址，其影響卻還能在一些文件系統設計中看到影子。 柱面、磁頭、扇區以及相關術語 磁盤示意圖（來自維基百科 Cylinder-head-sector 詞條 ） chs-illustrate-trans.svg 如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(platter)， 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …"/>
         <meta property="article:published_time" content="2020-03-06" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS筆記" />
@@ -291,7 +291,7 @@ Farseerfc的小窩            </a>
 chs-illustrate-trans.svg</object>
 </div>
 </div>
-<p>如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)，
+<p>如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(platter)，
 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置，加上一組控制芯片（controller）。
 每個磁碟片有上下兩面塗有磁性材質，磁頭臂上有一組磁頭（head），每個磁頭對應磁盤的一個面，
 所以比如一個 3 碟的硬盤會有 6 個磁頭。</p>
@@ -319,7 +319,7 @@ tikz diagram</object>
 </div>
 <div class="section" id="chs">
 <h2><a class="toc-backref" href="#id8">物理 CHS 尋址</a></h2>
-<p>以上術語中，柱面號和磁頭號直接對應了硬盤上的物理組成部分，所以通過在物理 CHS
+<p>以上術語中，柱面號和磁頭號直接對應了硬盤上的物理組成部分，所以在物理 CHS
 尋址方式下，通過扇區地址的寫法能對應到扇區的具體物理位置。之所以這樣描述扇區，
 是因爲早期的軟盤和硬盤驅動器沒有內置的控制芯片，可以完全由宿主系統執行驅動程序驅動。</p>
 <p>在 IBM PC 上，驅動軟盤和硬盤的是 CPU 執行位於主板
@@ -327,7 +327,7 @@ tikz diagram</object>
 中的程序，具體來說操作系統（比如DOS）和應用程序調用 <a class="reference external" href="https://en.wikipedia.org/wiki/INT_13H">INT 13H</a>
 中斷，通過 AH=02H/03H 選擇讀/寫操作，BIOS 在中斷表中註冊的 13H 中斷處理程序執行在 CPU
 上完成讀寫請求。調用 INT 13H 讀寫扇區的時候，CPU 先通過 INT 13H AH=0CH
-控制硬盤的磁頭臂旋轉到特定磁道上，然後選定具體磁頭，讓磁頭保持在磁道上讀數據，
+控制硬盤的磁頭臂旋轉到特定柱面上，然後選定具體磁頭，讓磁頭保持在磁道上讀數據，
 通過忙輪訓的方式等待要讀寫的扇區旋轉到磁頭下方，從而讀到所需扇區的數據。在 DOS 之後的操作系統，
 比如早期的 Windows 和 Linux 和 BSD 能以覆蓋中斷程序入口表的方式提供升級版本的這些操作替代
 BIOS 的程序。</p>
@@ -425,10 +425,12 @@ DiskStructure.svg</object>
 給每個磁道作爲保留扇區，留作壞扇區後備。</p>
 <p>另外有了獨立磁盤控制器芯片之後，扇區內的校驗算法也不再受制於 BIOS INT 13H 接口。
 原本 BIOS 的 INT 13H 接口定義了每個扇區 512 字節，額外配有 4 字節校驗， 32bit
-的校驗碼對 4096bit 的數據來說，只能允許一些簡單的校驗算法，比如
+的校驗碼對 4096bit 的數據來說，只能允許一些簡單的校驗算法，比如 32bit CRC ，或者比如
 <a class="reference external" href="https://en.wikipedia.org/wiki/Hamming_code">漢明碼</a> 對 4096bit 的數據需要 13bit
-的校驗，突破了校驗算法限制後硬盤可以在物理扇區中放更多校驗位，使用更複雜的
-<a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code">ECC</a> 算法，提供更強的容錯性。</p>
+的校驗。突破了校驗算法限制後硬盤可以在物理扇區中放更多校驗位，使用更複雜的
+<a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code">ECC</a> 算法，提供更強的容錯性。
+IDE/SATA 接口的硬盤由內部控制器負責計算和比對校驗，而 SAS 接口的硬盤（主要用於服務器）可以讀取
+520/528 字節長度的扇區，包含額外校驗位。</p>
 <p>通過 ZBR ，邏輯 CHS 尋址不再侷限在具體每磁道扇區數等物理限制上，但是仍然侷限在 CHS 總位數。
 24bit 的 CHS 地址能尋址 <span class="math">\(1024*256*63 = 16515072\)</span> 個扇區，也就是 8064MiB 的空間。
 於是早期很多操作系統有 7.8G 硬盤大小的限制。後來 ATA/IDE 標準提升了 CHS 尋址數量，從 24bit
@@ -462,7 +464,10 @@ LBA 地址 = ( C \times 磁頭數 + H ) \times 扇區數 + ( S - 1 )
 潛在地導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
 還開始負責維護一塊盤內緩衝區，實現盤內的 IO 隊列。緩衝區的存在允許磁盤控制器同時接收更多來自上層軟件
 的讀寫請求，轉換成實際物理佈局參數，並根據磁盤物理佈局來調整讀寫順序，增加總體吞吐率。
-當然有緩衝區的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
+比如 <a class="reference external" href="https://en.wikipedia.org/wiki/Tagged_Command_Queuing">ATA TCQ</a> 和
+<a class="reference external" href="https://en.wikipedia.org/wiki/Native_Command_Queuing">SATANCQ</a>
+就是這樣的盤內隊列協議。</p>
+<p>當然有緩衝區和盤內隊列的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
 標準開始約定特殊的請求，從操作系統能發送命令讓底層設備清空自己的讀寫隊列。</p>
 </div>
 <div class="section" id="shingled-magnetic-recording-smr">
@@ -531,7 +536,7 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
 <li>提升（磁頭臂和盤片）轉速</li>
 </ol>
 <p>第一種方式提升記錄密度，在增加容量的同時也能提升硬盤讀寫速度，所以是長久以來硬盤廠商的主要方式。
-第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400 rpm 現在最高能到 15000rpm
+第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400rpm 現在最高能到 15000rpm
 附近，高速旋轉的盤片就像一個螺旋槳一樣，外圈線速度已經到了接近聲速，很難再往上提升。
 以及盤片轉速影響連續讀寫速度，而磁頭臂轉速影響尋道速度，高速尋道對磁頭臂旋轉有極高精度要求。</p>
 <p>所以長久以來，衡量硬盤速度有兩項指標：連續讀寫速度和每秒操作數(IOPS)，隨着容量提升，
@@ -625,6 +630,11 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
                     </a>
                 </div>
                 <div class="col-xs-12">
+                    <a href="//farseerfc.me/flash-storage-ftl-layer.html" class="btn btn-default btn-lg" style="float:right;clear:both;background-color:#fff;">
+                        <h4>
+                        SSD 就是大U盤？聊聊閃存類存儲的轉換層<i class="fa fa-arrow-right"></i>
+                        </h4>
+                    </a>
                 </div>
             </div>
 
@@ -637,6 +647,7 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
                         <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zfs-layered-architecture-design.html' style="text-align:left">ZFS 分層架構設計</a></li>
                         <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/btrfs-vs-zfs-difference-in-implementing-snapshots.html' style="text-align:left">Btrfs vs ZFS 實現 snapshot 的差異</a></li>
                         <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/history-of-chs-addressing.html' style="text-align:left">柱面-磁頭-扇區尋址的一些舊事</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/flash-storage-ftl-layer.html' style="text-align:left">SSD 就是大U盤？聊聊閃存類存儲的轉換層</a></li>
                 </ul>
             </div>
 
@@ -808,12 +819,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
     <ul class="list-group list-inline tagcloud" id="tags">
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/tag/fsbi-ji.html">
-                    FS筆記 <sup> 3</sup>
+                    FS筆記 <sup> 4</sup>
                 </a>
             </li>
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/tag/fs-notes.html">
-                    FS notes <sup> 3</sup>
+                    FS notes <sup> 4</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ftl.html">
+                    FTL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ssd.html">
+                    SSD <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb-stick.html">
+                    USB stick <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/emmc.html">
+                    eMMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mmc.html">
+                    MMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sd-card.html">
+                    SD Card <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-4">
@@ -1254,36 +1295,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/unix.html">
                     unix <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ugh.html">
-                    ugh <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/ncurses.html">
-                    ncurses <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/termcap.html">
-                    termcap <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/terminfo.html">
-                    terminfo <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/kde5.html">
-                    kde5 <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/plasma.html">
-                    plasma <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">

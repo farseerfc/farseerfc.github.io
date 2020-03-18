@@ -1,5 +1,869 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-03-06T15:45:00+09:00</updated><entry><title>柱面-磁頭-扇區尋址的一些舊事</title><link href="//farseerfc.me/history-of-chs-addressing.html" rel="alternate"></link><published>2020-03-06T15:45:00+09:00</published><updated>2020-03-06T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-06:/history-of-chs-addressing.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-03-21T15:45:00+09:00</updated><entry><title>SSD 就是大U盤？聊聊閃存類存儲的轉換層</title><link href="//farseerfc.me/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-21T15:45:00+09:00</published><updated>2020-03-21T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-21:/flash-storage-ftl-layer.html</id><summary type="html">
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/history-of-chs-addressing.html"&gt;「柱面-磁頭-扇區尋址的一些舊事」&lt;/a&gt;
+整理了一下我對磁盤類存儲設備（包括軟盤、硬盤，不包括光盤、磁帶）的一些理解，
+算是爲以後討論文件系統作鋪墊；這篇整理一下我對閃存類存儲設備的理解。&lt;/p&gt;
+&lt;p&gt;這裏想要討論的閃存類存儲是指 SSD 、SD卡、U盤、手機內置閃存等基於 NAND
+又有閃存轉換層的存儲設備（下文簡稱閃存盤），但不包括裸 NAND 設備、3D Xpoint （Intel
+Optane）等相近物理結構但是沒有類似的閃存轉換層的存儲設備。
+閃存類存儲設備這幾年發展迅猛，SD卡和U盤早就替代軟盤成爲數據交換的主流， SSD 大有替代硬盤的趨勢。
+因爲發展迅速，所以其底層技術變革很快，不同於磁盤類存儲技術有很多公開資料可以獲取，
+閃存類存儲的技術細節通常是廠商們的祕密，互聯網上能找到很多外圍資料，
+但是關於其如何運作的細節卻很少提到。所以我想先整理一篇筆記，記下我蒐集到的資料，加上我自己的理解。
+本文大部分信息來源是 &lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt;
+和 &lt;a class="reference external" href="https://accelazh.github.io/ssd/A-Summary-On-SSD-And-FTL"&gt;A Summary on …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/history-of-chs-addressing.html"&gt;「柱面-磁頭-扇區尋址的一些舊事」&lt;/a&gt;
+整理了一下我對磁盤類存儲設備（包括軟盤、硬盤，不包括光盤、磁帶）的一些理解，
+算是爲以後討論文件系統作鋪墊；這篇整理一下我對閃存類存儲設備的理解。&lt;/p&gt;
+&lt;p&gt;這裏想要討論的閃存類存儲是指 SSD 、SD卡、U盤、手機內置閃存等基於 NAND
+又有閃存轉換層的存儲設備（下文簡稱閃存盤），但不包括裸 NAND 設備、3D Xpoint （Intel
+Optane）等相近物理結構但是沒有類似的閃存轉換層的存儲設備。
+閃存類存儲設備這幾年發展迅猛，SD卡和U盤早就替代軟盤成爲數據交換的主流， SSD 大有替代硬盤的趨勢。
+因爲發展迅速，所以其底層技術變革很快，不同於磁盤類存儲技術有很多公開資料可以獲取，
+閃存類存儲的技術細節通常是廠商們的祕密，互聯網上能找到很多外圍資料，
+但是關於其如何運作的細節卻很少提到。所以我想先整理一篇筆記，記下我蒐集到的資料，加上我自己的理解。
+本文大部分信息來源是 &lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt;
+和 &lt;a class="reference external" href="https://accelazh.github.io/ssd/A-Summary-On-SSD-And-FTL"&gt;A Summary on SSD &amp;amp; FTL&lt;/a&gt;
+，加上我的理解，文中一些配圖也來自這兩篇文章。&lt;/p&gt;
+&lt;div class="section" id="nand-flash"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;1   NAND Flash 原理&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;比 NAND Flash 更早的 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/EEPROM"&gt;EEPROM&lt;/a&gt; 等存儲技術
+曾經用過 NOR Flash cell ，用於存儲主板配置信息等少量數據已經存在 PC 中很久了。後來
+NAND Flash 的微型化使得 NAND Flash 可以用於存儲大量數據，急劇降低了存儲成本，所以以 NAND
+Flash 爲基礎的存儲技術能得以替代硬盤等存儲設備。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;Tutorial: Why NAND Flash Breaks Down&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/VajB8vCsZ3s"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;這裏不想涉及太多 NAND Flash 硬件細節，有個演講
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;Tutorial: Why NAND Flash Breaks Down&lt;/a&gt;
+和 &lt;a class="reference external" href="https://youtu.be/VajB8vCsZ3s"&gt;YouTube 視頻&lt;/a&gt;
+介紹了其原理，感興趣的可以參考一下。只羅列一下視頻中提到的一些 NAND Flash 的特點：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;NAND Flash 使用 floating gate 中束縛電子來保存二進制數據，對這些 Cell 有讀取（Read）、
+寫入（Programming）、擦除（Erase）的操作。擦寫次數叫 P/E cycle。&lt;/li&gt;
+&lt;li&gt;電子的量導致的電勢差可以區別 1 和 0 ，這是 Single Level Cell (SLC) 的存儲方式。
+或者可以用不同的電勢差區分更多狀態保存更多二進制位，從而有 Multi-Level Cell (MLC)，
+TLC， QLC 等技術。可以對 MLC 的 Flash Cell 使用類似 SLC 的寫入模式，物理區別只是參考電壓，
+只是 SLC 模式寫入下容量減半。&lt;/li&gt;
+&lt;li&gt;高密度設計下，一組 NAND Flash Cell 可以同時併發讀寫。所以有了讀寫頁 2KiB/4KiB 這樣的容量。
+頁面越大，存儲密度越高，爲了降低成本廠商都希望提高讀寫頁的大小。&lt;/li&gt;
+&lt;li&gt;爲了避免添加額外導線，NAND Flash Cell 是使用基板上加負電壓的方式擦除 floating gate
+中的二進制位的，所以擦除操作沒法通過地址線選擇特定 Cell 或者讀寫頁，於是整塊擦除有塊大小。&lt;/li&gt;
+&lt;li&gt;寫入操作對 SLC 單個 Cell 而言，就是把 1 置 0 ，而擦除操作則是把整塊置 1 。SLC
+可以通過地址線單獨選擇要寫入的 Cell ，MLC 則把不同頁的二進制放入一個 Cell ，放入時有順序要求，
+先寫處於高位的頁，再寫低位的。所以 MLC 中不同頁面地址的頁面是交錯在同一組 Cell 中的。&lt;/li&gt;
+&lt;li&gt;SLC 其實並沒有特別要求擦除塊中的寫入順序，只是要求僅寫一次（從 1 到 0）。
+MLC 則有先寫高位頁再寫低位頁的要求。廠商規格中的要求更嚴格，擦除塊中必須滿足按頁面編號順序寫入。&lt;/li&gt;
+&lt;li&gt;寫入和擦除操作是通過量子隧道效應把電子困在 floating gate 中的，所以是個概率事件。通過多次脈衝
+可以縮小發生非預期概率事件的可能性，但是沒法完全避免，所以需要 ECC 校驗糾錯。&lt;/li&gt;
+&lt;li&gt;根據 ECC 強度通常有三種 ECC 算法，強度越強需要越多算力：&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E6%B1%89%E6%98%8E%E7%A0%81"&gt;漢民碼&lt;/a&gt;
+可根據 n bit 探測 &lt;span class="math"&gt;\(2^n - n -1\)&lt;/span&gt; 中的 2 bit 錯誤，修正 1 bit 錯誤。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/BCH%E7%A0%81"&gt;BCH碼&lt;/a&gt; 可根據 &lt;span class="math"&gt;\(n*m\)&lt;/span&gt; bit
+糾錯 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 m bit 錯誤。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E4%BD%8E%E5%AF%86%E5%BA%A6%E5%A5%87%E5%81%B6%E6%AA%A2%E6%9F%A5%E7%A2%BC"&gt;LDPC&lt;/a&gt;
+原理上類似擴展的漢民碼，能做到使用更少校驗位糾錯更多錯誤。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;因爲 ECC 的存在，所以讀寫必須至少以 ECC 整塊爲單位，比如 256 字節或者整個頁面。&lt;/li&gt;
+&lt;li&gt;也因爲 ECC 的存在， &lt;span class="math"&gt;\(ECC(\texttt{0xFF}) \ne \texttt{0xFF}\)&lt;/span&gt;
+，空頁（擦除後全1的頁面）必須特殊處理。所以需要區分寫了數據全 1 的頁和空頁。&lt;/li&gt;
+&lt;li&gt;ECC校驗多次失敗的頁面可以被標記爲壞頁，出廠時就可能有一些壞頁，這些由轉換層隱藏起來。&lt;/li&gt;
+&lt;li&gt;斷電後，也有小概率下束縛的電子逃逸出 floating gate ，時間越長越可能發生可以探測到的位反轉。
+所以基於 NAND Flash 的存儲設備應該避免作爲存檔設備離線保存。&lt;/li&gt;
+&lt;li&gt;電子逃逸的概率也和溫度有關，溫度越高越容易逃逸，所以高溫使用下會有更高的校驗錯誤率。&lt;/li&gt;
+&lt;li&gt;讀取時，因爲用相對較高的電壓屏蔽沒有讀取的地址線，有一定概率影響到沒被讀取的頁面中存儲的數據。
+控制器可能考慮週期性地刷新這些寫入後多次讀取的頁面，這可能和後文的靜態擦寫均衡一起做。&lt;/li&gt;
+&lt;li&gt;正在寫入或者擦除中突然斷電的話下，寫入中的一整頁數據可能並不穩定，比如短期內能正常讀取但是難以持續很長時間。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;MLC 擦寫次數與錯誤率&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-pe-cycles.png" class="img-responsive" src="//farseerfc.me/images/ssd-pe-cycles.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;上篇講硬盤的筆記中提到過，硬盤物理存儲也有越來越強的校驗機制，不過相比之下 NAND Flash
+出現臨時性校驗失敗的可能性要高很多，需要控制器對校驗出錯誤的情況有更強的容忍能力。
+廠商們製作存儲設備的時候，有一個需要達到的錯誤率目標（比如每 &lt;span class="math"&gt;\(10^{-14}\)&lt;/span&gt; bit
+出現一次位反轉），針對這個目標和實際物理錯誤率，相應地設計糾錯強度。校驗太強會浪費存儲密度和算力，
+從而提升成本，這裏會根據市場細分找折衷點。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;2   封裝結構&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;從外部來看，一個閃存盤可能有這樣的結構：&lt;/p&gt;
+&lt;object class="embed-responsive-item" data="//farseerfc.me/images/ssd-enclosure.svg" type="image/svg+xml"&gt;
+ssd-enclosure.svg&lt;/object&gt;
+&lt;p&gt;從上往下，我們買到的一個閃存盤可能一層層分級：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;整個閃存盤有個控制器，其中含有一部分 RAM 。然後是一組 NAND Flash 封装芯片（chip）。&lt;/li&gt;
+&lt;li&gt;每個封装芯片可能還分多個 Device ，每個 Device 分多個 Die ，這中間有很多術語我無法跟上，大概和本文想討論的事情關係不大。&lt;/li&gt;
+&lt;li&gt;每個 Die 分多個平面（Plane），平面之間可以並行控制，每個平面相互獨立。從而比如在一個平面內
+做某個塊的擦除操作的時候，別的平面可以繼續讀寫而不受影響。&lt;/li&gt;
+&lt;li&gt;每個平面分成多個段（Segment)，段是擦除操作的基本單位，一次擦除一整個段。&lt;/li&gt;
+&lt;li&gt;每個段分成多個頁面（Page），頁面是讀寫操作的基本單位，一次可以讀寫一整頁。&lt;/li&gt;
+&lt;li&gt;頁面內存有多個單元格（Cell），單元格是存儲二進制位的基本單元，對應 SLC/MLC/TLC/QLC 這些，
+每個單元格可以存儲一個或多個二進制位。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上這些名字可能不同廠商不同文檔的稱法都各有不同，比如可能有的文檔把擦除塊叫 page 或者叫
+eraseblock 。隨着容量不斷增大，廠商們又新造出很多抽象層次，比如 chip device die 這些，
+不過這些可能和本文關係不大。如果看別的文檔注意區別術語所指概念，本文中我想統一成以上術語。
+重要的是有並行訪問單元的平面（Plane）、擦除單元的段（Segment）、讀寫單元的頁（Page）這些概念。
+抽象地列舉概念可能沒有實感，順便說一下這些概念的數量級：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;每个 SSD 可以有数个封装芯片。&lt;/li&gt;
+&lt;li&gt;每个芯片有多个 Die 。&lt;/li&gt;
+&lt;li&gt;每个 Die 有多个平面。&lt;/li&gt;
+&lt;li&gt;每个平面有幾千個段。比如 2048 個。&lt;/li&gt;
+&lt;li&gt;每個段有數百個頁到幾千頁，比如 128~4096 頁，可能外加一些段內元数据。&lt;/li&gt;
+&lt;li&gt;每個頁面是 2KiB~8KiB 這樣的容量，外加幾百字節的元數據比如 ECC 校驗碼。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;和硬盤相比，一個閃存頁面大概對應一個到數個物理扇區大小，現代硬盤也逐漸普及 4KiB 物理扇區，
+文件系統也基本普及 4KiB 或者更大的邏輯塊（block）或者簇（cluster）大小，可以對應到一個閃存頁面。
+每次讀寫都可以通過地址映射直接對應到某個閃存頁面，這方面沒有硬盤那樣的尋址開銷。
+閃存盤的一個頁面通常配有比硬盤扇區更強的 ECC 校驗碼，因爲 NAND
+單元格喪失數據的可能性比磁介質高了很多。&lt;/p&gt;
+&lt;p&gt;閃存有寫入方式的限制，每次寫入只能寫在「空」的頁面上，不能覆蓋寫入已有數據的頁面。
+要重複利用已經寫過的頁面，需要對頁面所在段整個做擦除操作，每個段是大概 128KiB 到 8MiB
+這樣的數量級。每個擦除段需要統計校驗失敗率或者跟蹤擦除次數，以進行擦寫均衡（Wear Leveling）。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="wear-leveling-flash-translation-layer"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;3   擦寫均衡（Wear Leveling）和映射層（Flash Translation Layer）&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428793/"&gt;Animation: wear leveling on SSD drives&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-segment.gif" class="img-responsive" src="//farseerfc.me/images/ssd-segment.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;擦除段的容量大小是個折衷，更小的擦除段比如 128KiB 更適合隨機讀寫，
+因爲每隨機修改一部分數據時需要垃圾回收的粒度更小；而使用更大的擦除段可以減少元數據和地址映射的開銷。
+從擦除段的大小這裏，已經開始有高端閃存和低端閃存的差異，比如商用 SSD 可能比 U 盤和 SD
+卡使用更小的擦除段大小。&lt;/p&gt;
+&lt;p&gt;閃存盤中維護一個邏輯段地址到物理段地址的映射層，叫閃存映射層（Flash Translation Layer
+）。每次寫一個段的時候都新分配一個空段，
+寫完後在映射表中記錄其物理地址。映射表用來在讀取時做地址轉換，所以映射表需要保存在閃存盤控制器的
+RAM 中，同時也需要記錄在閃存內。具體記錄方式要看閃存盤控制器的實現，可能是類似日誌的方式記錄的。&lt;/p&gt;
+&lt;p&gt;「段地址映射表」的大小可以由段大小和存儲設備容量推算出來。比如對一個 64GiB 的 SD
+卡，如果使用 4MiB 的段大小，那麼需要至少 16K 個表項。假設映射表中只記錄 2B 的物理段地址，
+那麼需要 32KiB 的 RAM 存儲段地址映射表。對一個 512GiB 的 SSD ，如果使用 128KiB 的段大小，
+那麼至少需要 4M 個表項。記錄 4B 的物理段地址的話，需要 16MiB 的 RAM 存儲地址映射，
+或者需要動態加載的方案只緩存一部分到 RAM 裏。控制器中的
+RAM 比 NAND 要昂貴很多，這裏可以看出成本差異。&lt;/p&gt;
+&lt;p&gt;除了地址映射表，每個物理段還要根據擦除次數或者校驗錯誤率之類的統計數據，做擦寫均衡。有兩種擦寫均衡：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;動態擦寫均衡（Dynamic Wear Leveling）：每次寫入新段時選擇擦除次數少的物理段。&lt;/li&gt;
+&lt;li&gt;靜態擦寫均衡（Static Wear Leveling）：空閒時，偶爾將那些許久沒有變化的邏輯段搬運到
+多次擦除的物理段上。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;低端閃存比如 SD 卡和 U 盤可能只有動態擦寫均衡，更高端的 SSD 可能會做靜態擦寫均衡。
+靜態擦寫均衡想要解決的問題是：盤中寫入的數據可以根據寫入頻率分爲冷熱，
+總有一些冷數據寫入盤上就不怎麼變化了，它們佔用着的物理段有比較低的擦除計數。
+只做動態擦寫均衡的話，只有熱數據的物理段被頻繁擦寫，加速磨損，
+通過靜態擦寫均衡能將冷數據所在物理段釋放出來，讓整體擦寫更平均。
+但是靜態擦寫均衡搬運數據本身也會磨損有限的擦寫次數，這需要優秀的算法來折衷。&lt;/p&gt;
+&lt;p&gt;除了擦寫均衡用的統計數據外， FTL 也要做壞塊管理。閃存盤出廠時就有一定故障率，可能有一部分壞塊。
+隨着消耗擦寫週期、閒置時間、環境溫度等因素影響，也會遇到一些無法再保證寫入正確率的壞塊。
+NAND Flash 上因爲量子隧道效應，偶爾會有臨時的校驗不一致，遇到這種情況，除了根據 ECC
+校驗恢復數據， FTL 也負責嘗試對同一個物理段多次擦除和讀寫，考察它的可用性。排除了臨時故障後，
+如果校驗不一致的情況仍然持續，那麼需要標註它爲壞塊，避免今後再寫入它。&lt;/p&gt;
+&lt;p&gt;出廠時，閃存盤配有的物理段數量就高於標稱的容量，除了出廠時的壞塊之外，剩餘的可用物理段可以用於
+擦寫均衡，這種行爲稱作 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E5%86%99%E5%85%A5%E6%94%BE%E5%A4%A7#%E9%A2%84%E7%95%99%E7%A9%BA%E9%97%B4"&gt;Over Provisioning&lt;/a&gt;
+。除了盤內預留的這些空間，用戶也可以主動通過分區的方式或者文件系統 TRIM 的方式預留出更多可用空間，
+允許 FTL 更靈活地均衡擦寫。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;4   段內寫入順序與垃圾回收策略&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;段是閃存盤的擦寫單元，考慮到段是 128KiB ~ 8MiB 這樣的數量級，現實中要求每次連續寫入一整段的話，
+這樣的塊設備接口不像硬盤的接口，不方便普通文件系統使用。所以在段的抽象之下有了更小粒度的頁面抽象，
+頁面對應到文件系統用的邏輯塊大小，是 2KiB~8KiB 這樣的數量級，每次以頁面爲單位讀寫。&lt;/p&gt;
+&lt;p&gt;寫入頁面時有段內連續寫入的限制，於是需要段內映射和垃圾回收算法，提供對外的隨機寫入接口。
+寫入操作時， FTL 控制器內部先「打開（open）」一個段，等寫入完成，再執行垃圾回收「關閉(close)」一個段。
+寫入過程中處於打開狀態的段需要一些額外資源（RAM等）跟蹤段內的寫入狀況，所以閃存盤同時能「打開」
+的段數量有限。並且根據不同的垃圾回收算法，需要的額外資源也不盡相同，在
+&lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt; 一文中介紹幾種可能的垃圾回收算法：&lt;/p&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;4.1   線性寫入優化&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428796/"&gt;Animations: linear-access optimized&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-linear.gif" class="img-responsive" src="//farseerfc.me/images/ssd-linear.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;假設寫入請求大部分都是連續寫入，很少有地址跳轉，那麼可以使用線性優化算法。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open：當第一次打開一個段，寫入其中一頁時，分配一個新段。如果要寫入的頁不在段的開頭位置，那麼搬運寫入頁面地址之前的所有頁面到新段中。&lt;/li&gt;
+&lt;li&gt;Write: 在 RAM 中跟蹤記錄當前寫入位置，然後按順序寫下新的頁面。&lt;/li&gt;
+&lt;li&gt;Close: 最後搬運同段中隨後地址上的頁面，並關閉整段，調整段映射表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果在段內寫入了幾頁之後，又跳轉到之前的位置，那需要在跳轉時關閉當前段寫入（並完整搬運剩下的頁面），
+然後重新打開這一段，搬運調轉地址之前的頁面，從跳轉的頁面位置開始寫入。&lt;/p&gt;
+&lt;p&gt;線性優化算法的好處在於：沒有複雜的頁面地址映射，段內的邏輯頁面地址就是物理頁面地址。
+讀一頁的時候根據頁面偏移和當前寫入位置就能判斷讀新物理段還是老物理段。遇到突然斷電之類的情況，
+即使丟失最近寫入的新物理段，老物理段的數據仍然還在，所以沒必要保存 RAM 中的地址映射到閃存元數據中。&lt;/p&gt;
+&lt;p&gt;線性優化算法的壞處是:每遇到一次亂序的寫入，都要整段執行一次搬運，造成
+&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E5%86%99%E5%85%A5%E6%94%BE%E5%A4%A7"&gt;寫入放大（Write Amplification）&lt;/a&gt;
+。&lt;/p&gt;
+&lt;p&gt;一些文檔中，將這種地址映射垃圾回收方式叫做「段映射（Segment Mapping）」，因爲從 FTL
+全局來看只維護了擦寫段的地址映射關係。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;4.2   段內地址映射&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428831/"&gt;Animations: block remapping&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-random.gif" class="img-responsive" src="//farseerfc.me/images/ssd-random.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;對需要隨機亂序寫入的數據，可以使用段內地址映射。方式是額外在段外的別的閃存區域維護一張段內地址映射表，
+像段地址一樣，通過查表間接訪問頁面地址。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open: 分配一塊新的段，同時分配一個新的段內映射表。&lt;/li&gt;
+&lt;li&gt;Write: 每寫入一頁，在段內映射表記錄頁面的在新段中的物理地址。&lt;/li&gt;
+&lt;li&gt;Close: 複製老段中沒有被覆蓋寫入的頁到新段，並記錄在段內映射表中，然後釋放老段和老的段內映射表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;也就是說同時維護兩塊不同大小的閃存空間，一塊是記錄段數據的，一塊是記錄段內地址映射表的，
+兩塊閃存空間有不同的寫入粒度。可以在每個物理段內額外留出一些空間記錄段內地址映射表，也可以在 FTL
+全局維護一定數量的段內地址映射表。
+每次讀取段內的數據時，根據映射表的內容，做地址翻譯。新段中頁面的排列順序將是寫入的順序，
+而不是地址順序。&lt;/p&gt;
+&lt;p&gt;根據實現細節，段內地址映射可以允許覆蓋寫入老段中的頁面，但是可能不允許覆蓋寫入新段（正在寫入的段）
+中已經寫入的頁面，遇到一次連續的寫請求中有重複寫入某一頁面的時候，就需要關閉這一段的寫入，然後重新打開。&lt;/p&gt;
+&lt;p&gt;段內地址映射的優點是：支持隨機寫入，並且只要段處於打開狀態，隨機寫入不會造成寫入放大（Write Amplification）。&lt;/p&gt;
+&lt;p&gt;缺點是：首先地址映射這層抽象有性能損失。其次遇到突然斷電之類的情況，
+下次上電後需要掃描所有正打開的段並完成段的關閉操作。&lt;/p&gt;
+&lt;p&gt;和「段映射」術語一樣，在一些文檔中，將這種段內地址映射的方式叫做「頁面映射（Page Mapping）」，因爲從
+FTL 全局來看跳過了擦寫段這一層，直接映射了頁面的地址映射。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;4.3   日誌式寫入&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428831/"&gt;Animations: data logging&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-logging.gif" class="img-responsive" src="//farseerfc.me/images/ssd-logging.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;除了大量隨機寫入和大量連續寫入這兩種極端情況，大部分文件系統的寫入方式可能會是對某個地址空間
+進行一段時間的隨機寫入，然後就長時間不再修改，這時適合日誌式的寫入方式。&lt;/p&gt;
+&lt;p&gt;日誌式的寫入方式中寫入一段採用三個物理段：老物理段，用於日誌記錄的新物理段，和垃圾回收後的段。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open: 分配一塊新的段。可能額外分配一個用於記錄日誌的段，或者將日誌信息記錄在數據段內。&lt;/li&gt;
+&lt;li&gt;Write：每寫入一頁，同時記錄頁面地址到日誌。&lt;/li&gt;
+&lt;li&gt;Close：再分配一個新段執行垃圾回收。按日誌中記錄的地址順序將數據段中（新寫入）的頁面或者老段中
+沒有被覆蓋的頁面複製到垃圾回收結束的新段中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;日誌式寫入在寫入過程中像段內地址映射的方式一樣，通過日誌記錄維護頁面地址映射關係，
+在寫入結束執行垃圾回收之後，則像線性寫入的方式一樣不再需要維護頁面映射。
+可以說日誌式寫入某種程度上綜合了前面兩種寫入方式的優點。&lt;/p&gt;
+&lt;p&gt;日誌式寫入的優點：允許隨機順序寫入，並且在執行垃圾回收之後，不再有間接訪問的地址轉換開銷。&lt;/p&gt;
+&lt;p&gt;日誌式寫入的缺點：觸發垃圾回收的話，可能比段地址映射有更大的寫入放大（Write Amplification）。&lt;/p&gt;
+&lt;p&gt;在一些文檔中，將這種日誌式寫入方式稱作「混合映射（Hybrid Mapping）」，因爲在段開啓寫入期間行爲像頁面映射，
+在段關閉寫入後行爲像段映射。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id10"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;5   針對特定寫入模式的優化&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上述三種地址映射和垃圾回收方式，各有不同的優缺點，根據數據塊的寫入模式可能需要挑選相應的策略。
+並且「全局段地址映射表」、「段內頁面地址映射表」、「寫入頁面地址日誌」之類的元數據因爲頻繁修改，
+FTL 也可能需要用不同的策略來記錄這些元數據。這裏面向不同使用場景的閃存設備可能有不同的 FTL
+策略，並且 FTL 可能根據邏輯地址來選擇哪種策略。&lt;/p&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id23"&gt;5.1   混合垃圾回收策略&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428592/"&gt;Performance measurements on a class 10 SDHC card&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-extrememory-results.png" class="img-responsive" src="//farseerfc.me/images/ssd-extrememory-results.png"/&gt;
+&lt;img alt="ssd-panasonic-plot.png" class="img-responsive" src="//farseerfc.me/images/ssd-panasonic-plot.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;用來記錄照片、視頻等的 SD 卡、microSD、U盤等設備可能根據數據的邏輯地址，爲特定文件系統佈局優化，
+這裏特定文件系統主要是指 FAT32 和 exFAT 這兩個 FAT 系文件系統。 FAT 系文件系統的特點在於，
+地址前端有一塊空間被用來放置 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/FAT"&gt;文件分配表(File Allocation Table)&lt;/a&gt;
+，可以根據文件系統簇大小和設備存儲容量推算出 FAT 表佔用大小，這塊表內空間需要頻繁隨機讀寫。
+對 FTL 自身的元數據，和 FAT 表的邏輯地址空間，需要使用「段內地址映射」來保證高效的隨機讀寫，
+而對隨後的數據空間可使用「線性寫入優化」的策略。&lt;/p&gt;
+&lt;p&gt;右側上圖有張性能曲線，測量了一個 class 10 SDHC 卡上，不同讀寫塊大小時，順序讀取、順序寫入、隨機寫入、
+對 FAT 區域的寫入之類的性能差異。下圖是測量的讀取延遲。可以看出 FAT
+區域的隨機寫入和其餘邏輯地址上有明顯不同的性能表現。&lt;/p&gt;
+&lt;p&gt;爲容納普通操作系統設計的 eMMC 和 SSD 難以預測文件系統的讀寫模式，可能需要使用更複雜的地址映射和垃圾回收策略。
+比如一開始假定寫入會是順序寫入，採用「線性優化」方式；當發生亂序寫入時，轉變成類似「日誌式寫入」
+的方式記錄寫入地址並做地址映射；關閉段時，再根據積累的統計數據判斷，可能將記錄的日誌與亂序的數據
+合併（merge）成順序的數據塊，也可能保持頁面映射轉變成類似「段內地址映射」的策略。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id12"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;5.2   利用 NAND Flash 物理特性的優化&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;再考慮 NAND Flash 的物理特性，因爲 MLC 要不斷調整參考電壓做寫入， MLC 的寫入比 SLC
+慢一些，但是可以對 MLC Flash 使用 SLC 式的寫入， FTL 控制器也可能利用這一點，讓所有新的寫入處於
+SLC 模式，直到關閉整段做垃圾回收時把積攢的 SLC 日誌段回收成 MLC 段用於長期保存。
+一些網頁將這種寫入現象稱作「SLC 緩存」甚至稱之爲作弊，需要理解這裏並不是用單獨的 SLC Flash
+芯片做 writeback 緩存，更不是用大 RAM 做緩存，處於 SLC 模式的寫入段也是持久存儲的。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;5.3   同時打開段數&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;上述地址映射和垃圾回收策略都有分別的打開（open）、寫入（write）、關閉（close）時的操作，
+閃存盤通常允許同時打開多個段，所以這三種操作不是順序進行的，某一時刻可能同時有多個段處在打開的狀態，
+能接受寫入。不過一個平面（Plane）通常只能進行一種操作（讀、寫、擦除），所以打開寫入段時，
+FTL 會儘量讓寫入分部在不同的平面上。還可能有更高層次的抽象比如 Device、 Chip 、 Die
+等等，可能對應閃存盤內部的 RAID 層級。&lt;/p&gt;
+&lt;p&gt;閃存盤能同時打開的段不光受平面之類的存儲結構限制，還受控制器可用內存（RAM）限制之類的。
+爲 FAT 和順序寫入優化的 FTL ，可能除了 FAT 區域之外，只允許少量（2~8）個併發寫入段，
+超過了段數之後就會對已經打開的段觸發關閉操作（close），執行垃圾回收調整地址映射，進而接受新的寫入。
+更高端的 SSD 的 FTL 如果採用日誌式記錄地址的話，同時打開的段數可能不再侷限於可用內存限制，
+連續的隨機寫入下按需動態加載段內地址映射到內存中，在空閒時或者剩餘空間壓力下才觸發垃圾回收。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id14"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;5.4   預格式化&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;FTL 可能爲某種文件系統的寫入模式做優化，同時如果文件系統能得知 FTL 的一些具體參數（比如擦除段大小、
+讀寫頁大小、隨機寫入優化區域），那麼可能更好地安排數據結構，和 FTL 相互配合。
+F2FS 和 exFAT 這些文件系統都在最開頭的文件系統描述中包含了一些區域，記錄這些閃存介質的物理參數。
+閃存盤出廠時，可能預先根據優化的文件系統做好格式化，並寫入這些特定參數。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="trim-discard"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;5.5   TRIM 和 discard&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;另一種文件系統和 FTL 相互配合的機制是 TRIM 指令。TRIM 由文件系統發出，告訴底層閃存盤（
+或者別的類型的 thin provisioning 塊設備）哪些空間已經不再使用， FTL 接受 TRIM
+指令之後可以避免一些數據搬運時的寫入放大。關於 TRIM 指令在 Linux 內核中的實現，有篇
+&lt;a class="reference external" href="https://lwn.net/Articles/417809/"&gt;The best way to throw blocks away&lt;/a&gt;
+介紹可以參考。&lt;/p&gt;
+&lt;p&gt;考慮到 FTL 的上述地址映射原理， TRIM 一塊連續空間對 FTL 而言並不總是有幫助的。
+如果被 TRIM 的地址位於正在以「段內地址映射」或「日誌式映射」方式打開的寫入段中，那麼
+TRIM 掉一些頁面可能減少垃圾回收時搬運的頁面數量。但是如果 TRIM 的地址發生在已經垃圾回收結束的段中，
+此時如果 FTL 選擇立刻對被 TRIM 的段執行垃圾回收，可能造成更多寫入放大，
+如果選擇不回收只記錄地址信息，記錄這些地址信息也需要耗費一定的 Flash 寫入。
+所以 FTL 的具體實現中，可能只接受 TRIM 請求中，整段擦除段的 TRIM ，而忽略細小的寫入頁的 TRIM 。&lt;/p&gt;
+&lt;p&gt;可見 FTL 對 TRIM 的實現是個黑盒操作，並且 TRIM 操作的耗時也非常難以預測，可能立刻返回，
+也可能需要等待垃圾回收執行結束。&lt;/p&gt;
+&lt;p&gt;對操作系統和文件系統實現而言，有兩種方式利用 TRIM ：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;通過 discard 掛載選項，每當釋放一些數據塊時就執行 TRIM 告知底層塊設備。&lt;/li&gt;
+&lt;li&gt;通過 fstrim 等外部工具，收集連續的空塊並定期發送 TRIM 給底層設備。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;直覺來看可能 discard 能讓底層設備更早得知 TRIM 區域的信息並更好利用，但是從實現角度來說，
+discard 不光影響文件系統寫入性能，還可能發送大量被設備忽略掉的小塊 TRIM 區域。可能 fstrim
+方式對連續大塊的區間執行 TRIM 指令更有效。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tl-dr-vs"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;6   TL;DR 低端 vs 高端&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;標題中的疑問「SSD就是大U盤？」相信看到這裏已經有一些解答了。
+即使 SSD 和U盤中可以採用類似的 NAND Flash 存儲芯片，由於他們很可能採用不同的 FTL
+策略，導致在讀寫性能和可靠性方面都有不同的表現。&lt;/p&gt;
+&lt;p&gt;如果不想細看全文，這裏整理一張表，列出「高端」閃存盤和「低端」閃存盤可能採取的不同策略。
+實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
+比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
+但是理解了 FTL 的差異後就可以看出這種「優化」只針對線性寫入，不一定適合放系統文件根目錄的文件系統。&lt;/p&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="34%"/&gt;
+&lt;col width="34%"/&gt;
+&lt;col width="31%"/&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head"&gt;參數&lt;/th&gt;
+&lt;th class="head"&gt;低端&lt;/th&gt;
+&lt;th class="head"&gt;高端&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;段大小&lt;/td&gt;
+&lt;td&gt;8MiB&lt;/td&gt;
+&lt;td&gt;128KiB&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;段地址映射&lt;/td&gt;
+&lt;td&gt;靜態段映射&lt;/td&gt;
+&lt;td&gt;日誌式映射&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;隨機寫入範圍&lt;/td&gt;
+&lt;td&gt;FTL元數據與FAT表區域&lt;/td&gt;
+&lt;td&gt;全盤&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;同時打開段數&lt;/td&gt;
+&lt;td&gt;4~8&lt;/td&gt;
+&lt;td&gt;全盤&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;物理段統計信息&lt;/td&gt;
+&lt;td&gt;無（隨機挑選空閒段）&lt;/td&gt;
+&lt;td&gt;擦除次數、校驗錯誤率等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;擦寫均衡&lt;/td&gt;
+&lt;td&gt;動態均衡（僅寫入時分配新段考慮）&lt;/td&gt;
+&lt;td&gt;靜態均衡（空閒時考慮搬運）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;寫入單元模式&lt;/td&gt;
+&lt;td&gt;TLC&lt;/td&gt;
+&lt;td&gt;長期存儲 MLC， 模擬 SLC 日誌&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="tech"></category><category term="FS筆記"></category><category term="FS notes"></category><category term="FTL"></category><category term="SSD"></category><category term="USB stick"></category><category term="eMMC"></category><category term="MMC"></category><category term="SD Card"></category></entry><entry><title>SSD 就是大U盘？聊聊闪存类存储的转换层</title><link href="//farseerfc.me/zhs/flash-storage-ftl-layer.html" rel="alternate"></link><published>2020-03-21T15:45:00+09:00</published><updated>2020-03-21T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-21:/zhs/flash-storage-ftl-layer.html</id><summary type="html">
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/zhs/history-of-chs-addressing.html"&gt;「柱面-磁头-扇区寻址的一些旧事」&lt;/a&gt;
+整理了一下我对磁盘类存储设备（包括软盘、硬盘，不包括光盘、磁带）的一些理解，
+算是为以后讨论文件系统作铺垫；这篇整理一下我对闪存类存储设备的理解。&lt;/p&gt;
+&lt;p&gt;这里想要讨论的闪存类存储是指 SSD 、SD卡、U盘、手机内置闪存等基于 NAND
+又有闪存转换层的存储设备（下文简称闪存盘），但不包括裸 NAND 设备、3D Xpoint （Intel
+Optane）等相近物理结构但是没有类似的闪存转换层的存储设备。
+闪存类存储设备这几年发展迅猛，SD卡和U盘早就替代软盘成为数据交换的主流， SSD 大有替代硬盘的趋势。
+因为发展迅速，所以其底层技术变革很快，不同于磁盘类存储技术有很多公开资料可以获取，
+闪存类存储的技术细节通常是厂商们的秘密，互联网上能找到很多外围资料，
+但是关于其如何运作的细节却很少提到。所以我想先整理一篇笔记，记下我搜集到的资料，加上我自己的理解。
+本文大部分信息来源是 &lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt;
+和 &lt;a class="reference external" href="https://accelazh.github.io/ssd/A-Summary-On-SSD-And-FTL"&gt;A Summary on …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">
+&lt;p&gt;上篇 &lt;a class="reference external" href="//farseerfc.me/zhs/history-of-chs-addressing.html"&gt;「柱面-磁头-扇区寻址的一些旧事」&lt;/a&gt;
+整理了一下我对磁盘类存储设备（包括软盘、硬盘，不包括光盘、磁带）的一些理解，
+算是为以后讨论文件系统作铺垫；这篇整理一下我对闪存类存储设备的理解。&lt;/p&gt;
+&lt;p&gt;这里想要讨论的闪存类存储是指 SSD 、SD卡、U盘、手机内置闪存等基于 NAND
+又有闪存转换层的存储设备（下文简称闪存盘），但不包括裸 NAND 设备、3D Xpoint （Intel
+Optane）等相近物理结构但是没有类似的闪存转换层的存储设备。
+闪存类存储设备这几年发展迅猛，SD卡和U盘早就替代软盘成为数据交换的主流， SSD 大有替代硬盘的趋势。
+因为发展迅速，所以其底层技术变革很快，不同于磁盘类存储技术有很多公开资料可以获取，
+闪存类存储的技术细节通常是厂商们的秘密，互联网上能找到很多外围资料，
+但是关于其如何运作的细节却很少提到。所以我想先整理一篇笔记，记下我搜集到的资料，加上我自己的理解。
+本文大部分信息来源是 &lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt;
+和 &lt;a class="reference external" href="https://accelazh.github.io/ssd/A-Summary-On-SSD-And-FTL"&gt;A Summary on SSD &amp;amp; FTL&lt;/a&gt;
+，加上我的理解，文中一些配图也来自这两篇文章。&lt;/p&gt;
+&lt;div class="section" id="nand-flash"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;1   NAND Flash 原理&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;比 NAND Flash 更早的 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/EEPROM"&gt;EEPROM&lt;/a&gt; 等存储技术
+曾经用过 NOR Flash cell ，用于存储主板配置信息等少量数据已经存在 PC 中很久了。后来
+NAND Flash 的微型化使得 NAND Flash 可以用于存储大量数据，急剧降低了存储成本，所以以 NAND
+Flash 为基础的存储技术能得以替代硬盘等存储设备。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;Tutorial: Why NAND Flash Breaks Down&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/VajB8vCsZ3s"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;这里不想涉及太多 NAND Flash 硬件细节，有个演讲
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;Tutorial: Why NAND Flash Breaks Down&lt;/a&gt;
+和 &lt;a class="reference external" href="https://youtu.be/VajB8vCsZ3s"&gt;YouTube 视频&lt;/a&gt;
+介绍了其原理，感兴趣的可以参考一下。只罗列一下视频中提到的一些 NAND Flash 的特点：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;NAND Flash 使用 floating gate 中束缚电子来保存二进制数据，对这些 Cell 有读取（Read）、
+写入（Programming）、擦除（Erase）的操作。擦写次数叫 P/E cycle。&lt;/li&gt;
+&lt;li&gt;电子的量导致的电势差可以区别 1 和 0 ，这是 Single Level Cell (SLC) 的存储方式。
+或者可以用不同的电势差区分更多状态保存更多二进制位，从而有 Multi-Level Cell (MLC)，
+TLC， QLC 等技术。可以对 MLC 的 Flash Cell 使用类似 SLC 的写入模式，物理区别只是参考电压，
+只是 SLC 模式写入下容量减半。&lt;/li&gt;
+&lt;li&gt;高密度设计下，一组 NAND Flash Cell 可以同时并发读写。所以有了读写页 2KiB/4KiB 这样的容量。
+页面越大，存储密度越高，为了降低成本厂商都希望提高读写页的大小。&lt;/li&gt;
+&lt;li&gt;为了避免添加额外导线，NAND Flash Cell 是使用基板上加负电压的方式擦除 floating gate
+中的二进制位的，所以擦除操作没法通过地址线选择特定 Cell 或者读写页，于是整块擦除有块大小。&lt;/li&gt;
+&lt;li&gt;写入操作对 SLC 单个 Cell 而言，就是把 1 置 0 ，而擦除操作则是把整块置 1 。SLC
+可以通过地址线单独选择要写入的 Cell ，MLC 则把不同页的二进制放入一个 Cell ，放入时有顺序要求，
+先写处于高位的页，再写低位的。所以 MLC 中不同页面地址的页面是交错在同一组 Cell 中的。&lt;/li&gt;
+&lt;li&gt;SLC 其实并没有特别要求擦除块中的写入顺序，只是要求仅写一次（从 1 到 0）。
+MLC 则有先写高位页再写低位页的要求。厂商规格中的要求更严格，擦除块中必须满足按页面编号顺序写入。&lt;/li&gt;
+&lt;li&gt;写入和擦除操作是通过量子隧道效应把电子困在 floating gate 中的，所以是个概率事件。通过多次脉冲
+可以缩小发生非预期概率事件的可能性，但是没法完全避免，所以需要 ECC 校验纠错。&lt;/li&gt;
+&lt;li&gt;根据 ECC 强度通常有三种 ECC 算法，强度越强需要越多算力：&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E6%B1%89%E6%98%8E%E7%A0%81"&gt;汉民码&lt;/a&gt;
+可根据 n bit 探测 &lt;span class="math"&gt;\(2^n - n -1\)&lt;/span&gt; 中的 2 bit 错误，修正 1 bit 错误。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/BCH%E7%A0%81"&gt;BCH码&lt;/a&gt; 可根据 &lt;span class="math"&gt;\(n*m\)&lt;/span&gt; bit
+纠错 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 m bit 错误。&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E4%BD%8E%E5%AF%86%E5%BA%A6%E5%A5%87%E5%81%B6%E6%AA%A2%E6%9F%A5%E7%A2%BC"&gt;LDPC&lt;/a&gt;
+原理上类似扩展的汉民码，能做到使用更少校验位纠错更多错误。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;因为 ECC 的存在，所以读写必须至少以 ECC 整块为单位，比如 256 字节或者整个页面。&lt;/li&gt;
+&lt;li&gt;也因为 ECC 的存在， &lt;span class="math"&gt;\(ECC(\texttt{0xFF}) \ne \texttt{0xFF}\)&lt;/span&gt;
+，空页（擦除后全1的页面）必须特殊处理。所以需要区分写了数据全 1 的页和空页。&lt;/li&gt;
+&lt;li&gt;ECC校验多次失败的页面可以被标记为坏页，出厂时就可能有一些坏页，这些由转换层隐藏起来。&lt;/li&gt;
+&lt;li&gt;断电后，也有小概率下束缚的电子逃逸出 floating gate ，时间越长越可能发生可以探测到的位反转。
+所以基于 NAND Flash 的存储设备应该避免作为存档设备离线保存。&lt;/li&gt;
+&lt;li&gt;电子逃逸的概率也和温度有关，温度越高越容易逃逸，所以高温使用下会有更高的校验错误率。&lt;/li&gt;
+&lt;li&gt;读取时，因为用相对较高的电压屏蔽没有读取的地址线，有一定概率影响到没被读取的页面中存储的数据。
+控制器可能考虑周期性地刷新这些写入后多次读取的页面，这可能和后文的静态擦写均衡一起做。&lt;/li&gt;
+&lt;li&gt;正在写入或者擦除中突然断电的话下，写入中的一整页数据可能并不稳定，比如短期内能正常读取但是难以持续很长时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://openiotelceurope2016.sched.com/event/7rsF/tutorial-why-nand-flash-breaks-down-arnout-vandecappelle-essensiummind"&gt;MLC 擦写次数与错误率&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-pe-cycles.png" class="img-responsive" src="//farseerfc.me/images/ssd-pe-cycles.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;上篇讲硬盘的笔记中提到过，硬盘物理存储也有越来越强的校验机制，不过相比之下 NAND Flash
+出现临时性校验失败的可能性要高很多，需要控制器对校验出错误的情况有更强的容忍能力。
+厂商们制作存储设备的时候，有一个需要达到的错误率目标（比如每 &lt;span class="math"&gt;\(10^{-14}\)&lt;/span&gt; bit
+出现一次位反转），针对这个目标和实际物理错误率，相应地设计纠错强度。校验太强会浪费存储密度和算力，
+从而提升成本，这里会根据市场细分找折衷点。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;2   封装结构&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;从外部来看，一个闪存盘可能有这样的结构：&lt;/p&gt;
+&lt;object class="embed-responsive-item" data="//farseerfc.me/images/ssd-enclosure.svg" type="image/svg+xml"&gt;
+ssd-enclosure.svg&lt;/object&gt;
+&lt;p&gt;从上往下，我们买到的一个闪存盘可能一层层分级：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;整个闪存盘有个控制器，其中含有一部分 RAM 。然后是一组 NAND Flash 封装芯片（chip）。&lt;/li&gt;
+&lt;li&gt;每个封装芯片可能还分多个 Device ，每个 Device 分多个 Die ，这中间有很多术语我无法跟上，大概和本文想讨论的事情关系不大。&lt;/li&gt;
+&lt;li&gt;每个 Die 分多个平面（Plane），平面之间可以并行控制，每个平面相互独立。从而比如在一个平面内
+做某个块的擦除操作的时候，别的平面可以继续读写而不受影响。&lt;/li&gt;
+&lt;li&gt;每个平面分成多个段（Segment)，段是擦除操作的基本单位，一次擦除一整个段。&lt;/li&gt;
+&lt;li&gt;每个段分成多个页面（Page），页面是读写操作的基本单位，一次可以读写一整页。&lt;/li&gt;
+&lt;li&gt;页面内存有多个单元格（Cell），单元格是存储二进制位的基本单元，对应 SLC/MLC/TLC/QLC 这些，
+每个单元格可以存储一个或多个二进制位。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上这些名字可能不同厂商不同文档的称法都各有不同，比如可能有的文档把擦除块叫 page 或者叫
+eraseblock 。随着容量不断增大，厂商们又新造出很多抽象层次，比如 chip device die 这些，
+不过这些可能和本文关系不大。如果看别的文档注意区别术语所指概念，本文中我想统一成以上术语。
+重要的是有并行访问单元的平面（Plane）、擦除单元的段（Segment）、读写单元的页（Page）这些概念。
+抽象地列举概念可能没有实感，顺便说一下这些概念的数量级：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;每个 SSD 可以有数个封装芯片。&lt;/li&gt;
+&lt;li&gt;每个芯片有多个 Die 。&lt;/li&gt;
+&lt;li&gt;每个 Die 有多个平面。&lt;/li&gt;
+&lt;li&gt;每个平面有几千个段。比如 2048 个。&lt;/li&gt;
+&lt;li&gt;每个段有数百个页到几千页，比如 128~4096 页，可能外加一些段内元数据。&lt;/li&gt;
+&lt;li&gt;每个页面是 2KiB~8KiB 这样的容量，外加几百字节的元数据比如 ECC 校验码。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;和硬盘相比，一个闪存页面大概对应一个到数个物理扇区大小，现代硬盘也逐渐普及 4KiB 物理扇区，
+文件系统也基本普及 4KiB 或者更大的逻辑块（block）或者簇（cluster）大小，可以对应到一个闪存页面。
+每次读写都可以通过地址映射直接对应到某个闪存页面，这方面没有硬盘那样的寻址开销。
+闪存盘的一个页面通常配有比硬盘扇区更强的 ECC 校验码，因为 NAND
+单元格丧失数据的可能性比磁介质高了很多。&lt;/p&gt;
+&lt;p&gt;闪存有写入方式的限制，每次写入只能写在「空」的页面上，不能覆盖写入已有数据的页面。
+要重复利用已经写过的页面，需要对页面所在段整个做擦除操作，每个段是大概 128KiB 到 8MiB
+这样的数量级。每个擦除段需要统计校验失败率或者跟踪擦除次数，以进行擦写均衡（Wear Leveling）。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="wear-leveling-flash-translation-layer"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;3   擦写均衡（Wear Leveling）和映射层（Flash Translation Layer）&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428793/"&gt;Animation: wear leveling on SSD drives&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-segment.gif" class="img-responsive" src="//farseerfc.me/images/ssd-segment.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;擦除段的容量大小是个折衷，更小的擦除段比如 128KiB 更适合随机读写，
+因为每随机修改一部分数据时需要垃圾回收的粒度更小；而使用更大的擦除段可以减少元数据和地址映射的开销。
+从擦除段的大小这里，已经开始有高端闪存和低端闪存的差异，比如商用 SSD 可能比 U 盘和 SD
+卡使用更小的擦除段大小。&lt;/p&gt;
+&lt;p&gt;闪存盘中维护一个逻辑段地址到物理段地址的映射层，叫闪存映射层（Flash Translation Layer
+）。每次写一个段的时候都新分配一个空段，
+写完后在映射表中记录其物理地址。映射表用来在读取时做地址转换，所以映射表需要保存在闪存盘控制器的
+RAM 中，同时也需要记录在闪存内。具体记录方式要看闪存盘控制器的实现，可能是类似日志的方式记录的。&lt;/p&gt;
+&lt;p&gt;「段地址映射表」的大小可以由段大小和存储设备容量推算出来。比如对一个 64GiB 的 SD
+卡，如果使用 4MiB 的段大小，那么需要至少 16K 个表项。假设映射表中只记录 2B 的物理段地址，
+那么需要 32KiB 的 RAM 存储段地址映射表。对一个 512GiB 的 SSD ，如果使用 128KiB 的段大小，
+那么至少需要 4M 个表项。记录 4B 的物理段地址的话，需要 16MiB 的 RAM 存储地址映射，
+或者需要动态加载的方案只缓存一部分到 RAM 里。控制器中的
+RAM 比 NAND 要昂贵很多，这里可以看出成本差异。&lt;/p&gt;
+&lt;p&gt;除了地址映射表，每个物理段还要根据擦除次数或者校验错误率之类的统计数据，做擦写均衡。有两种擦写均衡：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;动态擦写均衡（Dynamic Wear Leveling）：每次写入新段时选择擦除次数少的物理段。&lt;/li&gt;
+&lt;li&gt;静态擦写均衡（Static Wear Leveling）：空闲时，偶尔将那些许久没有变化的逻辑段搬运到
+多次擦除的物理段上。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;低端闪存比如 SD 卡和 U 盘可能只有动态擦写均衡，更高端的 SSD 可能会做静态擦写均衡。
+静态擦写均衡想要解决的问题是：盘中写入的数据可以根据写入频率分为冷热，
+总有一些冷数据写入盘上就不怎么变化了，它们占用着的物理段有比较低的擦除计数。
+只做动态擦写均衡的话，只有热数据的物理段被频繁擦写，加速磨损，
+通过静态擦写均衡能将冷数据所在物理段释放出来，让整体擦写更平均。
+但是静态擦写均衡搬运数据本身也会磨损有限的擦写次数，这需要优秀的算法来折衷。&lt;/p&gt;
+&lt;p&gt;除了擦写均衡用的统计数据外， FTL 也要做坏块管理。闪存盘出厂时就有一定故障率，可能有一部分坏块。
+随着消耗擦写周期、闲置时间、环境温度等因素影响，也会遇到一些无法再保证写入正确率的坏块。
+NAND Flash 上因为量子隧道效应，偶尔会有临时的校验不一致，遇到这种情况，除了根据 ECC
+校验恢复数据， FTL 也负责尝试对同一个物理段多次擦除和读写，考察它的可用性。排除了临时故障后，
+如果校验不一致的情况仍然持续，那么需要标注它为坏块，避免今后再写入它。&lt;/p&gt;
+&lt;p&gt;出厂时，闪存盘配有的物理段数量就高于标称的容量，除了出厂时的坏块之外，剩余的可用物理段可以用于
+擦写均衡，这种行为称作 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E5%86%99%E5%85%A5%E6%94%BE%E5%A4%A7#%E9%A2%84%E7%95%99%E7%A9%BA%E9%97%B4"&gt;Over Provisioning&lt;/a&gt;
+。除了盘内预留的这些空间，用户也可以主动通过分区的方式或者文件系统 TRIM 的方式预留出更多可用空间，
+允许 FTL 更灵活地均衡擦写。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id18"&gt;4   段内写入顺序与垃圾回收策略&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;段是闪存盘的擦写单元，考虑到段是 128KiB ~ 8MiB 这样的数量级，现实中要求每次连续写入一整段的话，
+这样的块设备接口不像硬盘的接口，不方便普通文件系统使用。所以在段的抽象之下有了更小粒度的页面抽象，
+页面对应到文件系统用的逻辑块大小，是 2KiB~8KiB 这样的数量级，每次以页面为单位读写。&lt;/p&gt;
+&lt;p&gt;写入页面时有段内连续写入的限制，于是需要段内映射和垃圾回收算法，提供对外的随机写入接口。
+写入操作时， FTL 控制器内部先「打开（open）」一个段，等写入完成，再执行垃圾回收「关闭(close)」一个段。
+写入过程中处于打开状态的段需要一些额外资源（RAM等）跟踪段内的写入状况，所以闪存盘同时能「打开」
+的段数量有限。并且根据不同的垃圾回收算法，需要的额外资源也不尽相同，在
+&lt;a class="reference external" href="https://lwn.net/Articles/428584/"&gt;Optimizing Linux with cheap flash drives&lt;/a&gt; 一文中介绍几种可能的垃圾回收算法：&lt;/p&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;4.1   线性写入优化&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428796/"&gt;Animations: linear-access optimized&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-linear.gif" class="img-responsive" src="//farseerfc.me/images/ssd-linear.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;假设写入请求大部分都是连续写入，很少有地址跳转，那么可以使用线性优化算法。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open：当第一次打开一个段，写入其中一页时，分配一个新段。如果要写入的页不在段的开头位置，那么搬运写入页面地址之前的所有页面到新段中。&lt;/li&gt;
+&lt;li&gt;Write: 在 RAM 中跟踪记录当前写入位置，然后按顺序写下新的页面。&lt;/li&gt;
+&lt;li&gt;Close: 最后搬运同段中随后地址上的页面，并关闭整段，调整段映射表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果在段内写入了几页之后，又跳转到之前的位置，那需要在跳转时关闭当前段写入（并完整搬运剩下的页面），
+然后重新打开这一段，搬运调转地址之前的页面，从跳转的页面位置开始写入。&lt;/p&gt;
+&lt;p&gt;线性优化算法的好处在于：没有复杂的页面地址映射，段内的逻辑页面地址就是物理页面地址。
+读一页的时候根据页面偏移和当前写入位置就能判断读新物理段还是老物理段。遇到突然断电之类的情况，
+即使丢失最近写入的新物理段，老物理段的数据仍然还在，所以没必要保存 RAM 中的地址映射到闪存元数据中。&lt;/p&gt;
+&lt;p&gt;线性优化算法的坏处是:每遇到一次乱序的写入，都要整段执行一次搬运，造成
+&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E5%86%99%E5%85%A5%E6%94%BE%E5%A4%A7"&gt;写入放大（Write Amplification）&lt;/a&gt;
+。&lt;/p&gt;
+&lt;p&gt;一些文档中，将这种地址映射垃圾回收方式叫做「段映射（Segment Mapping）」，因为从 FTL
+全局来看只维护了擦写段的地址映射关系。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;4.2   段内地址映射&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428831/"&gt;Animations: block remapping&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-random.gif" class="img-responsive" src="//farseerfc.me/images/ssd-random.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;对需要随机乱序写入的数据，可以使用段内地址映射。方式是额外在段外的别的闪存区域维护一张段内地址映射表，
+像段地址一样，通过查表间接访问页面地址。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open: 分配一块新的段，同时分配一个新的段内映射表。&lt;/li&gt;
+&lt;li&gt;Write: 每写入一页，在段内映射表记录页面的在新段中的物理地址。&lt;/li&gt;
+&lt;li&gt;Close: 复制老段中没有被覆盖写入的页到新段，并记录在段内映射表中，然后释放老段和老的段内映射表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;也就是说同时维护两块不同大小的闪存空间，一块是记录段数据的，一块是记录段内地址映射表的，
+两块闪存空间有不同的写入粒度。可以在每个物理段内额外留出一些空间记录段内地址映射表，也可以在 FTL
+全局维护一定数量的段内地址映射表。
+每次读取段内的数据时，根据映射表的内容，做地址翻译。新段中页面的排列顺序将是写入的顺序，
+而不是地址顺序。&lt;/p&gt;
+&lt;p&gt;根据实现细节，段内地址映射可以允许覆盖写入老段中的页面，但是可能不允许覆盖写入新段（正在写入的段）
+中已经写入的页面，遇到一次连续的写请求中有重复写入某一页面的时候，就需要关闭这一段的写入，然后重新打开。&lt;/p&gt;
+&lt;p&gt;段内地址映射的优点是：支持随机写入，并且只要段处于打开状态，随机写入不会造成写入放大（Write Amplification）。&lt;/p&gt;
+&lt;p&gt;缺点是：首先地址映射这层抽象有性能损失。其次遇到突然断电之类的情况，
+下次上电后需要扫描所有正打开的段并完成段的关闭操作。&lt;/p&gt;
+&lt;p&gt;和「段映射」术语一样，在一些文档中，将这种段内地址映射的方式叫做「页面映射（Page Mapping）」，因为从
+FTL 全局来看跳过了擦写段这一层，直接映射了页面的地址映射。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;4.3   日志式写入&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428831/"&gt;Animations: data logging&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-logging.gif" class="img-responsive" src="//farseerfc.me/images/ssd-logging.gif"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;除了大量随机写入和大量连续写入这两种极端情况，大部分文件系统的写入方式可能会是对某个地址空间
+进行一段时间的随机写入，然后就长时间不再修改，这时适合日志式的写入方式。&lt;/p&gt;
+&lt;p&gt;日志式的写入方式中写入一段采用三个物理段：老物理段，用于日志记录的新物理段，和垃圾回收后的段。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Open: 分配一块新的段。可能额外分配一个用于记录日志的段，或者将日志信息记录在数据段内。&lt;/li&gt;
+&lt;li&gt;Write：每写入一页，同时记录页面地址到日志。&lt;/li&gt;
+&lt;li&gt;Close：再分配一个新段执行垃圾回收。按日志中记录的地址顺序将数据段中（新写入）的页面或者老段中
+没有被覆盖的页面复制到垃圾回收结束的新段中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;日志式写入在写入过程中像段内地址映射的方式一样，通过日志记录维护页面地址映射关系，
+在写入结束执行垃圾回收之后，则像线性写入的方式一样不再需要维护页面映射。
+可以说日志式写入某种程度上综合了前面两种写入方式的优点。&lt;/p&gt;
+&lt;p&gt;日志式写入的优点：允许随机顺序写入，并且在执行垃圾回收之后，不再有间接访问的地址转换开销。&lt;/p&gt;
+&lt;p&gt;日志式写入的缺点：触发垃圾回收的话，可能比段地址映射有更大的写入放大（Write Amplification）。&lt;/p&gt;
+&lt;p&gt;在一些文档中，将这种日志式写入方式称作「混合映射（Hybrid Mapping）」，因为在段开启写入期间行为像页面映射，
+在段关闭写入后行为像段映射。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id10"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;5   针对特定写入模式的优化&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;上述三种地址映射和垃圾回收方式，各有不同的优缺点，根据数据块的写入模式可能需要挑选相应的策略。
+并且「全局段地址映射表」、「段内页面地址映射表」、「写入页面地址日志」之类的元数据因为频繁修改，
+FTL 也可能需要用不同的策略来记录这些元数据。这里面向不同使用场景的闪存设备可能有不同的 FTL
+策略，并且 FTL 可能根据逻辑地址来选择哪种策略。&lt;/p&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id23"&gt;5.1   混合垃圾回收策略&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://lwn.net/Articles/428592/"&gt;Performance measurements on a class 10 SDHC card&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ssd-extrememory-results.png" class="img-responsive" src="//farseerfc.me/images/ssd-extrememory-results.png"/&gt;
+&lt;img alt="ssd-panasonic-plot.png" class="img-responsive" src="//farseerfc.me/images/ssd-panasonic-plot.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;用来记录照片、视频等的 SD 卡、microSD、U盘等设备可能根据数据的逻辑地址，为特定文件系统布局优化，
+这里特定文件系统主要是指 FAT32 和 exFAT 这两个 FAT 系文件系统。 FAT 系文件系统的特点在于，
+地址前端有一块空间被用来放置 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/FAT"&gt;文件分配表(File Allocation Table)&lt;/a&gt;
+，可以根据文件系统簇大小和设备存储容量推算出 FAT 表占用大小，这块表内空间需要频繁随机读写。
+对 FTL 自身的元数据，和 FAT 表的逻辑地址空间，需要使用「段内地址映射」来保证高效的随机读写，
+而对随后的数据空间可使用「线性写入优化」的策略。&lt;/p&gt;
+&lt;p&gt;右侧上图有张性能曲线，测量了一个 class 10 SDHC 卡上，不同读写块大小时，顺序读取、顺序写入、随机写入、
+对 FAT 区域的写入之类的性能差异。下图是测量的读取延迟。可以看出 FAT
+区域的随机写入和其余逻辑地址上有明显不同的性能表现。&lt;/p&gt;
+&lt;p&gt;为容纳普通操作系统设计的 eMMC 和 SSD 难以预测文件系统的读写模式，可能需要使用更复杂的地址映射和垃圾回收策略。
+比如一开始假定写入会是顺序写入，采用「线性优化」方式；当发生乱序写入时，转变成类似「日志式写入」
+的方式记录写入地址并做地址映射；关闭段时，再根据积累的统计数据判断，可能将记录的日志与乱序的数据
+合并（merge）成顺序的数据块，也可能保持页面映射转变成类似「段内地址映射」的策略。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id12"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;5.2   利用 NAND Flash 物理特性的优化&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;再考虑 NAND Flash 的物理特性，因为 MLC 要不断调整参考电压做写入， MLC 的写入比 SLC
+慢一些，但是可以对 MLC Flash 使用 SLC 式的写入， FTL 控制器也可能利用这一点，让所有新的写入处于
+SLC 模式，直到关闭整段做垃圾回收时把积攒的 SLC 日志段回收成 MLC 段用于长期保存。
+一些网页将这种写入现象称作「SLC 缓存」甚至称之为作弊，需要理解这里并不是用单独的 SLC Flash
+芯片做 writeback 缓存，更不是用大 RAM 做缓存，处于 SLC 模式的写入段也是持久存储的。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;5.3   同时打开段数&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;上述地址映射和垃圾回收策略都有分别的打开（open）、写入（write）、关闭（close）时的操作，
+闪存盘通常允许同时打开多个段，所以这三种操作不是顺序进行的，某一时刻可能同时有多个段处在打开的状态，
+能接受写入。不过一个平面（Plane）通常只能进行一种操作（读、写、擦除），所以打开写入段时，
+FTL 会尽量让写入分部在不同的平面上。还可能有更高层次的抽象比如 Device、 Chip 、 Die
+等等，可能对应闪存盘内部的 RAID 层级。&lt;/p&gt;
+&lt;p&gt;闪存盘能同时打开的段不光受平面之类的存储结构限制，还受控制器可用内存（RAM）限制之类的。
+为 FAT 和顺序写入优化的 FTL ，可能除了 FAT 区域之外，只允许少量（2~8）个并发写入段，
+超过了段数之后就会对已经打开的段触发关闭操作（close），执行垃圾回收调整地址映射，进而接受新的写入。
+更高端的 SSD 的 FTL 如果采用日志式记录地址的话，同时打开的段数可能不再局限于可用内存限制，
+连续的随机写入下按需动态加载段内地址映射到内存中，在空闲时或者剩余空间压力下才触发垃圾回收。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id14"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;5.4   预格式化&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;FTL 可能为某种文件系统的写入模式做优化，同时如果文件系统能得知 FTL 的一些具体参数（比如擦除段大小、
+读写页大小、随机写入优化区域），那么可能更好地安排数据结构，和 FTL 相互配合。
+F2FS 和 exFAT 这些文件系统都在最开头的文件系统描述中包含了一些区域，记录这些闪存介质的物理参数。
+闪存盘出厂时，可能预先根据优化的文件系统做好格式化，并写入这些特定参数。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="trim-discard"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;5.5   TRIM 和 discard&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;另一种文件系统和 FTL 相互配合的机制是 TRIM 指令。TRIM 由文件系统发出，告诉底层闪存盘（
+或者别的类型的 thin provisioning 块设备）哪些空间已经不再使用， FTL 接受 TRIM
+指令之后可以避免一些数据搬运时的写入放大。关于 TRIM 指令在 Linux 内核中的实现，有篇
+&lt;a class="reference external" href="https://lwn.net/Articles/417809/"&gt;The best way to throw blocks away&lt;/a&gt;
+介绍可以参考。&lt;/p&gt;
+&lt;p&gt;考虑到 FTL 的上述地址映射原理， TRIM 一块连续空间对 FTL 而言并不总是有帮助的。
+如果被 TRIM 的地址位于正在以「段内地址映射」或「日志式映射」方式打开的写入段中，那么
+TRIM 掉一些页面可能减少垃圾回收时搬运的页面数量。但是如果 TRIM 的地址发生在已经垃圾回收结束的段中，
+此时如果 FTL 选择立刻对被 TRIM 的段执行垃圾回收，可能造成更多写入放大，
+如果选择不回收只记录地址信息，记录这些地址信息也需要耗费一定的 Flash 写入。
+所以 FTL 的具体实现中，可能只接受 TRIM 请求中，整段擦除段的 TRIM ，而忽略细小的写入页的 TRIM 。&lt;/p&gt;
+&lt;p&gt;可见 FTL 对 TRIM 的实现是个黑盒操作，并且 TRIM 操作的耗时也非常难以预测，可能立刻返回，
+也可能需要等待垃圾回收执行结束。&lt;/p&gt;
+&lt;p&gt;对操作系统和文件系统实现而言，有两种方式利用 TRIM ：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;通过 discard 挂载选项，每当释放一些数据块时就执行 TRIM 告知底层块设备。&lt;/li&gt;
+&lt;li&gt;通过 fstrim 等外部工具，收集连续的空块并定期发送 TRIM 给底层设备。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;直觉来看可能 discard 能让底层设备更早得知 TRIM 区域的信息并更好利用，但是从实现角度来说，
+discard 不光影响文件系统写入性能，还可能发送大量被设备忽略掉的小块 TRIM 区域。可能 fstrim
+方式对连续大块的区间执行 TRIM 指令更有效。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tl-dr-vs"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;6   TL;DR 低端 vs 高端&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;标题中的疑问「SSD就是大U盘？」相信看到这里已经有一些解答了。
+即使 SSD 和U盘中可以采用类似的 NAND Flash 存储芯片，由于他们很可能采用不同的 FTL
+策略，导致在读写性能和可靠性方面都有不同的表现。&lt;/p&gt;
+&lt;p&gt;如果不想细看全文，这里整理一张表，列出「高端」闪存盘和「低端」闪存盘可能采取的不同策略。
+实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
+比如有些标明着「为视频优化」之类宣传标语的「外置SSD」，对消费者来说可能会觉得为视频优化的话一定性能好，
+但是理解了 FTL 的差异后就可以看出这种「优化」只针对线性写入，不一定适合放系统文件根目录的文件系统。&lt;/p&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="34%"/&gt;
+&lt;col width="34%"/&gt;
+&lt;col width="31%"/&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head"&gt;参数&lt;/th&gt;
+&lt;th class="head"&gt;低端&lt;/th&gt;
+&lt;th class="head"&gt;高端&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;段大小&lt;/td&gt;
+&lt;td&gt;8MiB&lt;/td&gt;
+&lt;td&gt;128KiB&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;段地址映射&lt;/td&gt;
+&lt;td&gt;静态段映射&lt;/td&gt;
+&lt;td&gt;日志式映射&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;随机写入范围&lt;/td&gt;
+&lt;td&gt;FTL元数据与FAT表区域&lt;/td&gt;
+&lt;td&gt;全盘&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;同时打开段数&lt;/td&gt;
+&lt;td&gt;4~8&lt;/td&gt;
+&lt;td&gt;全盘&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;物理段统计信息&lt;/td&gt;
+&lt;td&gt;无（随机挑选空闲段）&lt;/td&gt;
+&lt;td&gt;擦除次数、校验错误率等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;擦写均衡&lt;/td&gt;
+&lt;td&gt;动态均衡（仅写入时分配新段考虑）&lt;/td&gt;
+&lt;td&gt;静态均衡（空闲时考虑搬运）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;写入单元模式&lt;/td&gt;
+&lt;td&gt;TLC&lt;/td&gt;
+&lt;td&gt;长期存储 MLC， 模拟 SLC 日志&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="FS笔记"></category><category term="FS notes"></category><category term="FTL"></category><category term="SSD"></category><category term="USB stick"></category><category term="eMMC"></category><category term="MMC"></category><category term="SD Card"></category></entry><entry><title>柱面-磁頭-扇區尋址的一些舊事</title><link href="//farseerfc.me/history-of-chs-addressing.html" rel="alternate"></link><published>2020-03-06T15:45:00+09:00</published><updated>2020-03-06T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-03-06:/history-of-chs-addressing.html</id><summary type="html">
 &lt;p&gt;在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。
 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/MiniDisc"&gt;MiniDisc&lt;/a&gt; 、
@@ -19,7 +883,7 @@
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)，
+&lt;p&gt;如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(platter)，
 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;p&gt;在 SSD 這種新興存儲設備普及之前，很長一段時間硬盤是個人計算機的主要存儲設備。
 更往前的磁帶機不常見於個人計算機，軟盤的地位很快被硬盤取代，到 SSD 出現爲止像
@@ -40,7 +904,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(plate)，
+&lt;p&gt;如右圖所示，一塊硬盤(Hard Disk Drive, HDD)是一個圓柱體轉軸上套着一些磁碟片(platter)，
 然後有一條磁頭臂(actuator arm)插入磁碟片間的位置，加上一組控制芯片（controller）。
 每個磁碟片有上下兩面塗有磁性材質，磁頭臂上有一組磁頭（head），每個磁頭對應磁盤的一個面，
 所以比如一個 3 碟的硬盤會有 6 個磁頭。&lt;/p&gt;
@@ -68,7 +932,7 @@ tikz diagram&lt;/object&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chs"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;物理 CHS 尋址&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;以上術語中，柱面號和磁頭號直接對應了硬盤上的物理組成部分，所以通過在物理 CHS
+&lt;p&gt;以上術語中，柱面號和磁頭號直接對應了硬盤上的物理組成部分，所以在物理 CHS
 尋址方式下，通過扇區地址的寫法能對應到扇區的具體物理位置。之所以這樣描述扇區，
 是因爲早期的軟盤和硬盤驅動器沒有內置的控制芯片，可以完全由宿主系統執行驅動程序驅動。&lt;/p&gt;
 &lt;p&gt;在 IBM PC 上，驅動軟盤和硬盤的是 CPU 執行位於主板
@@ -76,7 +940,7 @@ tikz diagram&lt;/object&gt;
 中的程序，具體來說操作系統（比如DOS）和應用程序調用 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/INT_13H"&gt;INT 13H&lt;/a&gt;
 中斷，通過 AH=02H/03H 選擇讀/寫操作，BIOS 在中斷表中註冊的 13H 中斷處理程序執行在 CPU
 上完成讀寫請求。調用 INT 13H 讀寫扇區的時候，CPU 先通過 INT 13H AH=0CH
-控制硬盤的磁頭臂旋轉到特定磁道上，然後選定具體磁頭，讓磁頭保持在磁道上讀數據，
+控制硬盤的磁頭臂旋轉到特定柱面上，然後選定具體磁頭，讓磁頭保持在磁道上讀數據，
 通過忙輪訓的方式等待要讀寫的扇區旋轉到磁頭下方，從而讀到所需扇區的數據。在 DOS 之後的操作系統，
 比如早期的 Windows 和 Linux 和 BSD 能以覆蓋中斷程序入口表的方式提供升級版本的這些操作替代
 BIOS 的程序。&lt;/p&gt;
@@ -174,10 +1038,12 @@ DiskStructure.svg&lt;/object&gt;
 給每個磁道作爲保留扇區，留作壞扇區後備。&lt;/p&gt;
 &lt;p&gt;另外有了獨立磁盤控制器芯片之後，扇區內的校驗算法也不再受制於 BIOS INT 13H 接口。
 原本 BIOS 的 INT 13H 接口定義了每個扇區 512 字節，額外配有 4 字節校驗， 32bit
-的校驗碼對 4096bit 的數據來說，只能允許一些簡單的校驗算法，比如
+的校驗碼對 4096bit 的數據來說，只能允許一些簡單的校驗算法，比如 32bit CRC ，或者比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Hamming_code"&gt;漢明碼&lt;/a&gt; 對 4096bit 的數據需要 13bit
-的校驗，突破了校驗算法限制後硬盤可以在物理扇區中放更多校驗位，使用更複雜的
-&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更強的容錯性。&lt;/p&gt;
+的校驗。突破了校驗算法限制後硬盤可以在物理扇區中放更多校驗位，使用更複雜的
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更強的容錯性。
+IDE/SATA 接口的硬盤由內部控制器負責計算和比對校驗，而 SAS 接口的硬盤（主要用於服務器）可以讀取
+520/528 字節長度的扇區，包含額外校驗位。&lt;/p&gt;
 &lt;p&gt;通過 ZBR ，邏輯 CHS 尋址不再侷限在具體每磁道扇區數等物理限制上，但是仍然侷限在 CHS 總位數。
 24bit 的 CHS 地址能尋址 &lt;span class="math"&gt;\(1024*256*63 = 16515072\)&lt;/span&gt; 個扇區，也就是 8064MiB 的空間。
 於是早期很多操作系統有 7.8G 硬盤大小的限制。後來 ATA/IDE 標準提升了 CHS 尋址數量，從 24bit
@@ -211,7 +1077,10 @@ LBA 地址 = ( C \times 磁頭數 + H ) \times 扇區數 + ( S - 1 )
 潛在地導致一些性能不確定性。於是硬盤控制器在除了負責實際驅動物理磁盤之外，
 還開始負責維護一塊盤內緩衝區，實現盤內的 IO 隊列。緩衝區的存在允許磁盤控制器同時接收更多來自上層軟件
 的讀寫請求，轉換成實際物理佈局參數，並根據磁盤物理佈局來調整讀寫順序，增加總體吞吐率。
-當然有緩衝區的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
+比如 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tagged_Command_Queuing"&gt;ATA TCQ&lt;/a&gt; 和
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Native_Command_Queuing"&gt;SATANCQ&lt;/a&gt;
+就是這樣的盤內隊列協議。&lt;/p&gt;
+&lt;p&gt;當然有緩衝區和盤內隊列的存在也使得突然斷電之類的情況下更難保證數據一致性，於是 SCSI/SATA
 標準開始約定特殊的請求，從操作系統能發送命令讓底層設備清空自己的讀寫隊列。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="shingled-magnetic-recording-smr"&gt;
@@ -280,7 +1149,7 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
 &lt;li&gt;提升（磁頭臂和盤片）轉速&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;第一種方式提升記錄密度，在增加容量的同時也能提升硬盤讀寫速度，所以是長久以來硬盤廠商的主要方式。
-第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400 rpm 現在最高能到 15000rpm
+第二種方式提升轉速則很快就遇到了物理瓶頸，硬盤以前是 5400rpm 現在最高能到 15000rpm
 附近，高速旋轉的盤片就像一個螺旋槳一樣，外圈線速度已經到了接近聲速，很難再往上提升。
 以及盤片轉速影響連續讀寫速度，而磁頭臂轉速影響尋道速度，高速尋道對磁頭臂旋轉有極高精度要求。&lt;/p&gt;
 &lt;p&gt;所以長久以來，衡量硬盤速度有兩項指標：連續讀寫速度和每秒操作數(IOPS)，隨着容量提升，
@@ -376,7 +1245,7 @@ CHS 尋址一樣，逐漸成爲了操作系統和硬盤廠商彼此間互相努�
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(plate)，
+&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(platter)，
 然后有一条磁头臂(actuator arm)插入磁碟片间的位置 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;p&gt;在 SSD 这种新兴存储设备普及之前，很长一段时间硬盘是个人计算机的主要存储设备。
 更往前的磁带机不常见于个人计算机，软盘的地位很快被硬盘取代，到 SSD 出现为止像
@@ -397,7 +1266,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(plate)，
+&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(platter)，
 然后有一条磁头臂(actuator arm)插入磁碟片间的位置，加上一组控制芯片（controller）。
 每个磁碟片有上下两面涂有磁性材质，磁头臂上有一组磁头（head），每个磁头对应磁盘的一个面，
 所以比如一个 3 碟的硬盘会有 6 个磁头。&lt;/p&gt;
@@ -425,7 +1294,7 @@ tikz diagram&lt;/object&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chs"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;物理 CHS 寻址&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;以上术语中，柱面号和磁头号直接对应了硬盘上的物理组成部分，所以通过在物理 CHS
+&lt;p&gt;以上术语中，柱面号和磁头号直接对应了硬盘上的物理组成部分，所以在物理 CHS
 寻址方式下，通过扇区地址的写法能对应到扇区的具体物理位置。之所以这样描述扇区，
 是因为早期的软盘和硬盘驱动器没有内置的控制芯片，可以完全由宿主系统执行驱动程序驱动。&lt;/p&gt;
 &lt;p&gt;在 IBM PC 上，驱动软盘和硬盘的是 CPU 执行位于主板
@@ -433,7 +1302,7 @@ tikz diagram&lt;/object&gt;
 中的程序，具体来说操作系统（比如DOS）和应用程序调用 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/INT_13H"&gt;INT 13H&lt;/a&gt;
 中断，通过 AH=02H/03H 选择读/写操作，BIOS 在中断表中注册的 13H 中断处理程序执行在 CPU
 上完成读写请求。调用 INT 13H 读写扇区的时候，CPU 先通过 INT 13H AH=0CH
-控制硬盘的磁头臂旋转到特定磁道上，然后选定具体磁头，让磁头保持在磁道上读数据，
+控制硬盘的磁头臂旋转到特定柱面上，然后选定具体磁头，让磁头保持在磁道上读数据，
 通过忙轮训的方式等待要读写的扇区旋转到磁头下方，从而读到所需扇区的数据。在 DOS 之后的操作系统，
 比如早期的 Windows 和 Linux 和 BSD 能以覆盖中断程序入口表的方式提供升级版本的这些操作替代
 BIOS 的程序。&lt;/p&gt;
@@ -531,10 +1400,12 @@ DiskStructure.svg&lt;/object&gt;
 给每个磁道作为保留扇区，留作坏扇区后备。&lt;/p&gt;
 &lt;p&gt;另外有了独立磁盘控制器芯片之后，扇区内的校验算法也不再受制于 BIOS INT 13H 接口。
 原本 BIOS 的 INT 13H 接口定义了每个扇区 512 字节，额外配有 4 字节校验， 32bit
-的校验码对 4096bit 的数据来说，只能允许一些简单的校验算法，比如
+的校验码对 4096bit 的数据来说，只能允许一些简单的校验算法，比如 32bit CRC ，或者比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Hamming_code"&gt;汉明码&lt;/a&gt; 对 4096bit 的数据需要 13bit
-的校验，突破了校验算法限制后硬盘可以在物理扇区中放更多校验位，使用更复杂的
-&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更强的容错性。&lt;/p&gt;
+的校验。突破了校验算法限制后硬盘可以在物理扇区中放更多校验位，使用更复杂的
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更强的容错性。
+IDE/SATA 接口的硬盘由内部控制器负责计算和比对校验，而 SAS 接口的硬盘（主要用于服务器）可以读取
+520/528 字节长度的扇区，包含额外校验位。&lt;/p&gt;
 &lt;p&gt;通过 ZBR ，逻辑 CHS 寻址不再局限在具体每磁道扇区数等物理限制上，但是仍然局限在 CHS 总位数。
 24bit 的 CHS 地址能寻址 &lt;span class="math"&gt;\(1024*256*63 = 16515072\)&lt;/span&gt; 个扇区，也就是 8064MiB 的空间。
 于是早期很多操作系统有 7.8G 硬盘大小的限制。后来 ATA/IDE 标准提升了 CHS 寻址数量，从 24bit
@@ -568,7 +1439,10 @@ LBA 地址 = ( C \times 磁头数 + H ) \times 扇区数 + ( S - 1 )
 潜在地导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
 还开始负责维护一块盘内缓冲区，实现盘内的 IO 队列。缓冲区的存在允许磁盘控制器同时接收更多来自上层软件
 的读写请求，转换成实际物理布局参数，并根据磁盘物理布局来调整读写顺序，增加总体吞吐率。
-当然有缓冲区的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
+比如 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tagged_Command_Queuing"&gt;ATA TCQ&lt;/a&gt; 和
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Native_Command_Queuing"&gt;SATANCQ&lt;/a&gt;
+就是这样的盘内队列协议。&lt;/p&gt;
+&lt;p&gt;当然有缓冲区和盘内队列的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
 标准开始约定特殊的请求，从操作系统能发送命令让底层设备清空自己的读写队列。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="shingled-magnetic-recording-smr"&gt;
@@ -637,7 +1511,7 @@ CHS 寻址一样，逐渐成为了操作系统和硬盘厂商彼此间互相努�
 &lt;li&gt;提升（磁头臂和盘片）转速&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;第一种方式提升记录密度，在增加容量的同时也能提升硬盘读写速度，所以是长久以来硬盘厂商的主要方式。
-第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400 rpm 现在最高能到 15000rpm
+第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400rpm 现在最高能到 15000rpm
 附近，高速旋转的盘片就像一个螺旋桨一样，外圈线速度已经到了接近声速，很难再往上提升。
 以及盘片转速影响连续读写速度，而磁头臂转速影响寻道速度，高速寻道对磁头臂旋转有极高精度要求。&lt;/p&gt;
 &lt;p&gt;所以长久以来，衡量硬盘速度有两项指标：连续读写速度和每秒操作数(IOPS)，随着容量提升，
@@ -1638,7 +2512,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1651,7 +2525,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -2043,7 +2917,8 @@ How ZFS snapshots really work And why they perform well (usually)&lt;/div&gt;
 &lt;p&gt;&lt;embed class="embed-responsive-item" src="//farseerfc.me/images/500_How_ZFS_Snapshots_Really_Work.pdf" style="width:90%;height:480px"/&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;OpenZFS 的項目領導者，同時也是最初設計 ZFS 中 DMU 子系統的作者 Matt Ahrens 在 DMU 和 DSL
+&lt;p&gt;OpenZFS 的項目領導者，同時也是最初設計 ZFS 中 DMU 子系統的作者 Matt Ahrens 在 DMU
+和                                                    DSL
 中設計並實現了 ZFS 獨特的快照的空間跟蹤算法。他也在很多地方發表演講，講過這個算法的思路和細節，
 比如右側就是他在 BSDCan 2019 做的演講
 &lt;a class="reference external" href="https://youtu.be/NXg86uBDSqI"&gt;How ZFS snapshots really work And why they perform well (usually)&lt;/a&gt;
@@ -2953,7 +3828,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3316,7 +4191,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -4533,7 +5408,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -4546,7 +5421,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -4938,7 +5813,8 @@ How ZFS snapshots really work And why they perform well (usually)&lt;/div&gt;
 &lt;p&gt;&lt;embed class="embed-responsive-item" src="//farseerfc.me/images/500_How_ZFS_Snapshots_Really_Work.pdf" style="width:90%;height:480px"/&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;OpenZFS 的项目领导者，同时也是最初设计 ZFS 中 DMU 子系统的作者 Matt Ahrens 在 DMU 和 DSL
+&lt;p&gt;OpenZFS 的项目领导者，同时也是最初设计 ZFS 中 DMU 子系统的作者 Matt Ahrens 在 DMU
+和                                                    DSL
 中设计并实现了 ZFS 独特的快照的空间跟踪算法。他也在很多地方发表演讲，讲过这个算法的思路和细节，
 比如右侧就是他在 BSDCan 2019 做的演讲
 &lt;a class="reference external" href="https://youtu.be/NXg86uBDSqI"&gt;How ZFS snapshots really work And why they perform well (usually)&lt;/a&gt;
@@ -5848,7 +6724,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -6211,7 +7087,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -8577,7 +9453,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 就不会再继续敲密码了。而且似乎对攻击者也没有什么好处？要是他 usb attach 到了我的设备上，
 我就能控制他的键盘了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8605,7 +9481,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8627,7 +9503,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8641,7 +9517,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8669,7 +9545,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8691,7 +9567,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8710,7 +9586,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8729,7 +9605,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8745,7 +9621,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8779,7 +9655,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8797,7 +9673,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="聽譯"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
+</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="聽譯"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8825,7 +9701,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8847,7 +9723,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8861,7 +9737,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;td&gt;虽说只要不在意就可以了　却一句不剩全收集了起来&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless docutils table"&gt;
+&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8889,7 +9765,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8911,7 +9787,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8930,7 +9806,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8949,7 +9825,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8965,7 +9841,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -8999,7 +9875,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9046,7 +9922,7 @@ Brandon Invergo 的博客採用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的點文件&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9190,7 +10066,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9225,7 +10101,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9242,7 +10118,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9301,7 +10177,7 @@ Brandon Invergo 的博客采用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的点文件&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9445,7 +10321,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9480,7 +10356,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9497,7 +10373,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9592,7 +10468,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然後接下來就是我承諾的翻譯了&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9686,7 +10562,7 @@ Tivoization 是 FSF 發明的一個詞，表示 TiVo 的做法。 TiVo
 編制的軟件，從而限制了用戶修改運行軟件的自由。這種做法在 FSF 看來是鑽了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵這種做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9825,7 +10701,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 協議是一個開源軟件協議，和兩句的 BSD 協議功能相同。OpenBSD 項目選擇儘量用 ISC
 協議公開他們新寫的代碼。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -9925,7 +10801,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然后接下来就是我承诺的翻译了&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -10019,7 +10895,7 @@ Tivoization 是 FSF 发明的一个词，表示 TiVo 的做法。 TiVo
 编制的软件，从而限制了用户修改运行软件的自由。这种做法在 FSF 看来是钻了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵这种做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -10158,7 +11034,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 协议是一个开源软件协议，和两句的 BSD 协议功能相同。OpenBSD 项目选择尽量用 ISC
 协议公开他们新写的代码。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -14093,7 +14969,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -14111,7 +14987,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -14127,7 +15003,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14145,7 +15021,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14172,7 +15048,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -14194,7 +15070,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -14620,7 +15496,7 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -14864,7 +15740,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -14882,7 +15758,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -14898,7 +15774,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14916,7 +15792,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -14943,7 +15819,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -14965,7 +15841,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="last borderless table first docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -15391,7 +16267,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -16450,7 +17326,7 @@ After rendering&lt;/div&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -16767,7 +17643,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -17066,7 +17942,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
 中存在的问题。他们首先确定修改是事后修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027个修改）&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -17383,7 +18259,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="borderless table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -18181,7 +19057,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -18198,7 +19074,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -18218,7 +19094,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -18235,7 +19111,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -19193,13 +20069,13 @@ type&lt;/code&gt;
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -19316,13 +20192,13 @@ debug into it and make minor modifications.&lt;/p&gt;
 &lt;p&gt;So I started searching for Static Blog Engine in Python on Github. The author of the great framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; , &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; ,
 wrote a &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; , but it's not well developed. &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; seems to be complete enough, but it use &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;MarkDown&lt;/a&gt; as its default markup
 language, and the design of its homepage is too fashion to be used as blog. Finally I found &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; .&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id3" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id3" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Such as the difference between Python 2.x and 3.x , and also difference in C-API of implementations of &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; , &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; , &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; , &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; .&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id4" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id4" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Yes, we have &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; and &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; , but all these are package manager, running in a perticular Python implementation. Python implementation itself don't need a manager. Version issue of Python largely have been solved by lightweight converters such as &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; and &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; , you don't need to store multiple implementations of Python in your disk for different packages. Yes you can use  &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; if you need to preserve stablility but this is another story.&lt;/td&gt;&lt;/tr&gt;
@@ -19442,13 +20318,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 &lt;p&gt;実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; それとも &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 両方も Unix/Linux/MacOSX しか実行できないらしいです。ギークとしたの皆は絶対に Windows つかっじゃいけないんですか？（本当かも……）。&lt;/p&gt;
 &lt;p&gt;残りは Ruby と Python の争いです。私は &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; に詳しくない、比べると &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; のほうが私に向いています。それに、どっちでも &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; を依存しシンタックス・ハイライトをしているから、 Rubyist 達も少なくとも Python を入れなきゃダメみたいです。 私の好みは一切の Ruby コンポーネントを頼らず、 C 拡張もない純粋な Python の実現がほしいです。&lt;/p&gt;
 &lt;p&gt;そこから Github に Python で実現した静的ブログ・エンジンを探し始めた。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; の作者である &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 氏が書いた &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; が素晴らしいが、あんまり他人に使われていないようです。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; は多く使われているけれと、ホームページにブログの感じがみえないです。最後に &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; を見かけました。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;例えば Python 2.x と 3.x の間にあまりにも巨大なる差、それと &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; など各実現間に微妙な違いがあります。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;はい、こっちに &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; とか &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; があります、ですがそれらはパッケージ管理、特定なPython環境を入れた後の話です。Python自身はまだ管理する必要がないです。 Python のバージョン問題も &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; とか &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; のようなツールで変換すればいいです、違うソフトを実行するためたくさんの Python バージョンを残る必要はないです。もしバージョンの違いが気にするなら &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; を使うのも構わないが、それも別のことです。&lt;/td&gt;&lt;/tr&gt;
@@ -19564,13 +20440,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -19924,8 +20800,8 @@ Linux 最好 :)&lt;/p&gt;
 </content><category term="import"></category><category term="zz"></category></entry><entry><title>寫程序讓CPU佔用率保持正弦函數</title><link href="//farseerfc.me/sine-cpu.html" rel="alternate"></link><published>2008-06-02T23:27:00+09:00</published><updated>2008-06-02T23:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-06-02:/sine-cpu.html</id><summary type="html">&lt;p&gt;導入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;據說是一道微軟的面試題。如題，寫程序，讓Windows的任務管理器中的性能監視器呈現正弦曲線。&lt;/p&gt;
-&lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲線" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲線" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潛心鑽研良久，得代碼：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -19941,8 +20817,8 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;導入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;據說是一道微軟的面試題。如題，寫程序，讓Windows的任務管理器中的性能監視器呈現正弦曲線。&lt;/p&gt;
-&lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲線" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲線" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲線" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潛心鑽研良久，得代碼：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -19977,19 +20853,19 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;多核CPU上測試時要注意關掉一個CPU：&lt;/p&gt;
-&lt;img alt="多核CPU上測試" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
+&lt;img alt="多核CPU上測試" class="align-center img-responsive" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
 </content><category term="import"></category><category term="java"></category><category term="microsoft"></category></entry><entry><title>Write a program to keep CPU usage as sin funcion</title><link href="//farseerfc.me/en/sine-cpu.html" rel="alternate"></link><published>2008-06-02T23:27:00+09:00</published><updated>2008-06-02T23:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-06-02:/en/sine-cpu.html</id><summary type="html">&lt;p&gt;Imported from:
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It is said that this is a problem from interview of Microsoft. Write a program, which makes the CPU usage curve in Windows Task Manager shows a Sin function.&lt;/p&gt;
-&lt;img alt="Sine function 1" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="Sine function 2" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="Sine function 1" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="Sine function 2" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;p&gt;The program below is written in java:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256 …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Imported from:
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It is said that this is a problem from interview of Microsoft. Write a program, which makes the CPU usage curve in Windows Task Manager shows a Sin function.&lt;/p&gt;
-&lt;img alt="Sine function 1" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="Sine function 2" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="Sine function 1" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="Sine function 2" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;p&gt;The program below is written in java:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cycle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tick&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
@@ -20023,12 +20899,12 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Be careful you need to turn off other cores if you have multi-core CPU.&lt;/p&gt;
-&lt;img alt="multi-core CPU" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
+&lt;img alt="multi-core CPU" class="align-center img-responsive" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
 </content><category term="import"></category><category term="java"></category><category term="microsoft"></category></entry><entry><title>写程序让CPU占用率保持正弦函数</title><link href="//farseerfc.me/zhs/sine-cpu.html" rel="alternate"></link><published>2008-06-02T23:27:00+09:00</published><updated>2008-06-02T23:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-06-02:/zhs/sine-cpu.html</id><summary type="html">&lt;p&gt;导入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;据说是一道微软的面试题。如题，写程序，让Windows的任务管理器中的性能监视器呈现正弦曲线。&lt;/p&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -20044,8 +20920,8 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;导入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;据说是一道微软的面试题。如题，写程序，让Windows的任务管理器中的性能监视器呈现正弦曲线。&lt;/p&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -20080,7 +20956,7 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;多核CPU上测试时要注意关掉一个CPU：&lt;/p&gt;
-&lt;img alt="多核CPU上测试" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
+&lt;img alt="多核CPU上测试" class="align-center img-responsive" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
 </content><category term="import"></category><category term="java"></category><category term="microsoft"></category></entry><entry><title>關於神創論的一些見解</title><link href="//farseerfc.me/some-thought-on-creationism.html" rel="alternate"></link><published>2008-05-12T11:16:00+09:00</published><updated>2008-05-12T11:16:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-05-12:/some-thought-on-creationism.html</id><summary type="html">&lt;p&gt;導入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/292274803"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;看到陳驫同學很有感想的一篇神創論與命運日誌，覺得近日很久沒有看到這樣的評論了。想說幾句自己的觀點。&lt;/p&gt;

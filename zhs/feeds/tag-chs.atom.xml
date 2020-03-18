@@ -19,7 +19,7 @@
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(plate)，
+&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(platter)，
 然后有一条磁头臂(actuator arm)插入磁碟片间的位置 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;p&gt;在 SSD 这种新兴存储设备普及之前，很长一段时间硬盘是个人计算机的主要存储设备。
 更往前的磁带机不常见于个人计算机，软盘的地位很快被硬盘取代，到 SSD 出现为止像
@@ -40,7 +40,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 chs-illustrate-trans.svg&lt;/object&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(plate)，
+&lt;p&gt;如右图所示，一块硬盘(Hard Disk Drive, HDD)是一个圆柱体转轴上套着一些磁碟片(platter)，
 然后有一条磁头臂(actuator arm)插入磁碟片间的位置，加上一组控制芯片（controller）。
 每个磁碟片有上下两面涂有磁性材质，磁头臂上有一组磁头（head），每个磁头对应磁盘的一个面，
 所以比如一个 3 碟的硬盘会有 6 个磁头。&lt;/p&gt;
@@ -68,7 +68,7 @@ tikz diagram&lt;/object&gt;
 &lt;/div&gt;
 &lt;div class="section" id="chs"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;物理 CHS 寻址&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;以上术语中，柱面号和磁头号直接对应了硬盘上的物理组成部分，所以通过在物理 CHS
+&lt;p&gt;以上术语中，柱面号和磁头号直接对应了硬盘上的物理组成部分，所以在物理 CHS
 寻址方式下，通过扇区地址的写法能对应到扇区的具体物理位置。之所以这样描述扇区，
 是因为早期的软盘和硬盘驱动器没有内置的控制芯片，可以完全由宿主系统执行驱动程序驱动。&lt;/p&gt;
 &lt;p&gt;在 IBM PC 上，驱动软盘和硬盘的是 CPU 执行位于主板
@@ -76,7 +76,7 @@ tikz diagram&lt;/object&gt;
 中的程序，具体来说操作系统（比如DOS）和应用程序调用 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/INT_13H"&gt;INT 13H&lt;/a&gt;
 中断，通过 AH=02H/03H 选择读/写操作，BIOS 在中断表中注册的 13H 中断处理程序执行在 CPU
 上完成读写请求。调用 INT 13H 读写扇区的时候，CPU 先通过 INT 13H AH=0CH
-控制硬盘的磁头臂旋转到特定磁道上，然后选定具体磁头，让磁头保持在磁道上读数据，
+控制硬盘的磁头臂旋转到特定柱面上，然后选定具体磁头，让磁头保持在磁道上读数据，
 通过忙轮训的方式等待要读写的扇区旋转到磁头下方，从而读到所需扇区的数据。在 DOS 之后的操作系统，
 比如早期的 Windows 和 Linux 和 BSD 能以覆盖中断程序入口表的方式提供升级版本的这些操作替代
 BIOS 的程序。&lt;/p&gt;
@@ -174,10 +174,12 @@ DiskStructure.svg&lt;/object&gt;
 给每个磁道作为保留扇区，留作坏扇区后备。&lt;/p&gt;
 &lt;p&gt;另外有了独立磁盘控制器芯片之后，扇区内的校验算法也不再受制于 BIOS INT 13H 接口。
 原本 BIOS 的 INT 13H 接口定义了每个扇区 512 字节，额外配有 4 字节校验， 32bit
-的校验码对 4096bit 的数据来说，只能允许一些简单的校验算法，比如
+的校验码对 4096bit 的数据来说，只能允许一些简单的校验算法，比如 32bit CRC ，或者比如
 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Hamming_code"&gt;汉明码&lt;/a&gt; 对 4096bit 的数据需要 13bit
-的校验，突破了校验算法限制后硬盘可以在物理扇区中放更多校验位，使用更复杂的
-&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更强的容错性。&lt;/p&gt;
+的校验。突破了校验算法限制后硬盘可以在物理扇区中放更多校验位，使用更复杂的
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Error_correction_code"&gt;ECC&lt;/a&gt; 算法，提供更强的容错性。
+IDE/SATA 接口的硬盘由内部控制器负责计算和比对校验，而 SAS 接口的硬盘（主要用于服务器）可以读取
+520/528 字节长度的扇区，包含额外校验位。&lt;/p&gt;
 &lt;p&gt;通过 ZBR ，逻辑 CHS 寻址不再局限在具体每磁道扇区数等物理限制上，但是仍然局限在 CHS 总位数。
 24bit 的 CHS 地址能寻址 &lt;span class="math"&gt;\(1024*256*63 = 16515072\)&lt;/span&gt; 个扇区，也就是 8064MiB 的空间。
 于是早期很多操作系统有 7.8G 硬盘大小的限制。后来 ATA/IDE 标准提升了 CHS 寻址数量，从 24bit
@@ -211,7 +213,10 @@ LBA 地址 = ( C \times 磁头数 + H ) \times 扇区数 + ( S - 1 )
 潜在地导致一些性能不确定性。于是硬盘控制器在除了负责实际驱动物理磁盘之外，
 还开始负责维护一块盘内缓冲区，实现盘内的 IO 队列。缓冲区的存在允许磁盘控制器同时接收更多来自上层软件
 的读写请求，转换成实际物理布局参数，并根据磁盘物理布局来调整读写顺序，增加总体吞吐率。
-当然有缓冲区的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
+比如 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tagged_Command_Queuing"&gt;ATA TCQ&lt;/a&gt; 和
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Native_Command_Queuing"&gt;SATANCQ&lt;/a&gt;
+就是这样的盘内队列协议。&lt;/p&gt;
+&lt;p&gt;当然有缓冲区和盘内队列的存在也使得突然断电之类的情况下更难保证数据一致性，于是 SCSI/SATA
 标准开始约定特殊的请求，从操作系统能发送命令让底层设备清空自己的读写队列。&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="shingled-magnetic-recording-smr"&gt;
@@ -280,7 +285,7 @@ CHS 寻址一样，逐渐成为了操作系统和硬盘厂商彼此间互相努�
 &lt;li&gt;提升（磁头臂和盘片）转速&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;第一种方式提升记录密度，在增加容量的同时也能提升硬盘读写速度，所以是长久以来硬盘厂商的主要方式。
-第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400 rpm 现在最高能到 15000rpm
+第二种方式提升转速则很快就遇到了物理瓶颈，硬盘以前是 5400rpm 现在最高能到 15000rpm
 附近，高速旋转的盘片就像一个螺旋桨一样，外圈线速度已经到了接近声速，很难再往上提升。
 以及盘片转速影响连续读写速度，而磁头臂转速影响寻道速度，高速寻道对磁头臂旋转有极高精度要求。&lt;/p&gt;
 &lt;p&gt;所以长久以来，衡量硬盘速度有两项指标：连续读写速度和每秒操作数(IOPS)，随着容量提升，
