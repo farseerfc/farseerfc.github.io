@@ -63,7 +63,7 @@ MLC 則有先寫高位頁再寫低位頁的要求。廠商規格中的要求更�
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E6%B1%89%E6%98%8E%E7%A0%81"&gt;漢民碼&lt;/a&gt;
 可根據 n bit 探測 &lt;span class="math"&gt;\(2^n - n -1\)&lt;/span&gt; 中的 2 bit 錯誤，修正 1 bit 錯誤。&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/BCH%E7%A0%81"&gt;BCH碼&lt;/a&gt; 可根據 &lt;span class="math"&gt;\(n*m\)&lt;/span&gt; bit
-糾錯 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 m bit 錯誤。&lt;/li&gt;
+糾錯 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 &lt;span class="math"&gt;\(m\)&lt;/span&gt; bit 錯誤。&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E4%BD%8E%E5%AF%86%E5%BA%A6%E5%A5%87%E5%81%B6%E6%AA%A2%E6%9F%A5%E7%A2%BC"&gt;LDPC&lt;/a&gt;
 原理上類似擴展的漢民碼，能做到使用更少校驗位糾錯更多錯誤。&lt;/li&gt;
 &lt;/ul&gt;
@@ -359,7 +359,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
 但是理解了 FTL 的差異後就可以看出這種「優化」只針對線性寫入，不一定適合放系統文件根目錄的文件系統。&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -522,7 +522,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不過理解了磁盤的機械結構的話，柱面的概念就比較合理了，尋址時先驅動磁頭臂旋轉，
 磁頭臂上多個磁頭一起飛到某個磁道上，從而運動磁頭臂的動作定義了一個柱面。
 柱面和磁頭（CH）組合起來能定位到某個特定的磁道，畫張圖大概如下圖所示：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中值得注意的是磁道的編號方式，我用相同的顏色畫出了相同的磁道。因爲按照 CHS
 的順序尋址，所以先定位柱面，然後選定磁頭。磁盤上按半徑從外向內定義柱面的編號，最外圈的磁道位於
@@ -555,7 +555,7 @@ BIOS 的程序。&lt;/p&gt;
 後纔能繼續讀下一個扇區，如果物理排列上連續編號扇區，可能等 CPU
 做完這些事情後磁頭已經旋轉到之後幾個扇區上了。所以出廠時做磁盤低級格式化的時候，
 會跳躍着給扇區編號，給 CPU 留足處理時間。比如下圖：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中假設有3個柱面，每個柱面6個磁頭，每個磁道內11個扇區，並且畫出了三種不同的扇區編號跳轉情況，
 分別是磁道內的扇區跳轉（+3），柱面內的磁頭跳轉（+5），以及柱面間跳轉（+10）。
@@ -1804,7 +1804,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1817,7 +1817,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3120,7 +3120,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3483,7 +3483,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;

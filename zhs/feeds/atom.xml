@@ -63,7 +63,7 @@ MLC 则有先写高位页再写低位页的要求。厂商规格中的要求更�
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/zh-hans/%E6%B1%89%E6%98%8E%E7%A0%81"&gt;汉民码&lt;/a&gt;
 可根据 n bit 探测 &lt;span class="math"&gt;\(2^n - n -1\)&lt;/span&gt; 中的 2 bit 错误，修正 1 bit 错误。&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/BCH%E7%A0%81"&gt;BCH码&lt;/a&gt; 可根据 &lt;span class="math"&gt;\(n*m\)&lt;/span&gt; bit
-纠错 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 m bit 错误。&lt;/li&gt;
+纠错 &lt;span class="math"&gt;\(2^n\)&lt;/span&gt; bit 中的 &lt;span class="math"&gt;\(m\)&lt;/span&gt; bit 错误。&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://zh.wikipedia.org/wiki/%E4%BD%8E%E5%AF%86%E5%BA%A6%E5%A5%87%E5%81%B6%E6%AA%A2%E6%9F%A5%E7%A2%BC"&gt;LDPC&lt;/a&gt;
 原理上类似扩展的汉民码，能做到使用更少校验位纠错更多错误。&lt;/li&gt;
 &lt;/ul&gt;
@@ -359,7 +359,7 @@ discard 不光影响文件系统写入性能，还可能发送大量被设备忽
 实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
 比如有些标明着「为视频优化」之类宣传标语的「外置SSD」，对消费者来说可能会觉得为视频优化的话一定性能好，
 但是理解了 FTL 的差异后就可以看出这种「优化」只针对线性写入，不一定适合放系统文件根目录的文件系统。&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -522,7 +522,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不过理解了磁盘的机械结构的话，柱面的概念就比较合理了，寻址时先驱动磁头臂旋转，
 磁头臂上多个磁头一起飞到某个磁道上，从而运动磁头臂的动作定义了一个柱面。
 柱面和磁头（CH）组合起来能定位到某个特定的磁道，画张图大概如下图所示：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中值得注意的是磁道的编号方式，我用相同的颜色画出了相同的磁道。因为按照 CHS
 的顺序寻址，所以先定位柱面，然后选定磁头。磁盘上按半径从外向内定义柱面的编号，最外圈的磁道位于
@@ -555,7 +555,7 @@ BIOS 的程序。&lt;/p&gt;
 后才能继续读下一个扇区，如果物理排列上连续编号扇区，可能等 CPU
 做完这些事情后磁头已经旋转到之后几个扇区上了。所以出厂时做磁盘低级格式化的时候，
 会跳跃着给扇区编号，给 CPU 留足处理时间。比如下图：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中假设有3个柱面，每个柱面6个磁头，每个磁道内11个扇区，并且画出了三种不同的扇区编号跳转情况，
 分别是磁道内的扇区跳转（+3），柱面内的磁头跳转（+5），以及柱面间跳转（+10）。
@@ -1804,7 +1804,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1817,7 +1817,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3120,7 +3120,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3483,7 +3483,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -4812,7 +4812,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 就不会再继续敲密码了。而且似乎对攻击者也没有什么好处？要是他 usb attach 到了我的设备上，
 我就能控制他的键盘了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4840,7 +4840,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4862,7 +4862,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4876,7 +4876,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;td&gt;虽说只要不在意就可以了　却一句不剩全收集了起来&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless table docutils"&gt;
+&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4904,7 +4904,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4926,7 +4926,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4945,7 +4945,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4964,7 +4964,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -4980,7 +4980,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5014,7 +5014,7 @@ PC 这边没法 attach 设备了，应该马上会发现吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5061,7 +5061,7 @@ Brandon Invergo 的博客采用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的点文件&lt;/h2&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5205,7 +5205,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5240,7 +5240,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5257,7 +5257,7 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5352,7 +5352,7 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然后接下来就是我承诺的翻译了&lt;/h2&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5446,7 +5446,7 @@ Tivoization 是 FSF 发明的一个词，表示 TiVo 的做法。 TiVo
 编制的软件，从而限制了用户修改运行软件的自由。这种做法在 FSF 看来是钻了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵这种做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -5585,7 +5585,7 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 协议是一个开源软件协议，和两句的 BSD 协议功能相同。OpenBSD 项目选择尽量用 ISC
 协议公开他们新写的代码。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -6944,7 +6944,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
-拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
+拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中显示编译状态。&lt;/p&gt;
@@ -7495,7 +7495,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -7513,7 +7513,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -7529,7 +7529,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -7547,7 +7547,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
+&lt;td&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -7574,7 +7574,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -7596,7 +7596,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="borderless first table last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="borderless docutils table first last"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -7796,7 +7796,7 @@ RELATIVE_URLS&lt;/code&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 PlantUML 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="uml diagram" class="img-responsive uml" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一个Java实现的，
@@ -8022,7 +8022,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -8570,7 +8570,7 @@ TTY 里 telnet 也不会乱的样子。&lt;/p&gt;
 &lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
 中存在的问题。他们首先确定修改是事后修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027个修改）&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -8887,7 +8887,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。&lt;/p&gt;
-&lt;table border="0" class="borderless table docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -9261,7 +9261,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -9278,7 +9278,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -9607,13 +9607,13 @@ type&lt;/code&gt;
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote docutils table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -9803,8 +9803,8 @@ Linux 最好 :)&lt;/p&gt;
 </content><category term="import"></category><category term="zz"></category></entry><entry><title>写程序让CPU占用率保持正弦函数</title><link href="//farseerfc.me/zhs/sine-cpu.html" rel="alternate"></link><published>2008-06-02T23:27:00+09:00</published><updated>2008-06-02T23:27:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-06-02:/zhs/sine-cpu.html</id><summary type="html">&lt;p&gt;导入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;据说是一道微软的面试题。如题，写程序，让Windows的任务管理器中的性能监视器呈现正弦曲线。&lt;/p&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -9820,8 +9820,8 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;导入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/298871889"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;据说是一道微软的面试题。如题，写程序，让Windows的任务管理器中的性能监视器呈现正弦曲线。&lt;/p&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
-&lt;img alt="正弦曲线" class="img-responsive align-center" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm531.img.xiaonei.com/pic001/20080602/23/14/large_10019p67.jpg"/&gt;
+&lt;img alt="正弦曲线" class="align-center img-responsive" src="http://fm541.img.xiaonei.com/pic001/20080602/23/14/large_9935o67.jpg"/&gt;
 &lt;!-- PELICAN_END_SUMMARY --&gt;
 &lt;p&gt;潜心钻研良久，得代码：（java）&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sincpu&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
@@ -9856,7 +9856,7 @@ Linux 最好 :)&lt;/p&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;多核CPU上测试时要注意关掉一个CPU：&lt;/p&gt;
-&lt;img alt="多核CPU上测试" class="img-responsive align-center" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
+&lt;img alt="多核CPU上测试" class="align-center img-responsive" src="http://fm411.img.xiaonei.com/pic001/20080602/23/14/large_9946k67.jpg"/&gt;
 </content><category term="import"></category><category term="java"></category><category term="microsoft"></category></entry><entry><title>关于神创论的一些见解</title><link href="//farseerfc.me/zhs/some-thought-on-creationism.html" rel="alternate"></link><published>2008-05-12T11:16:00+09:00</published><updated>2008-05-12T11:16:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2008-05-12:/zhs/some-thought-on-creationism.html</id><summary type="html">&lt;p&gt;导入自
 &lt;a class="reference external" href="http://blog.renren.com/blog/230263946/292274803"&gt;renren&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;看到陈骉同学很有感想的一篇神创论与命运日志，觉得近日很久没有看到这样的评论了。想说几句自己的观点。&lt;/p&gt;
