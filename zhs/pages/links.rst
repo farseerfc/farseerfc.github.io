@@ -115,7 +115,7 @@
 	萌萌哒 Poi ，博客引擎是自己写的 `Solomon <https://github.com/PoiScript/Solomon>`_ :del:`和我的博客是情侣色` 。:del:`不过不用 Arch` 用 openSUSE。
 
 .. friend:: nanpuyue
-	:nick: `南浦月 <https://blog.nanpuyue.com/links.html/>`_
+	:nick: `南浦月 <https://blog.nanpuyue.com/>`_
 	:logo: https://avatars2.githubusercontent.com/u/1524609
 
 	南老师，在线直播，声音甜美。アスナ粉，自称装机民工的 linux 桌面环境开发者。修了 powerline 的 `fontpatcher <https://github.com/nanpuyue/fontpatcher>`_ 。
@@ -197,4 +197,16 @@
 	:logo: https://avatars1.githubusercontent.com/u/10810336
 
 	Leo Shen 的 Hugo 博客，还有个 szclsya 的 nick :del:`似乎还没写什么东西` 每篇都有英语和中文两种呢。似乎也是 AOSC 常客，是 Emacs 用户。
+
+.. friend:: iovxw
+	:nick: `iovxw <https://iovxw.net/>`_
+	:logo: https://avatars2.githubusercontent.com/u/6631572
+
+	iovxw :del:`蓝猫不露开` 博客，最近写了好多 Rust 的文章，之前用过好多 :del:`奇奇怪怪|小众` 的编程语言。名字似乎是为了左右对称，除了养猫之外私生活一切都很神秘。
+
+.. friend:: justforlxz
+	:nick: `竹子 <https://blog.justforlxz.com/>`_
+	:logo: https://avatars1.githubusercontent.com/u/12298476
+
+	竹咂！好像是用着 Arch Linux 开发 Deepin Linux 的开发者， :del:`用 DDE 有虫子就找他！` 
 

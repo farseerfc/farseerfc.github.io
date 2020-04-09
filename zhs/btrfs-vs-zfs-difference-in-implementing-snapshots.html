@@ -1161,7 +1161,7 @@ btrfs subvolume snapshot</code>
 <li>检查点（checkpoint）：从 ZFS on Linux v0.8.0 开始</li>
 </ul>
 <p>梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些概念：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/>
 <p>上图中，假设我们有一个 pool ，其中有 3 个文件系统叫 fs1~fs3 和一个 zvol 叫 zv1
 ，然后文件系统 fs1 有两个快照 s1 和 s2 ，和两个书签 b1 和 b2。pool 整体有两个检查点 cp1 和
 cp2 。这个简图将作为例子在后面介绍这些概念。</p>
@@ -1290,7 +1290,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 <p>检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。</p>
 <p>除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1303,7 +1303,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。</
 </tbody>
 </table>
 <p>对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -1592,10 +1592,10 @@ GC 回收空间，这里是本文要讲的区别，所以在我看来不用 GC �
 <p>举个例子，比如下图是一个日志结构文件系统的磁盘占用，其中绿色是数据，蓝色是元数据（比如目录结构和
 inode），红色是文件系统级关键数据（比如最后的日志提交点），一开始可能是这样，有9个数据块，
 2个元数据块，1个系统块：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/>
 <p>现在要覆盖 2 和 3 的内容，新写入 n2 和 n3 ，再删除 4 号的内容 ，然后修改 10 里面的 inode 变成 n10
 引用这些新数据，然后写入一个新提交 n12 ，用黄色表示不再被引用的垃圾，提交完大概是这样：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/a0eb592f.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/a0eb592f.png"/>
 <p>日志结构文件系统需要 GC 比较容易理解，写日志嘛，总得有一个「添加到末尾」的写入点，比如上面图中的
 n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空间末尾，这时候就要覆盖写空间开头，
 就很难判断「末尾」在什么地方，而下一次写入需要在哪里了。
@@ -1617,7 +1617,7 @@ n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空
 又不利于利用整个可用空间，这里的抉择有个平衡点。</p>
 <p>继续上面的例子，假设上面文件系统的图示中每一列的4块是一个段，想要回收最开头那个段，
 那么需要搬运还在用的 1 到空闲空间，顺带修改引用它的 n10 ，最后提交 n12 ：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ba5b5955.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ba5b5955.png"/>
 <p>要扫描并释放一整段，需要扫描整个文件系统中别的元数据（图中的 n12 和 n10 和
 11）来确定有没有引用到目标段中的地址，可见释放一个段是一个 <span class="math">\(O(N)\)</span> 的操作，其中 N
 是元数据段的数量，按文件系统的大小增长，
@@ -1656,7 +1656,7 @@ GC 算法则排除掉用户手动标记的快照之后，根据快照创建的�
 的设计早期中考虑既然需要支持快照，那就把记录数据块占用情况的位图，变成快照的数组。
 于是整个文件系统有个 256 大小的快照利用率数组，数组中每个快照记录自己占用的数据块位图，
 文件系统中最多能容纳 255 个快照。</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5dfeb8e2.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5dfeb8e2.png"/>
 <p>上面每个单元格都是一个二进制位，表示某个快照有没有引用某个数据块。有这样一个位图的数组之后，
 就可以直接扫描位图判断出某个数据块是否已经占用，可以找出尚未被占用的数据块用作空间分配，
 也可以方便地计算每个快照引用的空间大小或者独占的空间大小，估算删除快照后可以释放的空间。</p>
@@ -1723,7 +1723,7 @@ How ZFS snapshots really work And why they perform well (usually)</div>
 </pre></div>
 <p>我们对 fs 创建了 s1 快照，删除了 fs 中某个文件，创建了 s2 快照，然后用 reflink
 把刚刚删除的文件从 s1 中复制出来，再创建 s3 。如此操作之后，按时间顺序有 s1、s2、s3 三个快照：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f91316de.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f91316de.png"/>
 <p>其中只有 s2 不存在 somefile ，而 s1 、 s3 和当前的 fs 都有，并且都引用到了同一个数据块。
 于是从时间线来看， somefile 的数据块在 s2 中「死掉」了，又在 s3 中「复活」了。</p>
 <p>而 ZFS (目前还）不支持 reflink ，所以没法像这样让数据块复活。一旦某个数据块在某个快照中「死」了，
@@ -1768,7 +1768,7 @@ CoW 了新的子节点。</li>
 <p>🐰兔子算法为每个数据集（文件系统或快照）增加了一个数据结构，叫死亡列表（dead list），
 记录 <strong>前一个快照中还活着，而当前数据集中死掉了的数据块指针</strong>
 ，换句话说就是在本数据集中「杀掉」的数据块。举例画图大概是这样</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ab76244a.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ab76244a.png"/>
 <p>上图中有三个快照和一个文件系统，共 4 个数据集。每个数据集维护自己的死亡列表，
 死亡列表中是那些在该数据集中被删掉的数据块。于是🐰兔子算法把🐢乌龟算法所做的操作分成了两部分，
 一部分在文件系统删除数据时记录死亡列表，另一部分在删除快照时根据死亡列表释放需要释放的块。</p>
@@ -1814,7 +1814,7 @@ CoW 了新的子节点。</li>
 都需要扫描死亡列表中的块指针，根据指针中记录的 birth txg 做判断是否能直接释放或是需要保留到另一个快照的死亡列表。
 于是🐆豹子算法的思路是，在死亡列表中记录块指针时，就把其中的块指针按 birth txg 分成子列表（sublist）。</p>
 <p>比如上面🐰兔子算法中那4个死亡列表，可以这样拆成子列表：</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/34b39b01.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/34b39b01.png"/>
 <p>这样拆成子列表之后，每次从死亡列表中释放数据块都能根据出生时间找到对应的子列表，
 然后连续释放整个子列表。每次合并死亡列表时，也能直接用单链表穿起需要合并的子列表，不需要复制块指针。</p>
 <p>死亡列表并不在跟踪快照的独占大小，而是在跟踪快照所需负责删除的数据块大小，
@@ -1852,7 +1852,7 @@ OpenZFS Summit 2017 有个演讲 <a class="reference external" href="https://www
 <p>克隆不光要记录新数据块的诞生，还要记录新数据块可能的死亡，所以磁盘上保存的生存日志虽然叫 livelist
 ，但不像死亡列表那样是列表的形式，而是日志的形式，而内存中保存的生存日志则组织成了棵
 <a class="reference external" href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91">自平衡树（AVLTree）</a> 来加速查找。</p>
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/7f244754.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/7f244754.png"/>
 <p>磁盘上存储的生存日志如上图，每个表项记录它是分配（A）或者删除（F）一个数据块，同时记录数据块的地址。
 这些记录在一般情况下直接记录在日志末尾，随着对克隆的写入操作而不断增长，长到一定程度则从内存中的
 AVL Tree 直接输出一个新的生存日志替代掉旧的，合并其中对应的分配和删除操作。</p>
@@ -2606,7 +2606,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 </li>
 </ol>
 <p>有两种记录方式是因为它们各有性能上的优缺点：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -2969,7 +2969,7 @@ Chris 的博客也有两篇文章《
 <p>ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：</p>
-<table border="0" class="docutils borderless table">
+<table border="0" class="table borderless docutils">
 <colgroup>
 <col width="24%"/>
 <col width="54%"/>
