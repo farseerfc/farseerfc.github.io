@@ -202,7 +202,7 @@
 	:nick: `iovxw <https://iovxw.net/>`_
 	:logo: https://avatars2.githubusercontent.com/u/6631572
 
-	iovxw :del:`蓝猫不露开` 博客，最近写了好多 Rust 的文章，之前用过好多 :del:`奇奇怪怪|小众` 的编程语言。名字似乎是为了左右对称，除了养猫之外私生活一切都很神秘。
+	iovxw :del:`蓝猫` 的博客，最近写了好多 Rust 的文章，之前用过好多 :del:`奇奇怪怪|小众` 的编程语言。名字似乎是为了左右对称，除了养猫之外私生活一切都很神秘。
 
 .. friend:: justforlxz
 	:nick: `竹子 <https://blog.justforlxz.com/>`_
