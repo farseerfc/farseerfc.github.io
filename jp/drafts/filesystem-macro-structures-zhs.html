@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="FS笔记,btrfs,zfs,ext,fs" />
-        <meta name="description" content="硬盘、光盘、SSD这些存储设备，在操作系统中被抽象为块设备（block device）， 是因为他们不同于随机存储设备（Random Access Memory） CHS寻址时代 DOS文件系统与文件分配表 早期Unix文件系统 柱面-磁头-扇区寻址与地理位置优化 BSD 的 FFS Linux 的 ext2 物理寻址到逻辑块寻址 Flash 媒介与 FTL" />
+        <meta name="description" content="前两篇笔记分别记录了 硬盘 和 闪存 两大类存储设备的物理特性。 这些存储设备，在操作系统中被抽象为块设备（block device）， 是因为他们不同于随机存储设备（Random Access Memory），需要按块为单位读写。 文件系统构建在块设备抽象之上，需要根据存储设备的物理特性做设计和优化，满足性能和安全性两方面的考量。 对传统硬盘而言，寻址时间依赖于地址跳转间隔，地址跳转越远寻址时消耗的时间越长。 因此设计文件系统时要尽量避免远距离的地址跳转，让读写尽量连续。 对 SSD 而言，虽然没有了跳转时间的考量，但是随机寻址的写入仍然会加重 FTL 地址翻译的负担， 并且增加垃圾回收时写放大的程度，所以对 SSD 也是同样，按地址连续写入时的性能远优于随机写入。 现代硬盘上内外圈的读写性能也会影响到文件系统设计，外圈柱面的连续读写能比内圈柱面上快很多倍， 甚至一些硬盘的外圈连续读取速度能高于 SSD 的读取速度， 所以在硬盘上写入数据时将经常读写的数据（比如文件系统元数据）放入低端地址能有效提升性能。 现代文件系统通过合理安排存储设备上的数据结构布局，来为这些读写情况优化性能，这种优化叫地理布局优化（ geometry based optimization）。 本篇笔记想讨论一下文件系统在存储设备上安排数据时如何做地理布局优化。文件系统设计中这种优化分两方面 …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="文件系统的宏观结构"/>
         <meta property="og:url" content="//farseerfc.me/jp/zhs/drafts/filesystem-macro-structures.html"/>
-        <meta property="og:description" content="硬盘、光盘、SSD这些存储设备，在操作系统中被抽象为块设备（block device）， 是因为他们不同于随机存储设备（Random Access Memory） CHS寻址时代 DOS文件系统与文件分配表 早期Unix文件系统 柱面-磁头-扇区寻址与地理位置优化 BSD 的 FFS Linux 的 ext2 物理寻址到逻辑块寻址 Flash 媒介与 FTL"/>
+        <meta property="og:description" content="前两篇笔记分别记录了 硬盘 和 闪存 两大类存储设备的物理特性。 这些存储设备，在操作系统中被抽象为块设备（block device）， 是因为他们不同于随机存储设备（Random Access Memory），需要按块为单位读写。 文件系统构建在块设备抽象之上，需要根据存储设备的物理特性做设计和优化，满足性能和安全性两方面的考量。 对传统硬盘而言，寻址时间依赖于地址跳转间隔，地址跳转越远寻址时消耗的时间越长。 因此设计文件系统时要尽量避免远距离的地址跳转，让读写尽量连续。 对 SSD 而言，虽然没有了跳转时间的考量，但是随机寻址的写入仍然会加重 FTL 地址翻译的负担， 并且增加垃圾回收时写放大的程度，所以对 SSD 也是同样，按地址连续写入时的性能远优于随机写入。 现代硬盘上内外圈的读写性能也会影响到文件系统设计，外圈柱面的连续读写能比内圈柱面上快很多倍， 甚至一些硬盘的外圈连续读取速度能高于 SSD 的读取速度， 所以在硬盘上写入数据时将经常读写的数据（比如文件系统元数据）放入低端地址能有效提升性能。 现代文件系统通过合理安排存储设备上的数据结构布局，来为这些读写情况优化性能，这种优化叫地理布局优化（ geometry based optimization）。 本篇笔记想讨论一下文件系统在存储设备上安排数据时如何做地理布局优化。文件系统设计中这种优化分两方面 …"/>
         <meta property="article:published_time" content="2020-03-21" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS笔记" />
@@ -237,18 +237,38 @@ Farseerfcの巣            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <p>硬盘、光盘、SSD这些存储设备，在操作系统中被抽象为块设备（block device），
-是因为他们不同于随机存储设备（Random Access Memory）</p>
-<div class="section" id="chs">
-<h2>CHS寻址时代</h2>
-<div class="section" id="dos">
-<h3>DOS文件系统与文件分配表</h3>
+                <p>前两篇笔记分别记录了 <a class="reference external" href="//farseerfc.me/jp/history-of-chs-addressing-zhs.html">硬盘</a> 和
+<a class="reference external" href="//farseerfc.me/jp/flash-storage-ftl-layer-zhs.html">闪存</a> 两大类存储设备的物理特性。
+这些存储设备，在操作系统中被抽象为块设备（block device），
+是因为他们不同于随机存储设备（Random Access Memory），需要按块为单位读写。
+文件系统构建在块设备抽象之上，需要根据存储设备的物理特性做设计和优化，满足性能和安全性两方面的考量。</p>
+<p>对传统硬盘而言，寻址时间依赖于地址跳转间隔，地址跳转越远寻址时消耗的时间越长。
+因此设计文件系统时要尽量避免远距离的地址跳转，让读写尽量连续。
+对 SSD 而言，虽然没有了跳转时间的考量，但是随机寻址的写入仍然会加重 FTL 地址翻译的负担，
+并且增加垃圾回收时写放大的程度，所以对 SSD 也是同样，按地址连续写入时的性能远优于随机写入。
+现代硬盘上内外圈的读写性能也会影响到文件系统设计，外圈柱面的连续读写能比内圈柱面上快很多倍，
+甚至一些硬盘的外圈连续读取速度能高于 SSD 的读取速度，
+所以在硬盘上写入数据时将经常读写的数据（比如文件系统元数据）放入低端地址能有效提升性能。</p>
+<p>现代文件系统通过合理安排存储设备上的数据结构布局，来为这些读写情况优化性能，这种优化叫地理布局优化（
+geometry based optimization）。
+本篇笔记想讨论一下文件系统在存储设备上安排数据时如何做地理布局优化。文件系统设计中这种优化分两方面：
+安排数据布局的「宏观结构（macro structures）」和实际分配地址的「分配器（allocators）」算法。</p>
+<p>「宏观结构（macro structures）」是盘上数据结构（on-disk structures）中，
+关于如何分割并分配整个地址空间的那些数据结构。「分配器（allocators）」则是在文件系统代码中负责
+在宏观结构里分配地址安放数据的具体算法。数据结构和算法相互配合而最优化性能，
+所以考察文件系统性能时也应当从这两者的设计开始考虑。</p>
+<p>值得区别的是「宏观结构」是特定文件系统记录的方式，所以和文件系统代码的实现无关，
+不同操作系统下实现同一个文件系统要支持同样的宏观结构布局，也难以在保持兼容性的前提下修改宏观结构。
+而「分配器算法」则属于具体文件系统实现的代码，可能在使用同样盘上结构的情况下优化算法、改善分配器性能。
+不同操作系统下实现的同一个文件系统也可以采用不同的算法。</p>
+<div class="section" id="dos-fat12-fat16-vfat-fat32">
+<h2>DOS文件系统与文件分配表（FAT12 FAT16 VFAT FAT32）</h2>
+<p>FAT 系文件系统最初为软盘驱动器设计，</p>
 </div>
 <div class="section" id="unix">
-<h3>早期Unix文件系统</h3>
+<h2>早期 Unix 文件系统</h2>
 </div>
-</div>
-<div class="section" id="id2">
+<div class="section" id="id4">
 <h2>柱面-磁头-扇区寻址与地理位置优化</h2>
 <div class="section" id="bsd-ffs">
 <h3>BSD 的 FFS</h3>
@@ -257,7 +277,7 @@ Farseerfcの巣            </a>
 <h3>Linux 的 ext2</h3>
 </div>
 </div>
-<div class="section" id="id3">
+<div class="section" id="id5">
 <h2>物理寻址到逻辑块寻址</h2>
 </div>
 <div class="section" id="flash-ftl">
@@ -282,7 +302,7 @@ Farseerfcの巣            </a>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7f67ea1abed0> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7fb1efd0b7b0> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>

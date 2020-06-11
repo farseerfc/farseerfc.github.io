@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="zh-Hans"
+>
+<head>
+    <title>系统中的大多数文件有多大？ - Farseerfc的小窝</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/zhs/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/zhs/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/zhs/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/zhs/file-size-histogram.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="FS笔记,FS notes,file,size,histogram" />
+        <meta name="description" content="你觉得，你的系统中大多数文件大概有多大？ 这是一个很有意思的问题，你可以试着先猜一下。 基于对系统中保存文件的了解，可能有这样的思考过程： 我收藏了好多照片，每个有 2~5MiB 吧。 我下载了好多漫画，每个 100KiB 左右，这些大概占了不少比例。 我还收藏了不少动画电影电视剧，虽然这些文件总数量可能不多？ 我下载了 Linux 的源码，那里面每个 C 代码文件都几千行，每行 100 字宽，平均也得有 30KiB 吧，有几万个源码文件呢，占比应该挺大的…… 问题中「大多数」其实是个挺不精确的称呼，换个精确点的问法：你觉得你的系统中 文件大小的中位数 大概在什么范围内？或者说，文件系统中 文件大小的分布情况 一般是怎样的曲线？ 这个问题其实还有多种别的问法，比如：一个常见的桌面或者服务器系统中，多大的文件算大文件， 多小的文件算小文件，什么范围内的大小算是普通呢？ 经历过基本的科学教育的人 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窝" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="系统中的大多数文件有多大？"/>
+        <meta property="og:url" content="//farseerfc.me/zhs/file-size-histogram.html"/>
+        <meta property="og:description" content="你觉得，你的系统中大多数文件大概有多大？ 这是一个很有意思的问题，你可以试着先猜一下。 基于对系统中保存文件的了解，可能有这样的思考过程： 我收藏了好多照片，每个有 2~5MiB 吧。 我下载了好多漫画，每个 100KiB 左右，这些大概占了不少比例。 我还收藏了不少动画电影电视剧，虽然这些文件总数量可能不多？ 我下载了 Linux 的源码，那里面每个 C 代码文件都几千行，每行 100 字宽，平均也得有 30KiB 吧，有几万个源码文件呢，占比应该挺大的…… 问题中「大多数」其实是个挺不精确的称呼，换个精确点的问法：你觉得你的系统中 文件大小的中位数 大概在什么范围内？或者说，文件系统中 文件大小的分布情况 一般是怎样的曲线？ 这个问题其实还有多种别的问法，比如：一个常见的桌面或者服务器系统中，多大的文件算大文件， 多小的文件算小文件，什么范围内的大小算是普通呢？ 经历过基本的科学教育的人 …"/>
+        <meta property="article:published_time" content="2020-06-11" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="FS笔记" />
+            <meta property="article:tag" content="FS notes" />
+            <meta property="article:tag" content="file" />
+            <meta property="article:tag" content="size" />
+            <meta property="article:tag" content="histogram" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/zhs/file-size-histogram.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/zhs/../theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/zhs/../theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/zhs/../theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/zhs/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窝 ATOM Feed"/>
+
+        <link href="//farseerfc.me/zhs/../theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/zhs/../theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/zhs/../theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">系统中的大多数文件有多大？ - Farseerfc的小窝</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/zhs/" class="navbar-brand">
+Farseerfc的小窝            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li class="active"><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li class="active"><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/zhs/pages/about.html"><i class="fa fa-user"></i>
+                                 关于
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/zhs/pages/links.html"><i class="fa fa-user"></i>
+                                 友情链接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/zhs/pages/about.html"><i class="fa fa-user"></i>
+                         关于
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/zhs/pages/links.html"><i class="fa fa-user"></i>
+                         友情链接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/zhs/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/zhs/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/zhs/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">归档</span></a></li>
+              <li><a href="//farseerfc.me/zhs/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/zhs/" title="Farseerfc的小窝"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/zhs/category/tech.html" title="tech">tech</a></li>
+                <li class="active">系统中的大多数文件有多大？</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        系统中的大多数文件有多大？
+                        <a href="//farseerfc.me/zhs/file-size-histogram.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 系统中的大多数文件有多大？ 的永久链接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-06-11T15:45:00+09:00"><i class="fa fa-calendar"></i> 2020年06月11日(周四)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/zhs/file-size-histogram.html">简体</a></li><li><a href="//farseerfc.me/zhs/../file-size-histogram.html" class="translate">繁體</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/zhs/file-size-histogram.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="显示这篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/zhs/file-size-histogram.pdf" class="btn btn-primary" title="显示这篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/zhs/file-size-histogram.png" class="btn btn-primary" title="显示这篇文章的截图PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/zhs/file-size-histogram.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="file-size-histogram" data-disqus-url="http://farseerfc.me/zhs/file-size-histogram.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/zhs/tag/fsbi-ji.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS笔记</a>
+	<a href="//farseerfc.me/zhs/tag/fs-notes.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> FS notes</a>
+	<a href="//farseerfc.me/zhs/tag/file.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> file</a>
+	<a href="//farseerfc.me/zhs/tag/size.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> size</a>
+	<a href="//farseerfc.me/zhs/tag/histogram.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> histogram</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目录                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id2" id="id8"><strong>你觉得，你的系统中大多数文件大概有多大？</strong></a></li>
+<li><a class="reference internal" href="#id3" id="id9">统计实际系统中文件大小的学术研究</a></li>
+<li><a class="reference internal" href="#id6" id="id10">不信？你可以测一下自己的文件系统</a></li>
+<li><a class="reference internal" href="#id7" id="id11">结论</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                
+<div class="section" id="id2">
+<h2><a class="toc-backref" href="#id8"><strong>你觉得，你的系统中大多数文件大概有多大？</strong></a></h2>
+<p>这是一个很有意思的问题，你可以试着先猜一下。</p>
+<p>基于对系统中保存文件的了解，可能有这样的思考过程：</p>
+<ul class="simple">
+<li>我收藏了好多照片，每个有 2~5MiB 吧。</li>
+<li>我下载了好多漫画，每个 100KiB 左右，这些大概占了不少比例。</li>
+<li>我还收藏了不少动画电影电视剧，虽然这些文件总数量可能不多？</li>
+<li>我下载了 Linux 的源码，那里面每个 C 代码文件都几千行，每行 100 字宽，平均也得有 30KiB
+吧，有几万个源码文件呢，占比应该挺大的……</li>
+</ul>
+<p>问题中「大多数」其实是个挺不精确的称呼，换个精确点的问法：你觉得你的系统中 <strong>文件大小的中位数</strong>
+大概在什么范围内？或者说，文件系统中 <strong>文件大小的分布情况</strong> 一般是怎样的曲线？</p>
+<p>这个问题其实还有多种别的问法，比如：一个常见的桌面或者服务器系统中，多大的文件算大文件，
+多小的文件算小文件，什么范围内的大小算是普通呢？</p>
+<p>经历过基本的科学教育的人，大概会做这样的基于科学假设的猜测：</p>
+<ul class="simple">
+<li>统计学上说，大量独立随机事件的累积概率满足正态分布（常态分布）曲线。假设我们把某个特定文件的大小增长
+1字节看作是一次独立随机事件，那么文件大小在文件系统中应该是满足正态分布的？</li>
+<li>正态分布的前提下，平均数接近中位数，文件系统的已占用大小除以文件数量大概就是大部分文件的大小了吧。</li>
+<li>根据我现在文件系统的占用大小和文件数量，平均数大概是 500KiB 左右？</li>
+<li>虽然我还存了几个非常大，上 GiB 的文件，但是看起来似乎也有很多很多非常小的文件，
+平均一下的话应该会把平均数拉大，大于中位数吧。那么中位数应该在 100KiB 这样的量级附近？</li>
+</ul>
+<p>你说为什么要关心这个？因为我经常在网上看到这样的讨论：</p>
+<p>「我有个仓库盘要存很多下载到的漫画，每个漫画都是一个文件夹里面一堆 <strong>小 JPG</strong> ，每个就几十 KiB
+。网上看到的说法是 XFS 对 <strong>小文件</strong> 的性能不那么好，我是不是该换 EXT4 ？我还想在 Windows
+上能读写，是不是 ExFAT 这种简单的文件系统更合适一点？」</p>
+<p>「软件源的镜像服务器需要存的都是些 <strong>小文件</strong> 吧，大多数软件包压缩后也就是几个 KiB 到几个
+MiB 的量级，这种需求是不是适合用对 <strong>小文件</strong> 优化比较好的文件系统？」</p>
+<p>「我的程序需要分析的数据是大量几百K的 <strong>小文件</strong> ，该怎么存合适呢，直接用文件系统还是应该上数据库？
+我还想多线程并发分析，是不是 SQL 数据库的并发能力强一些？又或者 MongoDB 的 GridFS
+看起来似乎能结合文件系统和数据库的特点，选它应该还不错？」</p>
+<p>有没有觉得上面这些讨论和直觉有些出入？如果你的直觉告诉你，上面的讨论似乎很自然的话，
+那说明你需要继续看下去了。</p>
+<p>好了写了这么多废话给大家思考时间，现在请回答一下我标题中那个问题，
+<strong>你觉得，你的系统中大多数文件大概有多大？</strong> ，接下来我要揭晓答案了。</p>
+</div>
+<div class="section" id="id3">
+<h2><a class="toc-backref" href="#id9">统计实际系统中文件大小的学术研究</a></h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="https://youtu.be/lTE26gkeVUs?t=452">A Study of Practical Deduplication</a></div>
+<div class="panel-body">
+<div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/lTE26gkeVUs"></iframe></div></div>
+</div>
+<p>最近看到一个挺早以前的研究报告，是 <a class="reference external" href="https://www.usenix.org/legacy/events/fast11/">FAST'11</a>
+的最优秀论文奖，研究的课题叫 <a class="reference external" href="https://www.usenix.org/legacy/event/fast11/tech/full_papers/Meyer.pdf">《A Study of Practical Deduplication》</a>
+。这个研究原本是想考察一下在桌面文件系统中「去重」（deduplication）的可行性和潜在收益，作为背景调查，
+他们收集了一个挺大的调查样本，记录文件大小和校验和之类的。从论文摘要看，他们在微软公司内，
+通过邮件的形式让微软员工在各自的工作机上执行他们的调查程序，大概在1个月左右的时间内收集到了 857
+份调查结果。关于去重的研究结果这里我们这里先不深究，只看这个背景调查，他们对收集到的文件大小画了个图表：</p>
+<img alt="file-histogram-4k.jpg" class="img-responsive" src="//farseerfc.me/zhs/images/file-histogram-4k.jpg"/>
+<p>他们结果显示最常见的文件大小是 <strong>4K</strong> ！</p>
+<p>注意上图里的横轴座标，是按2的指数来给文件大小分类的。比如 128~256 字节的算一类， 4K~8K
+字节的算一类，分类之后统计每一类里面文件的数量所占比例，也就是说横轴座标是指数增长的。
+在指数增长的横轴座标上，画出的曲线才看起来像是正态分布的曲线，如果把横轴座标画成线性的话，
+中位数会出现在非常靠近左侧小文件的地方。</p>
+<p>也就是说根据他们的统计，文件系统中大部分文件都是大概 2K 到 8K 这样的范围，最常见 4K 大小。
+非常大的比如 8M 以上的文件只是极个别，位于图表右侧非常长的尾巴中。</p>
+<p>其实我对这个结果还不是很惊讶，因为我记得在 2000 年左右，当我家的电脑还在用 Windows 98 跑在
+40G 的 FAT32 文件系统中的时候，读到过一篇介绍 NTFS 的「新」特性的文章。那篇文章讲到 FAT32
+的簇大小随着分区大小增长，越来越大的簇大小对保存大量小文件极其浪费，而 NTFS 用固定的 4K
+簇大小可避免这样的浪费，并且 1K MFT 记录甚至能「内联（inline）」存储非常小的文件。
+为了证明大量小文件对文件系统是个现实存在的问题，那篇文章也提到了常见系统中的文件大小分布曲线，
+提到了大部分文件都是 4K 大小这有点反直觉的结论。</p>
+<p>这次这个研究让我觉得吃惊的是，文件大小分布并没有随着硬盘大小的增加而增加，稳定在了 4K 这个数字上。
+他们以前还进行过两次类似的统计，分别在 2000 年和 2004 年，图中的点线画出了历史上的统计分布，实线是
+2009 年的最新统计。三年获得的统计结果的曲线基本吻合，这意味着随着存储容量增长，文件大小的分布几乎没有变化。</p>
+<p>正当我疑惑，这种文件大小不变的趋势，是否是因为微软公司内特定的操作系统和工作内容，
+在别的系统上或者在更长的时间跨度上是否有类似的趋势呢？这时演讲的幻灯片翻了一页：</p>
+<img alt="file-histogram-4k-since1981.jpg" class="img-responsive" src="//farseerfc.me/zhs/images/file-histogram-4k-since1981.jpg"/>
+<p>从早在 1981 年起，有研究表明文件系统中文件大小中位数就稳定在了 <strong>4K</strong> ！</p>
+<p>在他们论文的参考文献中，能找到 <a class="reference external" href="https://www.cs.cmu.edu/~satya/docdir/satya-sosp-1981.pdf">这个 1981 年的研究</a>
+。这篇早年的调查是在 DEC 的 PDP-10 机器上，使用 TOPS-10 操作系统。从现在的视点来看，被调查的
+TOPS-10 的文件系统已经可以说非常初级了，没法支持很大的文件或者很多的文件，
+然而即便如此常见文件大小也还是非常符合现代系统中得到的结果。</p>
+<p>微软的研究者们还回顾了计算机科学领域多年的相关研究，结论是常见文件大小这个值在 1981 到 2009
+这近 30 年中都非常稳定。演讲的原文中这么评价：</p>
+<blockquote>
+<p>…… the median file size is 4k. It was 4k the other two years of the study.
+We've actually gone back through the literature. It turns out it's 4k in every
+study going back to the last 30 years. So this is great news. We can finally
+compete with physicists: we have our own fundamental constant of the
+universe, it's a medium file size ……</p>
+<p>文件的平均大小是 4K 。在前几年的两次研究中它也是 4K。其实我们回顾了既往的学术研究，发现在过去30
+年中每个研究都说它是 4K 这个值。这是个好消息，我们终于有了一个堪比物理学家的结论：我们有我们自己的
+宇宙基本常数了，是文件大小中位数。</p>
+</blockquote>
+<p>这个结论很有意思，文件大小中位数在计算机科学领域的稳定程度堪比宇宙基本常数： <strong>4K</strong> ！</p>
+<p>很明显这是在调侃，文件大小这种变化很大的数字显然和文件系统内存储的内容直接相关，
+存游戏的可能不同于存音乐的。但是这调侃的背后也有一定真实性：文件系统中保存的文件，
+除了用户直接使用的那些视频、文档、代码，还有大量文件是程序内部创建使用的，比如浏览器的缓存和
+cookie ，这类不被用户知晓的文件可能在数量上反而占据绝大多数。
+于是从文件系统这边来看，大多数文件都是在 <strong>4K</strong> 左右的数量级，更大的文件是少数。</p>
+</div>
+<div class="section" id="id6">
+<h2><a class="toc-backref" href="#id10">不信？你可以测一下自己的文件系统</a></h2>
+<p>我也想测一下我的文件系统中文件大小的分布情况，于是稍微写了点代码测量和画图。如果你也想知道你的系统中
+文件大小的分布，那么可以像我这样测。</p>
+<p>首先用 <code class="code">
+find</code>
+ 命令统计一下每个文件的大小，输出到一个文件里：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>find /home -type f -printf <span class="s2">"%s %p\n"</span> &gt; myhome.txt</span>
+</pre></div>
+<p>上述命令对 <code class="code">
+/​home</code>
+ 中的所有普通文件而忽略文件夹和符号链接之类的（ <code class="code">
+-type f</code>
+
+），输出文件大小字节数和文件路径（ <code class="code">
+-printf "%s %pn"</code>
+ ）。
+如果文件名路径中有特殊符号可能之后比较难处理，那么可以 <code class="code">
+-printf "%sn"</code>
+
+忽略路径。</p>
+<p>然后用 Python 的 Matplotlib 和 NumPy 对收集到的文件大小数据画个直方图（histogram）。
+以下 <a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/zsh/.local/bin/filesizehistogram.py">filesizehistogram.py 脚本在这儿</a>
+能下载到。</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="ch">#!/usr/bin/python3</span></span>
+<span class="code-line"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span></span>
+<span class="code-line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span></span>
+<span class="code-line"><span class="kn">import</span> <span class="nn">sys</span></span>
+<span class="code-line"><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span></span>
+<span class="code-line"><span class="kn">from</span> <span class="nn">bisect</span> <span class="kn">import</span> <span class="n">bisect_left</span></span>
+<span class="code-line"></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">def</span> <span class="nf">numfmt</span><span class="p">(</span><span class="n">s</span><span class="p">):</span></span>
+<span class="code-line">    <span class="n">marks</span> <span class="o">=</span> <span class="s2">"KMGTP"</span></span>
+<span class="code-line">    <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span></span>
+<span class="code-line">    <span class="n">f</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">float</span></span>
+<span class="code-line">    <span class="k">while</span> <span class="n">s</span> <span class="o">&gt;=</span> <span class="mi">1024</span> <span class="ow">and</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">marks</span><span class="p">):</span></span>
+<span class="code-line">        <span class="k">if</span> <span class="n">f</span><span class="p">:</span></span>
+<span class="code-line">            <span class="n">s</span> <span class="o">/=</span> <span class="mf">1024.0</span></span>
+<span class="code-line">        <span class="k">else</span><span class="p">:</span></span>
+<span class="code-line">            <span class="n">s</span> <span class="o">//=</span><span class="mi">1024</span></span>
+<span class="code-line">        <span class="n">m</span> <span class="o">+=</span> <span class="mi">1</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="n">f</span><span class="p">:</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">marks</span><span class="p">[</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">m</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span></span>
+<span class="code-line">    <span class="k">else</span><span class="p">:</span></span>
+<span class="code-line">        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">}{</span><span class="n">marks</span><span class="p">[</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">m</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span></span>
+<span class="code-line">        <span class="nb">print</span><span class="p">(</span><span class="s1">'Usage: filesizehistogram.py input'</span><span class="p">)</span></span>
+<span class="code-line">        <span class="nb">print</span><span class="p">(</span><span class="s1">'       can use "-" as input filename, indicate input is taken from stdin.'</span><span class="p">)</span></span>
+<span class="code-line">        <span class="nb">print</span><span class="p">(</span><span class="s1">'       otherwise input file should be a result of "find -printf </span><span class="se">\'</span><span class="si">%s</span><span class="s1"> %p</span><span class="se">\'</span><span class="s1">"'</span><span class="p">)</span></span>
+<span class="code-line">        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="n">filename</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s1">'-'</span><span class="p">:</span></span>
+<span class="code-line">        <span class="n">filename</span> <span class="o">=</span> <span class="s1">'/dev/stdin'</span></span>
+<span class="code-line">    <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)])</span></span>
+<span class="code-line">    <span class="n">mindatalog2</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># cut from 32</span></span>
+<span class="code-line">    <span class="n">maxdatalog2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">log2</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())),</span> <span class="mi">31</span><span class="p">)</span> <span class="c1"># cut at 1G and above</span></span>
+<span class="code-line">    <span class="c1"># bins [0, 1, 32, 64, 128, 256, ... , 1G, 2G] , last bin is open range</span></span>
+<span class="code-line">    <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mindatalog2</span><span class="p">,</span> <span class="n">maxdatalog2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="n">median</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></span>
+<span class="code-line">    <span class="n">mean</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span></span>
+<span class="code-line">    <span class="n">bmedian</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">median</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span></span>
+<span class="code-line">    <span class="n">bmean</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span></span>
+<span class="code-line">    <span class="n">files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">total</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="n">hist</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">bins</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">)),</span> <span class="n">hist</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hist</span><span class="p">)])</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s1">'</span><span class="si">{}{}</span><span class="s1">~</span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">'┊</span><span class="se">\n</span><span class="s1">'</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">%</span><span class="mi">3</span><span class="p">),</span> <span class="n">numfmt</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">numfmt</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">+</span></span>
+<span class="code-line">                       <span class="p">[</span><span class="s2">"</span><span class="si">{}</span><span class="s2">~"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numfmt</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]))])</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">bmean</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'k'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'dashed'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">bmedian</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'r'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'dashed'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">min_ylim</span><span class="p">,</span> <span class="n">max_ylim</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">()</span></span>
+<span class="code-line">    <span class="n">min_xlim</span><span class="p">,</span> <span class="n">max_xlim</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">()</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bmean</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_ylim</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="s1">'Mean: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numfmt</span><span class="p">(</span><span class="n">mean</span><span class="p">)))</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bmedian</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_ylim</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="s1">'Median: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numfmt</span><span class="p">(</span><span class="n">median</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">'r'</span><span class="p">)</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">max_xlim</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">max_ylim</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="s1">'Files: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">files</span><span class="p">))</span></span>
+<span class="code-line">    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">max_xlim</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">max_ylim</span><span class="o">*</span><span class="mf">0.9</span><span class="p">,</span> <span class="s1">'Total: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numfmt</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">total</span><span class="p">))))</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hist</span><span class="p">)):</span></span>
+<span class="code-line">        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">files</span><span class="o">/</span><span class="mi">400</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># label on top of every bar</span></span>
+<span class="code-line"></span>
+<span class="code-line">    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></span>
+</pre></div>
+<p>然后就能 <code class="code">
+./​filesizehistogram.py myhome.txt</code>
+ 这样画出一张图。以下是我一台机器上根目录
+<code class="code">
+/​</code>
+ 和家目录 <code class="code">
+/​home</code>
+ 放在一起的结果：</p>
+<img alt="myroot.png" class="img-responsive" src="//farseerfc.me/zhs/images/myroot.png"/>
+<p>图中我用点线标出了中位数（median）和平均数（mean）大小的位置，可见在我的文件系统中，
+文件大小中位数在 2.24K ，平均数是 88.09K ，512~8K
+范围内的文件数量加在一起超过了文件总数一半。文件数量最多的范围是 1K~2K
+，大概因为我家里存了好多源代码。还有一个小突起在 64K~128K ，这堆主要是我收藏的漫画 JPG 文件。</p>
+<p>图的横座标和上面微软的研究类似，用2倍增长的bin统计文件数量。
+不过稍微修改了一下，因为我想知道 0 大小文件的个数，还想把 1~32 和 1G~
+以上这两个曲线底端的尾巴放在一起统计。图的纵座标是文件数。</p>
+<p>也可以用这个来画你感兴趣的文件夹的文件大小分布，比如用 linux 内核代码树画出来的图大概这样：</p>
+<img alt="linux-filesize.png" class="img-responsive" src="//farseerfc.me/zhs/images/linux-filesize.png"/>
+<p>linux 代码树的文件大部分比我猜的 30K 要小呢，主要在 1K~16K ，中位数 3.28K
+。而且意外得在代码树里有好几个 0 大小的文件，看了几个文件路径确认了一下，它们的确是 0
+大小的头文件，并不是我的文件系统丢了文件内容。</p>
+</div>
+<div class="section" id="id7">
+<h2><a class="toc-backref" href="#id11">结论</a></h2>
+<p>有没有觉得「文件大小的中位数是 4K 」这个结论出乎意料呢？</p>
+<p>你在用的系统中文件大小的分布曲线又是什么样的呢？欢迎留言告诉我。（贴图可以用
+<a class="reference external" href="https://fars.ee/f">https://fars.ee/f</a> 图床呀）</p>
+<p>知道了文件大小分布的规律，就会发现设计文件系统的时候，需要考虑两个极端情况：
+既要照顾到文件系统中数量很少而大小超大的那些文件，又要考虑到这么多数量众多而大小只有数 K
+的文件。也会发现，对于文件系统而言，超过 16K 的文件就绝不会被算作是「小文件」了，而文件系统设计中说的
+「小文件优化」针对的通常是更小的文件大小。并且这一趋势并不会随着存储设备容量增加而改变，
+不能妄图通过随着容量逐步增加文件分配「簇」大小的方式，来简化文件系统设计。</p>
+<p>那么众多文件系统实际是如何满足这些极端情况的呢？待我有空再细聊……</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/zhs/flash-storage-ftl-layer.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        SSD 就是大U盘？聊聊闪存类存储的转换层
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="series">
+                <div class="panel-heading">
+                  <h4>
+这篇文章是 "FS笔记" 系列文章的第 5 篇：                  </h4>
+                </div>
+                <ul class="list-group">
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/zfs-layered-architecture-design.html' style="text-align:left">ZFS 分层架构设计</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/btrfs-vs-zfs-difference-in-implementing-snapshots.html' style="text-align:left">Btrfs vs ZFS 实现 snapshot 的差异</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/history-of-chs-addressing.html' style="text-align:left">柱面-磁头-扇区寻址的一些旧事</a></li>
+                        <li class="list-group-item"><a class="btn btn-default" href='//farseerfc.me/zhs/flash-storage-ftl-layer.html' style="text-align:left">SSD 就是大U盘？聊聊闪存类存储的转换层</a></li>
+                        <li class="list-group-item"><a class="btn btn-primary" href='//farseerfc.me/zhs/file-size-histogram.html' style="text-align:left">系统中的大多数文件有多大？</a></li>
+                </ul>
+            </div>
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+请用你的 GitHub 账户登录并在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/96#new_comment_field" target="_blank">这篇文章的 Issue 页下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/96#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hant", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言于 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/96/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'file-size-histogram';
+                        var disqus_url = 'http://farseerfc.me/zhs/file-size-histogram.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/zhs/pages/about.html">
+关于 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/zhs/pages/about.html"><img width="100%" src="//farseerfc.me/zhs/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/zhs/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">标签云</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/fsbi-ji.html">
+                    FS笔记 <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/fs-notes.html">
+                    FS notes <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/file.html">
+                    file <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/size.html">
+                    size <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/histogram.html">
+                    histogram <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ftl.html">
+                    FTL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ssd.html">
+                    SSD <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/usb-stick.html">
+                    USB stick <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/emmc.html">
+                    eMMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/mmc.html">
+                    MMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sd-card.html">
+                    SD Card <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chs.html">
+                    CHS <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cylinder.html">
+                    cylinder <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/head.html">
+                    head <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sector.html">
+                    sector <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/lba.html">
+                    LBA <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/smr.html">
+                    SMR <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/4kn.html">
+                    4Kn <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/btrfs.html">
+                    btrfs <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/zfs.html">
+                    zfs <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cow.html">
+                    cow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/snapshot.html">
+                    snapshot <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/clone.html">
+                    clone <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/subvolume.html">
+                    subvolume <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/dedup.html">
+                    dedup <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/reflink.html">
+                    reflink <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/spa.html">
+                    SPA <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/dmu.html">
+                    DMU <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/dsl.html">
+                    DSL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/zpl.html">
+                    ZPL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/layered.html">
+                    layered <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/architecture.html">
+                    architecture <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zio.html">
+                    ZIO <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/vdev.html">
+                    VDEV <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/arc.html">
+                    ARC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zap.html">
+                    ZAP <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zil.html">
+                    ZIL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/zvol.html">
+                    ZVOL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/friend.html">
+                    friend <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/horo.html">
+                    horo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/life.html">
+                    life <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/linux.html">
+                    linux <sup> 9</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/archlinux.html">
+                    archlinux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/raspberrypi.html">
+                    raspberrypi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/usbip.html">
+                    usbip <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/usb.html">
+                    usb <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/forward.html">
+                    forward <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/translate.html">
+                    translate <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chouyaku.html">
+                    chouyaku <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/kimi.html">
+                    kimi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/sae.html">
+                    sae <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/inakerya.html">
+                    inakerya <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ting-yi.html">
+                    听译 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/dotfiles.html">
+                    dotfiles <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/stow.html">
+                    stow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/zhs/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/zhs/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/bootstrap.html">
+                    bootstrap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/subsite.html">
+                    subsite <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/css.html">
+                    css <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/zhs/tag/paper.html">
+                    paper <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/zhs/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub仓库</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目录</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id2" id="id8"><strong>你觉得，你的系统中大多数文件大概有多大？</strong></a></li>
+<li><a class="reference internal" href="#id3" id="id9">统计实际系统中文件大小的学术研究</a></li>
+<li><a class="reference internal" href="#id6" id="id10">不信？你可以测一下自己的文件系统</a></li>
+<li><a class="reference internal" href="#id7" id="id11">结论</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2020 farseerfc
+            &middot; 通过            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/zhs/../theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/zhs/../theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/zhs/../theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/zhs/../theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/zhs/../theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/zhs/../theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/zhs/../theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/material.min.js"></script>
+<script src="//farseerfc.me/zhs/../theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

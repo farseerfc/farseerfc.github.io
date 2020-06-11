@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝 - histogram</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/tag-histogram.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-06-11T15:45:00+09:00</updated><entry><title>系统中的大多数文件有多大？</title><link href="//farseerfc.me/zhs/file-size-histogram.html" rel="alternate"></link><published>2020-06-11T15:45:00+09:00</published><updated>2020-06-11T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-06-11:/zhs/file-size-histogram.html</id><summary type="html">
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;&lt;strong&gt;你觉得，你的系统中大多数文件大概有多大？&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这是一个很有意思的问题，你可以试着先猜一下。&lt;/p&gt;
+&lt;p&gt;基于对系统中保存文件的了解，可能有这样的思考过程：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;我收藏了好多照片，每个有 2~5MiB 吧。&lt;/li&gt;
+&lt;li&gt;我下载了好多漫画，每个 100KiB 左右，这些大概占了不少比例。&lt;/li&gt;
+&lt;li&gt;我还收藏了不少动画电影电视剧，虽然这些文件总数量可能不多？&lt;/li&gt;
+&lt;li&gt;我下载了 Linux 的源码，那里面每个 C 代码文件都几千行，每行 100 字宽，平均也得有 30KiB
+吧，有几万个源码文件呢，占比应该挺大的……&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;问题中「大多数」其实是个挺不精确的称呼，换个精确点的问法：你觉得你的系统中 &lt;strong&gt;文件大小的中位数&lt;/strong&gt;
+大概在什么范围内？或者说，文件系统中 &lt;strong&gt;文件大小的分布情况&lt;/strong&gt; 一般是怎样的曲线？&lt;/p&gt;
+&lt;p&gt;这个问题其实还有多种别的问法，比如：一个常见的桌面或者服务器系统中，多大的文件算大文件，
+多小的文件算小文件，什么范围内的大小算是普通呢？&lt;/p&gt;
+&lt;p&gt;经历过基本的科学教育的人 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;div class="section" id="id2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;&lt;strong&gt;你觉得，你的系统中大多数文件大概有多大？&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;这是一个很有意思的问题，你可以试着先猜一下。&lt;/p&gt;
+&lt;p&gt;基于对系统中保存文件的了解，可能有这样的思考过程：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;我收藏了好多照片，每个有 2~5MiB 吧。&lt;/li&gt;
+&lt;li&gt;我下载了好多漫画，每个 100KiB 左右，这些大概占了不少比例。&lt;/li&gt;
+&lt;li&gt;我还收藏了不少动画电影电视剧，虽然这些文件总数量可能不多？&lt;/li&gt;
+&lt;li&gt;我下载了 Linux 的源码，那里面每个 C 代码文件都几千行，每行 100 字宽，平均也得有 30KiB
+吧，有几万个源码文件呢，占比应该挺大的……&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;问题中「大多数」其实是个挺不精确的称呼，换个精确点的问法：你觉得你的系统中 &lt;strong&gt;文件大小的中位数&lt;/strong&gt;
+大概在什么范围内？或者说，文件系统中 &lt;strong&gt;文件大小的分布情况&lt;/strong&gt; 一般是怎样的曲线？&lt;/p&gt;
+&lt;p&gt;这个问题其实还有多种别的问法，比如：一个常见的桌面或者服务器系统中，多大的文件算大文件，
+多小的文件算小文件，什么范围内的大小算是普通呢？&lt;/p&gt;
+&lt;p&gt;经历过基本的科学教育的人，大概会做这样的基于科学假设的猜测：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;统计学上说，大量独立随机事件的累积概率满足正态分布（常态分布）曲线。假设我们把某个特定文件的大小增长
+1字节看作是一次独立随机事件，那么文件大小在文件系统中应该是满足正态分布的？&lt;/li&gt;
+&lt;li&gt;正态分布的前提下，平均数接近中位数，文件系统的已占用大小除以文件数量大概就是大部分文件的大小了吧。&lt;/li&gt;
+&lt;li&gt;根据我现在文件系统的占用大小和文件数量，平均数大概是 500KiB 左右？&lt;/li&gt;
+&lt;li&gt;虽然我还存了几个非常大，上 GiB 的文件，但是看起来似乎也有很多很多非常小的文件，
+平均一下的话应该会把平均数拉大，大于中位数吧。那么中位数应该在 100KiB 这样的量级附近？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;你说为什么要关心这个？因为我经常在网上看到这样的讨论：&lt;/p&gt;
+&lt;p&gt;「我有个仓库盘要存很多下载到的漫画，每个漫画都是一个文件夹里面一堆 &lt;strong&gt;小 JPG&lt;/strong&gt; ，每个就几十 KiB
+。网上看到的说法是 XFS 对 &lt;strong&gt;小文件&lt;/strong&gt; 的性能不那么好，我是不是该换 EXT4 ？我还想在 Windows
+上能读写，是不是 ExFAT 这种简单的文件系统更合适一点？」&lt;/p&gt;
+&lt;p&gt;「软件源的镜像服务器需要存的都是些 &lt;strong&gt;小文件&lt;/strong&gt; 吧，大多数软件包压缩后也就是几个 KiB 到几个
+MiB 的量级，这种需求是不是适合用对 &lt;strong&gt;小文件&lt;/strong&gt; 优化比较好的文件系统？」&lt;/p&gt;
+&lt;p&gt;「我的程序需要分析的数据是大量几百K的 &lt;strong&gt;小文件&lt;/strong&gt; ，该怎么存合适呢，直接用文件系统还是应该上数据库？
+我还想多线程并发分析，是不是 SQL 数据库的并发能力强一些？又或者 MongoDB 的 GridFS
+看起来似乎能结合文件系统和数据库的特点，选它应该还不错？」&lt;/p&gt;
+&lt;p&gt;有没有觉得上面这些讨论和直觉有些出入？如果你的直觉告诉你，上面的讨论似乎很自然的话，
+那说明你需要继续看下去了。&lt;/p&gt;
+&lt;p&gt;好了写了这么多废话给大家思考时间，现在请回答一下我标题中那个问题，
+&lt;strong&gt;你觉得，你的系统中大多数文件大概有多大？&lt;/strong&gt; ，接下来我要揭晓答案了。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;统计实际系统中文件大小的学术研究&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://youtu.be/lTE26gkeVUs?t=452"&gt;A Study of Practical Deduplication&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/lTE26gkeVUs"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;最近看到一个挺早以前的研究报告，是 &lt;a class="reference external" href="https://www.usenix.org/legacy/events/fast11/"&gt;FAST'11&lt;/a&gt;
+的最优秀论文奖，研究的课题叫 &lt;a class="reference external" href="https://www.usenix.org/legacy/event/fast11/tech/full_papers/Meyer.pdf"&gt;《A Study of Practical Deduplication》&lt;/a&gt;
+。这个研究原本是想考察一下在桌面文件系统中「去重」（deduplication）的可行性和潜在收益，作为背景调查，
+他们收集了一个挺大的调查样本，记录文件大小和校验和之类的。从论文摘要看，他们在微软公司内，
+通过邮件的形式让微软员工在各自的工作机上执行他们的调查程序，大概在1个月左右的时间内收集到了 857
+份调查结果。关于去重的研究结果这里我们这里先不深究，只看这个背景调查，他们对收集到的文件大小画了个图表：&lt;/p&gt;
+&lt;img alt="file-histogram-4k.jpg" class="img-responsive" src="//farseerfc.me/zhs/images/file-histogram-4k.jpg"/&gt;
+&lt;p&gt;他们结果显示最常见的文件大小是 &lt;strong&gt;4K&lt;/strong&gt; ！&lt;/p&gt;
+&lt;p&gt;注意上图里的横轴座标，是按2的指数来给文件大小分类的。比如 128~256 字节的算一类， 4K~8K
+字节的算一类，分类之后统计每一类里面文件的数量所占比例，也就是说横轴座标是指数增长的。
+在指数增长的横轴座标上，画出的曲线才看起来像是正态分布的曲线，如果把横轴座标画成线性的话，
+中位数会出现在非常靠近左侧小文件的地方。&lt;/p&gt;
+&lt;p&gt;也就是说根据他们的统计，文件系统中大部分文件都是大概 2K 到 8K 这样的范围，最常见 4K 大小。
+非常大的比如 8M 以上的文件只是极个别，位于图表右侧非常长的尾巴中。&lt;/p&gt;
+&lt;p&gt;其实我对这个结果还不是很惊讶，因为我记得在 2000 年左右，当我家的电脑还在用 Windows 98 跑在
+40G 的 FAT32 文件系统中的时候，读到过一篇介绍 NTFS 的「新」特性的文章。那篇文章讲到 FAT32
+的簇大小随着分区大小增长，越来越大的簇大小对保存大量小文件极其浪费，而 NTFS 用固定的 4K
+簇大小可避免这样的浪费，并且 1K MFT 记录甚至能「内联（inline）」存储非常小的文件。
+为了证明大量小文件对文件系统是个现实存在的问题，那篇文章也提到了常见系统中的文件大小分布曲线，
+提到了大部分文件都是 4K 大小这有点反直觉的结论。&lt;/p&gt;
+&lt;p&gt;这次这个研究让我觉得吃惊的是，文件大小分布并没有随着硬盘大小的增加而增加，稳定在了 4K 这个数字上。
+他们以前还进行过两次类似的统计，分别在 2000 年和 2004 年，图中的点线画出了历史上的统计分布，实线是
+2009 年的最新统计。三年获得的统计结果的曲线基本吻合，这意味着随着存储容量增长，文件大小的分布几乎没有变化。&lt;/p&gt;
+&lt;p&gt;正当我疑惑，这种文件大小不变的趋势，是否是因为微软公司内特定的操作系统和工作内容，
+在别的系统上或者在更长的时间跨度上是否有类似的趋势呢？这时演讲的幻灯片翻了一页：&lt;/p&gt;
+&lt;img alt="file-histogram-4k-since1981.jpg" class="img-responsive" src="//farseerfc.me/zhs/images/file-histogram-4k-since1981.jpg"/&gt;
+&lt;p&gt;从早在 1981 年起，有研究表明文件系统中文件大小中位数就稳定在了 &lt;strong&gt;4K&lt;/strong&gt; ！&lt;/p&gt;
+&lt;p&gt;在他们论文的参考文献中，能找到 &lt;a class="reference external" href="https://www.cs.cmu.edu/~satya/docdir/satya-sosp-1981.pdf"&gt;这个 1981 年的研究&lt;/a&gt;
+。这篇早年的调查是在 DEC 的 PDP-10 机器上，使用 TOPS-10 操作系统。从现在的视点来看，被调查的
+TOPS-10 的文件系统已经可以说非常初级了，没法支持很大的文件或者很多的文件，
+然而即便如此常见文件大小也还是非常符合现代系统中得到的结果。&lt;/p&gt;
+&lt;p&gt;微软的研究者们还回顾了计算机科学领域多年的相关研究，结论是常见文件大小这个值在 1981 到 2009
+这近 30 年中都非常稳定。演讲的原文中这么评价：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;…… the median file size is 4k. It was 4k the other two years of the study.
+We've actually gone back through the literature. It turns out it's 4k in every
+study going back to the last 30 years. So this is great news. We can finally
+compete with physicists: we have our own fundamental constant of the
+universe, it's a medium file size ……&lt;/p&gt;
+&lt;p&gt;文件的平均大小是 4K 。在前几年的两次研究中它也是 4K。其实我们回顾了既往的学术研究，发现在过去30
+年中每个研究都说它是 4K 这个值。这是个好消息，我们终于有了一个堪比物理学家的结论：我们有我们自己的
+宇宙基本常数了，是文件大小中位数。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这个结论很有意思，文件大小中位数在计算机科学领域的稳定程度堪比宇宙基本常数： &lt;strong&gt;4K&lt;/strong&gt; ！&lt;/p&gt;
+&lt;p&gt;很明显这是在调侃，文件大小这种变化很大的数字显然和文件系统内存储的内容直接相关，
+存游戏的可能不同于存音乐的。但是这调侃的背后也有一定真实性：文件系统中保存的文件，
+除了用户直接使用的那些视频、文档、代码，还有大量文件是程序内部创建使用的，比如浏览器的缓存和
+cookie ，这类不被用户知晓的文件可能在数量上反而占据绝大多数。
+于是从文件系统这边来看，大多数文件都是在 &lt;strong&gt;4K&lt;/strong&gt; 左右的数量级，更大的文件是少数。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;不信？你可以测一下自己的文件系统&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;我也想测一下我的文件系统中文件大小的分布情况，于是稍微写了点代码测量和画图。如果你也想知道你的系统中
+文件大小的分布，那么可以像我这样测。&lt;/p&gt;
+&lt;p&gt;首先用 &lt;code class="code"&gt;
+find&lt;/code&gt;
+ 命令统计一下每个文件的大小，输出到一个文件里：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;find /home -type f -printf &lt;span class="s2"&gt;"%s %p\n"&lt;/span&gt; &amp;gt; myhome.txt&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;上述命令对 &lt;code class="code"&gt;
+/​home&lt;/code&gt;
+ 中的所有普通文件而忽略文件夹和符号链接之类的（ &lt;code class="code"&gt;
+-type f&lt;/code&gt;
+
+），输出文件大小字节数和文件路径（ &lt;code class="code"&gt;
+-printf "%s %pn"&lt;/code&gt;
+ ）。
+如果文件名路径中有特殊符号可能之后比较难处理，那么可以 &lt;code class="code"&gt;
+-printf "%sn"&lt;/code&gt;
+
+忽略路径。&lt;/p&gt;
+&lt;p&gt;然后用 Python 的 Matplotlib 和 NumPy 对收集到的文件大小数据画个直方图（histogram）。
+以下 &lt;a class="reference external" href="https://github.com/farseerfc/dotfiles/blob/master/zsh/.local/bin/filesizehistogram.py"&gt;filesizehistogram.py 脚本在这儿&lt;/a&gt;
+能下载到。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/python3&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;plt&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;math&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;bisect&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;bisect_left&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;marks&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"KMGTP"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;1024&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;marks&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;/=&lt;/span&gt; &lt;span class="mf"&gt;1024.0&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;            &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;//=&lt;/span&gt;&lt;span class="mi"&gt;1024&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="si"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;.2f&lt;/span&gt;&lt;span class="si"&gt;}{&lt;/span&gt;&lt;span class="n"&gt;marks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="si"&gt;}{&lt;/span&gt;&lt;span class="n"&gt;marks&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;'__main__'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'Usage: filesizehistogram.py input'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'       can use "-" as input filename, indicate input is taken from stdin.'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'       otherwise input file should be a result of "find -printf &lt;/span&gt;&lt;span class="se"&gt;\'&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; %p&lt;/span&gt;&lt;span class="se"&gt;\'&lt;/span&gt;&lt;span class="s1"&gt;"'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;'-'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="n"&gt;filename&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'/dev/stdin'&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;' '&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;mindatalog2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt; &lt;span class="c1"&gt;# cut from 32&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;maxdatalog2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ceil&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;log2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;())),&lt;/span&gt; &lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# cut at 1G and above&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="c1"&gt;# bins [0, 1, 32, 64, 128, 256, ... , 1G, 2G] , last bin is open range&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mindatalog2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;maxdatalog2&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;median&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;median&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;mean&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;bmedian&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bisect_left&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;median&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;bmean&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bisect_left&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;files&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;total&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bin_edges&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;histogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;fig&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;subplots&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;bar&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;set_xticks&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;set_xticklabels&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="si"&gt;{}{}&lt;/span&gt;&lt;span class="s1"&gt;~&lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'┊&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt; &lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;                       &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s2"&gt;~"&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]))])&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axvline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmean&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'k'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linestyle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'dashed'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linewidth&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axvline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmedian&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'r'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linestyle&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'dashed'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linewidth&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;min_ylim&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_ylim&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylim&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;min_xlim&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_xlim&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlim&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmean&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_ylim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'Mean: &lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmedian&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_ylim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'Median: &lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;median&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;'r'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_xlim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_ylim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'Files: &lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_xlim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_ylim&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'Total: &lt;/span&gt;&lt;span class="si"&gt;{}&lt;/span&gt;&lt;span class="s1"&gt;'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;numfmt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;total&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;        &lt;span class="n"&gt;ax&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;400&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="si"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;5&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# label on top of every bar&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后就能 &lt;code class="code"&gt;
+./​filesizehistogram.py myhome.txt&lt;/code&gt;
+ 这样画出一张图。以下是我一台机器上根目录
+&lt;code class="code"&gt;
+/​&lt;/code&gt;
+ 和家目录 &lt;code class="code"&gt;
+/​home&lt;/code&gt;
+ 放在一起的结果：&lt;/p&gt;
+&lt;img alt="myroot.png" class="img-responsive" src="//farseerfc.me/zhs/images/myroot.png"/&gt;
+&lt;p&gt;图中我用点线标出了中位数（median）和平均数（mean）大小的位置，可见在我的文件系统中，
+文件大小中位数在 2.24K ，平均数是 88.09K ，512~8K
+范围内的文件数量加在一起超过了文件总数一半。文件数量最多的范围是 1K~2K
+，大概因为我家里存了好多源代码。还有一个小突起在 64K~128K ，这堆主要是我收藏的漫画 JPG 文件。&lt;/p&gt;
+&lt;p&gt;图的横座标和上面微软的研究类似，用2倍增长的bin统计文件数量。
+不过稍微修改了一下，因为我想知道 0 大小文件的个数，还想把 1~32 和 1G~
+以上这两个曲线底端的尾巴放在一起统计。图的纵座标是文件数。&lt;/p&gt;
+&lt;p&gt;也可以用这个来画你感兴趣的文件夹的文件大小分布，比如用 linux 内核代码树画出来的图大概这样：&lt;/p&gt;
+&lt;img alt="linux-filesize.png" class="img-responsive" src="//farseerfc.me/zhs/images/linux-filesize.png"/&gt;
+&lt;p&gt;linux 代码树的文件大部分比我猜的 30K 要小呢，主要在 1K~16K ，中位数 3.28K
+。而且意外得在代码树里有好几个 0 大小的文件，看了几个文件路径确认了一下，它们的确是 0
+大小的头文件，并不是我的文件系统丢了文件内容。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;结论&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;有没有觉得「文件大小的中位数是 4K 」这个结论出乎意料呢？&lt;/p&gt;
+&lt;p&gt;你在用的系统中文件大小的分布曲线又是什么样的呢？欢迎留言告诉我。（贴图可以用
+&lt;a class="reference external" href="https://fars.ee/f"&gt;https://fars.ee/f&lt;/a&gt; 图床呀）&lt;/p&gt;
+&lt;p&gt;知道了文件大小分布的规律，就会发现设计文件系统的时候，需要考虑两个极端情况：
+既要照顾到文件系统中数量很少而大小超大的那些文件，又要考虑到这么多数量众多而大小只有数 K
+的文件。也会发现，对于文件系统而言，超过 16K 的文件就绝不会被算作是「小文件」了，而文件系统设计中说的
+「小文件优化」针对的通常是更小的文件大小。并且这一趋势并不会随着存储设备容量增加而改变，
+不能妄图通过随着容量逐步增加文件分配「簇」大小的方式，来简化文件系统设计。&lt;/p&gt;
+&lt;p&gt;那么众多文件系统实际是如何满足这些极端情况的呢？待我有空再细聊……&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="FS笔记"></category><category term="FS notes"></category><category term="file"></category><category term="size"></category><category term="histogram"></category></entry></feed>
