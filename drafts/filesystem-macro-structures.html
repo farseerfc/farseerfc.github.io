@@ -270,11 +270,516 @@ geometry based optimization）。
 <div class="section" id="dos-fat12-fat16-vfat-fat32">
 <h2>DOS文件系統與文件分配表（FAT12 FAT16 VFAT FAT32）</h2>
 <p>FAT 系文件系統最初爲軟盤驅動器設計，</p>
+<p>比如 3.5 吋 1.44M 軟盤使用 FAT12 ，每簇對應一個 512B 扇區， FAT表項是 12bit
+，於是最多可以有 <span class="math">\(2^{12}=4096\)</span> 個簇。
+<a class="reference external" href="//farseerfc.me/history-of-chs-addressing.html#chs">之前的文章講過</a> 軟盤上共有
+<span class="math">\(2 \times 80 \times 18 = 2880\)</span> 個扇區，所以減去最開始的 33
+個非數據區的扇區，軟盤上的 FAT12 有 2847 個簇，於是存一個文件分配表需要至少
+<span class="math">\(\frac{2847 \times 12\texttt{bit}}{8\texttt{bit}}=4270.5\)</span> 字節的空間，不到 9
+個扇區。按正確大小畫出軟盤上的 FAT12 大概這樣：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/a8da4a21.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>注意上圖 FAT12 中非數據區佔用空間，引導扇區+兩份 FAT 表+根目錄全部位於軟盤的首個柱面上，
+這是微軟有意如此設計的，從而在讀寫 FAT 的時候磁頭位於最外圈的磁道，不需要移動磁頭。
+FAT12 用於軟盤，可用空間不會很大，所以可以一個簇對應一個扇區也不會導致很大的 FAT 表。
+相比之下用於硬盤的 FAT16 的大小可以很大，於是需要增加每簇中包含的扇區數量，讓 FAT
+表儘量放入首個柱面。</p>
+<table border="0" class="docutils table borderless">
+<colgroup>
+<col width="15%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+<col width="9%"/>
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Volume Size</th>
+<th class="head" colspan="3">FAT16</th>
+<th class="head" colspan="3">FAT32</th>
+<th class="head" colspan="3">exFAT</th>
+<th class="head">NTFS</th>
+</tr>
+<tr><th class="head">Volume Size</th>
+<th class="head">Cluster</th>
+<th class="head">FAT</th>
+<th class="head">FATS</th>
+<th class="head">Cluster</th>
+<th class="head">FAT</th>
+<th class="head">FATS</th>
+<th class="head">Cluster</th>
+<th class="head">FAT</th>
+<th class="head">FATS</th>
+<th class="head">NTFS</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>7 MiB–8 MiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>2K</td>
+<td>8KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>8 MiB–16 MiB</td>
+<td><span style="color:   rgb(100,100,255)">512B</span></td>
+<td>32K</td>
+<td>64KiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>4K</td>
+<td>16KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>16 MiB–32 MiB</td>
+<td><span style="color:   rgb(100,100,255)">512B</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(100,100,255)">512B</span></td>
+<td>64K</td>
+<td>256KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>8K</td>
+<td>32KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>32 MiB–64 MiB</td>
+<td><span style="color:   rgb( 50, 50,255)">1KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(100,100,255)">512B</span></td>
+<td>128K</td>
+<td>512KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>16K</td>
+<td>64KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>64 MiB–128 MiB</td>
+<td><span style="color:   rgb(  0,  0,255)">2KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb( 50, 50,255)">1KiB</span></td>
+<td>128K</td>
+<td>512KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>32K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>128 MiB–256 MiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,255)">2KiB</span></td>
+<td>128K</td>
+<td>512KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>64K</td>
+<td>256KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>256 MiB–512 MiB</td>
+<td><span style="color:   rgb( 50,  0,  0)">8KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>128K</td>
+<td>512KiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>16K</td>
+<td>64KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>512 MiB–1 GiB</td>
+<td><span style="color:  rgb(100,  0,  0)">16KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>256K</td>
+<td>1MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>32K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>1 GiB–2 GiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>512K</td>
+<td>2MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>64K</td>
+<td>256KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>2 GiB–4 GiB</td>
+<td><span style="color:  rgb(200,  0,  0)">64KiB</span></td>
+<td>64K</td>
+<td>128KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>1M</td>
+<td>4MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>128K</td>
+<td>512KiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>4 GiB–8 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+<td>2M</td>
+<td>8MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>256K</td>
+<td>1MiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>8 GiB–16 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:   rgb( 50,  0,  0)">8KiB</span></td>
+<td>2M</td>
+<td>8MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>512K</td>
+<td>2MiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>16 GiB–32 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:  rgb(100,  0,  0)">16KiB</span></td>
+<td>2M</td>
+<td>8MiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+<td>1M</td>
+<td>4MiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>32 GiB–16TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
+<td>128M</td>
+<td>512MiB</td>
+<td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
+</tr>
+<tr><td>16 TiB–32 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
+<td>256M</td>
+<td>1GiB</td>
+<td><span style="color:   rgb( 50,  0,  0)">8KiB</span></td>
+</tr>
+<tr><td>32 TiB–64 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
+<td>512M</td>
+<td>2GiB</td>
+<td><span style="color:  rgb(100,  0,  0)">16KiB</span></td>
+</tr>
+<tr><td>64 TiB–128 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
+<td>1G</td>
+<td>4GiB</td>
+<td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
+</tr>
+<tr><td>128 TiB–256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
+<td>2G</td>
+<td>8GiB</td>
+<td><span style="color:  rgb(200,  0,  0)">64KiB</span></td>
+</tr>
+<tr><td>&gt; 256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+</tr>
+</tbody>
+</table>
+<p>從中我們可以算出默認 FAT 表項的最大數量限制：</p>
+<table border="0" class="docutils table borderless">
+<colgroup>
+<col width="36%"/>
+<col width="21%"/>
+<col width="21%"/>
+<col width="21%"/>
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Volume Size</th>
+<th class="head">FAT16</th>
+<th class="head">FAT32</th>
+<th class="head">exFAT</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>7 MiB–8 MiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2K</td>
+</tr>
+<tr><td>8 MiB–16 MiB</td>
+<td>32K</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>4K</td>
+</tr>
+<tr><td>16 MiB–32 MiB</td>
+<td>64K</td>
+<td>64K</td>
+<td>8K</td>
+</tr>
+<tr><td>32 MiB–64 MiB</td>
+<td>64K</td>
+<td>128K</td>
+<td>16K</td>
+</tr>
+<tr><td>64 MiB–128 MiB</td>
+<td>64K</td>
+<td>128K</td>
+<td>32K</td>
+</tr>
+<tr><td>128 MiB–256 MiB</td>
+<td>64K</td>
+<td>128K</td>
+<td>64K</td>
+</tr>
+<tr><td>256 MiB–512 MiB</td>
+<td>64K</td>
+<td>128K</td>
+<td>16K</td>
+</tr>
+<tr><td>512 MiB–1 GiB</td>
+<td>64K</td>
+<td>256K</td>
+<td>32K</td>
+</tr>
+<tr><td>1 GiB–2 GiB</td>
+<td>64K</td>
+<td>512K</td>
+<td>64K</td>
+</tr>
+<tr><td>2 GiB–4 GiB</td>
+<td>64K</td>
+<td>1M</td>
+<td>128K</td>
+</tr>
+<tr><td>4 GiB–8 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2M</td>
+<td>256K</td>
+</tr>
+<tr><td>8 GiB–16 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2M</td>
+<td>512K</td>
+</tr>
+<tr><td>16 GiB–32 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2M</td>
+<td>1M</td>
+</tr>
+<tr><td>32 GiB–16TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>128M</td>
+</tr>
+<tr><td>16 TiB–32 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>256M</td>
+</tr>
+<tr><td>32 TiB–64 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>512M</td>
+</tr>
+<tr><td>64 TiB–128 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>1G</td>
+</tr>
+<tr><td>128 TiB–256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2G</td>
+</tr>
+<tr><td>&gt; 256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+</tr>
+</tbody>
+</table>
+<p>和單個 FAT 表大小：</p>
+<table border="0" class="docutils table borderless">
+<colgroup>
+<col width="36%"/>
+<col width="21%"/>
+<col width="21%"/>
+<col width="21%"/>
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Volume Size</th>
+<th class="head">FAT16</th>
+<th class="head">FAT32</th>
+<th class="head">exFAT</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>7 MiB–8 MiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>8KiB</td>
+</tr>
+<tr><td>8 MiB–16 MiB</td>
+<td>64KiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>16KiB</td>
+</tr>
+<tr><td>16 MiB–32 MiB</td>
+<td>128KiB</td>
+<td>256KiB</td>
+<td>32KiB</td>
+</tr>
+<tr><td>32 MiB–64 MiB</td>
+<td>128KiB</td>
+<td>512KiB</td>
+<td>64KiB</td>
+</tr>
+<tr><td>64 MiB–128 MiB</td>
+<td>128KiB</td>
+<td>512KiB</td>
+<td>128KiB</td>
+</tr>
+<tr><td>128 MiB–256 MiB</td>
+<td>128KiB</td>
+<td>512KiB</td>
+<td>256KiB</td>
+</tr>
+<tr><td>256 MiB–512 MiB</td>
+<td>128KiB</td>
+<td>512KiB</td>
+<td>64KiB</td>
+</tr>
+<tr><td>512 MiB–1 GiB</td>
+<td>128KiB</td>
+<td>1MiB</td>
+<td>128KiB</td>
+</tr>
+<tr><td>1 GiB–2 GiB</td>
+<td>128KiB</td>
+<td>2MiB</td>
+<td>256KiB</td>
+</tr>
+<tr><td>2 GiB–4 GiB</td>
+<td>128KiB</td>
+<td>4MiB</td>
+<td>512KiB</td>
+</tr>
+<tr><td>4 GiB–8 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>8MiB</td>
+<td>1MiB</td>
+</tr>
+<tr><td>8 GiB–16 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>8MiB</td>
+<td>2MiB</td>
+</tr>
+<tr><td>16 GiB–32 GiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>8MiB</td>
+<td>4MiB</td>
+</tr>
+<tr><td>32 GiB–16TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>512MiB</td>
+</tr>
+<tr><td>16 TiB–32 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>1GiB</td>
+</tr>
+<tr><td>32 TiB–64 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>2GiB</td>
+</tr>
+<tr><td>64 TiB–128 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>4GiB</td>
+</tr>
+<tr><td>128 TiB–256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td>8GiB</td>
+</tr>
+<tr><td>&gt; 256 TiB</td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="unix">
 <h2>早期 Unix 文件系統</h2>
 </div>
-<div class="section" id="id4">
+<div class="section" id="id5">
 <h2>柱面-磁頭-扇區尋址與地理位置優化</h2>
 <div class="section" id="bsd-ffs">
 <h3>BSD 的 FFS</h3>
@@ -283,13 +788,69 @@ geometry based optimization）。
 <h3>Linux 的 ext2</h3>
 </div>
 </div>
-<div class="section" id="id5">
+<div class="section" id="id6">
 <h2>物理尋址到邏輯塊尋址</h2>
 </div>
 <div class="section" id="flash-ftl">
 <h2>Flash 媒介與 FTL</h2>
 </div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
 
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -308,7 +869,7 @@ geometry based optimization）。
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f06229896f0> 篇：                  </h4>
+這篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f2895eb4e70> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
