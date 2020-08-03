@@ -216,3 +216,8 @@
 
 	也是一位社区中珍贵的 Gnome 用户，喵窝住民，ptrace专门家，NOIPer，博客似乎是 Hexo 很清爽的界面。
 
+.. friend:: bruceutut
+	:nick: `布鲁斯兔兔 <https://blog.brucezhang.cf/>`_
+	:logo: https://avatars3.githubusercontent.com/u/6873988
+
+	:del:`大黑客` 兔兔，博客引擎似乎刚换到 Hugo ，主题简洁漂亮。 :del:`兔兔这么可爱，不如我们……`
