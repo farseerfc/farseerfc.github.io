@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="FS笔记,FS notes,internal fragmentation,small file optimization,inline" />
-        <meta name="description" content="上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下（目前还在用的）最简单的文件系统怎么存文件的吧： FAT系文件系统与簇大小 在 …" />
+        <meta name="description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下 …" />
 
         <meta property="og:site_name" content="Farseerfc's Nest" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="内部碎片与小文件优化"/>
         <meta property="og:url" content="//farseerfc.me/en/zhs/drafts/internal-fragmentation-and-small-file-optimization.html"/>
-        <meta property="og:description" content="上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下（目前还在用的）最简单的文件系统怎么存文件的吧： FAT系文件系统与簇大小 在 …"/>
+        <meta property="og:description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下 …"/>
         <meta property="article:published_time" content="2020-07-03" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS笔记" />
@@ -237,7 +237,9 @@ Farseerfc's Nest            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
-                <p>上篇「 <a class="reference external" href="//farseerfc.me/en/file-size-histogram-zhs.html">系统中的大多数文件有多大？</a>
+                <p>副标题1：文件存入文件系统后占用多大？</p>
+<p>副标题2：文件系统的微观结构</p>
+<p>上篇「 <a class="reference external" href="//farseerfc.me/en/file-size-histogram-zhs.html">系统中的大多数文件有多大？</a>
 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K
 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的，
 ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况：</p>
@@ -258,17 +260,22 @@ Farseerfc's Nest            </a>
 <h2>FAT系文件系统与簇大小</h2>
 <p>在 FAT 系文件系统(FAT12/16/32/exFAT)中，整个存储空间除了一些保留扇区之外，被分为两大块区域，
 看起来类似这样：</p>
-<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/60f5397f.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/91d24daa.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>前一部分区域放文件分配表（File Allocation Table），后一部分是实际存储文件和目录的数据区。
 数据区被划分成「簇（cluster）」，每个簇是一到多个连续扇区，然后文件分配表中表项的数量
 决定了后面可用空间的簇的数量。文件分配表（FAT）在 FAT 系文件系统中这里充当了两个重要作用：</p>
 <ol class="arabic simple">
-<li>管理簇空间分配。空间分配器可以扫描 FAT 判断哪些簇处于空闲状态，那些簇已经被占用，从而分配空间。</li>
-<li>对现有文件，FAT 表中的记录形成一个单链表结构，用来寻找文件的所有已分配簇地址。</li>
+<li><strong>宏观尺度</strong> ：从 CHS 地址映射到线性的簇号地址空间，管理簇空间分配。空间分配器可以扫描 FAT 判断哪些簇处于空闲状态，那些簇已经被占用，从而分配空间。</li>
+<li><strong>微观尺度</strong> ：对现有文件，FAT 表中的记录形成一个单链表结构，用来寻找文件的所有已分配簇地址。</li>
 </ol>
-<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/c211797d.svg" type="image/svg+xml">
+<p>比如在根目录中有 4 个不同大小文件的 FAT16 中，使用 512 字节的簇大小的文件系统，其根目录结构和
+FAT 表可能看起来像下图这样：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/51f8666b.svg" type="image/svg+xml">
 tikz diagram</object>
+<p>目录结构中的文件记录是固定长度的，其中保存 8.3 长度的文件名，一些文件属性（修改日期和时间、
+隐藏文件之类的），文件大小的字节数，和一个起始簇号。起始簇号在 FAT 表中引出一个簇号的单链表，
+顺着这个单链表能找到存储文件内容的所有簇。</p>
 <p>直观上理解，FAT表像是数据区域的缩略图，数据区域有多少簇，FAT表就有多少表项。
 FAT系文件系统中每个簇有多大，由文件系统总容量，以及 FAT 表项的数量限制。
 我们来看一下微软文件系统默认格式化的簇大小（
@@ -277,7 +284,7 @@ FAT系文件系统中每个簇有多大，由文件系统总容量，以及 FAT 
 table.right-align-columns td,th {
     text-align: right
 }
-</style><table border="0" class="borderless table docutils right-align-columns">
+</style><table border="0" class="borderless docutils right-align-columns table">
 <colgroup>
 <col width="32%"/>
 <col width="17%"/>
@@ -295,14 +302,14 @@ table.right-align-columns td,th {
 </thead>
 <tbody valign="top">
 <tr><td>&lt; 8 MiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>8 MiB – 16 MiB</td>
 <td><span style="color:   rgb(100,100,255)">512B</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
@@ -355,76 +362,442 @@ table.right-align-columns td,th {
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>4 GiB – 8 GiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 <td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>8 GiB – 16 GiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color:   rgb( 50,  0,  0)">8KiB</span></td>
 <td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>16 GiB – 32 GiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color:  rgb(100,  0,  0)">16KiB</span></td>
 <td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>32 GiB – 16TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
 <td><span style="color:   rgb(  0,  0,  0)">4KiB</span></td>
 </tr>
 <tr><td>16 TiB – 32 TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
 <td><span style="color:   rgb( 50,  0,  0)">8KiB</span></td>
 </tr>
 <tr><td>32 TiB – 64 TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
 <td><span style="color:  rgb(100,  0,  0)">16KiB</span></td>
 </tr>
 <tr><td>64 TiB – 128 TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
 <td><span style="color:  rgb(150,  0,  0)">32KiB</span></td>
 </tr>
 <tr><td>128 TiB – 256 TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 <td><span style="color: rgb(255,  0,  0)">128KiB</span></td>
 <td><span style="color:  rgb(200,  0,  0)">64KiB</span></td>
 </tr>
 <tr><td>&gt; 256 TiB</td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
-<td><span style="color:     rgb(255,100,100)">N/A</span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
+<td><span style="color:     rgb(255,100,100)"></span></td>
 </tr>
 </tbody>
 </table>
 <p>用于软盘的时候 FAT12 的簇大小直接等于扇区大小 512B ，在容量较小的 FAT16 上也是如此。
 FAT12 和 FAT16 都被 FAT 表项的最大数量限制（分别是 4068 和 65460 ），FAT 表本身不会太大。
 所以上表中可见，随着设备容量增加， FAT16 需要增加每簇大小，保持同样数量的 FAT 表项。</p>
-<p>到 FAT32 和 exFAT 的年代，FAT 表项存储 32bit 的簇指针，最多能有接近 4G 的 FAT
-表项，从而表项数量理应不再限制 FAT 表大小，从而理应使用同样的簇大小。不过事实上，
+<p>到 FAT32 和 exFAT 的年代，FAT 表项存储 32bit 的簇指针，最多能有接近 4G 个数量的 FAT
+表项，从而表项数量理应不再限制 FAT 表大小，使用和扇区大小同样的簇大小。不过事实上，
 簇大小仍然根据设备容量增长而增大。 FAT32 上 256MiB 到 8GiB 的范围内使用 4KiB
 簇大小，随后簇大小开始增加；在 exFAT 上 256MiB 到 32GiB 使用 32KiB 簇大小，随后增加到
-128KiB 。增加簇大小的原因是为了限制 FAT 表整体的大小，因为在使用 FAT
-表的文件系统中，需要将 FAT 表整体装入内存才能满足文件访问和簇分配时的性能，如果读写 FAT
-表的范围需要访问磁盘，那么整个文件系统的读写性能将暴跌到几近不可用。到针对闪存优化的 exFAT
-上，虽然在 FAT 表外还有额外簇分配位图，但是也同样要限制 FAT 表整体大小，减少对 FAT
-表区域的随机读写。</p>
-<p>使用如此大的簇大小，导致的劣势在于极度浪费存储空间。</p>
+128KiB 。</p>
+<p>FAT 系的簇大小是可以由用户在创建文件系统时指定的，大部分普通用户会使用系统根据存储设备容量推算的默认值，
+而存储设备的生产厂商则可以根据底层存储设备的特性决定一个适合存储设备的簇大小。在选择簇大小时，
+要考虑取舍，较小的簇意味着同样容量下更多的簇数，而较大的簇意味着更少的簇数，取舍在于：</p>
+<table border="0" class="docutils field-list table" frame="void" rules="none">
+<col class="field-name"/>
+<col class="field-body"/>
+<tbody valign="top">
+<tr class="field"><th class="field-name">较小的簇:</th><td class="field-body">优势是存储大量小文件时，降低 <strong>内部碎片（Internal fragmentation）</strong>
+的程度，带来更多可用空间。劣势是更多 <strong>外部碎片（External fragmentation）</strong>
+导致访问大文件时来回跳转降低性能，并且更多簇数也导致簇分配器的性能降低。</td>
+</tr>
+<tr class="field"><th class="field-name">较大的簇:</th><td class="field-body">优势是避免 <strong>外部碎片</strong> 导致的性能损失，劣势是 <strong>内部碎片</strong> 带来的低空间利用率。</td>
+</tr>
+</tbody>
+</table>
+<p>FAT 系文件系统使用随着容量增加的簇大小，导致的劣势在于极度浪费存储空间。如果文件大小是满足随机分布，
+那么大量文件平均而言，每个文件将有半个簇的未使用空间，比如假设一个 64G 的 exFAT 文件系统中存有 8000
+个文件，使用 128KiB 的簇大小，那么平均下来大概会有 500MiB 的空间浪费。实际上如前文 <a class="reference external" href="//farseerfc.me/en/file-size-histogram-zhs.html">系统中的大多数文件有多大？</a>
+所述，一般系统中的文件大小并非随机分布，而是大多数都在大约 1KiB~4KiB
+的范围内，从而造成的空间浪费更为严重。</p>
+<p>可能有人想说「现在存储设备的容量都那么大了，浪费一点点存储空间换来读写性能的话也没什么坏处嘛」，
+于是要考察加大簇大小具体会浪费多少存储空间。借用前文中统计文件大小的工具和例子，
+比如我的文件系统中存有 31G 左右的文件，文件大小分布符合下图的样子：</p>
+<img alt="root-31g-filesize.png" class="img-responsive" src="//farseerfc.me/en/images/root-31g-filesize.png"/>
+<p>假如把这些文件存入不同簇大小的 FAT32 中，根据簇大小，最终文件系统占用空间是下图：</p>
+<img alt="root-31g-fat-clustersize.png" class="img-responsive" src="//farseerfc.me/en/images/root-31g-fat-clustersize.png"/>
+<p>在较小的簇大小时，文件系统占用接近于文件总大小 31G ，而随着簇大小增长，到使用 128KiB
+簇大小的时候空间占用徒增到 103.93G ，是文件总大小的 3.35 倍。如此大的空间占用源自于目标文件系统
+中有大量小文件，每个不足一簇的小文件都要占用完整一簇的大小。可能注意到上图 512B
+的簇大小时整个文件系统占用反而比 1KiB 簇大小时的更大，这是因为 512B 簇大小的时候 FAT
+表本身的占用更大。具体数字如下表：</p>
+<table border="0" class="borderless docutils right-align-columns table">
+<colgroup>
+<col width="18%"/>
+<col width="16%"/>
+<col width="20%"/>
+<col width="15%"/>
+<col width="13%"/>
+<col width="18%"/>
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">簇大小</th>
+<th class="head">FAT 表项数</th>
+<th class="head">总簇数</th>
+<th class="head">总占用</th>
+<th class="head">数据簇数</th>
+<th class="head">FAT簇数</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>512.00</td>
+<td>63.95M</td>
+<td>64.95M</td>
+<td>32.48G</td>
+<td>63.95M</td>
+<td>511.61K</td>
+</tr>
+<tr><td>1.00K</td>
+<td>32.14M</td>
+<td>32.39M</td>
+<td>32.39G</td>
+<td>32.14M</td>
+<td>128.55K</td>
+</tr>
+<tr><td>4.00K</td>
+<td>8.33M</td>
+<td>8.34M</td>
+<td>33.37G</td>
+<td>8.33M</td>
+<td>8.33K</td>
+</tr>
+<tr><td>8.00K</td>
+<td>4.40M</td>
+<td>4.41M</td>
+<td>35.24G</td>
+<td>4.40M</td>
+<td>2.20K</td>
+</tr>
+<tr><td>16.00K</td>
+<td>2.46M</td>
+<td>2.46M</td>
+<td>39.34G</td>
+<td>2.46M</td>
+<td>630.00</td>
+</tr>
+<tr><td>32.00K</td>
+<td>1.50M</td>
+<td>1.50M</td>
+<td>48.11G</td>
+<td>1.50M</td>
+<td>193.00</td>
+</tr>
+<tr><td>64.00K</td>
+<td>1.04M</td>
+<td>1.04M</td>
+<td>66.41G</td>
+<td>1.04M</td>
+<td>67.00</td>
+</tr>
+<tr><td>128.00K</td>
+<td>831.40K</td>
+<td>831.45K</td>
+<td>103.93G</td>
+<td>831.40K</td>
+<td>26.00</td>
+</tr>
+</tbody>
+</table>
+<p>FAT 系文件系统这种对簇大小选择的困境来源在于， FAT 试图用同一个数据结构——文件分配表——同时管理
+<strong>宏观尺度</strong> 的可用空间分配和 <strong>微观尺度</strong> 的文件寻址，这产生两头都难以兼顾的矛盾。
+NTFS 和其它 Unix-like 系统的文件系统都使用块位图(block bitmap)跟踪可用空间分配，
+将宏观尺度的空间分配问题和微观尺度的文件寻址问题分开解决，从而在可接受的性能下允许更小的簇大小和更多的簇数。</p>
 </div>
+<div class="section" id="unix">
+<h2>传统 Unix 文件系统的块映射</h2>
+<p>传统 Unix 文件系统（下称 UFS）和它的继任者们，包括 Linux 的 ext2/3 ， FreeBSD 的 FFS
+等文件系统，使用在 inode 中记录块映射（bmap, block mapping）的方式记录文件存储的地址范围。
+术语上 UFS 中所称的「块（block）」等价于微软系文件系统中所称的「簇（cluster）」，
+都是对底层存储设备中扇区寻址的抽象。</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/bb46190c.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>上图乍看和 FAT 总体结构很像，实际上重要的是「inode表」和「数据块」两大区域分别所占的比例。
+FAT 系文件系统中，每个簇需要在 FAT 表中有一个表项，所以 FAT 表的大小是每簇大小占 2字节 （FAT16）
+或 4 字节（FAT32/exFAT）。假设 exFAT 用 32K 簇大小的话， FAT 表整体大小与数据区的比例大约是 4:32K
+。 UFS 中，在创建文件系统时 <code class="code">
+mkfs</code>
+ 会指定一个
+<code class="code">
+bytes-per-inode</code>
+ 的比例，比如 mkfs.ext4 默认的 <code class="code">
+-i bytes-per-inode</code>
 
+是 32K 于是每 32K 数据空间分配一个 inode ，而每个 inode 在 ext4 占用 256 字节，于是 inode
+空间与数据块空间的比例大约是 256:32K 。宏观上，FAT 表是在 FAT 文件系统中地址前端一段连续空间；
+而 UFS 中 inode 表的位置 <strong>不一定</strong> 是在存储设备地址范围前端连续的空间，至于各个
+UFS 如何安排 inode 表与数据块的宏观布局可能今后有空再谈，本文所关心的只是 inode
+表中存放 inode 独立于数据块的存储空间，两者的比例在创建文件系统时固定。</p>
+<p>UFS 与 FAT 文件系统一点非常重要的区别在于：Unix 文件系统中
+<strong>文件名不属于 inode 记录的文件元数据</strong> 。FAT 系文件系统中文件元数据存储在目录结构中，
+每个目录表项代表一个文件（除了 VFAT 的长文件名用隐藏目录表项），占用 32
+字节，引出一个单链表表达文件存储地址；在 UFS 中，目录内容和 inode
+表中的表项和文件地址的样子像是这样：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/dd555855.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>UFS 中每个目录文件的内容可以看作是单纯的（文件名：inode号）构成的数组，最早 Unix v7
+的文件系统中文件名长度被限制在 14 字节，后来很快就演变成可以接受更长的文件名只要以 <code class="code">
+\0</code>
+
+结尾。关于文件的元数据信息，比如所有者和权限位这些，文件元数据并不记录在目录文件中，而是记录在长度规整的
+inode 表中。 inode 表中 inode 记录的长度规整这一点非常重要，因为知道了 inode 表的位置和
+inode 号，可以直接算出 inode 记录在存储设备上的地址，从而快速定位到所需文件的元数据信息。
+在 inode 记录的末尾有个固定长度的块映射表，填写文件的内容的块地址。</p>
+<p>因为 inode 记录的长度固定，从而 inode 记录末尾位置得到块指针数组的长度也是固定并且有限的，
+在 Unix v7 FS 中这个数组可以记录 13 个地址，在 ext2/3 中可以记录 15
+个地址。前文说过，文件系统中大部分文件大小都很小，而少数文件非常大，于是 UFS
+中使用间接块指针的方案，用有限长度的数组表达任意大小的文件。</p>
+<p>在 UFS 的 inode 中可以存 13 个地址，其中前 10 个地址用于记录「直接块指针（direct
+block address）」。当文件大小大于 10 块时，从第 11 块开始，分配一个「一级间接块（level 1
+indirect block）」，其位置写在 inode 中第 11 个块地址上，间接块中存放块指针数组。
+假设块大小是 4K 而指针大小是 4 字节，那么一级间接块可以存放 1024 个直接块指针。
+当文件大小超过 1034(=1024+10) 时，再分配一个「二级间接块（level 2 indirect block）」，
+存在 inode 中的第 12 个块地址上，二级间接块中存放的是一级间接块的地址，形成一个两层的指针树。
+同理，当二级间接块也不够用的时候，分配一个「三级间接块（level 3 indirect block）」，
+三级间接块本身的地址存在 inode 中最后第 13 个块地址位置上，而三级间接块内存放指向二级间接块的指针，
+形成一个三层的指针树。 UFS 的 inode 一共有 13 个块地址槽，于是不存在四级间接块了，
+依靠上述最多三级的间接块构成的指针树，如果是 4KiB 块大小的话，每个 inode 最多可以有
+<span class="math">\(10+1024+1024^2+1024^3 = 1074791434\)</span> 块，最大支持超过 4GiB 的文件大小。</p>
+<p>UFS 使用这种 inode 中存储块映射引出间接块树的形式存储文件块地址，这使得 UFS 中定位到文件的
+inode 之后查找文件存储的块比 FAT 类的文件系统快，因为不再需要去读取 FAT 表。这种方式另一个特征是，
+当文件较大时，读写文件前段部分的数据，比如 inode 中记录的前10块直接块地址的时候，比随后 10~1024
+块一级间接块要快，同样的访问一级间接块中的数据也比二级和三级间接块要快。一些 Unix 工具比如
+<code class="code">
+file</code>
+ 判断文件内容的类型只需要读取文件前段的内容，在这种记录方式下也可以比较高效。</p>
+</div>
+<div class="section" id="ffs">
+<h2>FFS 中的整块与碎块</h2>
+<p>FreeBSD 用的 FFS 基于传统 UFS 的存储方式，为了对抗比较小的块大小导致块分配器的性能损失，
+FFS 创新的使用两种块大小记录文件块，在此我们把两种块大小分布叫整块（block）和碎块（fragment）。
+整块和碎块的大小比例最多是 8:1，也可以是 4:1 或者 2:1，比如可以使用 4KiB 的整块和 1KiB
+的碎块，或者用 32KiB 的整块并配有 4KiB 大小的碎块。写文件时先把末端不足一个整块的内容写入碎块中，
+多个碎块的长度凑足一个整块后分配一个整块并把之前分配的碎块内容复制到整块里。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+ext2 中的碎块计划</div>
+<div class="panel-body">
+ext2 曾经也计划过类似 FFS 碎块的设计，超级块（superblock）中有个 s_log_frag_size
+记录碎块大小， inode 中也有碎块数量之类的记录，不过 ext2 的 Linux/Hurd
+实现最终都没有完成对碎块的支持，于是超级块中记录的碎块大小永远等于整块大小，而
+inode 记录的碎块永远为 0 。到 ext4 时代这些记录已经被标为了过期，不再计划支持碎块设计。</div>
+</div>
+<p>在 <a class="reference external" href="https://people.eecs.berkeley.edu/~brewer/cs262/FFS.pdf">A Fast File System for UNIX</a>
+中介绍了 FFS 的设计思想，最初设计这种整块碎块方案时 FFS 默认的整块是 4KiB 碎块是 512B
+，目前 FreeBSD 版本中 <a class="reference external" href="https://www.freebsd.org/cgi/man.cgi?newfs(8)">newfs</a>
+命令创建的整块是 32KiB 碎块是 4KiB 。实验表明采用这种整块碎块两级块大小的方案之后，
+文件系统的空间利用率接近块大小等于碎块大小时的 UFS ，而块分配器效率接近块大小等于整块大小的
+UFS 。碎块大小不应小于底层存储设备的扇区大小，而 FFS
+记录碎块的方式使得整块的大小不能大于碎块大小的 8 倍。</p>
+<p>不考虑希疏文件（sparse files）的前提下，碎块记录只发生在文件末尾，而且在文件系统实际写入到设备前，
+内存中仍旧用整块的方式记录，避免那些写入比较慢而一直在写入的程序比如日志文件产生大量碎块到整块的搬运。</p>
+<p>另一种考虑碎块设计的方式是可以看作 FFS 每次在结束写入时，会对文件末尾做一次小范围的碎片整理（
+defragmentation），将多个碎块整理成一个整块。</p>
+</div>
+<div class="section" id="ntfs-extent">
+<h2>NTFS 与区块（extent）</h2>
+<p>NTFS 虽然是出自微软之手，其微观结构却和 FAT 很不一样，某种角度来看更像是一个 UFS 后继。
+NTFS 没有固定位置的 inode 表，但是有一个巨大的文件叫 $MFT (Master File Table
+），整个 $MFT 的作用就像是 UFS 中 inode 表的作用。NTFS 中的每个文件都在 $MFT
+中存有一个对应的 MFT 表项， MFT 表现有固定长度 1024 字节，整个 $MFT 文件就是一个巨大的
+MFT 表现的数组。每个文件可以根据 MFT 序号在 $MFT 中找到具体位置。</p>
+<p>$MFT 本身也是个文件，所以它不必连续存放，在 $MFT 中记录的第一项文件记录了 $MFT 自身的元数据。
+于是可以先读取 $MFT 的最初几块，找到 $MFT 文件存放的地址信息，继而勾勒出整个 $MFT 所占的空间。
+实际上 Windows 的 NTFS 驱动在创建文件系统时给 $MFT 预留了很大一片存储区， Windows XP
+之后的碎片整理工具也会非常积极地对 $MFT 文件本身做碎片整理，于是通常存储设备上的 $MFT
+不会散布在很多地方而是集中在 NTFS 分区靠前的一块连续位置。于是宏观而言 NTFS 像是这样：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/c6779b6e.svg" type="image/svg+xml">
+tikz diagram</object>
+</div>
+<div class="section" id="ext4">
+<h2>ext4 中的小文件内联优化</h2>
+<p><a class="reference external" href="https://lwn.net/Articles/468678/">https://lwn.net/Articles/468678/</a></p>
+<p>ext4 的 inode 存储方式基本上类似上述 UFS ，具体到 inode 而言， ext2/3 中每个 inode 占用
+128 字节，其中末尾有 60 字节存储块映射，可以存放 12 个直接块指针和三级间接块指针。
+详细的 ext2 inode 结构可见 <a class="reference external" href="https://www.nongnu.org/ext2-doc/ext2.html#inode-table">ext2 文档</a> 。</p>
+<p>注意到典型的 Unix 文件系统中，有很多「小」文件小于 60 字节的块映射大小，而且不止有很多小的普通文件，
+包括目录文件、软链接、设备文件之类的特殊 Unix 文件通常也很小。为了存这些小文件而单独分配一个块
+并在 inode 中记录单个块指针显得很浪费，于是有了 <strong>小文件内联优化 (small file inlining)</strong>
+。</p>
+<p>一言以蔽之小文件内联优化就是在 inode 中的 60 字节的块映射区域中直接存放文件内容。
+在 inode 前半标志位 （i_flags）中安插一位记录(EXT4_INLINE_DATA_FL)，判断后面这 60 字节的块映射区是存储为内联文件，
+还是真的存放块映射。这些被内联优化掉的小文件磁盘占用会显示为 0
+，因为没有分配数据块，但是仍然要占用完整一个 inode 。</p>
+</div>
+<div class="section" id="id4">
+<h2>上述文件系统汇总</h2>
+<table border="0" class="borderless docutils table">
+<caption>文件系统汇总</caption>
+<colgroup>
+<col width="20%"/>
+<col width="20%"/>
+<col width="20%"/>
+<col width="20%"/>
+<col width="20%"/>
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">文件系统</th>
+<th class="head">基础分配单位</th>
+<th class="head">常见块大小</th>
+<th class="head">文件寻址方式</th>
+<th class="head">支持文件内联</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>FAT32</td>
+<td>簇</td>
+<td>32K</td>
+<td>FAT单链表</td>
+<td>否</td>
+</tr>
+<tr><td>exFAT</td>
+<td>簇</td>
+<td>128K</td>
+<td>FAT单链表</td>
+<td>否</td>
+</tr>
+<tr><td>NTFS</td>
+<td>MFT项/簇</td>
+<td>1K/4K</td>
+<td>区块</td>
+<td>900</td>
+</tr>
+<tr><td>FFS</td>
+<td>inode/碎块/整块</td>
+<td>128/4K/32K</td>
+<td>块映射</td>
+<td>否</td>
+</tr>
+<tr><td>Ext4</td>
+<td>inode/块</td>
+<td>256/4K</td>
+<td>块映射/区块树</td>
+<td>~150</td>
+</tr>
+<tr><td>xfs</td>
+<td>inode/块</td>
+<td>256/4K</td>
+<td>区块树</td>
+<td>仅目录和符号连接</td>
+</tr>
+<tr><td>F2FS</td>
+<td>node</td>
+<td>4K</td>
+<td>块映射</td>
+<td>~3400</td>
+</tr>
+<tr><td>reiser3</td>
+<td>tree node/blob</td>
+<td>4K/4K</td>
+<td>块映射</td>
+<td>4k(尾内联)</td>
+</tr>
+<tr><td>btrfs</td>
+<td>tree node/block</td>
+<td>16K/4K</td>
+<td>区块树</td>
+<td>~2K(区块内联)</td>
+</tr>
+<tr><td>ZFS</td>
+<td>ashift/recordsize</td>
+<td>4K/128K</td>
+<td>区块树</td>
+<td>~100(块指针内联)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
             </div>
             <div class="entry-content jumbotron" id="source-content" style="display: none">
                 <!-- <pre><code id="source-code">
@@ -443,7 +816,7 @@ FAT12 和 FAT16 都被 FAT 表项的最大数量限制（分别是 4068 和 6546
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7fd16339d0f0> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7f6d5aa52270> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>

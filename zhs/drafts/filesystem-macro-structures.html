@@ -284,7 +284,7 @@ tikz diagram</object>
 FAT12 用于软盘，可用空间不会很大，所以可以一个簇对应一个扇区也不会导致很大的 FAT 表。
 相比之下用于硬盘的 FAT16 的大小可以很大，于是需要增加每簇中包含的扇区数量，让 FAT
 表尽量放入首个柱面。</p>
-<table border="0" class="borderless table docutils">
+<table border="0" class="borderless docutils table">
 <colgroup>
 <col width="15%"/>
 <col width="9%"/>
@@ -550,7 +550,7 @@ FAT12 用于软盘，可用空间不会很大，所以可以一个簇对应一�
 </tbody>
 </table>
 <p>从中我们可以算出默认 FAT 表项的最大数量限制：</p>
-<table border="0" class="borderless table docutils">
+<table border="0" class="borderless docutils table">
 <colgroup>
 <col width="36%"/>
 <col width="21%"/>
@@ -663,7 +663,7 @@ FAT12 用于软盘，可用空间不会很大，所以可以一个簇对应一�
 </tbody>
 </table>
 <p>和单个 FAT 表大小：</p>
-<table border="0" class="borderless table docutils">
+<table border="0" class="borderless docutils table">
 <colgroup>
 <col width="36%"/>
 <col width="21%"/>
@@ -775,6 +775,11 @@ FAT12 用于软盘，可用空间不会很大，所以可以一个簇对应一�
 </tr>
 </tbody>
 </table>
+<p>增加簇大小的原因是为了限制 FAT 表整体的大小，因为在使用 FAT
+表的文件系统中，需要将 FAT 表整体装入内存才能满足文件访问和簇分配时的性能，如果读写 FAT
+表的范围需要访问磁盘，那么整个文件系统的读写性能将暴跌到几近不可用。到针对闪存优化的 exFAT
+上，虽然在 FAT 表外还有额外的簇分配位图（Cluster Bitmap），但是也同样要限制 FAT
+表整体大小，减少对 FAT 表区域的随机读写。</p>
 </div>
 <div class="section" id="unix">
 <h2>早期 Unix 文件系统</h2>
@@ -869,7 +874,7 @@ FAT12 用于软盘，可用空间不会很大，所以可以一个簇对应一�
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7fd1633089f0> 篇：                  </h4>
+这篇文章是 "" 系列文章的第 <built-in method index of str object at 0x7f6d5a7b3930> 篇：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
