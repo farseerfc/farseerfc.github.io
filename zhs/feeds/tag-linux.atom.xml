@@ -171,30 +171,22 @@ Brandon Invergo 的博客采用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的点文件&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;我昨天偶然间发现一些我觉得值得分享的经验，就是那种「为毛我没有早点知道这个？」那一类的。
-我将在这篇文章中介绍如何使用 GNU Stow 管理你的 GNU/Linux 系统中位于用户家目录里的各种配置文件
-（通常又叫「点文件(dotfiles)」比如 .bashrc）。&lt;/td&gt;
-&lt;td&gt;I accidentally stumbled upon something yesterday that I felt like sharing,
+&lt;a aria-controls="8b1882fc" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8b1882fc" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="8b1882fc"&gt;
+&lt;blockquote&gt;
+I accidentally stumbled upon something yesterday that I felt like sharing,
 which fell squarely into the "why the hell didn't I know about this before?"
 category. In this post, I'll describe how to manage the various
 configuration files in your GNU/Linux home directory
-(aka "dotfiles" like .bashrc) using GNU Stow.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;这件事的困难之处在于，如果能用版本管理系统(VCS, Version Control System)比如
-Git, Mercurial(hg), Bazaar(bzr)
-管理点文件的话会非常方便，但是这些点文件大部分都位于家目录的顶级目录下，
-在这个位置不太适合初始化一个版本管理仓库。这些年下来我试过很多程序，设计目的在于解决这个问题，
-帮你把这些配置文件安置在某个下级目录中，然后安装或者链接这些文件到它们应该在的位置。
-尝试下来这些程序没有一个真正能打动我。它们要么有很多依赖（比如 Ruby 和一大坨库），
-要么需要我记住如何用它，考虑到同步配置这种不算经常使用的场合，要记住用法真的挺难。&lt;/td&gt;
-&lt;td&gt;The difficulty is that it would be helpful to manage one's configuration
+(aka "dotfiles" like .bashrc) using GNU Stow.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;我昨天偶然间发现一些我觉得值得分享的经验，就是那种「为毛我没有早点知道这个？」那一类的。
+我将在这篇文章中介绍如何使用 GNU Stow 管理你的 GNU/Linux 系统中位于用户家目录里的各种配置文件
+（通常又叫「点文件(dotfiles)」比如 .bashrc）。&lt;/p&gt;
+&lt;a aria-controls="71af1930" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#71af1930" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="71af1930"&gt;
+&lt;blockquote&gt;
+The difficulty is that it would be helpful to manage one's configuration
 files with a version control system like Git, Mercurial or Bazaar, but
 many/most dotfiles reside at the top-level of your home directory,
 where it wouldn't be a good idea to initialize a VCS repository.
@@ -204,9 +196,30 @@ linking them into their appropriate places. None of those programs ever
 really appealed to me. They would require a ton of dependencies
 (like Ruby and a ton of libraries for it) or they would require me to
 remember how to use them, which is difficult when really for such a task
-you rarely use the program.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;最近我在用 GNU Stow 来管理我从源代码在本地编译安装到 &lt;code class="code"&gt;
+you rarely use the program.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;这件事的困难之处在于，如果能用版本管理系统(VCS, Version Control System)比如
+Git, Mercurial(hg), Bazaar(bzr)
+管理点文件的话会非常方便，但是这些点文件大部分都位于家目录的顶级目录下，
+在这个位置不太适合初始化一个版本管理仓库。这些年下来我试过很多程序，设计目的在于解决这个问题，
+帮你把这些配置文件安置在某个下级目录中，然后安装或者链接这些文件到它们应该在的位置。
+尝试下来这些程序没有一个真正能打动我。它们要么有很多依赖（比如 Ruby 和一大坨库），
+要么需要我记住如何用它，考虑到同步配置这种不算经常使用的场合，要记住用法真的挺难。&lt;/p&gt;
+&lt;a aria-controls="f79eff90" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f79eff90" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="f79eff90"&gt;
+&lt;blockquote&gt;
+Lately I've been using GNU Stow to manage programs I install from source to
+/usr/local/. Basically, in this typical usage, you install locally built
+packages to /usr/local/stow/${PKGNAME}-{PKGVERSION} and then
+from /usr/local/stow/ you run # stow ${PKGNAME}-${PKGVERSION} and the
+program generates symbolic links to all the programs' files into the
+appropriate places under /usr/local/. Then, when you uninstall a program
+via Stow, you don't have to worry about any stray files that you or a
+provide Makefile may have missed. It also makes handling alternate versions
+of a program quite easy (i.e. when I'm experimenting with different
+configurations of dwm or st).&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;最近我在用 GNU Stow 来管理我从源代码在本地编译安装到 &lt;code class="code"&gt;
 /​usr/​local/​&lt;/code&gt;
  中的一些程序。
 基本上说，在这种常见用法下，是你把这些本地编译的包配置安装到
@@ -224,30 +237,41 @@ you rarely use the program.&lt;/td&gt;
 中合适的地方。然后当你想用 Stow 卸载这个程序的时候，就不必再考虑会留下什么垃圾文件，
 或者找不到安装时用的 Makefile 了。这种安装方式下也可以非常容易地切换一个程序的不同版本
 （比如我想尝试不同配置选项下的 &lt;a class="reference external" href="https://dwm.suckless.org/"&gt;dwm&lt;/a&gt; 或者
-&lt;a class="reference external" href="https://st.suckless.org/"&gt;st&lt;/a&gt; 的时候）。&lt;/td&gt;
-&lt;td&gt;Lately I've been using GNU Stow to manage programs I install from source to
-/usr/local/. Basically, in this typical usage, you install locally built
-packages to /usr/local/stow/${PKGNAME}-{PKGVERSION} and then
-from /usr/local/stow/ you run # stow ${PKGNAME}-${PKGVERSION} and the
-program generates symbolic links to all the programs' files into the
-appropriate places under /usr/local/. Then, when you uninstall a program
-via Stow, you don't have to worry about any stray files that you or a
-provide Makefile may have missed. It also makes handling alternate versions
-of a program quite easy (i.e. when I'm experimenting with different
-configurations of dwm or st).&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;前段时间在我扫邮件列表的时候，看到某个帖子中某人在说使用 Stow 管理安装他的点文件。
-当时我没特别在意这个帖子，但是大概我大脑潜意识把它归档保存为今后阅读了。
-昨天我想起来试试这种用法，试过后我不得不说，这比那些专门设计用来做这任务的点文件管理器要方便太多了，
-虽然表面上看起来这种用法没那么显而易见。&lt;/td&gt;
-&lt;td&gt;Some time ago I happened across a mailing list posting where someone
+&lt;a class="reference external" href="https://st.suckless.org/"&gt;st&lt;/a&gt; 的时候）。&lt;/p&gt;
+&lt;a aria-controls="de09a7d8" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#de09a7d8" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="de09a7d8"&gt;
+&lt;blockquote&gt;
+Some time ago I happened across a mailing list posting where someone
 described using Stow to manage the installation of their dotfiles.
 I didn't pay much attention to it but my brain must have filed it away
 for later. Yesterday I decided to give it a try and I have to say that
 it is so much more convenient than those other dedicated dotfile-management
-programs, even if it wasn't an immediately obvious option.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;方法很简单。我建了个 &lt;code class="code"&gt;
+programs, even if it wasn't an immediately obvious option.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;前段时间在我扫邮件列表的时候，看到某个帖子中某人在说使用 Stow 管理安装他的点文件。
+当时我没特别在意这个帖子，但是大概我大脑潜意识把它归档保存为今后阅读了。
+昨天我想起来试试这种用法，试过后我不得不说，这比那些专门设计用来做这任务的点文件管理器要方便太多了，
+虽然表面上看起来这种用法没那么显而易见。&lt;/p&gt;
+&lt;a aria-controls="2e827562" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2e827562" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="2e827562"&gt;
+&lt;blockquote&gt;
+The procedure is simple. I created the ${HOME}/dotfiles directory and then
+inside it I made subdirectories for all the programs whose cofigurations
+I wanted to manage. Inside each of those directories, I moved in all the
+appropriate files, maintaining the directory structure of my home directory.
+So, if a file normally resides at the top level of your home directory,
+it would go into the top level of the program's subdirectory.
+If a file normally goes in the default ${XDG_CONFIG_HOME}/${PKGNAME}
+location (${HOME}/.config/${PKGNAME}), then it would instead go in
+${HOME}/dotfiles/${PKGNAME}/.config/${PKGNAME} and so on.
+Finally, from the dotfiles directory, you just run $ stow $PKGNAME and
+Stow will symlink all the package's configuration files to the appropriate
+locations. It's then easy to make the dotfiles a VCS repository so you can
+keep track of changes you make (plus it makes it so much easier to share
+configurations between different computers, which was my main reason to
+do it).&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;方法很简单。我建了个 &lt;code class="code"&gt;
 ${HOME}/​dotfiles&lt;/code&gt;
  文件夹，然后在里面为我想管理的每个程序配置都
 创建一个子文件夹。然后我把这些程序的配置从原本的家目录移动到这每一个对应的子文件夹中，
@@ -266,39 +290,24 @@ $ stow $PKGNAME&lt;/code&gt;
  命令，
 Stow 就会为你自动创建这些配置文件的符号链接到合适的位置。接下来就很容易为这个 dotfiles
 目录初始化版本管理仓库，从而记录你对这些配置文件做的修改（并且这也可以极度简化在不同电脑之间
-共享配置，这也是我想要这么做的主要原因）。&lt;/td&gt;
-&lt;td&gt;The procedure is simple. I created the ${HOME}/dotfiles directory and then
-inside it I made subdirectories for all the programs whose cofigurations
-I wanted to manage. Inside each of those directories, I moved in all the
-appropriate files, maintaining the directory structure of my home directory.
-So, if a file normally resides at the top level of your home directory,
-it would go into the top level of the program's subdirectory.
-If a file normally goes in the default ${XDG_CONFIG_HOME}/${PKGNAME}
-location (${HOME}/.config/${PKGNAME}), then it would instead go in
-${HOME}/dotfiles/${PKGNAME}/.config/${PKGNAME} and so on.
-Finally, from the dotfiles directory, you just run $ stow $PKGNAME and
-Stow will symlink all the package's configuration files to the appropriate
-locations. It's then easy to make the dotfiles a VCS repository so you can
-keep track of changes you make (plus it makes it so much easier to share
-configurations between different computers, which was my main reason to
-do it).&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;举个例子，比如说你想管理 Bash, VIM, Uzbl 这三个程序的配置文件。Bash 会在家目录的顶层文件夹
+共享配置，这也是我想要这么做的主要原因）。&lt;/p&gt;
+&lt;a aria-controls="5e0e831d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5e0e831d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="5e0e831d"&gt;
+&lt;blockquote&gt;
+For example, let's say you want to manage the configuration for Bash,
+VIM and Uzbl. Bash has a couple files in the top-level directory;
+VIM typically has your .vimrc file on the top-level and a .vim directory;
+and Uzbl has files in ${XDG_CONFIG_HOME}/uzbl and ${XDG_DATA_HOME}/uzbl.
+So, your home directory looks like this:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;举个例子，比如说你想管理 Bash, VIM, Uzbl 这三个程序的配置文件。Bash 会在家目录的顶层文件夹
 放几个文件； VIM 通常会有在顶层文件夹的 .vimrc 文件和 .vim 目录；然后 Uzbl 的配置位于
 &lt;code class="code"&gt;
 ${XDG_CONFIG_HOME}/​uzbl&lt;/code&gt;
  以及 &lt;code class="code"&gt;
 ${XDG_DATA_HOME}/​uzbl&lt;/code&gt;
 
-。于是在迁移配置前，你的家目录的文件夹结构应该看起来像这样：&lt;/td&gt;
-&lt;td&gt;For example, let's say you want to manage the configuration for Bash,
-VIM and Uzbl. Bash has a couple files in the top-level directory;
-VIM typically has your .vimrc file on the top-level and a .vim directory;
-and Uzbl has files in ${XDG_CONFIG_HOME}/uzbl and ${XDG_DATA_HOME}/uzbl.
-So, your home directory looks like this:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+。于是在迁移配置前，你的家目录的文件夹结构应该看起来像这样：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;home/&lt;/span&gt;
 &lt;span class="code-line"&gt;    brandon/&lt;/span&gt;
 &lt;span class="code-line"&gt;        .config/&lt;/span&gt;
@@ -315,18 +324,12 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然后迁移配置的方式是，应该建一个 dotfiles 子目录，然后像这样移动所有配置文件：&lt;/td&gt;
-&lt;td&gt;You would then create a dotfiles subdirectory and move all the files there:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;a aria-controls="8c2a2e91" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8c2a2e91" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="8c2a2e91"&gt;
+&lt;blockquote&gt;
+You would then create a dotfiles subdirectory and move all the files there:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然后迁移配置的方式是，应该建一个 dotfiles 子目录，然后像这样移动所有配置文件：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;home/&lt;/span&gt;
 &lt;span class="code-line"&gt;    /brandon/&lt;/span&gt;
 &lt;span class="code-line"&gt;        .config/&lt;/span&gt;
@@ -350,37 +353,21 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然后执行以下命令：&lt;/td&gt;
-&lt;td&gt;Then, perform the following commands:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;a aria-controls="a3ea20b7" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a3ea20b7" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="a3ea20b7"&gt;
+&lt;blockquote&gt;
+Then, perform the following commands:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然后执行以下命令：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt; ~/dotfiles&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow bash&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然后，瞬间，所有你的配置文件（的符号链接）就安安稳稳地放入了它们该在的地方，无论原本这些目录结构
-有多么错综复杂，这样安排之后的 dotfiles 文件夹内的目录结构立刻整理得有条有理，
-并且可以很容易地转换成版本控制仓库。非常有用的一点是，如果你有多台电脑，可能这些电脑并没有
-安装完全一样的软件集，那么你可以手选一些你需要的软件配置来安装。在你的 dotfiles 文件夹中总是
-可以找到所有的配置文件，但是如果你不需要某个程序的某份配置，那你就不对它执行 stow
-命令，它就不会扰乱你的家目录。&lt;/td&gt;
-&lt;td&gt;And, voila, all your config files (well, symbolic links to them) are all
+&lt;a aria-controls="6a03f8ee" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#6a03f8ee" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="6a03f8ee"&gt;
+&lt;blockquote&gt;
+And, voila, all your config files (well, symbolic links to them) are all
 in the correct place, however disorganized that might be, while the actual
 files are all neatly organized in your dotfiles directory, which is easily
 turned into a VCS repo. One handy thing is that if you use multiple
@@ -388,14 +375,21 @@ computers, which may not have the same software installed on them,
 you can pick and choose which configurations to install when you need them.
 All of your dotfiles are always available in your dotfiles directory,
 but if you don't need the configuration for one program, you simply don't
-Stow it and thus it does not clutter your home directory.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;嗯，以上就是整个用法介绍。希望能有别人觉得这个用法有用！我知道对我来说这个非常有帮助。&lt;/td&gt;
-&lt;td&gt;Well, that's all there is to it. Hopefully someone else out there finds
-this useful! I know I've found it to be a huge help.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+Stow it and thus it does not clutter your home directory.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然后，瞬间，所有你的配置文件（的符号链接）就安安稳稳地放入了它们该在的地方，无论原本这些目录结构
+有多么错综复杂，这样安排之后的 dotfiles 文件夹内的目录结构立刻整理得有条有理，
+并且可以很容易地转换成版本控制仓库。非常有用的一点是，如果你有多台电脑，可能这些电脑并没有
+安装完全一样的软件集，那么你可以手选一些你需要的软件配置来安装。在你的 dotfiles 文件夹中总是
+可以找到所有的配置文件，但是如果你不需要某个程序的某份配置，那你就不对它执行 stow
+命令，它就不会扰乱你的家目录。&lt;/p&gt;
+&lt;a aria-controls="68a93e12" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#68a93e12" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="68a93e12"&gt;
+&lt;blockquote&gt;
+Well, that's all there is to it. Hopefully someone else out there finds
+this useful! I know I've found it to be a huge help.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;嗯，以上就是整个用法介绍。希望能有别人觉得这个用法有用！我知道对我来说这个非常有帮助。&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="tech"></category><category term="linux"></category><category term="dotfiles"></category><category term="stow"></category></entry><entry><title>为什么 Linus Torvalds 不愿意将 Linux 变成 GPLv3 授权？</title><link href="//farseerfc.me/zhs/why-linus-torvalds-undermine-gplv3.html" rel="alternate"></link><published>2016-08-08T16:15:00+09:00</published><updated>2016-08-08T16:15:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-08-08:/zhs/why-linus-torvalds-undermine-gplv3.html</id><summary type="html">&lt;p&gt;从 &lt;a class="reference external" href="https://www.zhihu.com/question/48884264/answer/113454129"&gt;知乎&lt;/a&gt; 转载&lt;/p&gt;
 &lt;p&gt;和上篇文章一样，这篇也是来自一个知乎上我回答的问题。&lt;/p&gt;
@@ -462,62 +456,75 @@ DebConf 14: Q&amp;amp;A with Linus Torvalds&lt;/div&gt;
 &lt;/blockquote&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;然后接下来就是我承诺的翻译了&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问：你是否同意说你贬低了 GPLv3 ? 以及……&lt;/td&gt;
-&lt;td&gt;Q: Do you agree that you undermine GPLv3? and ...&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 是的&lt;/td&gt;
-&lt;td&gt;L: Yes&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问：我们如何才能让你别这么做？&lt;/td&gt;
-&lt;td&gt;Q: How can we get you to stop?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 什么？&lt;/td&gt;
-&lt;td&gt;L: What?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问：我们如何才能让你别这么做？&lt;/td&gt;
-&lt;td&gt;Q: How can we get you to stop?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 哦我讨厌 GPLv3 ，我是在故意贬低它。实际上我觉得 GPLv3 的扩展非常可怕。
-我能理解为什么人们想要做这个，但是我觉得它本应是一个全新的协议。&lt;/td&gt;
-&lt;td&gt;L: Oh I hate GPLv3. I undermined it on purpose.
+&lt;a aria-controls="ebbd22ff" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ebbd22ff" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="ebbd22ff"&gt;
+&lt;blockquote&gt;
+Q: Do you agree that you undermine GPLv3? and ...&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问：你是否同意说你贬低了 GPLv3 ? 以及……&lt;/p&gt;
+&lt;a aria-controls="505c14ba" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#505c14ba" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="505c14ba"&gt;
+&lt;blockquote&gt;
+L: Yes&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 是的&lt;/p&gt;
+&lt;a aria-controls="97e91d0f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#97e91d0f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="97e91d0f"&gt;
+&lt;blockquote&gt;
+Q: How can we get you to stop?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问：我们如何才能让你别这么做？&lt;/p&gt;
+&lt;a aria-controls="77f7155c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#77f7155c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="77f7155c"&gt;
+&lt;blockquote&gt;
+L: What?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 什么？&lt;/p&gt;
+&lt;a aria-controls="d3591d99" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d3591d99" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="d3591d99"&gt;
+&lt;blockquote&gt;
+Q: ...How can we get you to stop?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问：……我们如何才能让你别这么做？&lt;/p&gt;
+&lt;a aria-controls="7b4e5b8a" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#7b4e5b8a" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="7b4e5b8a"&gt;
+&lt;blockquote&gt;
+L: Oh I hate GPLv3. I undermined it on purpose.
 I actually thought the GPLv3 extensions were horrible.
 I understand why people would want to do them but I think it should have
-been a completely new license.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;嗯我喜欢版本 2 的那些理由，并且我仍然觉得版本 2 是一个非常棒的协议，
-理由是：「我给你源代码，你给我你对它的修改，我们就扯平了」
-对吧？这是我用 GPL 版本 2 的理由，就是这么简单。&lt;/td&gt;
-&lt;td&gt;Emm my argument for liking version 2, and I still think version 2 is a
+been a completely new license.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 哦我讨厌 GPLv3 ，我是在故意贬低它。实际上我觉得 GPLv3 的扩展非常可怕。
+我能理解为什么人们想要做这个，但是我觉得它本应是一个全新的协议。&lt;/p&gt;
+&lt;a aria-controls="20696190" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#20696190" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="20696190"&gt;
+&lt;blockquote&gt;
+Emm my argument for liking version 2, and I still think version 2 is a
 great license, was that, "I give you source code, you give me your
 changes back, we are even." Right? That's my take on GPL version 2, right,
-it's that simple.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然后版本 3 的扩展在某些方面让我个人觉得非常不舒服，也就是说「我给你源代码，
-这意味着你必须服从我的一些规则，否则你不能把它用在你的设备上。」
-对我来说，这是违反了版本 2 协议所追求的所有目的。然而我理解为什么 FSF 要这么做，
-因为我知道 FSF 想要达成什么，但是对我来说这完全是不同的协议了。&lt;/td&gt;
-&lt;td&gt;And version 3 extended that in ways that I personally am really
+it's that simple.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;嗯我喜欢版本 2 的那些理由，并且我仍然觉得版本 2 是一个非常棒的协议，
+理由是：「我给你源代码，你给我你对它的修改，我们就扯平了」
+对吧？这是我用 GPL 版本 2 的理由，就是这么简单。&lt;/p&gt;
+&lt;a aria-controls="7565a2bc" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#7565a2bc" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="7565a2bc"&gt;
+&lt;blockquote&gt;
+And version 3 extended that in ways that I personally am really
 uncomfortable with, namely "I give you source code, that means that if
 you use that source code, you can't use it on your device unless you
 follow my rules." And to me that's, that's a violation of everything
 version 2 stood for. And I understand why the FSF did it because I know
-what the FSF wants.     But to me it's not the same license at all.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;所以我当时非常不安，并且表明了自己的观点，并且这是在版本 3 发布的数月之前。
-在那很久之前曾经有过一场讨论……在版本 3 之前有一个早期的版本，
-事实上几年之前，那时我就说过：「不，这不可能工作」。
-并且在那个早期的讨论阶段我已经在内核里写好了「嘿，我可没有写过版本 2
-或者更高版本」。所以之后也没有过（争议）……随后版本 3 出来的时候我非常开心，
-因为我早在大概 5 年前做了预防，之后也就再也没有过关于内核的协议究竟是哪个
-版本的讨论。&lt;/td&gt;
-&lt;td&gt;So I was very upset and made it very clear, and this was months before
+what the FSF wants.     But to me it's not the same license at all.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然后版本 3 的扩展在某些方面让我个人觉得非常不舒服，也就是说「我给你源代码，
+这意味着你必须服从我的一些规则，否则你不能把它用在你的设备上。」
+对我来说，这是违反了版本 2 协议所追求的所有目的。然而我理解为什么 FSF 要这么做，
+因为我知道 FSF 想要达成什么，但是对我来说这完全是不同的协议了。&lt;/p&gt;
+&lt;a aria-controls="f0b4e1fb" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f0b4e1fb" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="f0b4e1fb"&gt;
+&lt;blockquote&gt;
+So I was very upset and made it very clear, and this was months before
 version 3 was actually published. There was a discussion about this
 long before... There was an earlier version of version 3, years before
 actually, where I said "No, this is not gonna fly."
@@ -525,26 +532,37 @@ And during that earlier discussion I had already added to the kernel that,
 "Hey, I don't have the version 2 or later". And there was no...
 And I was really happy then when version 3 came out, that I have done that
 something like 5 years before, because there was ever never any question
-about what the license for the kernel was.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;不过事实上我觉得版本 3 是……呃不……我事实上觉得版本 3 是个 &lt;strong&gt;不错&lt;/strong&gt; 的协议，
-对吧。我坚定地相信「如果是你写的代码，那么你有权利决定它应该用什么协议」。
-并且版本 3 是个不错的选择。版本 3 不好的地方在……「我们给你了版本 2
-，然后我们试图偷偷混入这些新的规则，并且想逼着所有人都跟着升级」这是我不喜欢版本
-3 的地方。并且 FSF 在其中做了很多见不得人的事情，我觉得做得很不道德。&lt;/td&gt;
-&lt;td&gt;But I actually thought that version 3 is ... Uh, no ... I actually think
+about what the license for the kernel was.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;所以我当时非常不安，并且表明了自己的观点，并且这是在版本 3 发布的数月之前。
+在那很久之前曾经有过一场讨论……在版本 3 之前有一个早期的版本，
+事实上几年之前，那时我就说过：「不，这不可能工作」。
+并且在那个早期的讨论阶段我已经在内核里写好了「嘿，我可没有写过版本 2
+或者更高版本」。所以之后也没有过（争议）……随后版本 3 出来的时候我非常开心，
+因为我早在大概 5 年前做了预防，之后也就再也没有过关于内核的协议究竟是哪个
+版本的讨论。&lt;/p&gt;
+&lt;a aria-controls="32e9bcca" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#32e9bcca" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="32e9bcca"&gt;
+&lt;blockquote&gt;
+But I actually thought that version 3 is ... Uh, no ... I actually think
 version 3 is a &lt;strong&gt;FINE&lt;/strong&gt; license, right. I'm a firm believer in,
 "If you write your code, it is your choice to pick a license."
 And version 3 is a fine license. Version 3 was not a good ...
 "Here we give you version 2, and then we tried to sneak in these new rules,
 and tried to force everybody to upgrade." That was the part I disliked.
-And the FSF did some really sneaky stuff, downright immoral in my opinion.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问：所以你在说 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tivoization"&gt;Tivoization&lt;/a&gt; 的事情么？&lt;/td&gt;
-&lt;td&gt;Q: So you are talking about &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tivoization"&gt;Tivoization&lt;/a&gt;?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+And the FSF did some really sneaky stuff, downright immoral in my opinion.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;不过事实上我觉得版本 3 是……呃不……我事实上觉得版本 3 是个 &lt;strong&gt;不错&lt;/strong&gt; 的协议，
+对吧。我坚定地相信「如果是你写的代码，那么你有权利决定它应该用什么协议」。
+并且版本 3 是个不错的选择。版本 3 不好的地方在……「我们给你了版本 2
+，然后我们试图偷偷混入这些新的规则，并且想逼着所有人都跟着升级」这是我不喜欢版本
+3 的地方。并且 FSF 在其中做了很多见不得人的事情，我觉得做得很不道德。&lt;/p&gt;
+&lt;a aria-controls="318f390b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#318f390b" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="318f390b"&gt;
+&lt;blockquote&gt;
+Q: So you are talking about &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tivoization"&gt;Tivoization&lt;/a&gt;?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问：所以你在说 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tivoization"&gt;Tivoization&lt;/a&gt; 的事情么？&lt;/p&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 译注： 关于 &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Tivoization"&gt;Tivoization&lt;/a&gt;&lt;/div&gt;
@@ -556,31 +574,24 @@ Tivoization 是 FSF 发明的一个词，表示 TiVo 的做法。 TiVo
 编制的软件，从而限制了用户修改运行软件的自由。这种做法在 FSF 看来是钻了 GPLv2
 的法律上的空子，所以 FSF 提出了 GPLv3 封堵这种做法。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 没错，Tivoization 的事情一直是我反对版本 3 的主要根据。并且，FSF
-在这件事上表现得极不诚实。「嘿，其实我们允许你无效化 Tivoization 条款」，这样他们试图，
-应该说他们是在明白着欺骗别人，并且说「嘿，这意味着你可以使用除去 Tivoization 部分的 GPLv3」。
-这很……在场的诸位中有谁从 FSF 那儿听过这个说法？（请举手）&lt;/td&gt;
-&lt;td&gt;L: Ehmm, yeah the Tivoization is always my main, eh dislike of version 3.
+&lt;a aria-controls="db80a74e" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#db80a74e" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="db80a74e"&gt;
+&lt;blockquote&gt;
+L: Ehmm, yeah the Tivoization is always my main, eh dislike of version 3.
 And, the FSF was being very dishonest thing. "Hey, we actually allow you
 to invalidate the Tivoization clause" and they tried to, they literally
 lied to people, and say "Hey, so that means that you can use GPLv3 without
 the Tivoization part", right. This is ... How many people heard this
-particular statement from the FSF? (Please raise your hands)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;好吧，或许他们只试过对我用这套说辞，但是他们真的试过。我的反应是「我可不傻」，对吧。是的，
-的确你可以…… GPLv3 允许你说「好， Tivoization 的事情对我们来说不是问题」，
-但是它同时又允许别人接过这个项目，并且说「嘿，我觉得……去掉了 Tivoization 的 GPLv3
-是兼容完整的 GPLv3 的，所以我可以 fork 这个项目，然后我将在自己的 fork 上用完整的
-GPLv3 写驱动。」然后我就囧了。我的困境在于说「嘿，我给了你我的源代码，现在我却不能拿回你对它
-的修改了」。这是彻底违背了我用这个协议最初的目的了。&lt;/td&gt;
-&lt;td&gt;Ok, maybe they only tried to convince me with that one.
+particular statement from the FSF? (Please raise your hands)&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 没错，Tivoization 的事情一直是我反对版本 3 的主要根据。并且，FSF
+在这件事上表现得极不诚实。「嘿，其实我们允许你无效化 Tivoization 条款」，这样他们试图，
+应该说他们是在明白着欺骗别人，并且说「嘿，这意味着你可以使用除去 Tivoization 部分的 GPLv3」。
+这很……在场的诸位中有谁从 FSF 那儿听过这个说法？（请举手）&lt;/p&gt;
+&lt;a aria-controls="d4a2f0a6" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d4a2f0a6" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="d4a2f0a6"&gt;
+&lt;blockquote&gt;
+Ok, maybe they only tried to convince me with that one.
 But they did try. And it was like, "I'm not stupid", right. Yes, you can
 ... The GPLv3 allows you to say "Ok, Tivoization is not an issue for us".
 But it allows somebody else to take the project, and say "Hey, I ... The
@@ -589,30 +600,40 @@ make my own fork of this, and I will start doing drivers that use the full
 version of version 3" And where am I stuck then? I am stuck saying "Hey I
 give you the source code, and now I can't take it back your changes".
 That's completely against the whole point of the license in the first
-place.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;所以 FSF 是，我是说那时他们暗地里做的那些事情，让我当下决定永远不再和 FSF 有任何瓜葛。
-所以如果你想捐钱给一个行善的组织，那就捐给 EFF 吧。FSF 充满了疯狂难处的人。这只是我的观点。
-呃其实我……嗯……我说得有点过分了。FSF 里有很多不错的人，不过其中有些人有点过激。&lt;/td&gt;
-&lt;td&gt;So the FSF was, I mean the kind of stuff that was going on behind the
+place.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;好吧，或许他们只试过对我用这套说辞，但是他们真的试过。我的反应是「我可不傻」，对吧。是的，
+的确你可以…… GPLv3 允许你说「好， Tivoization 的事情对我们来说不是问题」，
+但是它同时又允许别人接过这个项目，并且说「嘿，我觉得……去掉了 Tivoization 的 GPLv3
+是兼容完整的 GPLv3 的，所以我可以 fork 这个项目，然后我将在自己的 fork 上用完整的
+GPLv3 写驱动。」然后我就囧了。我的困境在于说「嘿，我给了你我的源代码，现在我却不能拿回你对它
+的修改了」。这是彻底违背了我用这个协议最初的目的了。&lt;/p&gt;
+&lt;a aria-controls="2f77aec5" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2f77aec5" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="2f77aec5"&gt;
+&lt;blockquote&gt;
+So the FSF was, I mean the kind of stuff that was going on behind the
 scenes, ah, made me once and for all to decide to never had any thing to
 do with the FSF again. So if you wanted to give money to an organization
 that does good? Give it to the EFF. The FSF is full of crazy bittered
 people. That's just mine opinion. Uh, actually I have ... Ah ...
 I overstated that a bit, right. The FSF has a lot of nice people in it,
-but some of them are bit too extreme.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问: 嗯我也希望 EFF 能更多的关注于软件的自由方面。但是你能……你觉得 Tivoization
-这种行为也能在某种方式上让我作为用户获益么？&lt;/td&gt;
-&lt;td&gt;Q: Well I wish the EFF care more about software freedom. But, uh,
-can you ... Do you think that Tivoization benefits me as a user somehow?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 不，我不觉得。我的意思是……这从来都不是我的论据，这不是我选择了 GPLv2 的理由。
-并不是说我觉得 Tivoization 是某种值得你去争取的权利，而是说在我的世界观中，这是你的决定。
-如果你生产硬件去锁住了其中的软件，这是你作为一个硬件提供者的决定。
-这完全不影响我作为一个软件提供者给你软件的决定。你能看出我的立场在哪儿了么？
-我不喜欢上锁的硬件，但是同时这也从来不是我想要给 Linux 加上的的社会契约。&lt;/td&gt;
-&lt;td&gt;L: No, no I don't. I mean that ... But that was never my argument. That
+but some of them are bit too extreme.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;所以 FSF 是，我是说那时他们暗地里做的那些事情，让我当下决定永远不再和 FSF 有任何瓜葛。
+所以如果你想捐钱给一个行善的组织，那就捐给 EFF 吧。FSF 充满了疯狂难处的人。这只是我的观点。
+呃其实我……嗯……我说得有点过分了。FSF 里有很多不错的人，不过其中有些人有点过激。&lt;/p&gt;
+&lt;a aria-controls="51874275" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#51874275" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="51874275"&gt;
+&lt;blockquote&gt;
+Q: Well I wish the EFF care more about software freedom. But, uh,
+can you ... Do you think that Tivoization benefits me as a user somehow?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问: 嗯我也希望 EFF 能更多的关注于软件的自由方面。但是你能……你觉得 Tivoization
+这种行为也能在某种方式上让我作为用户获益么？&lt;/p&gt;
+&lt;a aria-controls="489be787" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#489be787" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="489be787"&gt;
+&lt;blockquote&gt;
+L: No, no I don't. I mean that ... But that was never my argument. That
 was not why I selected the GPLv2. This is my whole point. It's not that
 I think Tivoization is necessarily something that you should strive for.
 But it is something that in my world view, it's your decision.
@@ -620,17 +641,17 @@ If you make hardware that locks down the software, that's your decision
 as a hardware maker. That has no impact on my decision as a software maker
 to give you the software. Do you see where I am coming from? I don't like
 the locked down hardware, but at the same time that was never the social
-contract I intended with Linux.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;对我来说，呃我想说，大家可能知道或者不知道， GPLv2 并不是 Linux 的最初的协议。
-对我来说重要的部分一直是「我给你软件，你可以用它做任何你想要做的事情。如果你做了任何改进，
-你需要把它交还给我。」这是协议最初的样子。最早的协议还有一条完全错误的条款，写得完全不合理，
-那时我很傻。嘿我也傻过。我最初的协议说你不能用它赚钱。这是失策，这明显是不对的不好的，
-因为它和我真正想要做的事情没有任何关系。但是那时我很傻很天真，
-我没意识到钱的事情在其中完全不重要。然后我发现了其中的问题，我看到了 GPLv2 然后说「嘿，
-这是个完美的协议」。然后我看到了 GPLv3 我说「不，这做得过分了，这不是我想要的」
-所以我让 Linux 成为了仅限 GPLv2 ，对吧。&lt;/td&gt;
-&lt;td&gt;To me, umm, I mean, people may or may not
+contract I intended with Linux.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 不，我不觉得。我的意思是……这从来都不是我的论据，这不是我选择了 GPLv2 的理由。
+并不是说我觉得 Tivoization 是某种值得你去争取的权利，而是说在我的世界观中，这是你的决定。
+如果你生产硬件去锁住了其中的软件，这是你作为一个硬件提供者的决定。
+这完全不影响我作为一个软件提供者给你软件的决定。你能看出我的立场在哪儿了么？
+我不喜欢上锁的硬件，但是同时这也从来不是我想要给 Linux 加上的的社会契约。&lt;/p&gt;
+&lt;a aria-controls="d4934e2e" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d4934e2e" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="d4934e2e"&gt;
+&lt;blockquote&gt;
+To me, umm, I mean, people may or may not
 realize GPLv2 wasn't even the first license for Linux.
 To me the important part was always "I give you software, you can do
 whatever you want with it. If you making improvements, you have to give
@@ -643,33 +664,42 @@ was young, I was poor, I didn't realize that the whole money thing wasn't
 the important part. And I have saw the errors in my ways, I saw the GPLv2
 and said "Hey, that's the perfect license". And I saw the GPLv3 and I said
 "No, that's overreaching a lot, that's not what I wanted". And so I made
-Linux GPLv2 only, right.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问: 所以你是否认为，即使你不能修改跑着这个软件的设备，拿回对软件的修改也还是同样重要的？&lt;/td&gt;
-&lt;td&gt;Q: So do you think getting the patches back is as useful even if you can't
-modify the device that it is used on?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 是的，当然。我想说 TiVo 它自己实际上就是一个例子。他们的修改有点复杂，但是我想说他们基本
-是，一开始基本是运行在一套相当标准的 MIPS 设备上。然后他们的修改是想绕开他们用到的芯片上的
-一些问题，并且这些是合格的修改。之后的事情是他们觉得他们需要锁住他们的硬件，我不喜欢这个。
-但是就像我已经说的，我觉得这是他们的决定。&lt;/td&gt;
-&lt;td&gt;L: Yeah, absolutely. And I mean TiVo itself is actually an example of this.
+Linux GPLv2 only, right.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;对我来说，呃我想说，大家可能知道或者不知道， GPLv2 并不是 Linux 的最初的协议。
+对我来说重要的部分一直是「我给你软件，你可以用它做任何你想要做的事情。如果你做了任何改进，
+你需要把它交还给我。」这是协议最初的样子。最早的协议还有一条完全错误的条款，写得完全不合理，
+那时我很傻。嘿我也傻过。我最初的协议说你不能用它赚钱。这是失策，这明显是不对的不好的，
+因为它和我真正想要做的事情没有任何关系。但是那时我很傻很天真，
+我没意识到钱的事情在其中完全不重要。然后我发现了其中的问题，我看到了 GPLv2 然后说「嘿，
+这是个完美的协议」。然后我看到了 GPLv3 我说「不，这做得过分了，这不是我想要的」
+所以我让 Linux 成为了仅限 GPLv2 ，对吧。&lt;/p&gt;
+&lt;a aria-controls="9e4f3a4f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#9e4f3a4f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="9e4f3a4f"&gt;
+&lt;blockquote&gt;
+Q: So do you think getting the patches back is as useful even if you can't
+modify the device that it is used on?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问: 所以你是否认为，即使你不能修改跑着这个软件的设备，拿回对软件的修改也还是同样重要的？&lt;/p&gt;
+&lt;a aria-controls="1eafb32a" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#1eafb32a" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="1eafb32a"&gt;
+&lt;blockquote&gt;
+L: Yeah, absolutely. And I mean TiVo itself is actually an example of this.
 Their patches were kind of crafty but I mean they were basically running
 on a, originally a fairly standard MIPS thing. And their patches were
 working around bugs in the chipsets they used. And they were valid patches.
 The fact that they then felt that their hardware had to be locked down
 someway. I didn't like it. But as I have mentioned, I felt that that was
-their decision.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;并且他们有真正的理由去这么做。这是有时人们忽视的地方。有时是真的有理由去做 TiVo
-他们做的事情。有时强加给你这种限制的是，无线运营商。有时强加给你的是迪士尼。
-有时强加给你限制的甚至是法律。 GPLv3 在医疗设备之类的场合其实允许最后一种情况，我记得。
-我的观点是，整个 Tivoization 的事情有时是有理由去这么做的。如果你生产……
-我是说我不是硬件设计者，我觉得 FPGA 之类的东西很酷，但是我……我的意思是我真的不想把我对世界的
-看法强加给别人。你不是非得要用 Linux ，如果你想要用 Linux
-，那么我唯一要求你做的事情是把源代码（变更）还给我。然后在 GPLv2
-中还有很多繁文缛节规定了详细的细节，这些都不重要。这是我一直以来的观点。&lt;/td&gt;
-&lt;td&gt;And they had real reasons for that. That's something people sometimes
+their decision.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 是的，当然。我想说 TiVo 它自己实际上就是一个例子。他们的修改有点复杂，但是我想说他们基本
+是，一开始基本是运行在一套相当标准的 MIPS 设备上。然后他们的修改是想绕开他们用到的芯片上的
+一些问题，并且这些是合格的修改。之后的事情是他们觉得他们需要锁住他们的硬件，我不喜欢这个。
+但是就像我已经说的，我觉得这是他们的决定。&lt;/p&gt;
+&lt;a aria-controls="93f9460e" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#93f9460e" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="93f9460e"&gt;
+&lt;blockquote&gt;
+And they had real reasons for that. That's something people sometimes
 missed. There are sometimes reasons to do what TiVo did. Sometimes it's
 imposed on you by, wireless carriers. Sometimes it's imposed on you by
 Disney. Uh sometimes it's imposed on you by laws. The GPLv3 actually
@@ -681,13 +711,22 @@ But I always ... I mean I really don't want to impose my world view on
 anybody else. You don't have to use Linux. If you do use Linux, the only
 thing I asked for is source code back. And there is all these other
 verbiages in the GPLv2 about exact details, those aren't important.
-And that was always my standpoint.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;问: 好吧那我就不浪费时间了。&lt;/td&gt;
-&lt;td&gt;Q: Ok, well I will stop my non-point of making noise now.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+And that was always my standpoint.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;并且他们有真正的理由去这么做。这是有时人们忽视的地方。有时是真的有理由去做 TiVo
+他们做的事情。有时强加给你这种限制的是，无线运营商。有时强加给你的是迪士尼。
+有时强加给你限制的甚至是法律。 GPLv3 在医疗设备之类的场合其实允许最后一种情况，我记得。
+我的观点是，整个 Tivoization 的事情有时是有理由去这么做的。如果你生产……
+我是说我不是硬件设计者，我觉得 FPGA 之类的东西很酷，但是我……我的意思是我真的不想把我对世界的
+看法强加给别人。你不是非得要用 Linux ，如果你想要用 Linux
+，那么我唯一要求你做的事情是把源代码（变更）还给我。然后在 GPLv2
+中还有很多繁文缛节规定了详细的细节，这些都不重要。这是我一直以来的观点。&lt;/p&gt;
+&lt;a aria-controls="1bed26a3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#1bed26a3" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="1bed26a3"&gt;
+&lt;blockquote&gt;
+Q: Ok, well I will stop my non-point of making noise now.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;问: 好吧那我就不浪费时间了。&lt;/p&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 译注： 关于 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/ISC%E8%A8%B1%E5%8F%AF%E8%AD%89"&gt;ISC 协议&lt;/a&gt;&lt;/div&gt;
@@ -695,29 +734,26 @@ And that was always my standpoint.&lt;/td&gt;
 ISC 协议是一个开源软件协议，和两句的 BSD 协议功能相同。OpenBSD 项目选择尽量用 ISC
 协议公开他们新写的代码。&lt;/div&gt;
 &lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: 我的意思是别误解……我也喜欢别的协议。我用过……到底是哪个 BSD 协议是可以接受的？
-有一个 BSD 协议实际上非常不错。它实际上是……什么？&lt;/td&gt;
-&lt;td&gt;L: I mean don't get me ... I mean I like other licenses too. I have used
+&lt;a aria-controls="a8a95a78" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a8a95a78" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="a8a95a78"&gt;
+&lt;blockquote&gt;
+L: I mean don't get me ... I mean I like other licenses too. I have used
 like the four, emmm... Which BSD license is the acceptable one?
 One of the BSD license is actually really nice. And it's actually the...
-What?&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;观众： ISC&lt;/td&gt;
-&lt;td&gt;A: ISC&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;L: ISC？并且事实上我在鼓励那些不在意拿回修改但是在意「嘿，我做了一个很酷的东西，请用它」。
-我鼓励这些人去用 BSD 协议做这些事情。我想说 BSD 协议在这种场合是完美的。
-只是碰巧我觉得对于我的项目，拿回修改也同样重要，所以对我而言 BSD 不好。但是重点是
-&lt;strong&gt;对我而言&lt;/strong&gt; 。 GPLv3 可能对你们想要做的事情而言是完美的协议，这很好，并且这时你就应该去用
-GPLv3 。只是当代码是别人写的时候，你没有这个选择权。&lt;/td&gt;
-&lt;td&gt;L: ISC? And I actually encourage people who don't care about the giving
+What?&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: 我的意思是别误解……我也喜欢别的协议。我用过……到底是哪个 BSD 协议是可以接受的？
+有一个 BSD 协议实际上非常不错。它实际上是……什么？&lt;/p&gt;
+&lt;a aria-controls="4624145d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#4624145d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="4624145d"&gt;
+&lt;blockquote&gt;
+A: ISC&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;观众： ISC&lt;/p&gt;
+&lt;a aria-controls="b1cbe308" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b1cbe308" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="b1cbe308"&gt;
+&lt;blockquote&gt;
+L: ISC? And I actually encourage people who don't care about the giving
 code back but care about the "Hey, I did something cool, please use it".
 I encourage people to use the BSD license for that. And I mean the BSD
 license is wonderful for that. It so happens that I thought that for my
@@ -725,10 +761,13 @@ project the giving back is equally important so I, for me BSD is bad.
 But the point is &lt;strong&gt;for me&lt;/strong&gt;. The GPLv3 maybe the perfect license for what
 you guys want to do. And that's fine. And then it's the license you should
 use. It's just that when somebody else wrote the code you don't get that
-choice.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+choice.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;L: ISC？并且事实上我在鼓励那些不在意拿回修改但是在意「嘿，我做了一个很酷的东西，请用它」。
+我鼓励这些人去用 BSD 协议做这些事情。我想说 BSD 协议在这种场合是完美的。
+只是碰巧我觉得对于我的项目，拿回修改也同样重要，所以对我而言 BSD 不好。但是重点是
+&lt;strong&gt;对我而言&lt;/strong&gt; 。 GPLv3 可能对你们想要做的事情而言是完美的协议，这很好，并且这时你就应该去用
+GPLv3 。只是当代码是别人写的时候，你没有这个选择权。&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="import"></category><category term="Linux"></category><category term="zhihu"></category><category term="GPLv3"></category><category term="licenses"></category><category term="Linus Torvalds"></category><category term="GPL"></category><category term="FSF"></category><category term="EFF"></category></entry><entry><title>PacVis: 可视化 pacman 本地数据库</title><link href="//farseerfc.me/zhs/pacvis.html" rel="alternate"></link><published>2016-07-31T03:52:00+09:00</published><updated>2016-07-31T03:52:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-07-31:/zhs/pacvis.html</id><summary type="html">
 &lt;div class="panel panel-default"&gt;
@@ -1538,14 +1577,14 @@ read&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;ttyfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;/* reset tty - useful also for restoring the terminal when this process&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;   wishes to temporarily relinquish the tty&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;*/&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="cm"&gt;/* flush and reset */&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -1553,7 +1592,7 @@ read&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="n"&gt;raw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="cm"&gt;/* copy original and then modify below */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;

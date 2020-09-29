@@ -26,37 +26,37 @@ Today I read a book about we can do cast-down in template, so I write this to te
 <span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">c++</span>
 
     <span class="k">template</span> <span class="o">&lt;</span><span class="kt">bool</span> <span class="n">_Test</span><span class="p">,</span> <span class="k">class</span> <span class="nc">_Type</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
-    <span class="k">struct</span> <span class="n">enable_if</span> <span class="p">{</span> <span class="p">};</span>
+    <span class="k">struct</span> <span class="nc">enable_if</span> <span class="p">{</span> <span class="p">};</span>
     
     <span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">_Type</span><span class="o">&gt;</span>
-    <span class="k">struct</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="n">_Type</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="nc">enable_if</span><span class="o">&lt;</span><span class="nb">true</span><span class="p">,</span> <span class="n">_Type</span><span class="o">&gt;</span> <span class="p">{</span>
         <span class="k">typedef</span> <span class="n">_Type</span> <span class="n">type</span><span class="p">;</span>
     <span class="p">};</span>
     
     <span class="k">class</span> <span class="nc">A</span> <span class="p">{</span> <span class="p">};</span>
     <span class="k">class</span> <span class="nc">B</span> <span class="o">:</span> <span class="n">A</span> <span class="p">{</span> <span class="p">};</span>
     
-    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-    <span class="k">struct</span> <span class="n">traits</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">};</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
+    <span class="k">struct</span> <span class="nc">traits</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="p">};</span>
     
     <span class="k">template</span> <span class="o">&lt;&gt;</span>
-    <span class="k">struct</span> <span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>
+    <span class="k">struct</span> <span class="nc">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span> <span class="p">{</span> <span class="k">static</span> <span class="kt">int</span> <span class="k">const</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>
     
-    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-    <span class="kt">void</span> <span class="n">f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
+    <span class="kt">void</span> <span class="n">f</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="nc">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
     
     <span class="k">template</span> <span class="o">&lt;&gt;</span>
     <span class="kt">void</span> <span class="n">f</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">enable_if</span><span class="o">&lt;</span><span class="n">traits</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;::</span><span class="n">type</span><span class="o">*</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
     
     
     
-    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
     <span class="k">class</span> <span class="nc">BB</span> <span class="p">{};</span>
     
-    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
     <span class="k">class</span> <span class="nc">DD</span> <span class="o">:</span> <span class="k">public</span> <span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{};</span>
     
-    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">ff</span><span class="p">(</span><span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{};</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">ff</span><span class="p">(</span><span class="n">BB</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{};</span>
     
     <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
     <span class="p">{</span>

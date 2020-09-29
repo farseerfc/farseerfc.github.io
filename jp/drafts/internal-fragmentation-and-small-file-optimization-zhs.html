@@ -24,13 +24,13 @@
 
         <meta name="author" content="farseerfc" />
         <meta name="keywords" content="FS笔记,FS notes,internal fragmentation,small file optimization,inline" />
-        <meta name="description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下 …" />
+        <meta name="description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 按块分配的文件系统 具体块/簇大小对文件系统设计带来什么样的挑战 …" />
 
         <meta property="og:site_name" content="Farseerfcの巣" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="内部碎片与小文件优化"/>
         <meta property="og:url" content="//farseerfc.me/jp/zhs/drafts/internal-fragmentation-and-small-file-optimization.html"/>
-        <meta property="og:description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 具体块/簇大小对文件系统设计带来什么样的挑战？ 我们先来看一下 …"/>
+        <meta property="og:description" content="副标题1：文件存入文件系统后占用多大？ 副标题2：文件系统的微观结构 上篇「 系统中的大多数文件有多大？ 」提到，文件系统中大部分文件其实都很小，中位数一直稳定在 4K 左右，而且这个数字并没有随着存储设备容量的增加而增大。但是存储设备的总体容量实际是在逐年增长的， ，总容量增加而文件大小中位数不变的原因，可能是以下两种情况： 文件数量在增加 大文件的大小在增加 实际上可能是这两者综合的结果。这种趋势给文件系统设计带来了越来越多的挑战， 因为我们不能单纯根据平均文件大小来增加块大小（block size）优化文件读写。 微软的文件系统（FAT系和 NTFS）使用「簇（cluster）」这个概念管理文件系统的可用空间分配，在 Unix 系文件系统中有类似的块（block）的概念，只不过称呼不一样。 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。 按块分配的文件系统 具体块/簇大小对文件系统设计带来什么样的挑战 …"/>
         <meta property="article:published_time" content="2020-07-03" />
             <meta property="article:section" content="tech" />
             <meta property="article:tag" content="FS笔记" />
@@ -237,6 +237,32 @@ Farseerfcの巣            </a>
             </header>
 
             <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目次                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+<p class="topic-title">目录</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id4" id="id12">按块分配的文件系统</a><ul>
+<li><a class="reference internal" href="#fat" id="id13">FAT系文件系统与簇大小</a></li>
+<li><a class="reference internal" href="#unix" id="id14">传统 Unix 文件系统的块映射</a></li>
+<li><a class="reference internal" href="#ext2-3" id="id15">以 ext2/3 为例，补充一下扩展属性和希疏文件</a></li>
+<li><a class="reference internal" href="#ffs" id="id16">FFS 中的整块与碎块设计</a></li>
+<li><a class="reference internal" href="#f2fs" id="id17">F2FS 的对闪存优化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id18">连续区块分配的文件系统</a><ul>
+<li><a class="reference internal" href="#xfs" id="id19">XFS 的区块记录</a></li>
+<li><a class="reference internal" href="#ext4" id="id20">ext4 中的小文件内联优化</a></li>
+<li><a class="reference internal" href="#ntfs-mft" id="id21">NTFS 的 MFT 表</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id11" id="id22">上述文件系统汇总</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
                 <p>副标题1：文件存入文件系统后占用多大？</p>
 <p>副标题2：文件系统的微观结构</p>
 <p>上篇「 <a class="reference external" href="//farseerfc.me/jp/file-size-histogram-zhs.html">系统中的大多数文件有多大？</a>
@@ -254,10 +280,12 @@ Farseerfcの巣            </a>
 现代文件系统都有这个块大小或者簇大小的概念，从而基本的文件空间分配可以独立于硬件设备本身的扇区大小。
 块大小越大，单次分配空间越大，文件系统所需维护的元数据越小，复杂度越低，实现起来也越容易。
 而块大小越小，越能节约可用空间，避免内部碎片造成的浪费，但是跟踪空间所需的元数据也越复杂。</p>
+<div class="section" id="id4">
+<h2><a class="toc-backref" href="#id12">按块分配的文件系统</a></h2>
 <p>具体块/簇大小对文件系统设计带来什么样的挑战？
 我们先来看一下（目前还在用的）最简单的文件系统怎么存文件的吧：</p>
 <div class="section" id="fat">
-<h2>FAT系文件系统与簇大小</h2>
+<h3><a class="toc-backref" href="#id13">FAT系文件系统与簇大小</a></h3>
 <p>在 FAT 系文件系统(FAT12/16/32/exFAT)中，整个存储空间除了一些保留扇区之外，被分为两大块区域，
 看起来类似这样：</p>
 <object class="tikz embed-responsive-item" data="//farseerfc.me/uml/91d24daa.svg" type="image/svg+xml">
@@ -284,7 +312,7 @@ FAT系文件系统中每个簇有多大，由文件系统总容量，以及 FAT 
 table.right-align-columns td,th {
     text-align: right
 }
-</style><table border="0" class="borderless docutils right-align-columns table">
+</style><table border="0" class="table docutils right-align-columns borderless">
 <colgroup>
 <col width="32%"/>
 <col width="17%"/>
@@ -428,7 +456,7 @@ FAT12 和 FAT16 都被 FAT 表项的最大数量限制（分别是 4068 和 6546
 <p>FAT 系的簇大小是可以由用户在创建文件系统时指定的，大部分普通用户会使用系统根据存储设备容量推算的默认值，
 而存储设备的生产厂商则可以根据底层存储设备的特性决定一个适合存储设备的簇大小。在选择簇大小时，
 要考虑取舍，较小的簇意味着同样容量下更多的簇数，而较大的簇意味着更少的簇数，取舍在于：</p>
-<table border="0" class="docutils field-list table" frame="void" rules="none">
+<table border="0" class="table docutils field-list" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -456,7 +484,7 @@ FAT12 和 FAT16 都被 FAT 表项的最大数量限制（分别是 4068 和 6546
 中有大量小文件，每个不足一簇的小文件都要占用完整一簇的大小。可能注意到上图 512B
 的簇大小时整个文件系统占用反而比 1KiB 簇大小时的更大，这是因为 512B 簇大小的时候 FAT
 表本身的占用更大。具体数字如下表：</p>
-<table border="0" class="borderless docutils right-align-columns table">
+<table border="0" class="table docutils right-align-columns borderless">
 <colgroup>
 <col width="18%"/>
 <col width="16%"/>
@@ -539,7 +567,7 @@ NTFS 和其它 Unix-like 系统的文件系统都使用块位图(block bitmap)�
 将宏观尺度的空间分配问题和微观尺度的文件寻址问题分开解决，从而在可接受的性能下允许更小的簇大小和更多的簇数。</p>
 </div>
 <div class="section" id="unix">
-<h2>传统 Unix 文件系统的块映射</h2>
+<h3><a class="toc-backref" href="#id14">传统 Unix 文件系统的块映射</a></h3>
 <p>传统 Unix 文件系统（下称 UFS）和它的继任者们，包括 Linux 的 ext2/3 ， FreeBSD 的 FFS
 等文件系统，使用在 inode 中记录块映射（bmap, block mapping）的方式记录文件存储的地址范围。
 术语上 UFS 中所称的「块（block）」等价于微软系文件系统中所称的「簇（cluster）」，
@@ -595,24 +623,64 @@ indirect block）」，其位置写在 inode 中第 11 个块地址上，间接�
 <p>UFS 使用这种 inode 中存储块映射引出间接块树的形式存储文件块地址，这使得 UFS 中定位到文件的
 inode 之后查找文件存储的块比 FAT 类的文件系统快，因为不再需要去读取 FAT 表。这种方式另一个特征是，
 当文件较大时，读写文件前段部分的数据，比如 inode 中记录的前10块直接块地址的时候，比随后 10~1024
-块一级间接块要快，同样的访问一级间接块中的数据也比二级和三级间接块要快。一些 Unix 工具比如
+块一级间接块要快一些，同样的访问一级间接块中的数据也比二级和三级间接块要快一些。一些 Unix 工具比如
 <code class="code">
 file</code>
  判断文件内容的类型只需要读取文件前段的内容，在这种记录方式下也可以比较高效。</p>
 </div>
+<div class="section" id="ext2-3">
+<h3><a class="toc-backref" href="#id15">以 ext2/3 为例，补充一下扩展属性和希疏文件</a></h3>
+<p>ext2/3 的 inode 存储方式基本上类似上述 UFS ，具体到它们的 inode 结构而言， ext2/3 中每个
+inode 占用 128 字节，其中有 60 字节存储块映射，可以存放 12 个直接块指针和三级间接块指针。
+详细的 ext2 inode 结构可见下图，结构来自 <a class="reference external" href="https://www.nongnu.org/ext2-doc/ext2.html#inode-table">ext2 文档</a>
+。</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/6ac10f5d.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>结构中 osd1 和 osd2 两大块被定义为是系统实现相关（OS Dependent）的区域，具体到 Linux 上的
+ext2/3 实现中 osd2 的部分区域被拿来保存 uid/gid/size/blocks 等位数不够的数据的高位，
+具体参考后文 ext4 的 inode 结构。</p>
+<p>传统上 Unix 的文件系统支持扩展属性（xattr, eXtended ATTRibutes）和希疏文件（sparse
+files）这两个比较少用的高级特性，每个 Unix 分支的 UFS 实现在实现这两个特性的方面都略有不同，
+所以拿 ext2/3 来举例说明一下扩展属性和希疏文件的存储方式。</p>
+<p>首先扩展属性是保存在 inode 中，文件系统本身不太关心，但是对系统别的部分而言需要保存的关于文件的一些属性。
+一开始扩展属性主要是保存 POSIX 访问控制列表（ACL） ，不同于普通的 POSIX 权限位（permissions flags），
+POSIX ACL 提供了更细粒度的文件权限的控制。后来扩展属性也用来存储 NFS 、 SELinux
+或者别的子系统用的属性。不同于「权限位」或者「修改时间」这些文件系统内置属性是保存在固定的 inode
+结构体中，扩展属性在文件系统 API 中是以键值对（key-value pair）的方式存储的。</p>
+<p>在 ext2/3 的 inode 中如果文件有扩展属性，是保存在额外的扩展属性块中，然后块指针写在
+<code class="code">
+inode.i_file_acl</code>
+ 里面。扩展属性块是文件系统块大小，只能有一块，而且 API
+限制所有扩展属性「键值对」的大小加起来不能超过 4KiB 。这个限制使得 ext2/3 有了对扩展属性支持不佳的评价。</p>
+<p>支持扩展属性的需求一开始不那么紧迫，随着 ext2 被部署到企业级应用中，对扩展属性的需求逐渐紧迫起来。
+像 POSIX ACL 和 SELinux 所需的扩展属性有个特点是它们经常递归地设置在文件夹树上，很多文件会直接
+继承父级文件夹设置的扩展属性。后来 ext2 有了个 ea_inode 的特性，用单独的特殊 inode
+保存扩展属性，这个 inode 不存在于任何文件夹，其文件内容是引用它的文件的扩展属性，很多普通文件可以共享一个
+ea_inode 来表达相同的扩展属性。</p>
+<p>希疏文件（sparse files）是文件地址范围内有部分地址空间没有分配对应存储块的文件，
+常用于存储磁盘镜像文件之类地址范围很大，而有很多空洞的文件。
+在 ext2/3 的块映射中，对希疏文件如果有文件地址没有分配块，则把该块的指针存成 0 的方式表达。
+可见在表达希疏文件的时候， ext2/3 虽然不需要分配块，但是仍然要存储空指针。</p>
+<p>总体而言对扩展属性和希疏文件的支持一开始并不在 ext2/3 文件系统的原始设计中，
+这两个较少使用的特性都是后来增加的，如果大量使用这两个特性可能带来一些性能问题。</p>
+</div>
 <div class="section" id="ffs">
-<h2>FFS 中的整块与碎块</h2>
+<h3><a class="toc-backref" href="#id16">FFS 中的整块与碎块设计</a></h3>
 <p>FreeBSD 用的 FFS 基于传统 UFS 的存储方式，为了对抗比较小的块大小导致块分配器的性能损失，
-FFS 创新的使用两种块大小记录文件块，在此我们把两种块大小分布叫整块（block）和碎块（fragment）。
+FFS 创新的使用两种块大小记录文件块，在此我们把两种块大小分别叫整块（block）和碎块（fragment）。
 整块和碎块的大小比例最多是 8:1，也可以是 4:1 或者 2:1，比如可以使用 4KiB 的整块和 1KiB
-的碎块，或者用 32KiB 的整块并配有 4KiB 大小的碎块。写文件时先把末端不足一个整块的内容写入碎块中，
-多个碎块的长度凑足一个整块后分配一个整块并把之前分配的碎块内容复制到整块里。</p>
+的碎块，或者用 32KiB 的整块并配有 4KiB 的碎块。写文件时先把末端不足一个整块的内容写入碎块中，
+之后多个碎块的长度凑足一个整块后再分配一个整块并把之前分配的碎块内容复制到整块里。</p>
+<p>另一种考虑碎块设计的方式是可以看作 FFS 每次在结束写入时，会对文件末尾做一次小范围的碎片整理（
+defragmentation），将多个碎块整理成一个整块。就像普通的碎片整理，这种积攒多个碎块直到构成一个整块，
+然后搬运碎块写入整块的操作，会造成一定程度的写入放大；不过因为对碎块的碎片整理只针对碎块，
+所以多次写入不会像普通的碎片整理那样产生多次写入放大，而只会发生一次。</p>
 <div class="panel panel-default">
 <div class="panel-heading">
-ext2 中的碎块计划</div>
+ext2 中实现碎块的计划</div>
 <div class="panel-body">
 ext2 曾经也计划过类似 FFS 碎块的设计，超级块（superblock）中有个 s_log_frag_size
-记录碎块大小， inode 中也有碎块数量之类的记录，不过 ext2 的 Linux/Hurd
+记录碎块大小， inode 中也有碎块地址 i_faddr 之类的记录，不过 ext2 的 Linux/Hurd
 实现最终都没有完成对碎块的支持，于是超级块中记录的碎块大小永远等于整块大小，而
 inode 记录的碎块永远为 0 。到 ext4 时代这些记录已经被标为了过期，不再计划支持碎块设计。</div>
 </div>
@@ -624,43 +692,181 @@ inode 记录的碎块永远为 0 。到 ext4 时代这些记录已经被标为�
 UFS 。碎块大小不应小于底层存储设备的扇区大小，而 FFS
 记录碎块的方式使得整块的大小不能大于碎块大小的 8 倍。</p>
 <p>不考虑希疏文件（sparse files）的前提下，碎块记录只发生在文件末尾，而且在文件系统实际写入到设备前，
-内存中仍旧用整块的方式记录，避免那些写入比较慢而一直在写入的程序比如日志文件产生大量碎块到整块的搬运。</p>
-<p>另一种考虑碎块设计的方式是可以看作 FFS 每次在结束写入时，会对文件末尾做一次小范围的碎片整理（
-defragmentation），将多个碎块整理成一个整块。</p>
+内存中仍旧用整块的方式记录，避免那些写入比较慢而一直在写入的程序（比如日志文件）产生大量碎块到整块的搬运。</p>
 </div>
-<div class="section" id="ntfs-extent">
-<h2>NTFS 与区块（extent）</h2>
-<p>NTFS 虽然是出自微软之手，其微观结构却和 FAT 很不一样，某种角度来看更像是一个 UFS 后继。
-NTFS 没有固定位置的 inode 表，但是有一个巨大的文件叫 $MFT (Master File Table
-），整个 $MFT 的作用就像是 UFS 中 inode 表的作用。NTFS 中的每个文件都在 $MFT
-中存有一个对应的 MFT 表项， MFT 表现有固定长度 1024 字节，整个 $MFT 文件就是一个巨大的
-MFT 表现的数组。每个文件可以根据 MFT 序号在 $MFT 中找到具体位置。</p>
-<p>$MFT 本身也是个文件，所以它不必连续存放，在 $MFT 中记录的第一项文件记录了 $MFT 自身的元数据。
-于是可以先读取 $MFT 的最初几块，找到 $MFT 文件存放的地址信息，继而勾勒出整个 $MFT 所占的空间。
-实际上 Windows 的 NTFS 驱动在创建文件系统时给 $MFT 预留了很大一片存储区， Windows XP
-之后的碎片整理工具也会非常积极地对 $MFT 文件本身做碎片整理，于是通常存储设备上的 $MFT
-不会散布在很多地方而是集中在 NTFS 分区靠前的一块连续位置。于是宏观而言 NTFS 像是这样：</p>
-<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/c6779b6e.svg" type="image/svg+xml">
+<div class="section" id="f2fs">
+<h3><a class="toc-backref" href="#id17">F2FS 的对闪存优化</a></h3>
+<p>打乱一下历史发展顺序，介绍完 FAT 系和传统 Unix 系文件系统的微观结构之后，这里时间线跳到现代，
+稍微聊一下 F2FS 的微观结构的实现方式。打乱时间线的原因等我们看完 F2FS 的设计就知道了。</p>
+<p>三星的 F2FS 是为有闪存控制器（FTL）的闪存类存储设备优化的日志结构（log-structured）文件系统。
+「为有闪存控制器（FTL）的闪存类存储设备优化」这一点听起来比较商业噱头，换个说法 F2FS
+实际做的是一个写入模式从宏观上看很像 FAT32/exFAT 的日志结构文件系统。</p>
+<p>关于 <a class="reference external" href="{filename}./btrfs-vs-zfs-difference-in-implementing-snapshots#id21#id21">日志结构文件系统的实现思路在我很久之前的一篇博客中稍微有介绍到</a>
+，传统上日志结构文件系统是为了优化硬盘类存储设备上的写入速度而设计的，
+写入时能保持在一大段空闲空间内连续写入，避免写入时发生寻道。这一点设计虽然是对硬盘的优化，
+但是反而对后来的闪存类存储设备而言更为友好。
+之前也有文章分别介绍 <a class="reference external" href="//farseerfc.me/jp/history-of-chs-addressing-zhs.html">硬盘</a>
+和 <a class="reference external" href="//farseerfc.me/jp/flash-storage-ftl-layer-zhs.html">闪存</a>
+的特点，稍微总结性概括一下的话闪存类存储设备相比硬盘有如下特点：</p>
+<ol class="arabic simple">
+<li>读取和写入的非对称性。读取可以任意地址寻址无须在意寻道开销，而写入必须顺序写入来减少写放大。</li>
+<li>写入和擦除的非对称性。读写的时候是基本扇区（比如4K）大小，而擦除的时候一次性擦除更大一块（比如 128K~8M）。</li>
+</ol>
+<p>传统上的日志结构文件系统中，每修改一个文件，无论是修改文件数据还是元数据，
+都分配新块写入在日志结构末尾，然后重新写入新的文件元数据（比如间接块和 inode ）和文件系统关键结构
+（比如 inode 表等），避免任何覆盖写入的操作。不做覆盖写入本身对 FTL 的闪存很友好，
+但是每次内容变化都需要重新写入整个文件系统元数据中涉及到的树结构，直到树根，这会造成一部分写放大。
+F2FS 的设计者把传统日志结构文件系统中，文件系统的关键树结构在整个存储空间中不断迁移的现象叫做
+<a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/f2fs.html#wandering-tree-problem">漫游树问题（wandering tree problem）</a>
+。</p>
+<p>F2FS 的设计认识到，实际配有 FTL 的存储设备一般为了支持类似 FAT 的写入模式，会区别对待地址范围内
+前面一小部分 FAT 表占用的地址空间和后面 FAT 的数据区所在的地址空间，通常 FAT 表占用的地址空间
+允许高效地随机地址写入。基于 FTL 闪存这样的存储特点，F2FS 有了解决漫游树问题的方案：
+在地址空间前面一小部分通常是 FAT 表的范围内，放入一个节点地址转换表（NAT，Node Address Table），
+随后当文件内容或者 inode 改变的时候只需要更新 NAT 中记录的地址，就可以切断漫游树需要更新到树根的特点，
+避免每次修改一个文件都需要重新写入核心树结构导致的写入放大。于是 F2FS 的宏观结构看起来像是下图：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/c24fe97e.svg" type="image/svg+xml">
 tikz diagram</object>
+<p>超级块（SB, superblock）中记录关于文件系统不变的元信息，传统 UFS
+中那些会变化的统计信息（比如共有多少 inode ，其中用了多少 inode ）单独分出来记录，叫做检查点（
+CP, checkpoint），随后是段信息表（SIT, segment information table）记录每一段的信息（比如写入指针），
+接下来是上述节点地址转换表（NAT, Node Address Table），是一个地址数组，
+记录每个节点（node）的地址。</p>
+<p>F2FS 中节点（node）的概念包含两种节点，一是传统 UFS 的 inode 节点，
+二是当需要间接地址块时的间接节点。从而当很大的文件使用了间接块记录地址的时候，
+修改了间接块地址只需要修改间接块节点在 NAT 中的地址，而不需要修改 inode 本身。</p>
+<p>F2FS 的 inode 节点散布在主数据区（main area）中，每个 inode 和普通文件块一样大，
+比传统 UFS 的 inode 要大得多。比如 ext2 的 inode 是 128 字节， ext4 的 inode 是 256
+字节，而常见的 F2FS 的 inode 有 4KiB 大小。如此大的 inode 仍然使用传统 UFS
+的块映射的方式存放文件地址，可以估算除了文件属性之类的元数据需要的近 100 字节空间外，
+F2FS 的 inode 可以存储非常多的块指针。实际上 4KiB 中可存放最多 923 个直接块指针，
+外加 2 个一级间接节点，2 个二级间接节点，1 个三级间接节点。</p>
+<p>NAT 表大小和节点数量来看， F2FS 需要的节点数量大于传统 UFS 的 inode 数量（因为每个 inode
+都是一个 F2FS 节点，而存储大文件用的间接块也是 F2FS 节点），但是小于主数据区的块数量（因为
+inode 和别的数据块都占用主数据区）。从而 F2FS 的 NAT 表大小远小于同样块大小的 exFAT 的 FAT
+表大小。因为 F2FS 使用 4KiB 块大小而 exFAT 一般使用 32KiB 或者 128KiB
+这样的块大小，所以通常 F2FS 的 NAT 大小大概正好较小于同设备上用 exFAT 时 FAT 的大小。
+NAT 大小这一点对 F2FS 所说的闪存类存储设备优化很关键，一旦 NAT 超过了 FAT
+大小，就可能难以享受针对 FAT 类闪存设备对 FAT 系文件系统的特殊优化了。</p>
+<p>因为 F2FS 使用 4KiB 的 inode ，使得 F2FS 很适合做小文件内联优化，对很小的文件（大约小于 3400
+字节）可以直接将文件内容写入 inode 中用来存放块映射的那部分空间，避免对文件内容单独分配数据块。
+F2FS 也支持文件夹和符号链接等特殊文件的小文件内联，以及支持扩展属性内联存储在 inode 中。</p>
+<p>从 F2FS 的设计中可以看出， F2FS 是一个拼命表现得像是 FAT 的日志结构文件系统（LFS），
+进而可以说是 FAT 和 UFS 特点的结合，比起后继的那些为了减少硬盘寻道而优化的现代文件系统而言，
+F2FS 的设计更古典朴素一些。</p>
+</div>
+</div>
+<div class="section" id="id9">
+<h2><a class="toc-backref" href="#id18">连续区块分配的文件系统</a></h2>
+<p>前述几个文件系统都是按块分配的文件系统，意味着它们的文件元数据中以某种方式逐一记录了所有数据块的地址。
+FAT 系文件系统用 FAT 表中的单链表穿起了文件簇的地址， ext2/3 和 FFS 和 F2FS 这些基于传统
+UFS 设计的文件系统用块映射的方式记录了所有块地址。</p>
+<p>随着存储设备不断增大而块大小基本保持不变，导致的结果是存储文件的数据块经常有连续地址的多块构成，
+从而在按块分配的文件系统中要逐一记录连续的块地址，导致较大的元数据。
+并且逐块分配的文件系统也通常不考虑块与块之间是否连续，导致 <strong>外部碎片</strong> 降低硬盘上的读写效率。</p>
+<p>新的文件系统设计中为了解决这个问题，通常使用区块分配器，一次分配连续的多块存放文件，
+并且在文件元数据中也以（起始地址，区块长度）的方式记录连续的多块存储空间。
+这种记录连续多块地址的方式通常叫做 <a class="reference external" href="https://en.wikipedia.org/wiki/Extent_(file_systems)">区块（extent）</a>
+每个文件的内容由多个区块构成，接下来介绍一些使用区块记录文件地址的文件系统。</p>
+<p>最早使用区块方式记录文件地址，并且使用连续分配的分配器算法避免产生外部碎片的文件系统
+可能是 SGI 的 EFS (Extent Filesystem)，这种设计在其继任的 SGI XFS 中被传承并且发扬光大。</p>
+<div class="section" id="xfs">
+<h3><a class="toc-backref" href="#id19">XFS 的区块记录</a></h3>
+<div class="panel panel-default">
+<div class="panel-heading">
+XFS 在线文档的图示</div>
+<div class="panel-body">
+<a class="reference external" href="https://xfs.org/docs/xfsdocs-xml-dev/XFS_Filesystem_Structure//tmp/en-US/html/index.html">XFS 在线文档</a>
+中提供了针对 XFS 数据结构相当明确的图示，本文中使用关于 XFS 的图示全都来自这里。</div>
+</div>
+<p>首先 XFS 中没有 UFS 那样的固定位置的 inode 表，而是把小块的 inode 表散布在整个存储空间中。
+每次需要新的空间保存 inode 的时候，一次分配 64 个 inode 所需的数据块，而每个 inode 是 256 字节大小，
+从而一个存放 inode 表的数据块大概占用 16KiB 。</p>
+<p>传统 UFS 中用 inode 号表示在 inode 表内的数组偏移可以快速定位到 inode ，也可以通过扫描 inode
+表的方式找到文件系统中的所有 inode 。而 XFS 中通过两种方式支持快速定位 inode 。</p>
+<ol class="arabic">
+<li><p class="first">给定 inode 号找 inode 的时候， XFS 把 inode 所在数据块的地址和 inode
+在数据块中的数组下标直接 <a class="reference external" href="https://xfs.org/docs/xfsdocs-xml-dev/XFS_Filesystem_Structure/tmp/en-US/html/AG_Inode_Management.html#Inode_Numbers">编码在了 inode 号</a>
+中。比如使用 32位 inode 号的时候，可能有 26 位记录数据块地址，6位记录数据块内的 64 个 inode
+中的哪一个。具体使用 inode 号的多少位作为数据块地址，还有多少位作为下标，要看超级块中的
+sb_inoplog 记录。这种 inode 号的编码方式使得 XFS 的 inode 号通常非常大，并且32位CPU架构上使用 XFS
+时的 inode 号与64位CPU架构上的 XFS 并不兼容。</p>
+<img alt="XFS inode number" class="img-responsive" src="//farseerfc.me/jp/images/xfs-18.png"/>
+</li>
+<li><p class="first">用平衡树（B+Tree）记录所有保存 inode 的数据块的地址和利用率信息，叫做
+<a class="reference external" href="https://xfs.org/docs/xfsdocs-xml-dev/XFS_Filesystem_Structure/tmp/en-US/html/Inode_Btrees.html">inode B+tree</a>
+，从而扫描 inode b+tree 可以遍历文件系统中所有在使用的 inode 。</p>
+<p>高度只有一级的 inode B+Tree 结构类似这样：</p>
+<img alt="XFS single level inode b+tree" class="img-responsive" src="//farseerfc.me/jp/images/xfs-20a.png"/>
+<p>高度为二级的 inode B+Tree 结构类似这样：</p>
+<img alt="XFS 2-level inode b+tree" class="img-responsive" src="//farseerfc.me/jp/images/xfs-20b.png"/>
+</li>
+</ol>
+<p>定位到 inode 之后，每个文件至少 256 字节的 inode 又分为三大部分： inode core
+、数据分支（data fork）、扩展属性分支（extended attribute fork）。</p>
+<img alt="XFS inode 三部分" class="img-responsive" src="//farseerfc.me/jp/images/xfs-23.png"/>
+<p>其中 XFS 的 inode core 像是 ext 的 inode 中去掉块映射的部分，记录文件元数据，
+数据分支记录文件的地址信息，扩展属性分支则记录文件的扩展属性。XFS 的 inode 结构是有版本号区分的，在
+v4 版本结构体中 inode core 占用 96 字节，在 v5 版本结构体中占用 176 字节，从而
+inode 剩余的空间可以用来存储数据分支和扩展属性。</p>
+<p>在 inode 的数据分支中用区块的方式记录文件地址，每个区块是这样一个 128 位（32字节）的结构：</p>
+<img alt="XFS extent" class="img-responsive" src="//farseerfc.me/jp/images/xfs-31.png"/>
+<p>结构记录了文件的（文件内起始偏移、块地址、块数）三部分信息，和一个标志位。标志位可以用来区分这个区块是
+普通区块还是预分配区块（unwritten），用来支持 fallocate 预分配空间。通过跳过一部分起始偏移，
+这种区块记录方式可以自然地表达希疏文件，而不需要像 ext2/3 那样记录空指针。
+每个区块记录可以表示 2^21 块连续的数据块。</p>
+<p>如果文件数据的所有区块记录都可以塞入 inode 的数据分支中，那么 XFS 用 inode
+中的区块列表记录这些区块，否则 XFS 会分配区块的 B+Tree ，把这些区块信息写入 B+Tree 的叶节点中。
+单层的区块 B+Tree 看起来像是这样：</p>
+<img alt="XFS extent B+Tree" class="img-responsive" src="//farseerfc.me/jp/images/xfs-35.png"/>
+<p>对扩展属性的支持也是类似， 当扩展属性比较小的时候 XFS 可以将扩展属性列表直接存入 inode
+的扩展属性分支中，当扩展属性较大的时候 XFS 分配间接数据块保存扩展属性的 B+Tree 。</p>
 </div>
 <div class="section" id="ext4">
-<h2>ext4 中的小文件内联优化</h2>
-<p><a class="reference external" href="https://lwn.net/Articles/468678/">https://lwn.net/Articles/468678/</a></p>
-<p>ext4 的 inode 存储方式基本上类似上述 UFS ，具体到 inode 而言， ext2/3 中每个 inode 占用
-128 字节，其中末尾有 60 字节存储块映射，可以存放 12 个直接块指针和三级间接块指针。
-详细的 ext2 inode 结构可见 <a class="reference external" href="https://www.nongnu.org/ext2-doc/ext2.html#inode-table">ext2 文档</a> 。</p>
+<h3><a class="toc-backref" href="#id20">ext4 中的小文件内联优化</a></h3>
+<p>ext4 中首先将 ext2/3 的 128 字节 inode 扩展到了默认 256 字节大小，整个结构类似下图：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/f262158d.svg" type="image/svg+xml">
+tikz diagram</object>
+<p>对比上面 ext2 的 inode ，ext4 中用 osd2 的位置额外存了很多数据的高位，扩展了那些数据的位数，
+随后在增加的结构中加入了几个时间戳的纳秒支持。之后总共 256 字节的 inode 保存了大约 156 的
+inode 结构后还有大概 100 字节空间剩余，ext4 用这些剩余空间保存扩展属性。</p>
+<p>inode 中 60 字节的 block 数组在 ext2/3 中是用来保存块映射，而在 ext4 中保存区块结构。
+ext4 中每个区块记录占用 12 字节，多个区块记录和 XFS 一样以树的形式构成。</p>
 <p>注意到典型的 Unix 文件系统中，有很多「小」文件小于 60 字节的块映射大小，而且不止有很多小的普通文件，
 包括目录文件、软链接、设备文件之类的特殊 Unix 文件通常也很小。为了存这些小文件而单独分配一个块
 并在 inode 中记录单个块指针显得很浪费，于是有了 <strong>小文件内联优化 (small file inlining)</strong>
 。</p>
 <p>一言以蔽之小文件内联优化就是在 inode 中的 60 字节的块映射区域中直接存放文件内容。
-在 inode 前半标志位 （i_flags）中安插一位记录(EXT4_INLINE_DATA_FL)，判断后面这 60 字节的块映射区是存储为内联文件，
-还是真的存放块映射。这些被内联优化掉的小文件磁盘占用会显示为 0
+在 inode 前半标志位 （flags）中安插一位记录(EXT4_INLINE_DATA_FL)，判断后面这
+60 字节的块映射区是存储为内联文件，还是真的存放块映射。这些被内联优化掉的小文件磁盘占用会显示为 0
 ，因为没有分配数据块，但是仍然要占用完整一个 inode 。</p>
+<p>ext4 实现的小文件内联还利用了扩展属性占用的空间，当 60 字节的块映射区还不足存放文件内容时，
+ext4 会分配一个特殊的扩展属性 “system.data” 直接保存文件内容。</p>
+<p>对较小的目录文件，inode 中的 60 字节 block 空间可以直接保存目录的内容。对符号链接文件，
+这部分空间可以直接保存符号链接的目标，这两种特殊文件可以视作小文件内联优化的特例。</p>
 </div>
-<div class="section" id="id4">
-<h2>上述文件系统汇总</h2>
-<table border="0" class="borderless docutils table">
+<div class="section" id="ntfs-mft">
+<h3><a class="toc-backref" href="#id21">NTFS 的 MFT 表</a></h3>
+<p>NTFS 虽然是出自微软之手，其微观结构却和 FAT 很不一样，某种角度来看更像是一个 UFS 后继。
+NTFS 没有固定位置的 inode 表，但是有一个巨大的文件叫 $MFT (Master File Table
+），整个 $MFT 的作用就像是 UFS 中 inode 表的作用。NTFS 中的每个文件都在 $MFT
+中存有一个对应的 MFT 表项， MFT 表现有固定长度 1024 字节，整个 $MFT 文件就是一个巨大的
+MFT 表项构成的数组。每个文件可以根据 MFT 序号作为数组下标在 $MFT 中找到具体位置。
+网上经常有人说 NTFS 中所有东西都是文件，包括 $MFT 也是个文件，这其实是在说所有东西包括 $MFT
+本身都在 $MFT 中有个占用 1KiB 的文件记录。</p>
+<p>$MFT 本身也是个文件，所以它不必连续存放也没有固定的开始位置，在引导块中记录了 $MFT 的起始位置，然后在
+$MFT 起始位置中记录的第一项文件记录了关于 $MFT 自身的元数据，也就包含 $MFT 占用的别的空间的信息。
+于是可以先读取 $MFT 的最初几块，找到 $MFT 文件存放的地址信息，继而勾勒出整个 $MFT 所占的空间。
+实际上 Windows 的 NTFS 驱动在创建文件系统时给 $MFT 预留了很大一片存储区， Windows XP
+之后的碎片整理工具也会非常积极地对 $MFT 文件本身做碎片整理，于是通常存储设备上的 $MFT
+不会散布在很多地方而是集中在 NTFS 分区靠前的一块连续位置。于是宏观而言 NTFS 像是这样：</p>
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/b5bf9b9f.svg" type="image/svg+xml">
+tikz diagram</object>
+</div>
+</div>
+<div class="section" id="id11">
+<h2><a class="toc-backref" href="#id22">上述文件系统汇总</a></h2>
+<table border="0" class="table docutils borderless">
 <caption>文件系统汇总</caption>
 <colgroup>
 <col width="20%"/>
@@ -674,7 +880,7 @@ tikz diagram</object>
 <th class="head">基础分配单位</th>
 <th class="head">常见块大小</th>
 <th class="head">文件寻址方式</th>
-<th class="head">支持文件内联</th>
+<th class="head">小文件内联</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -694,7 +900,7 @@ tikz diagram</object>
 <td>MFT项/簇</td>
 <td>1K/4K</td>
 <td>区块</td>
-<td>900</td>
+<td>~900</td>
 </tr>
 <tr><td>FFS</td>
 <td>inode/碎块/整块</td>
@@ -702,7 +908,13 @@ tikz diagram</object>
 <td>块映射</td>
 <td>否</td>
 </tr>
-<tr><td>Ext4</td>
+<tr><td>ext2/3</td>
+<td>inode/块</td>
+<td>128/4K</td>
+<td>块映射</td>
+<td>否</td>
+</tr>
+<tr><td>ext4</td>
 <td>inode/块</td>
 <td>256/4K</td>
 <td>块映射/区块树</td>
@@ -712,7 +924,7 @@ tikz diagram</object>
 <td>inode/块</td>
 <td>256/4K</td>
 <td>区块树</td>
-<td>仅目录和符号连接</td>
+<td>~80，仅目录和符号连接</td>
 </tr>
 <tr><td>F2FS</td>
 <td>node</td>
@@ -730,7 +942,7 @@ tikz diagram</object>
 <td>tree node/block</td>
 <td>16K/4K</td>
 <td>区块树</td>
-<td>~2K(区块内联)</td>
+<td>2K(区块内联)</td>
 </tr>
 <tr><td>ZFS</td>
 <td>ashift/recordsize</td>
@@ -816,7 +1028,7 @@ tikz diagram</object>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-この文章は ""　シリーズの <built-in method index of str object at 0x7f6d5aa0f090> 番目の文章：                  </h4>
+この文章は ""　シリーズの <built-in method index of str object at 0x7f79c68576f0> 番目の文章：                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
@@ -1133,6 +1345,33 @@ farseerfc に連絡</a>
 
     </div>
 </section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目次</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+<p class="topic-title">目录</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id4" id="id12">按块分配的文件系统</a><ul>
+<li><a class="reference internal" href="#fat" id="id13">FAT系文件系统与簇大小</a></li>
+<li><a class="reference internal" href="#unix" id="id14">传统 Unix 文件系统的块映射</a></li>
+<li><a class="reference internal" href="#ext2-3" id="id15">以 ext2/3 为例，补充一下扩展属性和希疏文件</a></li>
+<li><a class="reference internal" href="#ffs" id="id16">FFS 中的整块与碎块设计</a></li>
+<li><a class="reference internal" href="#f2fs" id="id17">F2FS 的对闪存优化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id18">连续区块分配的文件系统</a><ul>
+<li><a class="reference internal" href="#xfs" id="id19">XFS 的区块记录</a></li>
+<li><a class="reference internal" href="#ext4" id="id20">ext4 中的小文件内联优化</a></li>
+<li><a class="reference internal" href="#ntfs-mft" id="id21">NTFS 的 MFT 表</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id11" id="id22">上述文件系统汇总</a></li>
+</ul>
+</div>
+            </div>
+        </div>
             </aside>
         </div>
     </div>

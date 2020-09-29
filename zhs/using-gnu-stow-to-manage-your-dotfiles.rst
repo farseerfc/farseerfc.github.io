@@ -32,7 +32,7 @@ Brandon Invergo 的博客采用 `CC-BY-SA 3.0 <https://creativecommons.org/licen
 使用 GNU stow 管理你的点文件
 ----------------------------------------------------
 
-.. translate-paragraph::
+.. translate-collapse-paragraph::
 
     我昨天偶然间发现一些我觉得值得分享的经验，就是那种「为毛我没有早点知道这个？」那一类的。
     我将在这篇文章中介绍如何使用 GNU Stow 管理你的 GNU/Linux 系统中位于用户家目录里的各种配置文件
@@ -155,7 +155,7 @@ Brandon Invergo 的博客采用 `CC-BY-SA 3.0 <https://creativecommons.org/licen
             .vimrc
 
 
-.. translate-paragraph::
+.. translate-collapse-paragraph::
 
     然后迁移配置的方式是，应该建一个 dotfiles 子目录，然后像这样移动所有配置文件：
 
@@ -187,7 +187,7 @@ Brandon Invergo 的博客采用 `CC-BY-SA 3.0 <https://creativecommons.org/licen
                     .vimrc
 
 
-.. translate-paragraph::
+.. translate-collapse-paragraph::
 
     然后执行以下命令：
 
@@ -201,7 +201,7 @@ Brandon Invergo 的博客采用 `CC-BY-SA 3.0 <https://creativecommons.org/licen
     $ stow uzbl
     $ stow vim
 
-.. translate-paragraph::
+.. translate-collapse-paragraph::
 
     然后，瞬间，所有你的配置文件（的符号链接）就安安稳稳地放入了它们该在的地方，无论原本这些目录结构
     有多么错综复杂，这样安排之后的 dotfiles 文件夹内的目录结构立刻整理得有条有理，

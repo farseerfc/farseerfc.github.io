@@ -374,14 +374,14 @@ read</code>
 <span class="code-line"><span class="cp">#include</span> <span class="cpf">&lt;termios.h&gt;</span><span class="cp"></span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="k">static</span> <span class="kt">int</span> <span class="n">ttyfd</span> <span class="o">=</span> <span class="n">STDIN_FILENO</span><span class="p">;</span></span>
-<span class="code-line"><span class="k">static</span> <span class="k">struct</span> <span class="n">termios</span> <span class="n">orig_termios</span><span class="p">;</span></span>
+<span class="code-line"><span class="k">static</span> <span class="k">struct</span> <span class="nc">termios</span> <span class="n">orig_termios</span><span class="p">;</span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="cm">/* reset tty - useful also for restoring the terminal when this process</span></span>
 <span class="code-line"><span class="cm">   wishes to temporarily relinquish the tty</span></span>
 <span class="code-line"><span class="cm">*/</span></span>
 <span class="code-line"><span class="kt">int</span> <span class="nf">tty_reset</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span></span>
 <span class="code-line">    <span class="cm">/* flush and reset */</span></span>
-<span class="code-line">    <span class="k">if</span> <span class="p">(</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">ttyfd</span><span class="p">,</span><span class="n">TCSAFLUSH</span><span class="p">,</span><span class="o">&amp;</span><span class="n">orig_termios</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span></span>
+<span class="code-line">    <span class="k">if</span> <span class="p">(</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">ttyfd</span><span class="p">,</span><span class="n">TCSAFLUSH</span><span class="p">,</span><span class="o">&amp;</span><span class="n">orig_termios</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span></span>
 <span class="code-line">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span></span>
 <span class="code-line"><span class="p">}</span></span>
 <span class="code-line"></span>
@@ -389,7 +389,7 @@ read</code>
 <span class="code-line"><span class="cm">/* put terminal in raw mode - see termio(7I) for modes */</span></span>
 <span class="code-line"><span class="kt">void</span> <span class="nf">tty_raw</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span></span>
 <span class="code-line"><span class="p">{</span></span>
-<span class="code-line">    <span class="k">struct</span> <span class="n">termios</span> <span class="n">raw</span><span class="p">;</span></span>
+<span class="code-line">    <span class="k">struct</span> <span class="nc">termios</span> <span class="n">raw</span><span class="p">;</span></span>
 <span class="code-line"></span>
 <span class="code-line">    <span class="n">raw</span> <span class="o">=</span> <span class="n">orig_termios</span><span class="p">;</span>  <span class="cm">/* copy original and then modify below */</span></span>
 <span class="code-line"></span>

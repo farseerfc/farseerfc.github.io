@@ -605,7 +605,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
 但是理解了 FTL 的差異後就可以看出這種「優化」只針對線性寫入，不一定適合放系統文件根目錄的文件系統。&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="table docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -2050,7 +2050,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="docutils field-list table" frame="void" rules="none"&gt;
+&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -2063,7 +2063,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="docutils field-list table" frame="void" rules="none"&gt;
+&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3366,7 +3366,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="docutils field-list table" frame="void" rules="none"&gt;
+&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3729,7 +3729,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="table docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -4881,30 +4881,22 @@ Brandon Invergo 的博客採用 &lt;a class="reference external" href="https://c
 &lt;/div&gt;
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;使用 GNU stow 管理你的點文件&lt;/h2&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;我昨天偶然間發現一些我覺得值得分享的經驗，就是那種「爲毛我沒有早點知道這個？」那一類的。
-我將在這篇文章中介紹如何使用 GNU Stow 管理你的 GNU/Linux 系統中位於用戶家目錄裏的各種配置文件
-（通常又叫「點文件(dotfiles)」比如 .bashrc）。&lt;/td&gt;
-&lt;td&gt;I accidentally stumbled upon something yesterday that I felt like sharing,
+&lt;a aria-controls="8b1882fc" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8b1882fc" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="8b1882fc"&gt;
+&lt;blockquote&gt;
+I accidentally stumbled upon something yesterday that I felt like sharing,
 which fell squarely into the "why the hell didn't I know about this before?"
 category. In this post, I'll describe how to manage the various
 configuration files in your GNU/Linux home directory
-(aka "dotfiles" like .bashrc) using GNU Stow.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;這件事的困難之處在於，如果能用版本管理系統(VCS, Version Control System)比如
-Git, Mercurial(hg), Bazaar(bzr)
-管理點文件的話會非常方便，但是這些點文件大部分都位於家目錄的頂級目錄下，
-在這個位置不太適合初始化一個版本管理倉庫。這些年下來我試過很多程序，設計目的在於解決這個問題，
-幫你把這些配置文件安置在某個下級目錄中，然後安裝或者鏈接這些文件到它們應該在的位置。
-嘗試下來這些程序沒有一個真正能打動我。它們要麼有很多依賴（比如 Ruby 和一大坨庫），
-要麼需要我記住如何用它，考慮到同步配置這種不算經常使用的場合，要記住用法真的挺難。&lt;/td&gt;
-&lt;td&gt;The difficulty is that it would be helpful to manage one's configuration
+(aka "dotfiles" like .bashrc) using GNU Stow.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;我昨天偶然間發現一些我覺得值得分享的經驗，就是那種「爲毛我沒有早點知道這個？」那一類的。
+我將在這篇文章中介紹如何使用 GNU Stow 管理你的 GNU/Linux 系統中位於用戶家目錄裏的各種配置文件
+（通常又叫「點文件(dotfiles)」比如 .bashrc）。&lt;/p&gt;
+&lt;a aria-controls="71af1930" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#71af1930" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="71af1930"&gt;
+&lt;blockquote&gt;
+The difficulty is that it would be helpful to manage one's configuration
 files with a version control system like Git, Mercurial or Bazaar, but
 many/most dotfiles reside at the top-level of your home directory,
 where it wouldn't be a good idea to initialize a VCS repository.
@@ -4914,9 +4906,30 @@ linking them into their appropriate places. None of those programs ever
 really appealed to me. They would require a ton of dependencies
 (like Ruby and a ton of libraries for it) or they would require me to
 remember how to use them, which is difficult when really for such a task
-you rarely use the program.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;最近我在用 GNU Stow 來管理我從源代碼在本地編譯安裝到 &lt;code class="code"&gt;
+you rarely use the program.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;這件事的困難之處在於，如果能用版本管理系統(VCS, Version Control System)比如
+Git, Mercurial(hg), Bazaar(bzr)
+管理點文件的話會非常方便，但是這些點文件大部分都位於家目錄的頂級目錄下，
+在這個位置不太適合初始化一個版本管理倉庫。這些年下來我試過很多程序，設計目的在於解決這個問題，
+幫你把這些配置文件安置在某個下級目錄中，然後安裝或者鏈接這些文件到它們應該在的位置。
+嘗試下來這些程序沒有一個真正能打動我。它們要麼有很多依賴（比如 Ruby 和一大坨庫），
+要麼需要我記住如何用它，考慮到同步配置這種不算經常使用的場合，要記住用法真的挺難。&lt;/p&gt;
+&lt;a aria-controls="f79eff90" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f79eff90" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="f79eff90"&gt;
+&lt;blockquote&gt;
+Lately I've been using GNU Stow to manage programs I install from source to
+/usr/local/. Basically, in this typical usage, you install locally built
+packages to /usr/local/stow/${PKGNAME}-{PKGVERSION} and then
+from /usr/local/stow/ you run # stow ${PKGNAME}-${PKGVERSION} and the
+program generates symbolic links to all the programs' files into the
+appropriate places under /usr/local/. Then, when you uninstall a program
+via Stow, you don't have to worry about any stray files that you or a
+provide Makefile may have missed. It also makes handling alternate versions
+of a program quite easy (i.e. when I'm experimenting with different
+configurations of dwm or st).&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;最近我在用 GNU Stow 來管理我從源代碼在本地編譯安裝到 &lt;code class="code"&gt;
 /​usr/​local/​&lt;/code&gt;
  中的一些程序。
 基本上說，在這種常見用法下，是你把這些本地編譯的包配置安裝到
@@ -4934,30 +4947,41 @@ you rarely use the program.&lt;/td&gt;
 中合適的地方。然後當你想用 Stow 卸載這個程序的時候，就不必再考慮會留下什麼垃圾文件，
 或者找不到安裝時用的 Makefile 了。這種安裝方式下也可以非常容易地切換一個程序的不同版本
 （比如我想嘗試不同配置選項下的 &lt;a class="reference external" href="https://dwm.suckless.org/"&gt;dwm&lt;/a&gt; 或者
-&lt;a class="reference external" href="https://st.suckless.org/"&gt;st&lt;/a&gt; 的時候）。&lt;/td&gt;
-&lt;td&gt;Lately I've been using GNU Stow to manage programs I install from source to
-/usr/local/. Basically, in this typical usage, you install locally built
-packages to /usr/local/stow/${PKGNAME}-{PKGVERSION} and then
-from /usr/local/stow/ you run # stow ${PKGNAME}-${PKGVERSION} and the
-program generates symbolic links to all the programs' files into the
-appropriate places under /usr/local/. Then, when you uninstall a program
-via Stow, you don't have to worry about any stray files that you or a
-provide Makefile may have missed. It also makes handling alternate versions
-of a program quite easy (i.e. when I'm experimenting with different
-configurations of dwm or st).&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;前段時間在我掃郵件列表的時候，看到某個帖子中某人在說使用 Stow 管理安裝他的點文件。
-當時我沒特別在意這個帖子，但是大概我大腦潛意識把它歸檔保存爲今後閱讀了。
-昨天我想起來試試這種用法，試過後我不得不說，這比那些專門設計用來做這任務的點文件管理器要方便太多了，
-雖然表面上看起來這種用法沒那麼顯而易見。&lt;/td&gt;
-&lt;td&gt;Some time ago I happened across a mailing list posting where someone
+&lt;a class="reference external" href="https://st.suckless.org/"&gt;st&lt;/a&gt; 的時候）。&lt;/p&gt;
+&lt;a aria-controls="de09a7d8" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#de09a7d8" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="de09a7d8"&gt;
+&lt;blockquote&gt;
+Some time ago I happened across a mailing list posting where someone
 described using Stow to manage the installation of their dotfiles.
 I didn't pay much attention to it but my brain must have filed it away
 for later. Yesterday I decided to give it a try and I have to say that
 it is so much more convenient than those other dedicated dotfile-management
-programs, even if it wasn't an immediately obvious option.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;方法很簡單。我建了個 &lt;code class="code"&gt;
+programs, even if it wasn't an immediately obvious option.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;前段時間在我掃郵件列表的時候，看到某個帖子中某人在說使用 Stow 管理安裝他的點文件。
+當時我沒特別在意這個帖子，但是大概我大腦潛意識把它歸檔保存爲今後閱讀了。
+昨天我想起來試試這種用法，試過後我不得不說，這比那些專門設計用來做這任務的點文件管理器要方便太多了，
+雖然表面上看起來這種用法沒那麼顯而易見。&lt;/p&gt;
+&lt;a aria-controls="2e827562" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2e827562" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="2e827562"&gt;
+&lt;blockquote&gt;
+The procedure is simple. I created the ${HOME}/dotfiles directory and then
+inside it I made subdirectories for all the programs whose cofigurations
+I wanted to manage. Inside each of those directories, I moved in all the
+appropriate files, maintaining the directory structure of my home directory.
+So, if a file normally resides at the top level of your home directory,
+it would go into the top level of the program's subdirectory.
+If a file normally goes in the default ${XDG_CONFIG_HOME}/${PKGNAME}
+location (${HOME}/.config/${PKGNAME}), then it would instead go in
+${HOME}/dotfiles/${PKGNAME}/.config/${PKGNAME} and so on.
+Finally, from the dotfiles directory, you just run $ stow $PKGNAME and
+Stow will symlink all the package's configuration files to the appropriate
+locations. It's then easy to make the dotfiles a VCS repository so you can
+keep track of changes you make (plus it makes it so much easier to share
+configurations between different computers, which was my main reason to
+do it).&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;方法很簡單。我建了個 &lt;code class="code"&gt;
 ${HOME}/​dotfiles&lt;/code&gt;
  文件夾，然後在裏面爲我想管理的每個程序配置都
 創建一個子文件夾。然後我把這些程序的配置從原本的家目錄移動到這每一個對應的子文件夾中，
@@ -4976,39 +5000,24 @@ $ stow $PKGNAME&lt;/code&gt;
  命令，
 Stow 就會爲你自動創建這些配置文件的符號鏈接到合適的位置。接下來就很容易爲這個 dotfiles
 目錄初始化版本管理倉庫，從而記錄你對這些配置文件做的修改（並且這也可以極度簡化在不同電腦之間
-共享配置，這也是我想要這麼做的主要原因）。&lt;/td&gt;
-&lt;td&gt;The procedure is simple. I created the ${HOME}/dotfiles directory and then
-inside it I made subdirectories for all the programs whose cofigurations
-I wanted to manage. Inside each of those directories, I moved in all the
-appropriate files, maintaining the directory structure of my home directory.
-So, if a file normally resides at the top level of your home directory,
-it would go into the top level of the program's subdirectory.
-If a file normally goes in the default ${XDG_CONFIG_HOME}/${PKGNAME}
-location (${HOME}/.config/${PKGNAME}), then it would instead go in
-${HOME}/dotfiles/${PKGNAME}/.config/${PKGNAME} and so on.
-Finally, from the dotfiles directory, you just run $ stow $PKGNAME and
-Stow will symlink all the package's configuration files to the appropriate
-locations. It's then easy to make the dotfiles a VCS repository so you can
-keep track of changes you make (plus it makes it so much easier to share
-configurations between different computers, which was my main reason to
-do it).&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;舉個例子，比如說你想管理 Bash, VIM, Uzbl 這三個程序的配置文件。Bash 會在家目錄的頂層文件夾
+共享配置，這也是我想要這麼做的主要原因）。&lt;/p&gt;
+&lt;a aria-controls="5e0e831d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5e0e831d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="5e0e831d"&gt;
+&lt;blockquote&gt;
+For example, let's say you want to manage the configuration for Bash,
+VIM and Uzbl. Bash has a couple files in the top-level directory;
+VIM typically has your .vimrc file on the top-level and a .vim directory;
+and Uzbl has files in ${XDG_CONFIG_HOME}/uzbl and ${XDG_DATA_HOME}/uzbl.
+So, your home directory looks like this:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;舉個例子，比如說你想管理 Bash, VIM, Uzbl 這三個程序的配置文件。Bash 會在家目錄的頂層文件夾
 放幾個文件； VIM 通常會有在頂層文件夾的 .vimrc 文件和 .vim 目錄；然後 Uzbl 的配置位於
 &lt;code class="code"&gt;
 ${XDG_CONFIG_HOME}/​uzbl&lt;/code&gt;
  以及 &lt;code class="code"&gt;
 ${XDG_DATA_HOME}/​uzbl&lt;/code&gt;
 
-。於是在遷移配置前，你的家目錄的文件夾結構應該看起來像這樣：&lt;/td&gt;
-&lt;td&gt;For example, let's say you want to manage the configuration for Bash,
-VIM and Uzbl. Bash has a couple files in the top-level directory;
-VIM typically has your .vimrc file on the top-level and a .vim directory;
-and Uzbl has files in ${XDG_CONFIG_HOME}/uzbl and ${XDG_DATA_HOME}/uzbl.
-So, your home directory looks like this:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+。於是在遷移配置前，你的家目錄的文件夾結構應該看起來像這樣：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;home/&lt;/span&gt;
 &lt;span class="code-line"&gt;    brandon/&lt;/span&gt;
 &lt;span class="code-line"&gt;        .config/&lt;/span&gt;
@@ -5025,18 +5034,12 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;        .bash_logout&lt;/span&gt;
 &lt;span class="code-line"&gt;        .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然後遷移配置的方式是，應該建一個 dotfiles 子目錄，然後像這樣移動所有配置文件：&lt;/td&gt;
-&lt;td&gt;You would then create a dotfiles subdirectory and move all the files there:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;a aria-controls="8c2a2e91" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8c2a2e91" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="8c2a2e91"&gt;
+&lt;blockquote&gt;
+You would then create a dotfiles subdirectory and move all the files there:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然後遷移配置的方式是，應該建一個 dotfiles 子目錄，然後像這樣移動所有配置文件：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;home/&lt;/span&gt;
 &lt;span class="code-line"&gt;    /brandon/&lt;/span&gt;
 &lt;span class="code-line"&gt;        .config/&lt;/span&gt;
@@ -5060,37 +5063,21 @@ So, your home directory looks like this:&lt;/td&gt;
 &lt;span class="code-line"&gt;                    [...some files]&lt;/span&gt;
 &lt;span class="code-line"&gt;                .vimrc&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然後執行以下命令：&lt;/td&gt;
-&lt;td&gt;Then, perform the following commands:&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+&lt;a aria-controls="a3ea20b7" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a3ea20b7" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="a3ea20b7"&gt;
+&lt;blockquote&gt;
+Then, perform the following commands:&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然後執行以下命令：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;$&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt; ~/dotfiles&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow bash&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow uzbl&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="gp"&gt;$&lt;/span&gt; stow vim&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
-&lt;colgroup&gt;
-&lt;col width="50%"/&gt;
-&lt;col width="50%"/&gt;
-&lt;/colgroup&gt;
-&lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;然後，瞬間，所有你的配置文件（的符號鏈接）就安安穩穩地放入了它們該在的地方，無論原本這些目錄結構
-有多麼錯綜複雜，這樣安排之後的 dotfiles 文件夾內的目錄結構立刻整理得有條有理，
-並且可以很容易地轉換成版本控制倉庫。非常有用的一點是，如果你有多臺電腦，可能這些電腦並沒有
-安裝完全一樣的軟件集，那麼你可以手選一些你需要的軟件配置來安裝。在你的 dotfiles 文件夾中總是
-可以找到所有的配置文件，但是如果你不需要某個程序的某份配置，那你就不對它執行 stow
-命令，它就不會擾亂你的家目錄。&lt;/td&gt;
-&lt;td&gt;And, voila, all your config files (well, symbolic links to them) are all
+&lt;a aria-controls="6a03f8ee" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#6a03f8ee" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="6a03f8ee"&gt;
+&lt;blockquote&gt;
+And, voila, all your config files (well, symbolic links to them) are all
 in the correct place, however disorganized that might be, while the actual
 files are all neatly organized in your dotfiles directory, which is easily
 turned into a VCS repo. One handy thing is that if you use multiple
@@ -5098,14 +5085,21 @@ computers, which may not have the same software installed on them,
 you can pick and choose which configurations to install when you need them.
 All of your dotfiles are always available in your dotfiles directory,
 but if you don't need the configuration for one program, you simply don't
-Stow it and thus it does not clutter your home directory.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;嗯，以上就是整個用法介紹。希望能有別人覺得這個用法有用！我知道對我來說這個非常有幫助。&lt;/td&gt;
-&lt;td&gt;Well, that's all there is to it. Hopefully someone else out there finds
-this useful! I know I've found it to be a huge help.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+Stow it and thus it does not clutter your home directory.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;然後，瞬間，所有你的配置文件（的符號鏈接）就安安穩穩地放入了它們該在的地方，無論原本這些目錄結構
+有多麼錯綜複雜，這樣安排之後的 dotfiles 文件夾內的目錄結構立刻整理得有條有理，
+並且可以很容易地轉換成版本控制倉庫。非常有用的一點是，如果你有多臺電腦，可能這些電腦並沒有
+安裝完全一樣的軟件集，那麼你可以手選一些你需要的軟件配置來安裝。在你的 dotfiles 文件夾中總是
+可以找到所有的配置文件，但是如果你不需要某個程序的某份配置，那你就不對它執行 stow
+命令，它就不會擾亂你的家目錄。&lt;/p&gt;
+&lt;a aria-controls="68a93e12" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#68a93e12" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;div class="collapse" id="68a93e12"&gt;
+&lt;blockquote&gt;
+Well, that's all there is to it. Hopefully someone else out there finds
+this useful! I know I've found it to be a huge help.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;p&gt;嗯，以上就是整個用法介紹。希望能有別人覺得這個用法有用！我知道對我來說這個非常有幫助。&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="tech"></category><category term="linux"></category><category term="dotfiles"></category><category term="stow"></category></entry><entry><title>啓用 GitHub Issue 作爲博客留言系統</title><link href="//farseerfc.me/github-issues-as-comments.html" rel="alternate"></link><published>2016-08-07T16:28:00+09:00</published><updated>2016-08-07T16:28:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2016-08-07:/github-issues-as-comments.html</id><summary type="html">&lt;p&gt;從今天起本博客將啓用 GitHub Issue 作爲留言系統。
 原本使用的 Disqus 將繼續保留一段時間，目前沒有關閉的計劃。&lt;/p&gt;
@@ -6723,7 +6717,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="borderless docutils table"&gt;
+&lt;table border="0" class="table docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -6741,7 +6735,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="last docutils table borderless first"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -6757,7 +6751,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="last docutils table borderless first"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6775,7 +6769,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="last docutils table borderless first"&gt;
+&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -6802,7 +6796,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="last docutils table borderless first"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -6824,7 +6818,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="last docutils table borderless first"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -7024,7 +7018,7 @@ RELATIVE_URLS&lt;/code&gt;
 &lt;div class="panel-heading"&gt;
 嵌入 PlantUML 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="uml diagram" class="uml img-responsive" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
+&lt;img alt="uml diagram" class="img-responsive uml" src="//farseerfc.me/uml/8e4b1ee3.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a class="reference external" href="http://plantuml.sourceforge.net/"&gt;PlantUML&lt;/a&gt; 是一個Java實現的，
@@ -7542,14 +7536,14 @@ read&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;termios.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;ttyfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;STDIN_FILENO&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;/* reset tty - useful also for restoring the terminal when this process&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;   wishes to temporarily relinquish the tty&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;*/&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;tty_reset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="cm"&gt;/* flush and reset */&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tcsetattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttyfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TCSAFLUSH&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;-1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -7557,7 +7551,7 @@ read&lt;/code&gt;
 &lt;span class="code-line"&gt;&lt;span class="cm"&gt;/* put terminal in raw mode - see termio(7I) for modes */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;tty_raw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;termios&lt;/span&gt; &lt;span class="n"&gt;raw&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="n"&gt;raw&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;orig_termios&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="cm"&gt;/* copy original and then modify below */&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
@@ -7849,17 +7843,17 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;原問題&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;struct …&lt;/span&gt;&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</summary><content type="html">
 &lt;p&gt;這兩天在飲水思源的C板，關於C++模板的類型轉換的一個討論，後面是我的解答。&lt;/p&gt;
 &lt;div class="section" id="id1"&gt;
@@ -7870,37 +7864,37 @@ From now on you should be able to write Ruby code within a regular Python module
 &lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;原問題&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;今天在書上看到模板演繹的時候可以允許cast-down，於是我寫了個東西：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;_Test&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;enable_if&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="n"&gt;_Type&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;B&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;traits&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enable_if&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;traits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BB&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DD&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="k"&gt;template&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;typename&lt;/span&gt; &lt;span class="nc"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;ff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BB&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[])&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
