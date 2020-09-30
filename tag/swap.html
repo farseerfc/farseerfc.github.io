@@ -2,7 +2,7 @@
 <html lang="zh-Hant"
 >
 <head>
-    <title>【譯】替 swap 辯護：常見誤解 - Farseerfc的小窩</title>
+    <title>swap - Farseerfc的小窩</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -20,27 +20,16 @@
 <link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
 <link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
 
-<link rel="canonical" href="//farseerfc.me/drafts/in-defence-of-swap.html">
 
-        <meta name="author" content="farseerfc" />
-        <meta name="keywords" content="swap,mm,memory management,translate,swappiness" />
-        <meta name="description" content="這篇翻譯自 Chris Down 的博客 In defence of swap: common misconceptions ，下面是原文翻譯。 這篇文章也有 日文 和 俄文 翻譯。 tl;dr: Having swap is a reasonably important part of a well functioning system. Without it, sane memory management becomes harder to achieve. Swap is not generally about getting emergency memory, it&#39;s about making …" />
+    <meta name="author" content="farseerfc" />
+    <meta name="keywords" content="swap" />
 
+    <!-- Open Graph tags -->
         <meta property="og:site_name" content="Farseerfc的小窩" />
-        <meta property="og:type" content="article"/>
-        <meta property="og:title" content="【譯】替 swap 辯護：常見誤解"/>
-        <meta property="og:url" content="//farseerfc.me/drafts/in-defence-of-swap.html"/>
-        <meta property="og:description" content="這篇翻譯自 Chris Down 的博客 In defence of swap: common misconceptions ，下面是原文翻譯。 這篇文章也有 日文 和 俄文 翻譯。 tl;dr: Having swap is a reasonably important part of a well functioning system. Without it, sane memory management becomes harder to achieve. Swap is not generally about getting emergency memory, it&#39;s about making …"/>
-        <meta property="article:published_time" content="2020-09-28" />
-            <meta property="article:section" content="tech" />
-            <meta property="article:tag" content="swap" />
-            <meta property="article:tag" content="mm" />
-            <meta property="article:tag" content="memory management" />
-            <meta property="article:tag" content="translate" />
-            <meta property="article:tag" content="swappiness" />
-            <meta property="article:author" content="farseerfc" />
-        <meta property="og:image"
-                  content="//farseerfc.me/in-defence-of-swap.png"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="Farseerfc的小窩"/>
+        <meta property="og:url" content="//farseerfc.me"/>
+        <meta property="og:description" content="Farseerfc的小窩"/>
 
 
 
@@ -62,7 +51,7 @@
     <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
 </head>
 <body>
-<div style="display:none" id="title">【譯】替 swap 辯護：常見誤解 - Farseerfc的小窩</div>
+<div style="display:none" id="title">swap - Farseerfc的小窩</div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -134,7 +123,7 @@ Farseerfc的小窩            </a>
                             <li >
                                 <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
                             </li>
-                            <li class="active">
+                            <li >
                                 <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
                             </li>
                         </ul>
@@ -148,7 +137,7 @@ Farseerfc的小窩            </a>
                         <li >
                             <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
                         </li>
-                        <li class="active">
+                        <li >
                             <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
                         </li>
                     </ul>
@@ -192,275 +181,49 @@ Farseerfc的小窩            </a>
     <div class="row" style="padding-bottom:80px;padding-top:80px;">
         <div class="col-xl-21 col-lg-20 col-md-18">
             <div id="loading-block">
-            <ol class="breadcrumb">
-                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
-                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
-                <li class="active">【譯】替 swap 辯護：常見誤解</li>
-            </ol>
-    <section id="content" class="article-content">
-        <article>
-            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+    <ol class="breadcrumb">
+        <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+        <li><a href="//farseerfc.me/tags.html" title="Tags">標籤雲</a></li>
+        <li class="active">swap</li>
+        <li><a href="//farseerfc.me/feeds/tag-swap.atom.xml" title="訂閱標籤 swap"><i class="fa fa-rss fa-lg"></i></a></li>
+    </ol>
+    <div class="articles-container">
+        <div class="article-item">
+            <article class="panel panel-primary">
                 <div class="panel-heading">
-                    <h1>
-                        【譯】替 swap 辯護：常見誤解
-                        <a href="//farseerfc.me/drafts/in-defence-of-swap.html"
-                           rel="bookmark"
-                           class="btn btn-primary btn-lg"
-                           title="到 【譯】替 swap 辯護：常見誤解 的永久鏈接">
-                           <i class="mdi-action-launch"></i>
-                        </a>
-                    </h1>
-                </div>
-                <div class="panel-body">
-<div class="post-info">
-    <span class="published">
-        <time datetime="2020-09-28T15:45:00+09:00"><i class="fa fa-calendar"></i> 2020年09月28日(週一)</time>
-    </span>
-
-
-
-<div class="btn-group translations">
+                    <div class="row">
+                        <div class="col-xl-20 col-lg-20 col-md-20 col-sm-19 col-xs-19">
+                            <a href="//farseerfc.me/in-defence-of-swap.html" class="btn btn-primary btn-lg"><h2>【譯】替 swap 辯護：常見的誤解
+                            </h2></a>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-xs-5">
+                            <div class="btn-group translations">
 <a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
 <ul class="dropdown-menu">
-<li class="active"><a href="//farseerfc.me/drafts/in-defence-of-swap.html">繁體</a></li><li><a href="//farseerfc.me/zhs/drafts/in-defence-of-swap.html" class="translate">简体</a></li></ul>
+<li class="active"><a href="//farseerfc.me/in-defence-of-swap.html">繁體</a></li><li><a href="//farseerfc.me/zhs/in-defence-of-swap.html" class="translate">简体</a></li></ul>
 </div>
 
-    <a onclick="$.get('//farseerfc.me/in-defence-of-swap.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
-    <a href="//farseerfc.me/in-defence-of-swap.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
-    <a href="//farseerfc.me/in-defence-of-swap.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
-
-<small><span><a href="//farseerfc.me/drafts/in-defence-of-swap.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="in-defence-of-swap" data-disqus-url="http://farseerfc.me/drafts/in-defence-of-swap.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
-	<a href="//farseerfc.me/tag/swap.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swap</a>
-	<a href="//farseerfc.me/tag/mm.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> mm</a>
-	<a href="//farseerfc.me/tag/memory-management.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> memory management</a>
-	<a href="//farseerfc.me/tag/translate.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> translate</a>
-	<a href="//farseerfc.me/tag/swappiness.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swappiness</a>
-</span>
-
-
-
-</div><!-- /.post-info -->                </div>
-            </header>
-
-            <div class="entry-content jumbotron" id="article-content">
-                <p>這篇翻譯自 Chris Down 的博客
+                            <span class="published">
+                                <time datetime="2020-09-30T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年09月30日(週三)</time>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="summary"><p>這篇翻譯自 Chris Down 的博文
 <a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html">In defence of swap: common misconceptions</a>
-，下面是原文翻譯。</p>
-<p>這篇文章也有 <a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html">日文</a>
-和 <a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya">俄文</a>
-翻譯。</p>
-<a aria-controls="a01b6caa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a01b6caa" role="button">
-<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="a01b6caa">
-<p>tl;dr:</p>
-<ol class="arabic simple">
-<li>Having swap is a reasonably important part of a well functioning system.
-Without it, sane memory management becomes harder to achieve.</li>
-<li>Swap is not generally about getting emergency memory, it's about making
-memory reclamation egalitarian and efficient. In fact, using it as
-"emergency memory" is generally actively harmful.</li>
-<li>Disabling swap does not prevent disk I/O from becoming a problem
-under memory contention, it simply shifts the disk I/O thrashing from
-anonymous pages to file pages. Not only may this be less efficient,
-as we have a smaller pool of pages to select from for reclaim, but it
-may also contribute to getting into this high contention state in
-the first place.</li>
-<li>The swapper on kernels before 4.0 has a lot of pitfalls,
-and has contributed to a lot of people's negative perceptions about
-swap due to its overeagerness to swap out pages. On kernels &gt;4.0,
-the situation is significantly better.</li>
-<li>On SSDs, swapping out anonymous pages and reclaiming file pages are
-essentially equivalent in terms of performance/latency.
-On older spinning disks, swap reads are slower due to random reads,
-so a lower <code class="code">
-vm.swappiness</code>
- setting makes sense there
-(read on for more about <code class="code">
-vm.swappiness</code>
-).</li>
-<li>Disabling swap doesn't prevent pathological behaviour at near-OOM,
-although it's true that having swap may prolong it. Whether the
-system global OOM killer is invoked with or without swap, or was invoked
-sooner or later, the result is the same: you are left with a system in an
-unpredictable state. Having no swap doesn't avoid this.</li>
-<li>You can achieve better swap behaviour under memory pressure and prevent
-thrashing using <code class="code">
-memory.low</code>
- and friends in cgroup v2.</li>
-</ol>
-</blockquote>
-<p>太長不看：</p>
-<ol class="arabic simple">
-<li>對正常功能的系統而言，有 swap 是相對挺重要的一部分。沒有它的話很難做到合理的內存管理。</li>
-<li>swap 的目的通常並不是用作緊急內存，它的目的在於讓內存回收能更平等高效。
-事實上把它當作「緊急內存」來用通常是有害的。</li>
-<li>禁用 swap 在內存壓力下並不能避免磁盤I/O造成的性能問題，這麼做只是讓磁盤I/O顛簸的範圍從
-匿名頁面轉化到文件頁面。這不僅更低效，因爲系統能回收的頁面的選擇範圍更有限了，
-而且這還可能是最初導致內存壓力的原因之一。</li>
-<li>內核 4.0 版本之前的交換進程（swapper）有一些問題，導致很多人對 swap 有負面印象，
-因爲它太急於（overeagerness）把頁面交換出去。在 4.0 之後的內核上這種情況已經改善了很多。</li>
-<li>在 SSD 上，交換出匿名頁面的開銷和回收文件頁面的開銷基本上在性能/延遲方面沒有區別。
-在磁盤上，讀取交換文件因爲屬於隨機訪問讀取所以會更慢，於是較低的 <code class="code">
-vm.swappiness</code>
-
-設置可能比較合理（繼續讀下面關於 <code class="code">
-vm.swappiness</code>
- 的描述）。</li>
-</ol>
-<hr class="docutils"/>
-<a aria-controls="053c68ad" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#053c68ad" role="button">
-<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="053c68ad">
-As part of my work improving kernel memory management and cgroup v2,
-I've been talking to a lot of engineers about attitudes towards memory
-management, especially around application behaviour under pressure and
-operating system heuristics used under the hood for memory management.</blockquote>
-<p>As part of my work improving kernel memory management and cgroup v2,
-I've been talking to a lot of engineers about attitudes towards memory
-management, especially around application behaviour under pressure and
-operating system heuristics used under the hood for memory management.</p>
-<a aria-controls="8dedecec" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8dedecec" role="button">
-<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="8dedecec">
-A repeated topic in these discussions has been swap.
-Swap is a hotly contested and poorly understood topic,
-even by those who have been working with Linux for many years.
-Many see it as useless or actively harmful: a relic of a time where
-memory was scarce, and disks were a necessary evil to provide much-needed
-space for paging. This is a statement that I still see being batted
-around with relative frequency in recent years, and I've had many
-discussions with colleagues, friends, and industry peers to help them
-understand why swap is still a useful concept on modern computers with
-significantly more physical memory available than in the past.</blockquote>
-<p>A repeated topic in these discussions has been swap.
-Swap is a hotly contested and poorly understood topic,
-even by those who have been working with Linux for many years.
-Many see it as useless or actively harmful: a relic of a time where
-memory was scarce, and disks were a necessary evil to provide much-needed
-space for paging. This is a statement that I still see being batted
-around with relative frequency in recent years, and I've had many
-discussions with colleagues, friends, and industry peers to help them
-understand why swap is still a useful concept on modern computers with
-significantly more physical memory available than in the past.</p>
-
-            </div>
-            <div class="entry-content jumbotron" id="source-content" style="display: none">
-                <!-- <pre><code id="source-code">
-                </code></pre> -->
-                <div id="source-code"></div>
-            </div>
-            <!-- /.entry-content -->
-
-            <div class="row" id="prevnext">
-                <div class="col-xs-12">
+。 <a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE">原文的協議</a>
+是 <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+，本文翻譯同樣也使用 <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。</p>
+<p>翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness
+有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的
+swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲，
+需要不同的調優方式。比如在 <a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial">FreeBSD …</a></p>
+                    </div>
                 </div>
-                <div class="col-xs-12">
-                </div>
-            </div>
-
-
-<section class="comments" id="comments">
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-      <div class="panel panel-primary">
-        <div class="panel-heading" role="tab" id="githubissue-heading">
-          <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
-              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
-          </h4>
+            </article>
         </div>
-        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
-          <div class="panel-body">
-            <div class="tab-pane fade active in" id="githubissue-comments">
-請用你的 GitHub 賬戶登錄並在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/97#new_comment_field" target="_blank">這篇文章的 Issue 頁下</a>留言                <div id="githubissue_comments"></div>
-<script type="text/javascript">
-document.addEventListener("DOMContentLoaded", function(event) {
-  var reaction_fa = {
-    "+1": "thumbs-o-up",
-    "-1": "thumbs-o-down",
-    "laugh": "smile-o",
-    "hooray": "gift",
-    "confused": "frown-o",
-    "heart": "heart-o"
-  };
-
-  function loadComments(data) {
-    for (var i=0; i<data.length; i++) {
-      var cuser = data[i].user.login;
-      var cuserlink = "https://github.com/" + data[i].user.login;
-      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/97#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
-      var cbody = data[i].body_html || data[i].body;
-      var cavatarlink = data[i].user.avatar_url;
-      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
-      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
-      var reactions = data[i].reactions;
-      var creactions = "";
-      if(reactions){
-        for(reactionkey in reaction_fa){
-          if(reactions[reactionkey] > 0) {
-              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
-          }
-        }
-      }
-      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言於 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
-      $(".email-hidden-toggle > a").on("click", function (e){
-        e.preventDefault();
-        $(".email-hidden-reply", this.parent).toggle();
-      });
-    }
-  }
-  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/97/comments", {
-    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
-    dataType: "json",
-    success: function(msg){
-      loadComments(msg);
-   }
-  });
-});
-</script>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-primary">
-        <div class="panel-heading" role="tab" id="disqus-heading">
-          <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
-              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
-          </h4>
-        </div>
-        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
-          <div class="panel-body">
-            <div class="tab-pane fade active in" id="disqus-comments">
-                <div id="disqus_thread"></div>
-                <script type="text/javascript">
-                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
-
-                            var disqus_identifier = 'in-defence-of-swap';
-                        var disqus_url = 'http://farseerfc.me/drafts/in-defence-of-swap.html';
-
-                    var disqus_config = function () {
-
-                        this.language = "zh";
-                    };
-
-                    /* * * DON'T EDIT BELOW THIS LINE * * */
-                    (function () {
-                        var dsq = document.createElement('script');
-                        dsq.type = 'text/javascript';
-                        dsq.async = true;
-                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    })();
-                </script>
-                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
-                    Disqus.</a></noscript>
-                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-</section>        </article>
-    </section>
-
 
             </div>
 <!-- Modal -->
@@ -522,6 +285,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
     </div>
 <div class="panel-body">
     <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/swap.html">
+                    swap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mm.html">
+                    mm <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/memory-management.html">
+                    memory management <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/translate.html">
+                    translate <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/swappiness.html">
+                    swappiness <sup> 1</sup>
+                </a>
+            </li>
             <li class="list-group-item tag-2">
                 <a href="//farseerfc.me/tag/fsbi-ji.html">
                     FS筆記 <sup> 5</sup>
@@ -758,11 +546,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 </a>
             </li>
             <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/translate.html">
-                    translate <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
                 <a href="//farseerfc.me/tag/chouyaku.html">
                     chouyaku <sup> 1</sup>
                 </a>
@@ -977,29 +760,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     cloudflare <sup> 1</sup>
                 </a>
             </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/bootstrap.html">
-                    bootstrap <sup> 1</sup>
-                </a>
-            </li>
             <li class="list-group-item tag-3">
                 <a href="//farseerfc.me/tag/material.html">
                     material <sup> 2</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/subsite.html">
-                    subsite <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/css.html">
-                    css <sup> 1</sup>
-                </a>
-            </li>
-            <li class="list-group-item tag-4">
-                <a href="//farseerfc.me/tag/paper.html">
-                    paper <sup> 1</sup>
                 </a>
             </li>
             <li class="list-group-item tag-3">

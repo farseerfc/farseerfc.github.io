@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>【譯】替 swap 辯護：常見的誤解 - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/in-defence-of-swap.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="swap,mm,memory management,translate,swappiness" />
+        <meta name="description" content="這篇翻譯自 Chris Down 的博文 In defence of swap: common misconceptions 。 原文的協議 是 CC BY-SA 4.0 ，本文翻譯同樣也使用 CC BY-SA 4.0 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。 翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness 有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的 swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲， 需要不同的調優方式。比如在 FreeBSD …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="【譯】替 swap 辯護：常見的誤解"/>
+        <meta property="og:url" content="//farseerfc.me/in-defence-of-swap.html"/>
+        <meta property="og:description" content="這篇翻譯自 Chris Down 的博文 In defence of swap: common misconceptions 。 原文的協議 是 CC BY-SA 4.0 ，本文翻譯同樣也使用 CC BY-SA 4.0 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。 翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness 有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的 swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲， 需要不同的調優方式。比如在 FreeBSD …"/>
+        <meta property="article:published_time" content="2020-09-30" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="swap" />
+            <meta property="article:tag" content="mm" />
+            <meta property="article:tag" content="memory management" />
+            <meta property="article:tag" content="translate" />
+            <meta property="article:tag" content="swappiness" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/in-defence-of-swap.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">【譯】替 swap 辯護：常見的誤解 - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切換導航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                                 關於
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                         關於
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">歸檔</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
+                <li class="active">【譯】替 swap 辯護：常見的誤解</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        【譯】替 swap 辯護：常見的誤解
+                        <a href="//farseerfc.me/in-defence-of-swap.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 【譯】替 swap 辯護：常見的誤解 的永久鏈接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-09-30T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年09月30日(週三)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/in-defence-of-swap.html">繁體</a></li><li><a href="//farseerfc.me/zhs/in-defence-of-swap.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/in-defence-of-swap.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/in-defence-of-swap.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/in-defence-of-swap.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/in-defence-of-swap.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="in-defence-of-swap" data-disqus-url="http://farseerfc.me/in-defence-of-swap.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/swap.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swap</a>
+	<a href="//farseerfc.me/tag/mm.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> mm</a>
+	<a href="//farseerfc.me/tag/memory-management.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> memory management</a>
+	<a href="//farseerfc.me/tag/translate.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> translate</a>
+	<a href="//farseerfc.me/tag/swappiness.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swappiness</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+目錄                        </div>
+                        <div class="panel-boy">
+                        <div class="toc" id="">
+<p class="topic-title">目录</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id6" id="id23">背景</a><ul>
+<li><a class="reference internal" href="#id7" id="id24">內存的類型</a></li>
+<li><a class="reference internal" href="#id8" id="id25">可回收/不可回收內存</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id26">說到交換區的本質</a></li>
+<li><a class="reference internal" href="#id10" id="id27">考察有無交換區時會發生什麼</a><ul>
+<li><a class="reference internal" href="#id11" id="id28">在無/低內存競爭的狀態下</a></li>
+<li><a class="reference internal" href="#id12" id="id29">在中/高內存競爭的狀態下</a></li>
+<li><a class="reference internal" href="#id13" id="id30">在臨時內存佔用高峰時</a></li>
+<li><a class="reference internal" href="#id14" id="id31">好吧，所以我需要系統交換區，但是我該怎麼爲每個程序微調它的行爲？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id16" id="id32">調優</a><ul>
+<li><a class="reference internal" href="#id17" id="id33">那麼，我需要多少交換空間？</a></li>
+<li><a class="reference internal" href="#swappiness" id="id34">我的 swappiness 應該如何設置？</a></li>
+<li><a class="reference internal" href="#id19" id="id35">2019年07月更新：內核 4.20+ 中的內存壓力指標</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id20" id="id36">結論</a></li>
+</ul>
+</div>
+                        </div>
+                    </div>
+                <p>這篇翻譯自 Chris Down 的博文
+<a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html">In defence of swap: common misconceptions</a>
+。 <a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE">原文的協議</a>
+是 <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+，本文翻譯同樣也使用 <a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。</p>
+<p>翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness
+有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的
+swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲，
+需要不同的調優方式。比如在 <a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial">FreeBSD handbook</a>
+中明確建議了 swap 分區通常應該是兩倍物理內存大小，這一點建議對 FreeBSD 系內核的內存管理可能非常合理，
+而不一定適合 Linux 內核，FreeBSD 和 Linux 有不同的內存管理方式尤其是 swap 和 page cache 和
+buffer cache 的處理方式有諸多不同。</p>
+<p>經常有朋友看到系統卡噸之後看系統內存使用狀況觀察到大量 swap 佔用，於是覺得卡噸是來源於 swap
+。就像文中所述，相關不蘊含因果，產生內存顛簸之後的確會造成大量 swap 佔用，也會造成系統卡噸，
+但是 swap 不是導致卡噸的原因，關掉 swap 或者調低 swappiness 並不能阻止卡噸，只會將 swap
+造成的 I/O 轉化爲加載文件緩存造成的 I/O 。</p>
+<p>以下是原文翻譯：</p>
+<hr class="docutils"/>
+<p>這篇文章也有 <a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html">日文</a>
+和 <a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya">俄文</a>
+翻譯。</p>
+<a aria-controls="a01b6caa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a01b6caa" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="a01b6caa">
+<p>tl;dr:</p>
+<ol class="arabic simple">
+<li>Having swap is a reasonably important part of a well functioning system.
+Without it, sane memory management becomes harder to achieve.</li>
+<li>Swap is not generally about getting emergency memory, it's about making
+memory reclamation egalitarian and efficient. In fact, using it as
+"emergency memory" is generally actively harmful.</li>
+<li>Disabling swap does not prevent disk I/O from becoming a problem
+under memory contention, it simply shifts the disk I/O thrashing from
+anonymous pages to file pages. Not only may this be less efficient,
+as we have a smaller pool of pages to select from for reclaim, but it
+may also contribute to getting into this high contention state in
+the first place.</li>
+<li>The swapper on kernels before 4.0 has a lot of pitfalls,
+and has contributed to a lot of people's negative perceptions about
+swap due to its overeagerness to swap out pages. On kernels &gt;4.0,
+the situation is significantly better.</li>
+<li>On SSDs, swapping out anonymous pages and reclaiming file pages are
+essentially equivalent in terms of performance/latency.
+On older spinning disks, swap reads are slower due to random reads,
+so a lower <code class="code">
+vm.swappiness</code>
+ setting makes sense there
+(read on for more about <code class="code">
+vm.swappiness</code>
+).</li>
+<li>Disabling swap doesn't prevent pathological behaviour at near-OOM,
+although it's true that having swap may prolong it. Whether the
+system global OOM killer is invoked with or without swap, or was invoked
+sooner or later, the result is the same: you are left with a system in an
+unpredictable state. Having no swap doesn't avoid this.</li>
+<li>You can achieve better swap behaviour under memory pressure and prevent
+thrashing using <code class="code">
+memory.low</code>
+ and friends in cgroup v2.</li>
+</ol>
+</blockquote>
+<p>太長不看：</p>
+<ol class="arabic simple">
+<li>對維持系統的正常功能而言，有 swap 是相對挺重要的一部分。沒有它的話會更難做到合理的內存管理。</li>
+<li>swap 的目的通常並不是用作緊急內存，它的目的在於讓內存回收能更平等和高效。
+事實上把它當作「緊急內存」來用的想法通常是有害的。</li>
+<li>禁用 swap 在內存壓力下並不能避免磁盤I/O造成的性能問題，這麼做只是讓磁盤I/O顛簸的範圍從
+匿名頁面轉化到文件頁面。這不僅更低效，因爲系統能回收的頁面的選擇範圍更有限了，
+而且這種做法還可能是加重了內存壓力的原因之一。</li>
+<li>內核 4.0 版本之前的交換進程（swapper）有一些問題，導致很多人對 swap 有負面印象，
+因爲它太急於（overeagerness）把頁面交換出去。在 4.0 之後的內核上這種情況已經改善了很多。</li>
+<li>在 SSD 上，交換出匿名頁面的開銷和回收文件頁面的開銷基本上在性能/延遲方面沒有區別。
+在老式的磁盤上，讀取交換文件因爲屬於隨機訪問讀取所以會更慢，於是設置較低的 <code class="code">
+vm.swappiness</code>
+
+可能比較合理（繼續讀下面關於 <code class="code">
+vm.swappiness</code>
+ 的描述）。</li>
+<li>禁用 swap 並不能避免在接近 OOM 狀態下最終表現出的症狀，儘管的確有 swap
+的情況下這種症狀持續的時間可能會延長。在系統調用 OOM 殺手的時候無論有沒有啓用 swap
+，或者更早/更晚開始調用 OOM 殺手，結果都是一樣的：整個系統留在了一種不可預知的狀態下。
+有 swap 也不能避免這一點。</li>
+<li>可以用 cgroup v2 的 <code class="code">
+memory.low</code>
+ 相關機制來改善內存壓力下 swap 的行爲並且
+避免發生顛簸。</li>
+</ol>
+<hr class="docutils"/>
+<a aria-controls="053c68ad" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#053c68ad" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="053c68ad">
+As part of my work improving kernel memory management and cgroup v2,
+I've been talking to a lot of engineers about attitudes towards memory
+management, especially around application behaviour under pressure and
+operating system heuristics used under the hood for memory management.</blockquote>
+<p>我的工作的一部分是改善內核中內存管理和 cgroup v2 相關，所以我和很多工程師討論過看待內存管理的態度，
+尤其是在壓力下應用程序的行爲和操作系統在底層內存管理中用的基於經驗的啓發式決策邏輯。</p>
+<a aria-controls="8dedecec" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8dedecec" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="8dedecec">
+A repeated topic in these discussions has been swap.
+Swap is a hotly contested and poorly understood topic,
+even by those who have been working with Linux for many years.
+Many see it as useless or actively harmful: a relic of a time where
+memory was scarce, and disks were a necessary evil to provide much-needed
+space for paging. This is a statement that I still see being batted
+around with relative frequency in recent years, and I've had many
+discussions with colleagues, friends, and industry peers to help them
+understand why swap is still a useful concept on modern computers with
+significantly more physical memory available than in the past.</blockquote>
+<p>在這種討論中經常重複的話題是交換區（swap）。交換區的話題是非常有爭議而且很少被理解的話題，甚至包括那些在
+Linux 上工作過多年的人也是如此。很多人覺得它沒什麼用甚至是有害的：它是歷史遺蹟，從內存緊缺而
+磁盤讀寫是必要之惡的時代遺留到現在，爲計算機提供在當年很必要的頁面交換功能作爲內存空間。
+最近幾年我還經常能以一定頻度看到這種論調，然後我和很多同事、朋友、業界同行們討論過很多次，
+幫他們理解爲什麼在現代計算機系統中交換區仍是有用的概念，即便現在的電腦中物理內存已經遠多於過去。</p>
+<a aria-controls="b1c86306" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b1c86306" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="b1c86306">
+There's also a lot of misunderstanding about the purpose of swap –
+many people just see it as a kind of "slow extra memory" for use in emergencies,
+but don't understand how it can contribute during normal load to the healthy
+operation of an operating system as a whole.</blockquote>
+<p>圍繞交換區的目的還有很多誤解——很多人覺得它只是某種爲了應對緊急情況的「慢速額外內存」，
+但是沒能理解在整個操作系統健康運作的時候它也能改善普通負載的性能。</p>
+<a aria-controls="3603c7fa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3603c7fa" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="3603c7fa">
+Many of us have heard most of the usual tropes about memory:
+" <a class="reference external" href="https://www.linuxatemyram.com/">Linux uses too much memory</a> ",
+" <a class="reference external" href="https://superuser.com/a/111510">swap should be double your physical memory size</a>
+", and the like. While these are either trivial to dispel,
+or discussion around them has become more nuanced in recent years,
+the myth of "useless" swap is much more grounded in heuristics and
+arcana rather than something that can be explained by simple analogy,
+and requires somewhat more understanding of memory management to reason about.</blockquote>
+<p>我們很多人也聽說過描述內存時所用的常見說法： 「 <a class="reference external" href="https://www.linuxatemyram.com/">Linux 用了太多內存</a>
+」，「 <a class="reference external" href="https://superuser.com/a/111510">swap 應該設爲物理內存的兩倍大小</a> 」，或者類似的說法。
+雖然這些誤解要麼很容易化解，或者關於他們的討論在最近幾年已經逐漸變得瑣碎，但是關於「無用」交換區
+的傳言有更深的經驗傳承的根基，而不是一兩個類比就能解釋清楚的，並且要探討這個先得對內存管理有
+一些基礎認知。</p>
+<a aria-controls="ff09462c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ff09462c" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="ff09462c">
+This post is mostly aimed at those who administrate Linux systems and
+are interested in hearing the counterpoints to running with
+undersized/no swap or running with vm.swappiness set to 0.</blockquote>
+<p>本文主要目標是針對那些管理 Linux 系統並且有興趣理解「讓系統運行於低/無交換區狀態」或者「把
+<code class="code">
+vm.swappiness</code>
+ 設爲 0 」這些做法的反論。</p>
+<div class="section" id="id6">
+<h2><a class="toc-backref" href="#id23">背景</a></h2>
+<a aria-controls="283c5b39" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#283c5b39" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="283c5b39">
+It's hard to talk about why having swap and swapping out pages are good
+things in normal operation without a shared understanding of some of
+the basic underlying mechanisms at play in Linux memory management,
+so let's make sure we're on the same page.</blockquote>
+<p>如果沒有基本理解 Linux 內存管理的底層機制是如何運作的，就很難討論爲什麼需要交換區以及交換出頁面
+對正常運行的系統爲什麼是件好事，所以我們先確保大家有討論的基礎。</p>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id24">內存的類型</a></h3>
+<a aria-controls="b93d3e73" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b93d3e73" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="b93d3e73">
+There are many different types of memory in Linux, and each type has its
+own properties. Understanding the nuances of these is key to understanding
+why swap is important.</blockquote>
+<p>Linux 中內存分爲好幾種類型，每種都有各自的屬性。想理解爲什麼交換區很重要的關鍵一點在於理解這些的細微區別。</p>
+<a aria-controls="ea5c81cf" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ea5c81cf" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="ea5c81cf">
+For example, there are <strong>pages ("blocks" of memory, typically 4k)</strong>
+responsible for holding the code for each process being run on your computer.
+There are also pages responsible for caching data and metadata related to
+files accessed by those programs in order to speed up future access.
+These are part of the <strong>page cache</strong> , and I will refer to them as file memory.</blockquote>
+<p>比如說，有種 <strong>頁面（「整塊」的內存，通常 4K）</strong> 是用來存放電腦裏每個程序運行時各自的代碼的。
+也有頁面用來保存這些程序所需要讀取的文件數據和元數據的緩存，以便加速隨後的文件讀寫。
+這些內存頁面構成 <strong>頁面緩存（page cache）</strong>，後文中我稱他們爲文件內存。</p>
+<a aria-controls="a8e582f2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a8e582f2" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="a8e582f2">
+There are also pages which are responsible for the memory allocations
+made inside that code, for example, when new memory that has been allocated
+with <code class="code">
+malloc</code>
+ is written to, or when using <code class="code">
+mmap</code>
+'s
+<code class="code">
+MAP_ANONYMOUS</code>
+ flag. These are "anonymous" pages –
+so called because they are not backed by anything –
+and I will refer to them as anon memory.</blockquote>
+<p>還有一些頁面是在代碼執行過程中做的內存分配得到的，比如說，當代碼調用 <code class="code">
+malloc</code>
+
+能分配到新內存區，或者使用 <code class="code">
+mmap</code>
+ 的 <code class="code">
+MAP_ANONYMOUS</code>
+ 標誌分配的內存。
+這些是「匿名(anonymous)」頁面——之所以這麼稱呼它們是因爲他們沒有任何東西作後備——
+後文中我稱他們爲匿名內存。</p>
+<a aria-controls="38d36a1d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#38d36a1d" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="38d36a1d">
+There are other types of memory too –
+shared memory, slab memory, kernel stack memory, buffers, and the like –
+but anonymous memory and file memory are the most well known and
+easy to understand ones, so I will use these in my examples,
+although they apply equally to these types too.</blockquote>
+<p>還有其它類型的內存——共享內存、slab內存、內核棧內存、文件緩衝區（buffers），這種的——
+但是匿名內存和文件內存是最知名也最好理解的，所以後面的例子裏我會用這兩個說明，
+雖然後面的說明也同樣適用於別的這些內存類型。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id25">可回收/不可回收內存</a></h3>
+<a aria-controls="896d577c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#896d577c" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="896d577c">
+One of the most fundamental questions when thinking about a particular type
+of memory is whether it is able to be reclaimed or not.
+"Reclaim" here means that the system can, without losing data,
+purge pages of that type from physical memory.</blockquote>
+<p>考慮某種內存的類型時，一個非常基礎的問題是這種內存是否能被回收。
+「回收（Reclaim）」在這裏是指系統可以，在不丟失數據的前提下，從物理內存中釋放這種內存的頁面。</p>
+<a aria-controls="c8915ce3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c8915ce3" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="c8915ce3">
+For some page types, this is typically fairly trivial. For example,
+in the case of clean (unmodified) page cache memory,
+we're simply caching something that we have on disk for performance,
+so we can drop the page without having to do any special operations.</blockquote>
+<p>對一些內存類型而言，是否可回收通常可以直接判斷。比如對於那些乾淨（未修改）的頁面緩存內存，
+我們只是爲了性能在用它們緩存一些磁盤上現有的數據，所以我們可以直接扔掉這些頁面，
+不需要做什麼特殊的操作。</p>
+<a aria-controls="543b6f9b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#543b6f9b" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="543b6f9b">
+For some page types, this is possible, but not trivial. For example,
+in the case of dirty (modified) page cache memory, we can't just drop the page,
+because the disk doesn't have our modifications yet.
+As such we either need to deny reclamation or first get our changes back to
+disk before we can drop this memory.</blockquote>
+<p>對有些內存類型而言，回收是可能的，但是不是那麼直接。比如對髒（修改過）的頁面緩存內存，
+我們不能直接扔掉這些頁面，因爲磁盤上還沒有寫入我們所做的修改。這種情況下，我們可以選擇拒絕回收，
+或者選擇先等待我們的變更寫入磁盤之後才能扔掉這些內存。</p>
+<a aria-controls="5111480d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5111480d" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="5111480d">
+For some page types, this is not possible. For example,
+in the case of the anonymous pages mentioned previously,
+they only exist in memory and in no other backing store,
+so they have to be kept there.</blockquote>
+<p>對還有些內存類型而言，是不能回收的。比如前面提到的匿名頁面，它們只存在於內存中，沒有任何後備存儲，
+所以它們必須留在內存裏。</p>
+</div>
+</div>
+<div class="section" id="id9">
+<h2><a class="toc-backref" href="#id26">說到交換區的本質</a></h2>
+<a aria-controls="99551744" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#99551744" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="99551744">
+<p>If you look for descriptions of the purpose of swap on Linux,
+you'll inevitably find many people talking about it as if it is merely
+an extension of the physical RAM for use in emergencies. For example,
+here is a random post I got as one of the top results from typing
+"what is swap" in Google:</p>
+<blockquote>
+Swap is essentially emergency memory; a space set aside for times
+when your system temporarily needs more physical memory than you
+have available in RAM. It's considered "bad" in the sense that
+it's slow and inefficient, and if your system constantly needs
+to use swap then it obviously doesn't have enough memory. […]
+If you have enough RAM to handle all of your needs, and don't
+expect to ever max it out, then you should be perfectly safe
+running without a swap space.</blockquote>
+</blockquote>
+<p>如果你去搜 Linux 上交換區的目的的描述，肯定會找到很多人說交換區只是在緊急時用來擴展物理內存的機制。
+比如下面這段是我在 google 中輸入「什麼是 swap」 從前排結果中隨機找到的一篇：</p>
+<blockquote>
+交換區本質上是緊急內存；是爲了應對你的系統臨時所需內存多餘你現有物理內存時，專門分出一塊額外空間。
+大家覺得交換區「不好」是因爲它又慢又低效，並且如果你的系統一直需要使用交換區那說明它明顯沒有足夠的內存。
+［……］如果你有足夠內存覆蓋所有你需要的情況，而且你覺得肯定不會用滿內存，那麼完全可以不用交換區
+安全地運行系統。</blockquote>
+<a aria-controls="fe4c8bc1" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe4c8bc1" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="fe4c8bc1">
+To be clear, I don't blame the poster of this comment at all for the content
+of their post – this is accepted as "common knowledge" by a lot of
+Linux sysadmins and is probably one of the most likely things that you will
+hear from one if you ask them to talk about swap. It is unfortunately also,
+however, a misunderstanding of the purpose and use of swap, especially on
+modern systems.</blockquote>
+<p>事先說明，我不想因爲這些文章的內容責怪這些文章的作者——這些內容被很多 Linux 系統管理員認爲是「常識」，
+並且很可能你問他們什麼是交換區的時候他們會給你這樣的回答。但是也很不幸的是，
+這種認識是使用交換區的目的的一種普遍誤解，尤其在現代系統上。</p>
+<a aria-controls="77407587" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#77407587" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="77407587">
+Above, I talked about reclamation for anonymous pages being "not possible",
+as anonymous pages by their nature have no backing store to fall back to
+when being purged from memory – as such, their reclamation would result in
+complete data loss for those pages. What if we could create such a
+store for these pages, though?</blockquote>
+<p>前文中我說過回收匿名頁面的內存是「不可能的」，因爲匿名內存的特點，把它們從內存中清除掉之後，
+沒有別的存儲區域能作爲他們的備份——因此，要回收它們會造成數據丟失。但是，如果我們爲這種內存頁面創建
+一種後備存儲呢？</p>
+<a aria-controls="75be861f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#75be861f" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="75be861f">
+Well, this is precisely what swap is for. Swap is a storage area for these
+seemingly "unreclaimable" pages that allows us to page them out to
+a storage device on demand. This means that they can now be considered as
+equally eligible for reclaim as their more trivially reclaimable friends,
+like clean file pages, allowing more efficient use of available physical memory.</blockquote>
+<p>嗯，這正是交換區存在的意義。交換區是一塊存儲空間，用來讓這些看起來「不可回收」的內存頁面在需要的時候
+可以交換到存儲設備上。這意味着有了交換區之後，這些匿名頁面也和別的那些可回收內存一樣，
+可以作爲內存回收的候選，就像乾淨文件頁面，從而允許更有效地使用物理內存。</p>
+<a aria-controls="aa3951ca" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#aa3951ca" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="aa3951ca">
+<strong>Swap is primarily a mechanism for equality of reclamation,</strong>
+<strong>not for emergency "extra memory". Swap is not what makes your application</strong>
+<strong>slow – entering overall memory contention is what makes your application slow.</strong></blockquote>
+<p><strong>交換區主要是爲了平等的回收機制，而不是爲了緊急情況的「額外內存」。使用交換區不會讓你的程序變慢——</strong>
+<strong>進入內存競爭的狀態才是讓程序變慢的元兇。</strong></p>
+<a aria-controls="526740fe" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#526740fe" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="526740fe">
+So in what situations under this "equality of reclamation"
+scenario would we legitimately choose to reclaim anonymous pages?
+Here are, abstractly, some not uncommon scenarios:</blockquote>
+<p>那麼在這種「平等的可回收機遇」的情況下，讓我們選擇回收匿名頁面的行爲在何種場景中更合理呢？
+抽象地說，比如在下述不算罕見的場景中：</p>
+<a aria-controls="a12ad6df" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a12ad6df" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="a12ad6df">
+<ol class="arabic simple">
+<li>During initialisation, a long-running program may allocate and
+use many pages. These pages may also be used as part of shutdown/cleanup,
+but are not needed once the program is "started" (in an
+application-specific sense). This is fairly common for daemons which
+have significant dependencies to initialise.</li>
+<li>During the program's normal operation, we may allocate memory which is
+only used rarely. It may make more sense for overall system performance
+to require a <strong>major fault</strong> to page these in from disk on demand,
+instead using the memory for something else that's more important.</li>
+</ol>
+</blockquote>
+<ol class="arabic simple">
+<li>程序初始化的時候，那些長期運行的程序可能要分配和使用很多頁面。這些頁面可能在最後的關閉/清理的
+時候還需要使用，但是在程序「啓動」之後（以具體的程序相關的方式）持續運行的時候不需要訪問。
+對後臺服務程序來說，很多後臺程序要初始化不少依賴庫，這種情況很常見。</li>
+<li>在程序的正常運行過程中，我們可能分配一些很少使用的內存。對整體系統性能而言可能比起讓這些內存頁
+一直留在內存中，只有在用到的時候才按需把它們用 <strong>缺頁異常（major fault）</strong> 換入內存，
+可以空出更多內存留給更重要的東西。</li>
+</ol>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4">cgroupv2: Linux's new unified control group hierarchy (QCON London 2017)</a></div>
+<div class="panel-body">
+<div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/ikZ8_mRotT4"></iframe></div></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h2><a class="toc-backref" href="#id27">考察有無交換區時會發生什麼</a></h2>
+<a aria-controls="fc974b28" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fc974b28" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="fc974b28">
+Let's look at typical situations, and how they perform with and without
+swap present. I talk about metrics around "memory contention" in my
+<a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4">talk on cgroup v2</a> .</blockquote>
+<p>我們來看一些在常見場景中，有無交換區時分別會如何運行。
+在我的 <a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4">關於 cgroup v2 的演講</a>
+中探討過「內存競爭」的指標。</p>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id28">在無/低內存競爭的狀態下</a></h3>
+<a aria-controls="a577bbc2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a577bbc2" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="a577bbc2">
+<ul class="simple">
+<li><strong>With swap:</strong> We can choose to swap out rarely-used anonymous memory that
+may only be used during a small part of the process lifecycle,
+allowing us to use this memory to improve cache hit rate,
+or do other optimisations.</li>
+<li><strong>Without swap</strong> We cannot swap out rarely-used anonymous memory,
+as it's locked in memory. While this may not immediately
+present as a problem, on some workloads this may represent
+a non-trivial drop in performance due to stale,
+anonymous pages taking space away from more important use.</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li><strong>有交换区:</strong> 我們可以選擇換出那些只有在進程生存期內很小一部分時間會訪問的匿名內存，
+這允許我們空出更多內存空間用來提升緩存命中率，或者做別的優化。</li>
+<li><strong>無交換區:</strong> 我們不能換出那些很少使用的匿名內存，因爲它們被鎖在了內存中。雖然這通常不會直接表現出問題，
+但是在一些工作條件下這可能造成卡頓導致不平凡的性能下降，因爲匿名內存佔着空間不能給
+更重要的需求使用。</li>
+</ul>
+<div class="panel panel-default">
+<div class="panel-heading">
+譯註：關於 <strong>內存熱度</strong> 和 <strong>內存顛簸（thrash）</strong></div>
+<div class="panel-body">
+<p>討論內核中內存管理的時候經常會說到內存頁的 <strong>冷熱</strong> 程度。這裏冷熱是指歷史上內存頁被訪問到的頻度，
+內存管理的經驗在說，歷史上在近期頻繁訪問的 <strong>熱</strong> 內存，在未來也可能被頻繁訪問，
+從而應該留在物理內存裏；反之歷史上不那麼頻繁訪問的 <strong>冷</strong> 內存，在未來也可能很少被用到，
+從而可以考慮交換到磁盤或者丟棄文件緩存。</p>
+<p><strong>顛簸（thrash）</strong> 這個詞在文中出現多次但是似乎沒有詳細介紹，實際計算機科學專業的課程中應該有講過。
+一段時間內，讓程序繼續運行所需的熱內存總量被稱作程序的工作集（workset），估算工作集大小，
+換句話說判斷進程分配的內存頁中哪些屬於 <strong>熱</strong> 內存哪些屬於 <strong>冷</strong> 內存，是內核中
+內存管理的最重要的工作。當分配給程序的內存大於工作集的時候，程序可以不需要等待I/O全速運行；
+而當分配給程序的內存不足以放下整個工作集的時候，意味着程序每執行一小段就需要等待換頁或者等待
+磁盤緩存讀入所需內存頁，產生這種情況的時候，從用戶角度來看可以觀察到程序肉眼可見的「卡頓」。
+當系統中所有程序都內存不足的時候，整個系統都處於顛簸的狀態下，響應速度直接降至磁盤I/O的帶寬。
+如本文所說，禁用交換區並不能防止顛簸，只是從等待換頁變成了等待文件緩存，
+給程序分配超過工作集大小的內存才能防止顛簸。</p>
+</div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id29">在中/高內存競爭的狀態下</a></h3>
+<a aria-controls="266f0b15" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#266f0b15" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="266f0b15">
+<ul class="simple">
+<li><strong>With swap:</strong> All memory types have an equal possibility of being reclaimed.
+This means we have more chance of being able to reclaim pages
+successfully – that is, we can reclaim pages that are not quickly
+faulted back in again (thrashing).</li>
+<li><strong>Without swap</strong> Anonymous pages are locked into memory as they have nowhere to go.
+The chance of successful long-term page reclamation is lower,
+as we have only some types of memory eligible to be reclaimed
+at all. The risk of page thrashing is higher. The casual
+reader might think that this would still be better as it might
+avoid having to do disk I/O, but this isn't true –
+we simply transfer the disk I/O of swapping to dropping
+hot page caches and dropping code segments we need soon.</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li><strong>有交换区:</strong> 所有內存類型都有平等的被回收的可能性。這意味着我們回收頁面有更高的成功率——
+成功回收的意思是說被回收的那些頁面不會在近期內被缺頁異常換回內存中（顛簸）。</li>
+<li><strong>無交換區:</strong> 匿名內存因爲無處可去所以被鎖在內存中。長期內存回收的成功率變低了，因爲我們成體上
+能回收的頁面總量少了。發生缺頁顛簸的危險性更高了。缺乏經驗的讀者可能覺得這某時也是好事，
+因爲這能避免進行磁盤I/O，但是實際上不是如此——我們只是把交換頁面造成的磁盤I/O變成了扔掉熱緩存頁
+和扔掉代碼段，這些頁面很可能馬上又要從文件中讀回來。</li>
+</ul>
+</div>
+<div class="section" id="id13">
+<h3><a class="toc-backref" href="#id30">在臨時內存佔用高峰時</a></h3>
+<a aria-controls="bf276ac9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#bf276ac9" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="bf276ac9">
+<ul class="simple">
+<li><strong>With swap:</strong> We're more resilient to temporary spikes, but in cases of
+severe memory starvation, the period from memory thrashing beginning
+to the OOM killer may be prolonged. We have more visibility into the
+instigators of memory pressure and can act on them more reasonably,
+and can perform a controlled intervention.</li>
+<li><strong>Without swap</strong> The OOM killer is triggered more quickly as anonymous
+pages are locked into memory and cannot be reclaimed. We're more likely to
+thrash on memory, but the time between thrashing and OOMing is reduced.
+Depending on your application, this may be better or worse. For example,
+a queue-based application may desire this quick transfer from thrashing
+to killing. That said, this is still too late to be really useful –
+the OOM killer is only invoked at moments of severe starvation,
+and relying on this method for such behaviour would be better replaced
+with more opportunistic killing of processes as memory contention
+is reached in the first place.</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li><strong>有交换区:</strong> 我們對內存使用激增的情況更有抵抗力，但是在嚴重的內存不足的情況下，
+從開始發生內存顛簸到 OOM 殺手開始工作的時間會被延長。內存壓力造成的問題更容易觀察到，
+從而可能更有效地應對，或者更有機會可控地干預。</li>
+<li><strong>無交換區:</strong> 因爲匿名內存被鎖在內存中了不能被回收，所以 OOM 殺手會被更早觸發。
+發生內存顛簸的可能性更大，但是發生顛簸之後到 OOM 解決問題的時間間隔被縮短了。
+基於你的程序，這可能更好或是更糟。比如說，基於隊列的程序可能更希望這種從顛簸到殺進程的轉換更快發生。
+即便如此，發生 OOM 的時機通常還是太遲於是沒什麼幫助——只有在系統極度內存緊缺的情況下才會請出
+OOM 殺手，如果想依賴這種行爲模式，不如換成更早殺進程的方案，因爲在這之前已經發生內存競爭了。</li>
+</ul>
+</div>
+<div class="section" id="id14">
+<h3><a class="toc-backref" href="#id31">好吧，所以我需要系統交換區，但是我該怎麼爲每個程序微調它的行爲？</a></h3>
+<a aria-controls="7f9321c9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#7f9321c9" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="7f9321c9">
+You didn't think you'd get through this entire post without me plugging cgroup v2, did you? ;-)</blockquote>
+<p>你肯定想到了我寫這篇文章一定會在哪兒插點 cgroup v2 的安利吧？ ;-)</p>
+<a aria-controls="3fcbadba" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3fcbadba" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="3fcbadba">
+Obviously, it's hard for a generic heuristic algorithm to be right all the time,
+so it's important for you to be able to give guidance to the kernel.
+Historically the only tuning you could do was at the system level,
+using <code class="code">
+vm.swappiness</code>
+ . This has two problems: <code class="code">
+vm.swappiness</code>
+
+is incredibly hard to reason about because it only feeds in as
+a small part of a larger heuristic system, and it also is system-wide
+instead of being granular to a smaller set of processes.</blockquote>
+<p>顯然，要設計一種對所有情況都有效的啓發算法會非常難，所以給內核提一些指引就很重要。
+歷史上我們只能在整個系統層面做這方面微調，通過 <code class="code">
+vm.swappiness</code>
+ 。這有兩方面問題：
+<code class="code">
+vm.swappiness</code>
+ 的行爲很難準確控制，因爲它只是傳遞給一個更大的啓發式算法中的一個小參數；
+並且它是一個系統級別的設置，沒法針對一小部分進程微調。</p>
+<a aria-controls="dc0990d3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#dc0990d3" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="dc0990d3">
+You can also use <code class="code">
+mlock</code>
+ to lock pages into memory, but this requires
+either modifying program code, fun with <code class="code">
+LD_PRELOAD</code>
+ , or doing
+horrible things with a debugger at runtime.
+In VM-based languages this also doesn't work very well, since you
+generally have no control over allocation and end up having to
+<code class="code">
+mlockall</code>
+ , which has no precision towards the pages
+you actually care about.</blockquote>
+<p>你可以用 <code class="code">
+mlock</code>
+ 把頁面鎖在內存裏，但是這要麼必須改程序代碼，或者折騰
+<code class="code">
+LD_PRELOAD</code>
+ ，或者在運行期用調試器做一些魔法操作。對基於虛擬機的語言來說這種方案也不能
+很好工作，因爲通常你沒法控制內存分配，最後得用上 <code class="code">
+mlockall</code>
+
+，而這個沒有辦法精確指定你實際上想鎖住的頁面。</p>
+<a aria-controls="ee392737" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ee392737" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="ee392737">
+cgroup v2 has a tunable per-cgroup in the form of <code class="code">
+memory.low</code>
+
+, which allows us to tell the kernel to prefer other applications for
+reclaim below a certain threshold of memory used. This allows us to not
+prevent the kernel from swapping out parts of our application,
+but prefer to reclaim from other applications under memory contention.
+Under normal conditions, the kernel's swap logic is generally pretty good,
+and allowing it to swap out pages opportunistically generally increases
+system performance. Swap thrash under heavy memory contention is not ideal,
+but it's more a property of simply running out of memory entirely than
+a problem with the swapper. In these situations, you typically want to
+fail fast by self-killing non-critical processes when memory pressure
+starts to build up.</blockquote>
+<p>cgroup v2 提供了一套可以每個 cgroup 微調的 <code class="code">
+memory.low</code>
+
+，允許我們告訴內核說當使用的內存低於一定閾值之後優先回收別的程序的內存。這可以讓我們不強硬禁止內核
+換出程序的一部分內存，但是當發生內存競爭的時候讓內核優先回收別的程序的內存。在正常條件下，
+內核的交換邏輯通常還是不錯的，允許它有條件地換出一部分頁面通常可以改善系統性能。在內存競爭的時候
+發生交換顛簸雖然不理想，但是這更多地是單純因爲整體內存不夠了，而不是因爲交換進程（swapper）導致的問題。
+在這種場景下，你通常希望在內存壓力開始積攢的時候通過自殺一些非關鍵的進程的方式來快速退出（fail fast）。</p>
+<a aria-controls="d789770a" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d789770a" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="d789770a">
+You can not simply rely on the OOM killer for this. The OOM killer is
+only invoked in situations of dire failure when we've already entered
+a state where the system is severely unhealthy and may well have been
+so for a while. You need to opportunistically handle the situation yourself
+before ever thinking about the OOM killer.</blockquote>
+<p>你不能依賴 OOM 殺手達成這個。 OOM 殺手只有在非常急迫的情況下纔會出動，那時系統已經處於極度不健康的
+狀態了，而且很可能在這種狀態下保持了一陣子了。需要在開始考慮 OOM 殺手之前，積極地自己處理這種情況。</p>
+<a aria-controls="fe0515e4" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe0515e4" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="fe0515e4">
+Determination of memory pressure is somewhat difficult using traditional
+Linux memory counters, though. We have some things which seem somewhat related,
+but are merely tangential – memory usage, page scans, etc – and from these
+metrics alone it's very hard to tell an efficient memory configuration
+from one that's trending towards memory contention. There is a group of us
+at Facebook, spearheaded by <a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45">Johannes</a>
+, working on developing new metrics that expose memory pressure more easily
+that should help with this in future. If you're interested in hearing more
+about this,
+<a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145">I go into detail about one metric being considered in my talk on cgroup v2</a>.</blockquote>
+<p>不過，用傳統的 Linux 內存統計數據還是挺難判斷內存壓力的。我們有一些看起來相關的系統指標，但是都
+只是支離破碎的——內存用量、頁面掃描，這些——單純從這些指標很難判斷系統是處於高效的內存利用率還是
+在滑向內存競爭狀態。我們在 Facebook 有個團隊，由
+<a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45">Johannes</a>
+牽頭，努力開發一些能評價內存壓力的新指標，希望能在今後改善目前的現狀。
+如果你對這方面感興趣， <a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145">在我的 cgroup v2 的演講中介紹到一個被提議的指標</a>
+。</p>
+</div>
+</div>
+<div class="section" id="id16">
+<h2><a class="toc-backref" href="#id32">調優</a></h2>
+<div class="section" id="id17">
+<h3><a class="toc-backref" href="#id33">那麼，我需要多少交換空間？</a></h3>
+<a aria-controls="5b5c883c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5b5c883c" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="5b5c883c">
+In general, the minimum amount of swap space required for optimal
+memory management depends on the number of anonymous pages pinned into
+memory that are rarely reaccessed by an application, and the value of
+reclaiming those anonymous pages. The latter is mostly a question of
+which pages are no longer purged to make way for these infrequently
+accessed anonymous pages.</blockquote>
+<p>通常而言，最優內存管理所需的最小交換空間取決於程序固定在內存中而又很少訪問到的匿名頁面的數量，
+以及回收這些匿名頁面換來的價值。後者大體上來說是問哪些頁面不再會因爲要保留這些很少訪問的匿名頁面而
+被回收掉騰出空間。</p>
+<a aria-controls="f070dec0" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f070dec0" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="f070dec0">
+If you have a bunch of disk space and a recent (4.0+) kernel,
+more swap is almost always better than less. In older kernels <code class="code">
+kswapd</code>
+,
+one of the kernel processes responsible for managing swap, was historically
+very overeager to swap out memory aggressively the more swap you had.
+In recent times, swapping behaviour when a large amount of swap space is
+available has been significantly improved. If you're running kernel 4.0+,
+having a larger swap on a modern kernel should not result in overzealous
+swapping. As such, if you have the space, having a swap size of a few GB
+keeps your options open on modern kernels.</blockquote>
+<p>如果你有足夠大的磁盤空間和比較新的內核版本（4.0+），越大的交換空間基本上總是越好的。
+更老的內核上 <code class="code">
+kswapd</code>
+ ， 內核中負責管理交換區的內核線程，在歷史上傾向於有越多交換空間就
+急於交換越多內存出去。在最近一段時間，可用交換空間很大的時候的交換行爲已經改善了很多。
+如果在運行 4.0+ 以後的內核，即便有很大的交換區在現代內核上也不會很激進地做交換。因此，
+如果你有足夠的容量，現代內核上有個幾個 GB 的交換空間大小能讓你有更多選擇。</p>
+<a aria-controls="d981b13d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d981b13d" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="d981b13d">
+If you're more constrained with disk space, then the answer really
+depends on the tradeoffs you have to make, and the nature of the environment.
+Ideally you should have enough swap to make your system operate optimally
+at normal and peak (memory) load. What I'd recommend is setting up a few
+testing systems with 2-3GB of swap or more, and monitoring what happens
+over the course of a week or so under varying (memory) load conditions.
+As long as you haven't encountered severe memory starvation during that week
+– in which case the test will not have been very useful – you will probably
+end up with some number of MB of swap occupied. As such, it's probably worth
+having at least that much swap available, in addition to a little buffer for
+changing workloads. <code class="code">
+atop</code>
+ in logging mode can also show you which applications
+are having their pages swapped out in the <code class="code">
+SWAPSZ</code>
+ column, so if you don't
+already use it on your servers to log historic server state you probably
+want to set it up on these test machines with logging mode as part of this
+experiment. This also tells you when your application started swapping out
+pages, which you can tie to log events or other key data.</blockquote>
+<p>如果你的磁盤空間優先，那麼答案更多取決於你願意做的取捨，以及運行的環境。理想上應該有足夠的交換空間
+能高效應對正常負載和高峰（內存）負載。我建議先用 2-3GB 或者更多的交換空間搭個測試環境，
+然後監視在不同（內存）負載條件下持續一週左右的情況。只要在那一週裏沒有發生過嚴重的內存不足——
+發生了的話說明測試結果沒什麼用——在測試結束的時候大概會留有多少 MB 交換區佔用。
+作爲結果說明你至少應該有那麼多可用的交換空間，再多加一些以應對負載變化。用日誌模式跑 <code class="code">
+atop</code>
+
+可以在 <code class="code">
+SWAPSZ</code>
+ 欄顯示程序的頁面被交換出去的情況，所以如果你還沒用它記錄服務器歷史日誌的話
+，這次測試中可以試試在測試機上用它記錄日誌。這也會告訴你什麼時候你的程序開始換出頁面，你可以用這個
+對照事件日誌或者別的關鍵數據。</p>
+<a aria-controls="c81cfdce" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c81cfdce" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="c81cfdce">
+Another thing worth considering is the nature of the swap medium.
+Swap reads tend to be highly random, since we can't reliably predict
+which pages will be refaulted and when. On an SSD this doesn't matter much,
+but on spinning disks, random I/O is extremely expensive since it requires
+physical movement to achieve. On the other hand, refaulting of file pages
+is likely less random, since files related to the operation of a single
+application at runtime tend to be less fragmented. This might mean that on
+a spinning disk you may want to bias more towards reclaiming file pages
+instead of swapping out anonymous pages, but again, you need to test and
+evaluate how this balances out for your workload.</blockquote>
+<p>另一點值得考慮的是交換空間所在存儲設備的媒介。讀取交換區傾向於很隨機，因爲我們不能可靠預測什麼時候
+什麼頁面會被再次訪問。在 SSD 上這不是什麼問題，但是在傳統磁盤上，隨機 I/O 操作會很昂貴，
+因爲需要物理動作尋道。另一方面，重新加載文件緩存可能不那麼隨機，因爲單一程序在運行期的文件讀操作
+一般不會太碎片化。這可能意味着在傳統磁盤上你想更多地回收文件頁面而不是換出匿名頁面，但仍就，
+你需要做測試評估在你的工作負載下如何取得平衡。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+譯註：關於休眠到磁盤時的交換空間大小</div>
+<div class="panel-body">
+原文這裏建議交換空間至少是物理內存大小，我覺得實際上不需要。休眠到磁盤的時候內核會寫回並丟棄
+所有有文件作後備的可回收頁面，交換區只需要能放下那些沒有文件後備的頁面就可以了。
+如果去掉文件緩存頁面之後剩下的已用物理內存總量能完整放入交換區中，就可以正常休眠。
+對於桌面瀏覽器這種內存大戶，通常有很多緩存頁可以在休眠的時候丟棄。</div>
+</div>
+<a aria-controls="34173e8b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#34173e8b" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="34173e8b">
+For laptop/desktop users who want to hibernate to swap, this also needs to
+be taken into account – in this case your swap file should be at least
+your physical RAM size.</blockquote>
+<p>對筆記本/桌面用戶如果想要休眠到交換區，這也需要考慮——這種情況下你的交換文件應該至少是物理內存大小。</p>
+</div>
+<div class="section" id="swappiness">
+<h3><a class="toc-backref" href="#id34">我的 swappiness 應該如何設置？</a></h3>
+<a aria-controls="02421253" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#02421253" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="02421253">
+First, it's important to understand what <code class="code">
+vm.swappiness</code>
+ does.
+<code class="code">
+vm.swappiness</code>
+ is a sysctl that biases memory reclaim either towards
+reclamation of anonymous pages, or towards file pages. It does this using two
+different attributes: <code class="code">
+file_prio</code>
+ (our willingness to reclaim file pages)
+and <code class="code">
+anon_prio</code>
+ (our willingness to reclaim anonymous pages).
+<code class="code">
+vm.swappiness`plays into this, as it becomes the default value for
+:code:`anon_prio</code>
+, and it also is subtracted from the default value of 200
+for <code class="code">
+file_prio</code>
+, which means for a value of <code class="code">
+vm.swappiness = 50</code>
+,
+the outcome is that <code class="code">
+anon_prio</code>
+ is 50, and <code class="code">
+file_prio</code>
+ is 150
+(the exact numbers don't matter as much as their relative weight compared to the other).</blockquote>
+<p>首先很重要的一點是，要理解 <code class="code">
+vm.swappiness</code>
+ 是做什麼的。
+<code class="code">
+vm.swappiness</code>
+ 是一個 sysctl 用來控制在內存回收的時候，是優先回收匿名頁面，
+還是優先回收文件頁面。內存回收的時候用兩個屬性： <code class="code">
+file_prio</code>
+ （回收文件頁面的傾向）
+和 <code class="code">
+anon_prio</code>
+ （回收匿名頁面的傾向）。 <code class="code">
+vm.swappiness</code>
+ 控制這兩個值，
+因爲它是 <code class="code">
+anon_prio</code>
+ 的默認值，然後也是默認 200 減去它之後 <code class="code">
+file_prio</code>
+ 的默認值。
+意味着如果我們設置 <code class="code">
+vm.swappiness = 50</code>
+ 那麼結果是 <code class="code">
+anon_prio</code>
+ 是 50，
+<code class="code">
+file_prio</code>
+ 是 150 （這裏數值本身不是很重要，重要的是兩者之間的權重比）。</p>
+<a aria-controls="b2897dd9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b2897dd9" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="b2897dd9">
+This means that, in general, <code class="code">
+vm.swappiness</code>
+<strong>is simply a ratio of how</strong>
+<strong>costly reclaiming and refaulting anonymous memory is compared to file memory</strong>
+<strong>for your hardware and workload</strong>. The lower the value, the more you tell the
+kernel that infrequently accessed anonymous pages are expensive to swap out
+and in on your hardware. The higher the value, the more you tell the kernel
+that the cost of swapping anonymous pages and file pages is similar on your
+hardware. The memory management subsystem will still try to mostly decide
+whether it swaps file or anonymous pages based on how hot the memory is,
+but swappiness tips the cost calculation either more towards swapping or
+more towards dropping filesystem caches when it could go either way.
+On SSDs these are basically as expensive as each other, so setting
+<code class="code">
+vm.swappiness = 100</code>
+ (full equality) may work well.
+On spinning disks, swapping may be significantly more expensive since
+swapping in generally requires random reads, so you may want to
+bias more towards a lower value.</blockquote>
+<p>這意味着，通常來說 <code class="code">
+vm.swappiness</code>
+<strong>只是一個比例，用來衡量在你的硬件和工作負載下，</strong>
+<strong>回收和換回匿名內存還是文件內存哪種更昂貴</strong> 。設定的值越低，你就是在告訴內核說換出那些不常訪問的
+匿名頁面在你的硬件上開銷越昂貴；設定的值越高，你就是在告訴內核說在你的硬件上交換匿名頁和
+文件緩存的開銷越接近。內存管理子系統仍然還是會根據實際想要回收的內存的訪問熱度嘗試自己決定具體是
+交換出文件還是匿名頁面，只不過 swappiness 會在兩種回收方式皆可的時候，在計算開銷權重的過程中左右
+是該更多地做交換還是丟棄緩存。在 SSD 上這兩種方式基本上是同等開銷，所以設成
+<code class="code">
+vm.swappiness = 100</code>
+ （同等比重）可能工作得不錯。在傳統磁盤上，交換頁面可能會更昂貴，
+因爲通常需要隨機讀取，所以你可能想要設低一些。</p>
+<a aria-controls="916d89d2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#916d89d2" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="916d89d2">
+The reality is that most people don't really have a feeling about which
+their hardware demands, so it's non-trivial to tune this value based on
+instinct alone – this is something that you need to test using different
+values. You can also spend time evaluating the memory composition of your
+system and core applications and their behaviour under mild memory reclamation.</blockquote>
+<p>現實是大部分人對他們的硬件需求沒有什麼感受，所以根據直覺調整這個值可能挺困難的 ——
+你需要用不同的值做測試。你也可以花時間評估一下你的系統的內存分配情況和核心應用在大量回收內存的時候的行爲表現。</p>
+<a aria-controls="1716806c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#1716806c" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="1716806c">
+When talking about <code class="code">
+vm.swappiness</code>
+ , an extremely important change to
+consider from recent(ish) times is
+<a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd">this change to vmscan by Satoru Moriya in 2012</a>
+, which changes the way that <code class="code">
+vm.swappiness = 0</code>
+ is handled
+quite significantly.</blockquote>
+<p>討論 <code class="code">
+vm.swappiness</code>
+ 的時候，一個極爲重要需要考慮的修改是（相對）近期在
+<a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd">2012 年左右 Satoru Moriya 對 vmscan 行爲的修改</a>
+，它顯著改變了代碼對 <code class="code">
+vm.swappiness = 0</code>
+ 這個值的處理方式。</p>
+<a aria-controls="0d73ddd8" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#0d73ddd8" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="0d73ddd8">
+Essentially, the patch makes it so that we are extremely biased against
+scanning (and thus reclaiming) any anonymous pages at all with
+<code class="code">
+vm.swappiness = 0</code>
+ , unless we are already encountering severe
+memory contention. As mentioned previously in this post, that's generally
+not what you want, since this prevents equality of reclamation prior to
+extreme memory pressure occurring, which may actually lead to this
+extreme memory pressure in the first place. <code class="code">
+vm.swappiness = 1</code>
+
+is the lowest you can go without invoking the special casing for
+anonymous page scanning implemented in that patch.</blockquote>
+<p>基本上來說這個補丁讓我們在 <code class="code">
+vm.swappiness = 0</code>
+ 的時候會極度避免掃描（進而回收）匿名頁面，
+除非我們已經在經歷嚴重的內存搶佔。就如本文前面所屬，這種行爲基本上不會是你想要的，
+因爲這種行爲會導致在發生內存搶佔之前無法保證內存回收的公平性，這甚至可能是最初導致發生內存搶佔的原因。
+想要避免這個補丁中對掃描匿名頁面的特殊行爲的話， <code class="code">
+vm.swappiness = 1</code>
+ 是你能設置的最低值。</p>
+<a aria-controls="8283fab5" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8283fab5" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="8283fab5">
+The kernel default here is <code class="code">
+vm.swappiness = 60</code>
+. This value is
+generally not too bad for most workloads, but it's hard to have a
+general default that suits all workloads. As such, a valuable extension
+to the tuning mentioned in the "how much swap do I need" section above
+would be to test these systems with differing values for <code class="code">
+vm.swappiness</code>
+
+, and monitor your application and system metrics under heavy (memory) load.
+Some time in the near future, once we have a decent implementation of
+<a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145">refault detection</a> in the kernel,
+you'll also be able to determine this somewhat workload-agnostically by
+looking at cgroup v2's page refaulting metrics.</blockquote>
+<p>內核在這裏設置的默認值是 <code class="code">
+vm.swappiness = 60</code>
+ 。這個值對大部分工作負載來說都不會太壞，
+但是很難有一個默認值能符合所有種類的工作負載。因此，對上面「 <a class="reference internal" href="#id17">那麼，我需要多少交換空間？</a>
+」那段討論的一點重要擴展可以說，在測試系統中可以嘗試使用不同的 <code class="code">
+vm.swappiness</code>
+
+，然後監視你的程序和系統在重（內存）負載下的性能指標。在未來某天，如果我們在內核中有了合理的
+<a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145">缺頁檢測</a> ，你也將能通過 cgroup v2 的頁面缺頁
+指標來以負載無關的方式決定這個。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="https://www.youtube.com/watch?v=beefUhRH5lU">SREcon19 Asia/Pacific - Linux Memory Management at Scale: Under the Hood</a></div>
+<div class="panel-body">
+<div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/beefUhRH5lU"></iframe></div></div>
+</div>
+</div>
+<div class="section" id="id19">
+<h3><a class="toc-backref" href="#id35">2019年07月更新：內核 4.20+ 中的內存壓力指標</a></h3>
+<a aria-controls="2cbb410f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2cbb410f" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="2cbb410f">
+The refault metrics mentioned as in development earlier are now in the
+kernel from 4.20 onwards and can be enabled with <code class="code">
+CONFIG_PSI=y</code>
+
+. See my talk at SREcon at around the 25:05 mark:</blockquote>
+<p>前文中提到的開發中的內存缺頁檢測指標已經進入 4.20+ 以上版本的內核，可以通過
+<code class="code">
+CONFIG_PSI=y</code>
+ 開啓。詳情參見我在 SREcon 大約 25:05 左右的討論。</p>
+</div>
+</div>
+<div class="section" id="id20">
+<h2><a class="toc-backref" href="#id36">結論</a></h2>
+<a aria-controls="01142bf6" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#01142bf6" role="button">
+<span class="badge badge-pill badge-light"><i class="fa fa-language"></i> </span></a><blockquote class="collapse" id="01142bf6">
+<ul class="simple">
+<li>Swap is a useful tool to allow equality of reclamation of memory pages,
+but its purpose is frequently misunderstood, leading to its negative
+perception across the industry. If you use swap in the spirit intended,
+though – as a method of increasing equality of reclamation – you'll
+find that it's a useful tool instead of a hindrance.</li>
+<li>Disabling swap does not prevent disk I/O from becoming a problem under
+memory contention, it simply shifts the disk I/O thrashing from anonymous
+pages to file pages. Not only may this be less efficient, as we have
+a smaller pool of pages to select from for reclaim, but it may also
+contribute to getting into this high contention state in the first place.</li>
+<li>Swap can make a system slower to OOM kill, since it provides another,
+slower source of memory to thrash on in out of memory situations – the
+OOM killer is only used by the kernel as a last resort, after things have
+already become monumentally screwed. The solutions here depend on your system:<ul>
+<li>You can opportunistically change the system workload depending on
+cgroup-local or global memory pressure. This prevents getting into these
+situations in the first place, but solid memory pressure metrics are
+lacking throughout the history of Unix. Hopefully this should be
+better soon with the addition of refault detection.</li>
+<li>You can bias reclaiming (and thus swapping) away from certain processes
+per-cgroup using memory.low, allowing you to protect critical daemons
+without disabling swap entirely.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li>交換區是允許公平地回收內存的有用工具，但是它的目的經常被人誤解，導致它在業內這種負面聲譽。如果
+你是按照原本的目的使用交換區的話——作爲增加內存回收公平性的方式——你會發現它是很有效的工具而不是阻礙。</li>
+<li>禁用交換區並不能在內存競爭的時候防止磁盤I/O的問題，它只不過把匿名頁面的磁盤I/O變成了文件頁面的
+磁盤I/O。這不僅更低效，因爲我們回收內存的時候能選擇的頁面範圍更小了，而且它可能是導致高度內存競爭
+狀態的元兇。</li>
+<li>有交換區會導致系統更慢地使用 OOM 殺手，因爲在缺少內存的情況下它提供了另一種更慢的內存，
+會持續地內存顛簸——內核調用 OOM 殺手只是最後手段，會晚於所有事情已經被搞得一團糟之後。
+解決方案取決於你的系統：<ul>
+<li>你可以預先更具每個 cgroup 的或者系統全局的內存壓力改變系統負載。這能防止我們最初進入內存競爭
+的狀態，但是 Unix 的歷史中一直缺乏可靠的內存壓力檢測方式。希望不久之後在有了
+<a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145">缺頁檢測</a> 這樣的性能指標之後能改善這一點。</li>
+<li>你可以使用 <code class="code">
+memory.low</code>
+ 讓內核不傾向於回收（進而交換）特定一些 cgroup 中的進程，
+允許你在不禁用交換區的前提下保護關鍵後臺服務。</li>
+</ul>
+</li>
+</ul>
+<hr class="docutils"/>
+<p>感謝在撰寫本文時 <a class="reference external" href="https://github.com/rahulg">Rahul</a> ，
+<a class="reference external" href="https://github.com/htejun">Tejun</a> 和
+<a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45">Johannes</a>
+提供的諸多建議和反饋。</p>
+</div>
+
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/file-size-histogram.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        系統中的大多數文件有多大？
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+請用你的 GitHub 賬戶登錄並在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/97#new_comment_field" target="_blank">這篇文章的 Issue 頁下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/97#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言於 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/97/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'in-defence-of-swap';
+                        var disqus_url = 'http://farseerfc.me/in-defence-of-swap.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/pages/about.html">
+關於 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/pages/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">標籤雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/swap.html">
+                    swap <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mm.html">
+                    mm <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/memory-management.html">
+                    memory management <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/translate.html">
+                    translate <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/swappiness.html">
+                    swappiness <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fsbi-ji.html">
+                    FS筆記 <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fs-notes.html">
+                    FS notes <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/file.html">
+                    file <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/size.html">
+                    size <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/histogram.html">
+                    histogram <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ftl.html">
+                    FTL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ssd.html">
+                    SSD <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb-stick.html">
+                    USB stick <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/emmc.html">
+                    eMMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mmc.html">
+                    MMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sd-card.html">
+                    SD Card <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chs.html">
+                    CHS <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cylinder.html">
+                    cylinder <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/head.html">
+                    head <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sector.html">
+                    sector <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/lba.html">
+                    LBA <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/smr.html">
+                    SMR <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/4kn.html">
+                    4Kn <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/btrfs.html">
+                    btrfs <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zfs.html">
+                    zfs <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cow.html">
+                    cow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/snapshot.html">
+                    snapshot <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/clone.html">
+                    clone <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subvolume.html">
+                    subvolume <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dedup.html">
+                    dedup <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/reflink.html">
+                    reflink <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/spa.html">
+                    SPA <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dmu.html">
+                    DMU <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dsl.html">
+                    DSL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zpl.html">
+                    ZPL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/layered.html">
+                    layered <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/architecture.html">
+                    architecture <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zio.html">
+                    ZIO <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/vdev.html">
+                    VDEV <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/arc.html">
+                    ARC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zap.html">
+                    ZAP <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zil.html">
+                    ZIL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zvol.html">
+                    ZVOL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/friend.html">
+                    friend <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/horo.html">
+                    horo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/life.html">
+                    life <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    linux <sup> 9</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/raspberrypi.html">
+                    raspberrypi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usbip.html">
+                    usbip <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb.html">
+                    usb <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/forward.html">
+                    forward <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chouyaku.html">
+                    chouyaku <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kimi.html">
+                    kimi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sae.html">
+                    sae <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/inakerya.html">
+                    inakerya <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ting-yi.html">
+                    聽譯 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dotfiles.html">
+                    dotfiles <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stow.html">
+                    stow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chrome.html">
+                    chrome <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/remote.html">
+                    remote <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/domain.html">
+                    domain <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cloudflare.html">
+                    cloudflare <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub倉庫</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://t.me/s/fcnotes">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">fc fs筆記</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body" style="padding: 0px">
+        <div id="tg_channel_iframe">
+            <iframe frameborder="0" style="width:100%;height:500px" src="https://rants.nichi.workers.dev/fcnotes"></iframe>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+        <div class="panel panel-default hidden-xs hidden-sm" id="affix-toc">
+            <div class="panel-heading"><h4>
+目錄</h4>
+            </div>
+            <div class="panel-boy">
+            <div class="toc" id="">
+<p class="topic-title">目录</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id6" id="id23">背景</a><ul>
+<li><a class="reference internal" href="#id7" id="id24">內存的類型</a></li>
+<li><a class="reference internal" href="#id8" id="id25">可回收/不可回收內存</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9" id="id26">說到交換區的本質</a></li>
+<li><a class="reference internal" href="#id10" id="id27">考察有無交換區時會發生什麼</a><ul>
+<li><a class="reference internal" href="#id11" id="id28">在無/低內存競爭的狀態下</a></li>
+<li><a class="reference internal" href="#id12" id="id29">在中/高內存競爭的狀態下</a></li>
+<li><a class="reference internal" href="#id13" id="id30">在臨時內存佔用高峰時</a></li>
+<li><a class="reference internal" href="#id14" id="id31">好吧，所以我需要系統交換區，但是我該怎麼爲每個程序微調它的行爲？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id16" id="id32">調優</a><ul>
+<li><a class="reference internal" href="#id17" id="id33">那麼，我需要多少交換空間？</a></li>
+<li><a class="reference internal" href="#swappiness" id="id34">我的 swappiness 應該如何設置？</a></li>
+<li><a class="reference internal" href="#id19" id="id35">2019年07月更新：內核 4.20+ 中的內存壓力指標</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id20" id="id36">結論</a></li>
+</ul>
+</div>
+            </div>
+        </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2020 farseerfc
+            &middot; 通過            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>

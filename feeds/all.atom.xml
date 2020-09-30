@@ -1,5 +1,1849 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-06-11T15:45:00+09:00</updated><entry><title>系統中的大多數文件有多大？</title><link href="//farseerfc.me/file-size-histogram.html" rel="alternate"></link><published>2020-06-11T15:45:00+09:00</published><updated>2020-06-11T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-06-11:/file-size-histogram.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窩</title><link href="//farseerfc.me/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/</id><updated>2020-09-30T13:45:00+09:00</updated><entry><title>【譯】替 swap 辯護：常見的誤解</title><link href="//farseerfc.me/in-defence-of-swap.html" rel="alternate"></link><published>2020-09-30T13:45:00+09:00</published><updated>2020-09-30T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-09-30:/in-defence-of-swap.html</id><summary type="html">&lt;p&gt;這篇翻譯自 Chris Down 的博文
+&lt;a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html"&gt;In defence of swap: common misconceptions&lt;/a&gt;
+。 &lt;a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE"&gt;原文的協議&lt;/a&gt;
+是 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt;
+，本文翻譯同樣也使用 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt; 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。&lt;/p&gt;
+&lt;p&gt;翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness
+有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的
+swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲，
+需要不同的調優方式。比如在 &lt;a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial"&gt;FreeBSD …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;這篇翻譯自 Chris Down 的博文
+&lt;a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html"&gt;In defence of swap: common misconceptions&lt;/a&gt;
+。 &lt;a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE"&gt;原文的協議&lt;/a&gt;
+是 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt;
+，本文翻譯同樣也使用 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt; 。其中加入了一些我自己的理解作爲旁註，所有譯註都在側邊欄中。&lt;/p&gt;
+&lt;p&gt;翻譯這篇文章是因爲經常看到朋友們（包括有經驗的程序員和 Linux 管理員）對 swap 和 swappiness
+有諸多誤解，而這篇文章正好澄清了這些誤解，也講清楚了 Linux 中這兩者的本質。值得一提的是本文討論的
+swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統中的交換文件可能有不同一樣的行爲，
+需要不同的調優方式。比如在 &lt;a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial"&gt;FreeBSD handbook&lt;/a&gt;
+中明確建議了 swap 分區通常應該是兩倍物理內存大小，這一點建議對 FreeBSD 系內核的內存管理可能非常合理，
+而不一定適合 Linux 內核，FreeBSD 和 Linux 有不同的內存管理方式尤其是 swap 和 page cache 和
+buffer cache 的處理方式有諸多不同。&lt;/p&gt;
+&lt;p&gt;經常有朋友看到系統卡噸之後看系統內存使用狀況觀察到大量 swap 佔用，於是覺得卡噸是來源於 swap
+。就像文中所述，相關不蘊含因果，產生內存顛簸之後的確會造成大量 swap 佔用，也會造成系統卡噸，
+但是 swap 不是導致卡噸的原因，關掉 swap 或者調低 swappiness 並不能阻止卡噸，只會將 swap
+造成的 I/O 轉化爲加載文件緩存造成的 I/O 。&lt;/p&gt;
+&lt;p&gt;以下是原文翻譯：&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;這篇文章也有 &lt;a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html"&gt;日文&lt;/a&gt;
+和 &lt;a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya"&gt;俄文&lt;/a&gt;
+翻譯。&lt;/p&gt;
+&lt;a aria-controls="a01b6caa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a01b6caa" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a01b6caa"&gt;
+&lt;p&gt;tl;dr:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Having swap is a reasonably important part of a well functioning system.
+Without it, sane memory management becomes harder to achieve.&lt;/li&gt;
+&lt;li&gt;Swap is not generally about getting emergency memory, it's about making
+memory reclamation egalitarian and efficient. In fact, using it as
+"emergency memory" is generally actively harmful.&lt;/li&gt;
+&lt;li&gt;Disabling swap does not prevent disk I/O from becoming a problem
+under memory contention, it simply shifts the disk I/O thrashing from
+anonymous pages to file pages. Not only may this be less efficient,
+as we have a smaller pool of pages to select from for reclaim, but it
+may also contribute to getting into this high contention state in
+the first place.&lt;/li&gt;
+&lt;li&gt;The swapper on kernels before 4.0 has a lot of pitfalls,
+and has contributed to a lot of people's negative perceptions about
+swap due to its overeagerness to swap out pages. On kernels &amp;gt;4.0,
+the situation is significantly better.&lt;/li&gt;
+&lt;li&gt;On SSDs, swapping out anonymous pages and reclaiming file pages are
+essentially equivalent in terms of performance/latency.
+On older spinning disks, swap reads are slower due to random reads,
+so a lower &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ setting makes sense there
+(read on for more about &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+).&lt;/li&gt;
+&lt;li&gt;Disabling swap doesn't prevent pathological behaviour at near-OOM,
+although it's true that having swap may prolong it. Whether the
+system global OOM killer is invoked with or without swap, or was invoked
+sooner or later, the result is the same: you are left with a system in an
+unpredictable state. Having no swap doesn't avoid this.&lt;/li&gt;
+&lt;li&gt;You can achieve better swap behaviour under memory pressure and prevent
+thrashing using &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ and friends in cgroup v2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;太長不看：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;對維持系統的正常功能而言，有 swap 是相對挺重要的一部分。沒有它的話會更難做到合理的內存管理。&lt;/li&gt;
+&lt;li&gt;swap 的目的通常並不是用作緊急內存，它的目的在於讓內存回收能更平等和高效。
+事實上把它當作「緊急內存」來用的想法通常是有害的。&lt;/li&gt;
+&lt;li&gt;禁用 swap 在內存壓力下並不能避免磁盤I/O造成的性能問題，這麼做只是讓磁盤I/O顛簸的範圍從
+匿名頁面轉化到文件頁面。這不僅更低效，因爲系統能回收的頁面的選擇範圍更有限了，
+而且這種做法還可能是加重了內存壓力的原因之一。&lt;/li&gt;
+&lt;li&gt;內核 4.0 版本之前的交換進程（swapper）有一些問題，導致很多人對 swap 有負面印象，
+因爲它太急於（overeagerness）把頁面交換出去。在 4.0 之後的內核上這種情況已經改善了很多。&lt;/li&gt;
+&lt;li&gt;在 SSD 上，交換出匿名頁面的開銷和回收文件頁面的開銷基本上在性能/延遲方面沒有區別。
+在老式的磁盤上，讀取交換文件因爲屬於隨機訪問讀取所以會更慢，於是設置較低的 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+可能比較合理（繼續讀下面關於 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的描述）。&lt;/li&gt;
+&lt;li&gt;禁用 swap 並不能避免在接近 OOM 狀態下最終表現出的症狀，儘管的確有 swap
+的情況下這種症狀持續的時間可能會延長。在系統調用 OOM 殺手的時候無論有沒有啓用 swap
+，或者更早/更晚開始調用 OOM 殺手，結果都是一樣的：整個系統留在了一種不可預知的狀態下。
+有 swap 也不能避免這一點。&lt;/li&gt;
+&lt;li&gt;可以用 cgroup v2 的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 相關機制來改善內存壓力下 swap 的行爲並且
+避免發生顛簸。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr class="docutils"/&gt;
+&lt;a aria-controls="053c68ad" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#053c68ad" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="053c68ad"&gt;
+As part of my work improving kernel memory management and cgroup v2,
+I've been talking to a lot of engineers about attitudes towards memory
+management, especially around application behaviour under pressure and
+operating system heuristics used under the hood for memory management.&lt;/blockquote&gt;
+&lt;p&gt;我的工作的一部分是改善內核中內存管理和 cgroup v2 相關，所以我和很多工程師討論過看待內存管理的態度，
+尤其是在壓力下應用程序的行爲和操作系統在底層內存管理中用的基於經驗的啓發式決策邏輯。&lt;/p&gt;
+&lt;a aria-controls="8dedecec" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8dedecec" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="8dedecec"&gt;
+A repeated topic in these discussions has been swap.
+Swap is a hotly contested and poorly understood topic,
+even by those who have been working with Linux for many years.
+Many see it as useless or actively harmful: a relic of a time where
+memory was scarce, and disks were a necessary evil to provide much-needed
+space for paging. This is a statement that I still see being batted
+around with relative frequency in recent years, and I've had many
+discussions with colleagues, friends, and industry peers to help them
+understand why swap is still a useful concept on modern computers with
+significantly more physical memory available than in the past.&lt;/blockquote&gt;
+&lt;p&gt;在這種討論中經常重複的話題是交換區（swap）。交換區的話題是非常有爭議而且很少被理解的話題，甚至包括那些在
+Linux 上工作過多年的人也是如此。很多人覺得它沒什麼用甚至是有害的：它是歷史遺蹟，從內存緊缺而
+磁盤讀寫是必要之惡的時代遺留到現在，爲計算機提供在當年很必要的頁面交換功能作爲內存空間。
+最近幾年我還經常能以一定頻度看到這種論調，然後我和很多同事、朋友、業界同行們討論過很多次，
+幫他們理解爲什麼在現代計算機系統中交換區仍是有用的概念，即便現在的電腦中物理內存已經遠多於過去。&lt;/p&gt;
+&lt;a aria-controls="b1c86306" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b1c86306" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b1c86306"&gt;
+There's also a lot of misunderstanding about the purpose of swap –
+many people just see it as a kind of "slow extra memory" for use in emergencies,
+but don't understand how it can contribute during normal load to the healthy
+operation of an operating system as a whole.&lt;/blockquote&gt;
+&lt;p&gt;圍繞交換區的目的還有很多誤解——很多人覺得它只是某種爲了應對緊急情況的「慢速額外內存」，
+但是沒能理解在整個操作系統健康運作的時候它也能改善普通負載的性能。&lt;/p&gt;
+&lt;a aria-controls="3603c7fa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3603c7fa" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="3603c7fa"&gt;
+Many of us have heard most of the usual tropes about memory:
+" &lt;a class="reference external" href="https://www.linuxatemyram.com/"&gt;Linux uses too much memory&lt;/a&gt; ",
+" &lt;a class="reference external" href="https://superuser.com/a/111510"&gt;swap should be double your physical memory size&lt;/a&gt;
+", and the like. While these are either trivial to dispel,
+or discussion around them has become more nuanced in recent years,
+the myth of "useless" swap is much more grounded in heuristics and
+arcana rather than something that can be explained by simple analogy,
+and requires somewhat more understanding of memory management to reason about.&lt;/blockquote&gt;
+&lt;p&gt;我們很多人也聽說過描述內存時所用的常見說法： 「 &lt;a class="reference external" href="https://www.linuxatemyram.com/"&gt;Linux 用了太多內存&lt;/a&gt;
+」，「 &lt;a class="reference external" href="https://superuser.com/a/111510"&gt;swap 應該設爲物理內存的兩倍大小&lt;/a&gt; 」，或者類似的說法。
+雖然這些誤解要麼很容易化解，或者關於他們的討論在最近幾年已經逐漸變得瑣碎，但是關於「無用」交換區
+的傳言有更深的經驗傳承的根基，而不是一兩個類比就能解釋清楚的，並且要探討這個先得對內存管理有
+一些基礎認知。&lt;/p&gt;
+&lt;a aria-controls="ff09462c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ff09462c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ff09462c"&gt;
+This post is mostly aimed at those who administrate Linux systems and
+are interested in hearing the counterpoints to running with
+undersized/no swap or running with vm.swappiness set to 0.&lt;/blockquote&gt;
+&lt;p&gt;本文主要目標是針對那些管理 Linux 系統並且有興趣理解「讓系統運行於低/無交換區狀態」或者「把
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 設爲 0 」這些做法的反論。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;背景&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="283c5b39" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#283c5b39" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="283c5b39"&gt;
+It's hard to talk about why having swap and swapping out pages are good
+things in normal operation without a shared understanding of some of
+the basic underlying mechanisms at play in Linux memory management,
+so let's make sure we're on the same page.&lt;/blockquote&gt;
+&lt;p&gt;如果沒有基本理解 Linux 內存管理的底層機制是如何運作的，就很難討論爲什麼需要交換區以及交換出頁面
+對正常運行的系統爲什麼是件好事，所以我們先確保大家有討論的基礎。&lt;/p&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;內存的類型&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="b93d3e73" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b93d3e73" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b93d3e73"&gt;
+There are many different types of memory in Linux, and each type has its
+own properties. Understanding the nuances of these is key to understanding
+why swap is important.&lt;/blockquote&gt;
+&lt;p&gt;Linux 中內存分爲好幾種類型，每種都有各自的屬性。想理解爲什麼交換區很重要的關鍵一點在於理解這些的細微區別。&lt;/p&gt;
+&lt;a aria-controls="ea5c81cf" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ea5c81cf" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ea5c81cf"&gt;
+For example, there are &lt;strong&gt;pages ("blocks" of memory, typically 4k)&lt;/strong&gt;
+responsible for holding the code for each process being run on your computer.
+There are also pages responsible for caching data and metadata related to
+files accessed by those programs in order to speed up future access.
+These are part of the &lt;strong&gt;page cache&lt;/strong&gt; , and I will refer to them as file memory.&lt;/blockquote&gt;
+&lt;p&gt;比如說，有種 &lt;strong&gt;頁面（「整塊」的內存，通常 4K）&lt;/strong&gt; 是用來存放電腦裏每個程序運行時各自的代碼的。
+也有頁面用來保存這些程序所需要讀取的文件數據和元數據的緩存，以便加速隨後的文件讀寫。
+這些內存頁面構成 &lt;strong&gt;頁面緩存（page cache）&lt;/strong&gt;，後文中我稱他們爲文件內存。&lt;/p&gt;
+&lt;a aria-controls="a8e582f2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a8e582f2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a8e582f2"&gt;
+There are also pages which are responsible for the memory allocations
+made inside that code, for example, when new memory that has been allocated
+with &lt;code class="code"&gt;
+malloc&lt;/code&gt;
+ is written to, or when using &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+'s
+&lt;code class="code"&gt;
+MAP_ANONYMOUS&lt;/code&gt;
+ flag. These are "anonymous" pages –
+so called because they are not backed by anything –
+and I will refer to them as anon memory.&lt;/blockquote&gt;
+&lt;p&gt;還有一些頁面是在代碼執行過程中做的內存分配得到的，比如說，當代碼調用 &lt;code class="code"&gt;
+malloc&lt;/code&gt;
+
+能分配到新內存區，或者使用 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 的 &lt;code class="code"&gt;
+MAP_ANONYMOUS&lt;/code&gt;
+ 標誌分配的內存。
+這些是「匿名(anonymous)」頁面——之所以這麼稱呼它們是因爲他們沒有任何東西作後備——
+後文中我稱他們爲匿名內存。&lt;/p&gt;
+&lt;a aria-controls="38d36a1d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#38d36a1d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="38d36a1d"&gt;
+There are other types of memory too –
+shared memory, slab memory, kernel stack memory, buffers, and the like –
+but anonymous memory and file memory are the most well known and
+easy to understand ones, so I will use these in my examples,
+although they apply equally to these types too.&lt;/blockquote&gt;
+&lt;p&gt;還有其它類型的內存——共享內存、slab內存、內核棧內存、文件緩衝區（buffers），這種的——
+但是匿名內存和文件內存是最知名也最好理解的，所以後面的例子裏我會用這兩個說明，
+雖然後面的說明也同樣適用於別的這些內存類型。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;可回收/不可回收內存&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="896d577c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#896d577c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="896d577c"&gt;
+One of the most fundamental questions when thinking about a particular type
+of memory is whether it is able to be reclaimed or not.
+"Reclaim" here means that the system can, without losing data,
+purge pages of that type from physical memory.&lt;/blockquote&gt;
+&lt;p&gt;考慮某種內存的類型時，一個非常基礎的問題是這種內存是否能被回收。
+「回收（Reclaim）」在這裏是指系統可以，在不丟失數據的前提下，從物理內存中釋放這種內存的頁面。&lt;/p&gt;
+&lt;a aria-controls="c8915ce3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c8915ce3" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="c8915ce3"&gt;
+For some page types, this is typically fairly trivial. For example,
+in the case of clean (unmodified) page cache memory,
+we're simply caching something that we have on disk for performance,
+so we can drop the page without having to do any special operations.&lt;/blockquote&gt;
+&lt;p&gt;對一些內存類型而言，是否可回收通常可以直接判斷。比如對於那些乾淨（未修改）的頁面緩存內存，
+我們只是爲了性能在用它們緩存一些磁盤上現有的數據，所以我們可以直接扔掉這些頁面，
+不需要做什麼特殊的操作。&lt;/p&gt;
+&lt;a aria-controls="543b6f9b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#543b6f9b" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="543b6f9b"&gt;
+For some page types, this is possible, but not trivial. For example,
+in the case of dirty (modified) page cache memory, we can't just drop the page,
+because the disk doesn't have our modifications yet.
+As such we either need to deny reclamation or first get our changes back to
+disk before we can drop this memory.&lt;/blockquote&gt;
+&lt;p&gt;對有些內存類型而言，回收是可能的，但是不是那麼直接。比如對髒（修改過）的頁面緩存內存，
+我們不能直接扔掉這些頁面，因爲磁盤上還沒有寫入我們所做的修改。這種情況下，我們可以選擇拒絕回收，
+或者選擇先等待我們的變更寫入磁盤之後才能扔掉這些內存。&lt;/p&gt;
+&lt;a aria-controls="5111480d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5111480d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="5111480d"&gt;
+For some page types, this is not possible. For example,
+in the case of the anonymous pages mentioned previously,
+they only exist in memory and in no other backing store,
+so they have to be kept there.&lt;/blockquote&gt;
+&lt;p&gt;對還有些內存類型而言，是不能回收的。比如前面提到的匿名頁面，它們只存在於內存中，沒有任何後備存儲，
+所以它們必須留在內存裏。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id26"&gt;說到交換區的本質&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="99551744" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#99551744" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="99551744"&gt;
+&lt;p&gt;If you look for descriptions of the purpose of swap on Linux,
+you'll inevitably find many people talking about it as if it is merely
+an extension of the physical RAM for use in emergencies. For example,
+here is a random post I got as one of the top results from typing
+"what is swap" in Google:&lt;/p&gt;
+&lt;blockquote&gt;
+Swap is essentially emergency memory; a space set aside for times
+when your system temporarily needs more physical memory than you
+have available in RAM. It's considered "bad" in the sense that
+it's slow and inefficient, and if your system constantly needs
+to use swap then it obviously doesn't have enough memory. […]
+If you have enough RAM to handle all of your needs, and don't
+expect to ever max it out, then you should be perfectly safe
+running without a swap space.&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果你去搜 Linux 上交換區的目的的描述，肯定會找到很多人說交換區只是在緊急時用來擴展物理內存的機制。
+比如下面這段是我在 google 中輸入「什麼是 swap」 從前排結果中隨機找到的一篇：&lt;/p&gt;
+&lt;blockquote&gt;
+交換區本質上是緊急內存；是爲了應對你的系統臨時所需內存多餘你現有物理內存時，專門分出一塊額外空間。
+大家覺得交換區「不好」是因爲它又慢又低效，並且如果你的系統一直需要使用交換區那說明它明顯沒有足夠的內存。
+［……］如果你有足夠內存覆蓋所有你需要的情況，而且你覺得肯定不會用滿內存，那麼完全可以不用交換區
+安全地運行系統。&lt;/blockquote&gt;
+&lt;a aria-controls="fe4c8bc1" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe4c8bc1" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fe4c8bc1"&gt;
+To be clear, I don't blame the poster of this comment at all for the content
+of their post – this is accepted as "common knowledge" by a lot of
+Linux sysadmins and is probably one of the most likely things that you will
+hear from one if you ask them to talk about swap. It is unfortunately also,
+however, a misunderstanding of the purpose and use of swap, especially on
+modern systems.&lt;/blockquote&gt;
+&lt;p&gt;事先說明，我不想因爲這些文章的內容責怪這些文章的作者——這些內容被很多 Linux 系統管理員認爲是「常識」，
+並且很可能你問他們什麼是交換區的時候他們會給你這樣的回答。但是也很不幸的是，
+這種認識是使用交換區的目的的一種普遍誤解，尤其在現代系統上。&lt;/p&gt;
+&lt;a aria-controls="77407587" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#77407587" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="77407587"&gt;
+Above, I talked about reclamation for anonymous pages being "not possible",
+as anonymous pages by their nature have no backing store to fall back to
+when being purged from memory – as such, their reclamation would result in
+complete data loss for those pages. What if we could create such a
+store for these pages, though?&lt;/blockquote&gt;
+&lt;p&gt;前文中我說過回收匿名頁面的內存是「不可能的」，因爲匿名內存的特點，把它們從內存中清除掉之後，
+沒有別的存儲區域能作爲他們的備份——因此，要回收它們會造成數據丟失。但是，如果我們爲這種內存頁面創建
+一種後備存儲呢？&lt;/p&gt;
+&lt;a aria-controls="75be861f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#75be861f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="75be861f"&gt;
+Well, this is precisely what swap is for. Swap is a storage area for these
+seemingly "unreclaimable" pages that allows us to page them out to
+a storage device on demand. This means that they can now be considered as
+equally eligible for reclaim as their more trivially reclaimable friends,
+like clean file pages, allowing more efficient use of available physical memory.&lt;/blockquote&gt;
+&lt;p&gt;嗯，這正是交換區存在的意義。交換區是一塊存儲空間，用來讓這些看起來「不可回收」的內存頁面在需要的時候
+可以交換到存儲設備上。這意味着有了交換區之後，這些匿名頁面也和別的那些可回收內存一樣，
+可以作爲內存回收的候選，就像乾淨文件頁面，從而允許更有效地使用物理內存。&lt;/p&gt;
+&lt;a aria-controls="aa3951ca" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#aa3951ca" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="aa3951ca"&gt;
+&lt;strong&gt;Swap is primarily a mechanism for equality of reclamation,&lt;/strong&gt;
+&lt;strong&gt;not for emergency "extra memory". Swap is not what makes your application&lt;/strong&gt;
+&lt;strong&gt;slow – entering overall memory contention is what makes your application slow.&lt;/strong&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;交換區主要是爲了平等的回收機制，而不是爲了緊急情況的「額外內存」。使用交換區不會讓你的程序變慢——&lt;/strong&gt;
+&lt;strong&gt;進入內存競爭的狀態才是讓程序變慢的元兇。&lt;/strong&gt;&lt;/p&gt;
+&lt;a aria-controls="526740fe" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#526740fe" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="526740fe"&gt;
+So in what situations under this "equality of reclamation"
+scenario would we legitimately choose to reclaim anonymous pages?
+Here are, abstractly, some not uncommon scenarios:&lt;/blockquote&gt;
+&lt;p&gt;那麼在這種「平等的可回收機遇」的情況下，讓我們選擇回收匿名頁面的行爲在何種場景中更合理呢？
+抽象地說，比如在下述不算罕見的場景中：&lt;/p&gt;
+&lt;a aria-controls="a12ad6df" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a12ad6df" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a12ad6df"&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;During initialisation, a long-running program may allocate and
+use many pages. These pages may also be used as part of shutdown/cleanup,
+but are not needed once the program is "started" (in an
+application-specific sense). This is fairly common for daemons which
+have significant dependencies to initialise.&lt;/li&gt;
+&lt;li&gt;During the program's normal operation, we may allocate memory which is
+only used rarely. It may make more sense for overall system performance
+to require a &lt;strong&gt;major fault&lt;/strong&gt; to page these in from disk on demand,
+instead using the memory for something else that's more important.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;程序初始化的時候，那些長期運行的程序可能要分配和使用很多頁面。這些頁面可能在最後的關閉/清理的
+時候還需要使用，但是在程序「啓動」之後（以具體的程序相關的方式）持續運行的時候不需要訪問。
+對後臺服務程序來說，很多後臺程序要初始化不少依賴庫，這種情況很常見。&lt;/li&gt;
+&lt;li&gt;在程序的正常運行過程中，我們可能分配一些很少使用的內存。對整體系統性能而言可能比起讓這些內存頁
+一直留在內存中，只有在用到的時候才按需把它們用 &lt;strong&gt;缺頁異常（major fault）&lt;/strong&gt; 換入內存，
+可以空出更多內存留給更重要的東西。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;cgroupv2: Linux's new unified control group hierarchy (QCON London 2017)&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/ikZ8_mRotT4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id10"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;考察有無交換區時會發生什麼&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="fc974b28" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fc974b28" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fc974b28"&gt;
+Let's look at typical situations, and how they perform with and without
+swap present. I talk about metrics around "memory contention" in my
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;talk on cgroup v2&lt;/a&gt; .&lt;/blockquote&gt;
+&lt;p&gt;我們來看一些在常見場景中，有無交換區時分別會如何運行。
+在我的 &lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;關於 cgroup v2 的演講&lt;/a&gt;
+中探討過「內存競爭」的指標。&lt;/p&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id28"&gt;在無/低內存競爭的狀態下&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="a577bbc2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a577bbc2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a577bbc2"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; We can choose to swap out rarely-used anonymous memory that
+may only be used during a small part of the process lifecycle,
+allowing us to use this memory to improve cache hit rate,
+or do other optimisations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; We cannot swap out rarely-used anonymous memory,
+as it's locked in memory. While this may not immediately
+present as a problem, on some workloads this may represent
+a non-trivial drop in performance due to stale,
+anonymous pages taking space away from more important use.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 我們可以選擇換出那些只有在進程生存期內很小一部分時間會訪問的匿名內存，
+這允許我們空出更多內存空間用來提升緩存命中率，或者做別的優化。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;無交換區:&lt;/strong&gt; 我們不能換出那些很少使用的匿名內存，因爲它們被鎖在了內存中。雖然這通常不會直接表現出問題，
+但是在一些工作條件下這可能造成卡頓導致不平凡的性能下降，因爲匿名內存佔着空間不能給
+更重要的需求使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+譯註：關於 &lt;strong&gt;內存熱度&lt;/strong&gt; 和 &lt;strong&gt;內存顛簸（thrash）&lt;/strong&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;討論內核中內存管理的時候經常會說到內存頁的 &lt;strong&gt;冷熱&lt;/strong&gt; 程度。這裏冷熱是指歷史上內存頁被訪問到的頻度，
+內存管理的經驗在說，歷史上在近期頻繁訪問的 &lt;strong&gt;熱&lt;/strong&gt; 內存，在未來也可能被頻繁訪問，
+從而應該留在物理內存裏；反之歷史上不那麼頻繁訪問的 &lt;strong&gt;冷&lt;/strong&gt; 內存，在未來也可能很少被用到，
+從而可以考慮交換到磁盤或者丟棄文件緩存。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;顛簸（thrash）&lt;/strong&gt; 這個詞在文中出現多次但是似乎沒有詳細介紹，實際計算機科學專業的課程中應該有講過。
+一段時間內，讓程序繼續運行所需的熱內存總量被稱作程序的工作集（workset），估算工作集大小，
+換句話說判斷進程分配的內存頁中哪些屬於 &lt;strong&gt;熱&lt;/strong&gt; 內存哪些屬於 &lt;strong&gt;冷&lt;/strong&gt; 內存，是內核中
+內存管理的最重要的工作。當分配給程序的內存大於工作集的時候，程序可以不需要等待I/O全速運行；
+而當分配給程序的內存不足以放下整個工作集的時候，意味着程序每執行一小段就需要等待換頁或者等待
+磁盤緩存讀入所需內存頁，產生這種情況的時候，從用戶角度來看可以觀察到程序肉眼可見的「卡頓」。
+當系統中所有程序都內存不足的時候，整個系統都處於顛簸的狀態下，響應速度直接降至磁盤I/O的帶寬。
+如本文所說，禁用交換區並不能防止顛簸，只是從等待換頁變成了等待文件緩存，
+給程序分配超過工作集大小的內存才能防止顛簸。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id12"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id29"&gt;在中/高內存競爭的狀態下&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="266f0b15" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#266f0b15" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="266f0b15"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; All memory types have an equal possibility of being reclaimed.
+This means we have more chance of being able to reclaim pages
+successfully – that is, we can reclaim pages that are not quickly
+faulted back in again (thrashing).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; Anonymous pages are locked into memory as they have nowhere to go.
+The chance of successful long-term page reclamation is lower,
+as we have only some types of memory eligible to be reclaimed
+at all. The risk of page thrashing is higher. The casual
+reader might think that this would still be better as it might
+avoid having to do disk I/O, but this isn't true –
+we simply transfer the disk I/O of swapping to dropping
+hot page caches and dropping code segments we need soon.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 所有內存類型都有平等的被回收的可能性。這意味着我們回收頁面有更高的成功率——
+成功回收的意思是說被回收的那些頁面不會在近期內被缺頁異常換回內存中（顛簸）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;無交換區:&lt;/strong&gt; 匿名內存因爲無處可去所以被鎖在內存中。長期內存回收的成功率變低了，因爲我們成體上
+能回收的頁面總量少了。發生缺頁顛簸的危險性更高了。缺乏經驗的讀者可能覺得這某時也是好事，
+因爲這能避免進行磁盤I/O，但是實際上不是如此——我們只是把交換頁面造成的磁盤I/O變成了扔掉熱緩存頁
+和扔掉代碼段，這些頁面很可能馬上又要從文件中讀回來。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id30"&gt;在臨時內存佔用高峰時&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="bf276ac9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#bf276ac9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="bf276ac9"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; We're more resilient to temporary spikes, but in cases of
+severe memory starvation, the period from memory thrashing beginning
+to the OOM killer may be prolonged. We have more visibility into the
+instigators of memory pressure and can act on them more reasonably,
+and can perform a controlled intervention.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; The OOM killer is triggered more quickly as anonymous
+pages are locked into memory and cannot be reclaimed. We're more likely to
+thrash on memory, but the time between thrashing and OOMing is reduced.
+Depending on your application, this may be better or worse. For example,
+a queue-based application may desire this quick transfer from thrashing
+to killing. That said, this is still too late to be really useful –
+the OOM killer is only invoked at moments of severe starvation,
+and relying on this method for such behaviour would be better replaced
+with more opportunistic killing of processes as memory contention
+is reached in the first place.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 我們對內存使用激增的情況更有抵抗力，但是在嚴重的內存不足的情況下，
+從開始發生內存顛簸到 OOM 殺手開始工作的時間會被延長。內存壓力造成的問題更容易觀察到，
+從而可能更有效地應對，或者更有機會可控地干預。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;無交換區:&lt;/strong&gt; 因爲匿名內存被鎖在內存中了不能被回收，所以 OOM 殺手會被更早觸發。
+發生內存顛簸的可能性更大，但是發生顛簸之後到 OOM 解決問題的時間間隔被縮短了。
+基於你的程序，這可能更好或是更糟。比如說，基於隊列的程序可能更希望這種從顛簸到殺進程的轉換更快發生。
+即便如此，發生 OOM 的時機通常還是太遲於是沒什麼幫助——只有在系統極度內存緊缺的情況下才會請出
+OOM 殺手，如果想依賴這種行爲模式，不如換成更早殺進程的方案，因爲在這之前已經發生內存競爭了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id14"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id31"&gt;好吧，所以我需要系統交換區，但是我該怎麼爲每個程序微調它的行爲？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="7f9321c9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#7f9321c9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="7f9321c9"&gt;
+You didn't think you'd get through this entire post without me plugging cgroup v2, did you? ;-)&lt;/blockquote&gt;
+&lt;p&gt;你肯定想到了我寫這篇文章一定會在哪兒插點 cgroup v2 的安利吧？ ;-)&lt;/p&gt;
+&lt;a aria-controls="3fcbadba" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3fcbadba" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="3fcbadba"&gt;
+Obviously, it's hard for a generic heuristic algorithm to be right all the time,
+so it's important for you to be able to give guidance to the kernel.
+Historically the only tuning you could do was at the system level,
+using &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ . This has two problems: &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+is incredibly hard to reason about because it only feeds in as
+a small part of a larger heuristic system, and it also is system-wide
+instead of being granular to a smaller set of processes.&lt;/blockquote&gt;
+&lt;p&gt;顯然，要設計一種對所有情況都有效的啓發算法會非常難，所以給內核提一些指引就很重要。
+歷史上我們只能在整個系統層面做這方面微調，通過 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 。這有兩方面問題：
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的行爲很難準確控制，因爲它只是傳遞給一個更大的啓發式算法中的一個小參數；
+並且它是一個系統級別的設置，沒法針對一小部分進程微調。&lt;/p&gt;
+&lt;a aria-controls="dc0990d3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#dc0990d3" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="dc0990d3"&gt;
+You can also use &lt;code class="code"&gt;
+mlock&lt;/code&gt;
+ to lock pages into memory, but this requires
+either modifying program code, fun with &lt;code class="code"&gt;
+LD_PRELOAD&lt;/code&gt;
+ , or doing
+horrible things with a debugger at runtime.
+In VM-based languages this also doesn't work very well, since you
+generally have no control over allocation and end up having to
+&lt;code class="code"&gt;
+mlockall&lt;/code&gt;
+ , which has no precision towards the pages
+you actually care about.&lt;/blockquote&gt;
+&lt;p&gt;你可以用 &lt;code class="code"&gt;
+mlock&lt;/code&gt;
+ 把頁面鎖在內存裏，但是這要麼必須改程序代碼，或者折騰
+&lt;code class="code"&gt;
+LD_PRELOAD&lt;/code&gt;
+ ，或者在運行期用調試器做一些魔法操作。對基於虛擬機的語言來說這種方案也不能
+很好工作，因爲通常你沒法控制內存分配，最後得用上 &lt;code class="code"&gt;
+mlockall&lt;/code&gt;
+
+，而這個沒有辦法精確指定你實際上想鎖住的頁面。&lt;/p&gt;
+&lt;a aria-controls="ee392737" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ee392737" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ee392737"&gt;
+cgroup v2 has a tunable per-cgroup in the form of &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+
+, which allows us to tell the kernel to prefer other applications for
+reclaim below a certain threshold of memory used. This allows us to not
+prevent the kernel from swapping out parts of our application,
+but prefer to reclaim from other applications under memory contention.
+Under normal conditions, the kernel's swap logic is generally pretty good,
+and allowing it to swap out pages opportunistically generally increases
+system performance. Swap thrash under heavy memory contention is not ideal,
+but it's more a property of simply running out of memory entirely than
+a problem with the swapper. In these situations, you typically want to
+fail fast by self-killing non-critical processes when memory pressure
+starts to build up.&lt;/blockquote&gt;
+&lt;p&gt;cgroup v2 提供了一套可以每個 cgroup 微調的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+
+，允許我們告訴內核說當使用的內存低於一定閾值之後優先回收別的程序的內存。這可以讓我們不強硬禁止內核
+換出程序的一部分內存，但是當發生內存競爭的時候讓內核優先回收別的程序的內存。在正常條件下，
+內核的交換邏輯通常還是不錯的，允許它有條件地換出一部分頁面通常可以改善系統性能。在內存競爭的時候
+發生交換顛簸雖然不理想，但是這更多地是單純因爲整體內存不夠了，而不是因爲交換進程（swapper）導致的問題。
+在這種場景下，你通常希望在內存壓力開始積攢的時候通過自殺一些非關鍵的進程的方式來快速退出（fail fast）。&lt;/p&gt;
+&lt;a aria-controls="d789770a" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d789770a" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="d789770a"&gt;
+You can not simply rely on the OOM killer for this. The OOM killer is
+only invoked in situations of dire failure when we've already entered
+a state where the system is severely unhealthy and may well have been
+so for a while. You need to opportunistically handle the situation yourself
+before ever thinking about the OOM killer.&lt;/blockquote&gt;
+&lt;p&gt;你不能依賴 OOM 殺手達成這個。 OOM 殺手只有在非常急迫的情況下纔會出動，那時系統已經處於極度不健康的
+狀態了，而且很可能在這種狀態下保持了一陣子了。需要在開始考慮 OOM 殺手之前，積極地自己處理這種情況。&lt;/p&gt;
+&lt;a aria-controls="fe0515e4" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe0515e4" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fe0515e4"&gt;
+Determination of memory pressure is somewhat difficult using traditional
+Linux memory counters, though. We have some things which seem somewhat related,
+but are merely tangential – memory usage, page scans, etc – and from these
+metrics alone it's very hard to tell an efficient memory configuration
+from one that's trending towards memory contention. There is a group of us
+at Facebook, spearheaded by &lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+, working on developing new metrics that expose memory pressure more easily
+that should help with this in future. If you're interested in hearing more
+about this,
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;I go into detail about one metric being considered in my talk on cgroup v2&lt;/a&gt;.&lt;/blockquote&gt;
+&lt;p&gt;不過，用傳統的 Linux 內存統計數據還是挺難判斷內存壓力的。我們有一些看起來相關的系統指標，但是都
+只是支離破碎的——內存用量、頁面掃描，這些——單純從這些指標很難判斷系統是處於高效的內存利用率還是
+在滑向內存競爭狀態。我們在 Facebook 有個團隊，由
+&lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+牽頭，努力開發一些能評價內存壓力的新指標，希望能在今後改善目前的現狀。
+如果你對這方面感興趣， &lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;在我的 cgroup v2 的演講中介紹到一個被提議的指標&lt;/a&gt;
+。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id16"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id32"&gt;調優&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id17"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id33"&gt;那麼，我需要多少交換空間？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="5b5c883c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5b5c883c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="5b5c883c"&gt;
+In general, the minimum amount of swap space required for optimal
+memory management depends on the number of anonymous pages pinned into
+memory that are rarely reaccessed by an application, and the value of
+reclaiming those anonymous pages. The latter is mostly a question of
+which pages are no longer purged to make way for these infrequently
+accessed anonymous pages.&lt;/blockquote&gt;
+&lt;p&gt;通常而言，最優內存管理所需的最小交換空間取決於程序固定在內存中而又很少訪問到的匿名頁面的數量，
+以及回收這些匿名頁面換來的價值。後者大體上來說是問哪些頁面不再會因爲要保留這些很少訪問的匿名頁面而
+被回收掉騰出空間。&lt;/p&gt;
+&lt;a aria-controls="f070dec0" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f070dec0" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="f070dec0"&gt;
+If you have a bunch of disk space and a recent (4.0+) kernel,
+more swap is almost always better than less. In older kernels &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+,
+one of the kernel processes responsible for managing swap, was historically
+very overeager to swap out memory aggressively the more swap you had.
+In recent times, swapping behaviour when a large amount of swap space is
+available has been significantly improved. If you're running kernel 4.0+,
+having a larger swap on a modern kernel should not result in overzealous
+swapping. As such, if you have the space, having a swap size of a few GB
+keeps your options open on modern kernels.&lt;/blockquote&gt;
+&lt;p&gt;如果你有足夠大的磁盤空間和比較新的內核版本（4.0+），越大的交換空間基本上總是越好的。
+更老的內核上 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ ， 內核中負責管理交換區的內核線程，在歷史上傾向於有越多交換空間就
+急於交換越多內存出去。在最近一段時間，可用交換空間很大的時候的交換行爲已經改善了很多。
+如果在運行 4.0+ 以後的內核，即便有很大的交換區在現代內核上也不會很激進地做交換。因此，
+如果你有足夠的容量，現代內核上有個幾個 GB 的交換空間大小能讓你有更多選擇。&lt;/p&gt;
+&lt;a aria-controls="d981b13d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d981b13d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="d981b13d"&gt;
+If you're more constrained with disk space, then the answer really
+depends on the tradeoffs you have to make, and the nature of the environment.
+Ideally you should have enough swap to make your system operate optimally
+at normal and peak (memory) load. What I'd recommend is setting up a few
+testing systems with 2-3GB of swap or more, and monitoring what happens
+over the course of a week or so under varying (memory) load conditions.
+As long as you haven't encountered severe memory starvation during that week
+– in which case the test will not have been very useful – you will probably
+end up with some number of MB of swap occupied. As such, it's probably worth
+having at least that much swap available, in addition to a little buffer for
+changing workloads. &lt;code class="code"&gt;
+atop&lt;/code&gt;
+ in logging mode can also show you which applications
+are having their pages swapped out in the &lt;code class="code"&gt;
+SWAPSZ&lt;/code&gt;
+ column, so if you don't
+already use it on your servers to log historic server state you probably
+want to set it up on these test machines with logging mode as part of this
+experiment. This also tells you when your application started swapping out
+pages, which you can tie to log events or other key data.&lt;/blockquote&gt;
+&lt;p&gt;如果你的磁盤空間優先，那麼答案更多取決於你願意做的取捨，以及運行的環境。理想上應該有足夠的交換空間
+能高效應對正常負載和高峰（內存）負載。我建議先用 2-3GB 或者更多的交換空間搭個測試環境，
+然後監視在不同（內存）負載條件下持續一週左右的情況。只要在那一週裏沒有發生過嚴重的內存不足——
+發生了的話說明測試結果沒什麼用——在測試結束的時候大概會留有多少 MB 交換區佔用。
+作爲結果說明你至少應該有那麼多可用的交換空間，再多加一些以應對負載變化。用日誌模式跑 &lt;code class="code"&gt;
+atop&lt;/code&gt;
+
+可以在 &lt;code class="code"&gt;
+SWAPSZ&lt;/code&gt;
+ 欄顯示程序的頁面被交換出去的情況，所以如果你還沒用它記錄服務器歷史日誌的話
+，這次測試中可以試試在測試機上用它記錄日誌。這也會告訴你什麼時候你的程序開始換出頁面，你可以用這個
+對照事件日誌或者別的關鍵數據。&lt;/p&gt;
+&lt;a aria-controls="c81cfdce" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c81cfdce" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="c81cfdce"&gt;
+Another thing worth considering is the nature of the swap medium.
+Swap reads tend to be highly random, since we can't reliably predict
+which pages will be refaulted and when. On an SSD this doesn't matter much,
+but on spinning disks, random I/O is extremely expensive since it requires
+physical movement to achieve. On the other hand, refaulting of file pages
+is likely less random, since files related to the operation of a single
+application at runtime tend to be less fragmented. This might mean that on
+a spinning disk you may want to bias more towards reclaiming file pages
+instead of swapping out anonymous pages, but again, you need to test and
+evaluate how this balances out for your workload.&lt;/blockquote&gt;
+&lt;p&gt;另一點值得考慮的是交換空間所在存儲設備的媒介。讀取交換區傾向於很隨機，因爲我們不能可靠預測什麼時候
+什麼頁面會被再次訪問。在 SSD 上這不是什麼問題，但是在傳統磁盤上，隨機 I/O 操作會很昂貴，
+因爲需要物理動作尋道。另一方面，重新加載文件緩存可能不那麼隨機，因爲單一程序在運行期的文件讀操作
+一般不會太碎片化。這可能意味着在傳統磁盤上你想更多地回收文件頁面而不是換出匿名頁面，但仍就，
+你需要做測試評估在你的工作負載下如何取得平衡。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+譯註：關於休眠到磁盤時的交換空間大小&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+原文這裏建議交換空間至少是物理內存大小，我覺得實際上不需要。休眠到磁盤的時候內核會寫回並丟棄
+所有有文件作後備的可回收頁面，交換區只需要能放下那些沒有文件後備的頁面就可以了。
+如果去掉文件緩存頁面之後剩下的已用物理內存總量能完整放入交換區中，就可以正常休眠。
+對於桌面瀏覽器這種內存大戶，通常有很多緩存頁可以在休眠的時候丟棄。&lt;/div&gt;
+&lt;/div&gt;
+&lt;a aria-controls="34173e8b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#34173e8b" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="34173e8b"&gt;
+For laptop/desktop users who want to hibernate to swap, this also needs to
+be taken into account – in this case your swap file should be at least
+your physical RAM size.&lt;/blockquote&gt;
+&lt;p&gt;對筆記本/桌面用戶如果想要休眠到交換區，這也需要考慮——這種情況下你的交換文件應該至少是物理內存大小。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="swappiness"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id34"&gt;我的 swappiness 應該如何設置？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="02421253" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#02421253" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="02421253"&gt;
+First, it's important to understand what &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ does.
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ is a sysctl that biases memory reclaim either towards
+reclamation of anonymous pages, or towards file pages. It does this using two
+different attributes: &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ (our willingness to reclaim file pages)
+and &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ (our willingness to reclaim anonymous pages).
+&lt;code class="code"&gt;
+vm.swappiness`plays into this, as it becomes the default value for
+:code:`anon_prio&lt;/code&gt;
+, and it also is subtracted from the default value of 200
+for &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+, which means for a value of &lt;code class="code"&gt;
+vm.swappiness = 50&lt;/code&gt;
+,
+the outcome is that &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ is 50, and &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ is 150
+(the exact numbers don't matter as much as their relative weight compared to the other).&lt;/blockquote&gt;
+&lt;p&gt;首先很重要的一點是，要理解 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 是做什麼的。
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 是一個 sysctl 用來控制在內存回收的時候，是優先回收匿名頁面，
+還是優先回收文件頁面。內存回收的時候用兩個屬性： &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ （回收文件頁面的傾向）
+和 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ （回收匿名頁面的傾向）。 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 控制這兩個值，
+因爲它是 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ 的默認值，然後也是默認 200 減去它之後 &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ 的默認值。
+意味着如果我們設置 &lt;code class="code"&gt;
+vm.swappiness = 50&lt;/code&gt;
+ 那麼結果是 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ 是 50，
+&lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ 是 150 （這裏數值本身不是很重要，重要的是兩者之間的權重比）。&lt;/p&gt;
+&lt;a aria-controls="b2897dd9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b2897dd9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b2897dd9"&gt;
+This means that, in general, &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+&lt;strong&gt;is simply a ratio of how&lt;/strong&gt;
+&lt;strong&gt;costly reclaiming and refaulting anonymous memory is compared to file memory&lt;/strong&gt;
+&lt;strong&gt;for your hardware and workload&lt;/strong&gt;. The lower the value, the more you tell the
+kernel that infrequently accessed anonymous pages are expensive to swap out
+and in on your hardware. The higher the value, the more you tell the kernel
+that the cost of swapping anonymous pages and file pages is similar on your
+hardware. The memory management subsystem will still try to mostly decide
+whether it swaps file or anonymous pages based on how hot the memory is,
+but swappiness tips the cost calculation either more towards swapping or
+more towards dropping filesystem caches when it could go either way.
+On SSDs these are basically as expensive as each other, so setting
+&lt;code class="code"&gt;
+vm.swappiness = 100&lt;/code&gt;
+ (full equality) may work well.
+On spinning disks, swapping may be significantly more expensive since
+swapping in generally requires random reads, so you may want to
+bias more towards a lower value.&lt;/blockquote&gt;
+&lt;p&gt;這意味着，通常來說 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+&lt;strong&gt;只是一個比例，用來衡量在你的硬件和工作負載下，&lt;/strong&gt;
+&lt;strong&gt;回收和換回匿名內存還是文件內存哪種更昂貴&lt;/strong&gt; 。設定的值越低，你就是在告訴內核說換出那些不常訪問的
+匿名頁面在你的硬件上開銷越昂貴；設定的值越高，你就是在告訴內核說在你的硬件上交換匿名頁和
+文件緩存的開銷越接近。內存管理子系統仍然還是會根據實際想要回收的內存的訪問熱度嘗試自己決定具體是
+交換出文件還是匿名頁面，只不過 swappiness 會在兩種回收方式皆可的時候，在計算開銷權重的過程中左右
+是該更多地做交換還是丟棄緩存。在 SSD 上這兩種方式基本上是同等開銷，所以設成
+&lt;code class="code"&gt;
+vm.swappiness = 100&lt;/code&gt;
+ （同等比重）可能工作得不錯。在傳統磁盤上，交換頁面可能會更昂貴，
+因爲通常需要隨機讀取，所以你可能想要設低一些。&lt;/p&gt;
+&lt;a aria-controls="916d89d2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#916d89d2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="916d89d2"&gt;
+The reality is that most people don't really have a feeling about which
+their hardware demands, so it's non-trivial to tune this value based on
+instinct alone – this is something that you need to test using different
+values. You can also spend time evaluating the memory composition of your
+system and core applications and their behaviour under mild memory reclamation.&lt;/blockquote&gt;
+&lt;p&gt;現實是大部分人對他們的硬件需求沒有什麼感受，所以根據直覺調整這個值可能挺困難的 ——
+你需要用不同的值做測試。你也可以花時間評估一下你的系統的內存分配情況和核心應用在大量回收內存的時候的行爲表現。&lt;/p&gt;
+&lt;a aria-controls="1716806c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#1716806c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="1716806c"&gt;
+When talking about &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ , an extremely important change to
+consider from recent(ish) times is
+&lt;a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd"&gt;this change to vmscan by Satoru Moriya in 2012&lt;/a&gt;
+, which changes the way that &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ is handled
+quite significantly.&lt;/blockquote&gt;
+&lt;p&gt;討論 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的時候，一個極爲重要需要考慮的修改是（相對）近期在
+&lt;a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd"&gt;2012 年左右 Satoru Moriya 對 vmscan 行爲的修改&lt;/a&gt;
+，它顯著改變了代碼對 &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ 這個值的處理方式。&lt;/p&gt;
+&lt;a aria-controls="0d73ddd8" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#0d73ddd8" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="0d73ddd8"&gt;
+Essentially, the patch makes it so that we are extremely biased against
+scanning (and thus reclaiming) any anonymous pages at all with
+&lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ , unless we are already encountering severe
+memory contention. As mentioned previously in this post, that's generally
+not what you want, since this prevents equality of reclamation prior to
+extreme memory pressure occurring, which may actually lead to this
+extreme memory pressure in the first place. &lt;code class="code"&gt;
+vm.swappiness = 1&lt;/code&gt;
+
+is the lowest you can go without invoking the special casing for
+anonymous page scanning implemented in that patch.&lt;/blockquote&gt;
+&lt;p&gt;基本上來說這個補丁讓我們在 &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ 的時候會極度避免掃描（進而回收）匿名頁面，
+除非我們已經在經歷嚴重的內存搶佔。就如本文前面所屬，這種行爲基本上不會是你想要的，
+因爲這種行爲會導致在發生內存搶佔之前無法保證內存回收的公平性，這甚至可能是最初導致發生內存搶佔的原因。
+想要避免這個補丁中對掃描匿名頁面的特殊行爲的話， &lt;code class="code"&gt;
+vm.swappiness = 1&lt;/code&gt;
+ 是你能設置的最低值。&lt;/p&gt;
+&lt;a aria-controls="8283fab5" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8283fab5" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="8283fab5"&gt;
+The kernel default here is &lt;code class="code"&gt;
+vm.swappiness = 60&lt;/code&gt;
+. This value is
+generally not too bad for most workloads, but it's hard to have a
+general default that suits all workloads. As such, a valuable extension
+to the tuning mentioned in the "how much swap do I need" section above
+would be to test these systems with differing values for &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+, and monitor your application and system metrics under heavy (memory) load.
+Some time in the near future, once we have a decent implementation of
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;refault detection&lt;/a&gt; in the kernel,
+you'll also be able to determine this somewhat workload-agnostically by
+looking at cgroup v2's page refaulting metrics.&lt;/blockquote&gt;
+&lt;p&gt;內核在這裏設置的默認值是 &lt;code class="code"&gt;
+vm.swappiness = 60&lt;/code&gt;
+ 。這個值對大部分工作負載來說都不會太壞，
+但是很難有一個默認值能符合所有種類的工作負載。因此，對上面「 &lt;a class="reference internal" href="#id17"&gt;那麼，我需要多少交換空間？&lt;/a&gt;
+」那段討論的一點重要擴展可以說，在測試系統中可以嘗試使用不同的 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+，然後監視你的程序和系統在重（內存）負載下的性能指標。在未來某天，如果我們在內核中有了合理的
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;缺頁檢測&lt;/a&gt; ，你也將能通過 cgroup v2 的頁面缺頁
+指標來以負載無關的方式決定這個。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=beefUhRH5lU"&gt;SREcon19 Asia/Pacific - Linux Memory Management at Scale: Under the Hood&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/beefUhRH5lU"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id19"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id35"&gt;2019年07月更新：內核 4.20+ 中的內存壓力指標&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="2cbb410f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2cbb410f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="2cbb410f"&gt;
+The refault metrics mentioned as in development earlier are now in the
+kernel from 4.20 onwards and can be enabled with &lt;code class="code"&gt;
+CONFIG_PSI=y&lt;/code&gt;
+
+. See my talk at SREcon at around the 25:05 mark:&lt;/blockquote&gt;
+&lt;p&gt;前文中提到的開發中的內存缺頁檢測指標已經進入 4.20+ 以上版本的內核，可以通過
+&lt;code class="code"&gt;
+CONFIG_PSI=y&lt;/code&gt;
+ 開啓。詳情參見我在 SREcon 大約 25:05 左右的討論。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id20"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id36"&gt;結論&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="01142bf6" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#01142bf6" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="01142bf6"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Swap is a useful tool to allow equality of reclamation of memory pages,
+but its purpose is frequently misunderstood, leading to its negative
+perception across the industry. If you use swap in the spirit intended,
+though – as a method of increasing equality of reclamation – you'll
+find that it's a useful tool instead of a hindrance.&lt;/li&gt;
+&lt;li&gt;Disabling swap does not prevent disk I/O from becoming a problem under
+memory contention, it simply shifts the disk I/O thrashing from anonymous
+pages to file pages. Not only may this be less efficient, as we have
+a smaller pool of pages to select from for reclaim, but it may also
+contribute to getting into this high contention state in the first place.&lt;/li&gt;
+&lt;li&gt;Swap can make a system slower to OOM kill, since it provides another,
+slower source of memory to thrash on in out of memory situations – the
+OOM killer is only used by the kernel as a last resort, after things have
+already become monumentally screwed. The solutions here depend on your system:&lt;ul&gt;
+&lt;li&gt;You can opportunistically change the system workload depending on
+cgroup-local or global memory pressure. This prevents getting into these
+situations in the first place, but solid memory pressure metrics are
+lacking throughout the history of Unix. Hopefully this should be
+better soon with the addition of refault detection.&lt;/li&gt;
+&lt;li&gt;You can bias reclaiming (and thus swapping) away from certain processes
+per-cgroup using memory.low, allowing you to protect critical daemons
+without disabling swap entirely.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;交換區是允許公平地回收內存的有用工具，但是它的目的經常被人誤解，導致它在業內這種負面聲譽。如果
+你是按照原本的目的使用交換區的話——作爲增加內存回收公平性的方式——你會發現它是很有效的工具而不是阻礙。&lt;/li&gt;
+&lt;li&gt;禁用交換區並不能在內存競爭的時候防止磁盤I/O的問題，它只不過把匿名頁面的磁盤I/O變成了文件頁面的
+磁盤I/O。這不僅更低效，因爲我們回收內存的時候能選擇的頁面範圍更小了，而且它可能是導致高度內存競爭
+狀態的元兇。&lt;/li&gt;
+&lt;li&gt;有交換區會導致系統更慢地使用 OOM 殺手，因爲在缺少內存的情況下它提供了另一種更慢的內存，
+會持續地內存顛簸——內核調用 OOM 殺手只是最後手段，會晚於所有事情已經被搞得一團糟之後。
+解決方案取決於你的系統：&lt;ul&gt;
+&lt;li&gt;你可以預先更具每個 cgroup 的或者系統全局的內存壓力改變系統負載。這能防止我們最初進入內存競爭
+的狀態，但是 Unix 的歷史中一直缺乏可靠的內存壓力檢測方式。希望不久之後在有了
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;缺頁檢測&lt;/a&gt; 這樣的性能指標之後能改善這一點。&lt;/li&gt;
+&lt;li&gt;你可以使用 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 讓內核不傾向於回收（進而交換）特定一些 cgroup 中的進程，
+允許你在不禁用交換區的前提下保護關鍵後臺服務。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;感謝在撰寫本文時 &lt;a class="reference external" href="https://github.com/rahulg"&gt;Rahul&lt;/a&gt; ，
+&lt;a class="reference external" href="https://github.com/htejun"&gt;Tejun&lt;/a&gt; 和
+&lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+提供的諸多建議和反饋。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="translate"></category><category term="swappiness"></category></entry><entry><title>【译】替 swap 辩护：常见的误解</title><link href="//farseerfc.me/zhs/in-defence-of-swap.html" rel="alternate"></link><published>2020-09-30T13:45:00+09:00</published><updated>2020-09-30T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-09-30:/zhs/in-defence-of-swap.html</id><summary type="html">&lt;p&gt;这篇翻译自 Chris Down 的博文
+&lt;a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html"&gt;In defence of swap: common misconceptions&lt;/a&gt;
+。 &lt;a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE"&gt;原文的协议&lt;/a&gt;
+是 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt;
+，本文翻译同样也使用 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt; 。其中加入了一些我自己的理解作为旁注，所有译注都在侧边栏中。&lt;/p&gt;
+&lt;p&gt;翻译这篇文章是因为经常看到朋友们（包括有经验的程序员和 Linux 管理员）对 swap 和 swappiness
+有诸多误解，而这篇文章正好澄清了这些误解，也讲清楚了 Linux 中这两者的本质。值得一提的是本文讨论的
+swap 针对 Linux 内核，在别的系统包括 macOS/WinNT 或者 Unix 系统中的交换文件可能有不同一样的行为，
+需要不同的调优方式。比如在 &lt;a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial"&gt;FreeBSD …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;这篇翻译自 Chris Down 的博文
+&lt;a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html"&gt;In defence of swap: common misconceptions&lt;/a&gt;
+。 &lt;a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE"&gt;原文的协议&lt;/a&gt;
+是 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt;
+，本文翻译同样也使用 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt; 。其中加入了一些我自己的理解作为旁注，所有译注都在侧边栏中。&lt;/p&gt;
+&lt;p&gt;翻译这篇文章是因为经常看到朋友们（包括有经验的程序员和 Linux 管理员）对 swap 和 swappiness
+有诸多误解，而这篇文章正好澄清了这些误解，也讲清楚了 Linux 中这两者的本质。值得一提的是本文讨论的
+swap 针对 Linux 内核，在别的系统包括 macOS/WinNT 或者 Unix 系统中的交换文件可能有不同一样的行为，
+需要不同的调优方式。比如在 &lt;a class="reference external" href="https://www.freebsd.org/doc/handbook/bsdinstall-partitioning.html#configtuning-initial"&gt;FreeBSD handbook&lt;/a&gt;
+中明确建议了 swap 分区通常应该是两倍物理内存大小，这一点建议对 FreeBSD 系内核的内存管理可能非常合理，
+而不一定适合 Linux 内核，FreeBSD 和 Linux 有不同的内存管理方式尤其是 swap 和 page cache 和
+buffer cache 的处理方式有诸多不同。&lt;/p&gt;
+&lt;p&gt;经常有朋友看到系统卡吨之后看系统内存使用状况观察到大量 swap 占用，于是觉得卡吨是来源于 swap
+。就像文中所述，相关不蕴含因果，产生内存颠簸之后的确会造成大量 swap 占用，也会造成系统卡吨，
+但是 swap 不是导致卡吨的原因，关掉 swap 或者调低 swappiness 并不能阻止卡吨，只会将 swap
+造成的 I/O 转化为加载文件缓存造成的 I/O 。&lt;/p&gt;
+&lt;p&gt;以下是原文翻译：&lt;/p&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;这篇文章也有 &lt;a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html"&gt;日文&lt;/a&gt;
+和 &lt;a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya"&gt;俄文&lt;/a&gt;
+翻译。&lt;/p&gt;
+&lt;a aria-controls="a01b6caa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a01b6caa" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a01b6caa"&gt;
+&lt;p&gt;tl;dr:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Having swap is a reasonably important part of a well functioning system.
+Without it, sane memory management becomes harder to achieve.&lt;/li&gt;
+&lt;li&gt;Swap is not generally about getting emergency memory, it's about making
+memory reclamation egalitarian and efficient. In fact, using it as
+"emergency memory" is generally actively harmful.&lt;/li&gt;
+&lt;li&gt;Disabling swap does not prevent disk I/O from becoming a problem
+under memory contention, it simply shifts the disk I/O thrashing from
+anonymous pages to file pages. Not only may this be less efficient,
+as we have a smaller pool of pages to select from for reclaim, but it
+may also contribute to getting into this high contention state in
+the first place.&lt;/li&gt;
+&lt;li&gt;The swapper on kernels before 4.0 has a lot of pitfalls,
+and has contributed to a lot of people's negative perceptions about
+swap due to its overeagerness to swap out pages. On kernels &amp;gt;4.0,
+the situation is significantly better.&lt;/li&gt;
+&lt;li&gt;On SSDs, swapping out anonymous pages and reclaiming file pages are
+essentially equivalent in terms of performance/latency.
+On older spinning disks, swap reads are slower due to random reads,
+so a lower &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ setting makes sense there
+(read on for more about &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+).&lt;/li&gt;
+&lt;li&gt;Disabling swap doesn't prevent pathological behaviour at near-OOM,
+although it's true that having swap may prolong it. Whether the
+system global OOM killer is invoked with or without swap, or was invoked
+sooner or later, the result is the same: you are left with a system in an
+unpredictable state. Having no swap doesn't avoid this.&lt;/li&gt;
+&lt;li&gt;You can achieve better swap behaviour under memory pressure and prevent
+thrashing using &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ and friends in cgroup v2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;太长不看：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;对维持系统的正常功能而言，有 swap 是相对挺重要的一部分。没有它的话会更难做到合理的内存管理。&lt;/li&gt;
+&lt;li&gt;swap 的目的通常并不是用作紧急内存，它的目的在于让内存回收能更平等和高效。
+事实上把它当作「紧急内存」来用的想法通常是有害的。&lt;/li&gt;
+&lt;li&gt;禁用 swap 在内存压力下并不能避免磁盘I/O造成的性能问题，这么做只是让磁盘I/O颠簸的范围从
+匿名页面转化到文件页面。这不仅更低效，因为系统能回收的页面的选择范围更有限了，
+而且这种做法还可能是加重了内存压力的原因之一。&lt;/li&gt;
+&lt;li&gt;内核 4.0 版本之前的交换进程（swapper）有一些问题，导致很多人对 swap 有负面印象，
+因为它太急于（overeagerness）把页面交换出去。在 4.0 之后的内核上这种情况已经改善了很多。&lt;/li&gt;
+&lt;li&gt;在 SSD 上，交换出匿名页面的开销和回收文件页面的开销基本上在性能/延迟方面没有区别。
+在老式的磁盘上，读取交换文件因为属于随机访问读取所以会更慢，于是设置较低的 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+可能比较合理（继续读下面关于 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的描述）。&lt;/li&gt;
+&lt;li&gt;禁用 swap 并不能避免在接近 OOM 状态下最终表现出的症状，尽管的确有 swap
+的情况下这种症状持续的时间可能会延长。在系统调用 OOM 杀手的时候无论有没有启用 swap
+，或者更早/更晚开始调用 OOM 杀手，结果都是一样的：整个系统留在了一种不可预知的状态下。
+有 swap 也不能避免这一点。&lt;/li&gt;
+&lt;li&gt;可以用 cgroup v2 的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 相关机制来改善内存压力下 swap 的行为并且
+避免发生颠簸。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr class="docutils"/&gt;
+&lt;a aria-controls="053c68ad" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#053c68ad" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="053c68ad"&gt;
+As part of my work improving kernel memory management and cgroup v2,
+I've been talking to a lot of engineers about attitudes towards memory
+management, especially around application behaviour under pressure and
+operating system heuristics used under the hood for memory management.&lt;/blockquote&gt;
+&lt;p&gt;我的工作的一部分是改善内核中内存管理和 cgroup v2 相关，所以我和很多工程师讨论过看待内存管理的态度，
+尤其是在压力下应用程序的行为和操作系统在底层内存管理中用的基于经验的启发式决策逻辑。&lt;/p&gt;
+&lt;a aria-controls="8dedecec" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8dedecec" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="8dedecec"&gt;
+A repeated topic in these discussions has been swap.
+Swap is a hotly contested and poorly understood topic,
+even by those who have been working with Linux for many years.
+Many see it as useless or actively harmful: a relic of a time where
+memory was scarce, and disks were a necessary evil to provide much-needed
+space for paging. This is a statement that I still see being batted
+around with relative frequency in recent years, and I've had many
+discussions with colleagues, friends, and industry peers to help them
+understand why swap is still a useful concept on modern computers with
+significantly more physical memory available than in the past.&lt;/blockquote&gt;
+&lt;p&gt;在这种讨论中经常重复的话题是交换区（swap）。交换区的话题是非常有争议而且很少被理解的话题，甚至包括那些在
+Linux 上工作过多年的人也是如此。很多人觉得它没什么用甚至是有害的：它是历史遗迹，从内存紧缺而
+磁盘读写是必要之恶的时代遗留到现在，为计算机提供在当年很必要的页面交换功能作为内存空间。
+最近几年我还经常能以一定频度看到这种论调，然后我和很多同事、朋友、业界同行们讨论过很多次，
+帮他们理解为什么在现代计算机系统中交换区仍是有用的概念，即便现在的电脑中物理内存已经远多于过去。&lt;/p&gt;
+&lt;a aria-controls="b1c86306" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b1c86306" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b1c86306"&gt;
+There's also a lot of misunderstanding about the purpose of swap –
+many people just see it as a kind of "slow extra memory" for use in emergencies,
+but don't understand how it can contribute during normal load to the healthy
+operation of an operating system as a whole.&lt;/blockquote&gt;
+&lt;p&gt;围绕交换区的目的还有很多误解——很多人觉得它只是某种为了应对紧急情况的「慢速额外内存」，
+但是没能理解在整个操作系统健康运作的时候它也能改善普通负载的性能。&lt;/p&gt;
+&lt;a aria-controls="3603c7fa" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3603c7fa" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="3603c7fa"&gt;
+Many of us have heard most of the usual tropes about memory:
+" &lt;a class="reference external" href="https://www.linuxatemyram.com/"&gt;Linux uses too much memory&lt;/a&gt; ",
+" &lt;a class="reference external" href="https://superuser.com/a/111510"&gt;swap should be double your physical memory size&lt;/a&gt;
+", and the like. While these are either trivial to dispel,
+or discussion around them has become more nuanced in recent years,
+the myth of "useless" swap is much more grounded in heuristics and
+arcana rather than something that can be explained by simple analogy,
+and requires somewhat more understanding of memory management to reason about.&lt;/blockquote&gt;
+&lt;p&gt;我们很多人也听说过描述内存时所用的常见说法： 「 &lt;a class="reference external" href="https://www.linuxatemyram.com/"&gt;Linux 用了太多内存&lt;/a&gt;
+」，「 &lt;a class="reference external" href="https://superuser.com/a/111510"&gt;swap 应该设为物理内存的两倍大小&lt;/a&gt; 」，或者类似的说法。
+虽然这些误解要么很容易化解，或者关于他们的讨论在最近几年已经逐渐变得琐碎，但是关于「无用」交换区
+的传言有更深的经验传承的根基，而不是一两个类比就能解释清楚的，并且要探讨这个先得对内存管理有
+一些基础认知。&lt;/p&gt;
+&lt;a aria-controls="ff09462c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ff09462c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ff09462c"&gt;
+This post is mostly aimed at those who administrate Linux systems and
+are interested in hearing the counterpoints to running with
+undersized/no swap or running with vm.swappiness set to 0.&lt;/blockquote&gt;
+&lt;p&gt;本文主要目标是针对那些管理 Linux 系统并且有兴趣理解「让系统运行于低/无交换区状态」或者「把
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 设为 0 」这些做法的反论。&lt;/p&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;背景&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="283c5b39" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#283c5b39" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="283c5b39"&gt;
+It's hard to talk about why having swap and swapping out pages are good
+things in normal operation without a shared understanding of some of
+the basic underlying mechanisms at play in Linux memory management,
+so let's make sure we're on the same page.&lt;/blockquote&gt;
+&lt;p&gt;如果没有基本理解 Linux 内存管理的底层机制是如何运作的，就很难讨论为什么需要交换区以及交换出页面
+对正常运行的系统为什么是件好事，所以我们先确保大家有讨论的基础。&lt;/p&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;内存的类型&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="b93d3e73" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b93d3e73" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b93d3e73"&gt;
+There are many different types of memory in Linux, and each type has its
+own properties. Understanding the nuances of these is key to understanding
+why swap is important.&lt;/blockquote&gt;
+&lt;p&gt;Linux 中内存分为好几种类型，每种都有各自的属性。想理解为什么交换区很重要的关键一点在于理解这些的细微区别。&lt;/p&gt;
+&lt;a aria-controls="ea5c81cf" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ea5c81cf" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ea5c81cf"&gt;
+For example, there are &lt;strong&gt;pages ("blocks" of memory, typically 4k)&lt;/strong&gt;
+responsible for holding the code for each process being run on your computer.
+There are also pages responsible for caching data and metadata related to
+files accessed by those programs in order to speed up future access.
+These are part of the &lt;strong&gt;page cache&lt;/strong&gt; , and I will refer to them as file memory.&lt;/blockquote&gt;
+&lt;p&gt;比如说，有种 &lt;strong&gt;页面（「整块」的内存，通常 4K）&lt;/strong&gt; 是用来存放电脑里每个程序运行时各自的代码的。
+也有页面用来保存这些程序所需要读取的文件数据和元数据的缓存，以便加速随后的文件读写。
+这些内存页面构成 &lt;strong&gt;页面缓存（page cache）&lt;/strong&gt;，后文中我称他们为文件内存。&lt;/p&gt;
+&lt;a aria-controls="a8e582f2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a8e582f2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a8e582f2"&gt;
+There are also pages which are responsible for the memory allocations
+made inside that code, for example, when new memory that has been allocated
+with &lt;code class="code"&gt;
+malloc&lt;/code&gt;
+ is written to, or when using &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+'s
+&lt;code class="code"&gt;
+MAP_ANONYMOUS&lt;/code&gt;
+ flag. These are "anonymous" pages –
+so called because they are not backed by anything –
+and I will refer to them as anon memory.&lt;/blockquote&gt;
+&lt;p&gt;还有一些页面是在代码执行过程中做的内存分配得到的，比如说，当代码调用 &lt;code class="code"&gt;
+malloc&lt;/code&gt;
+
+能分配到新内存区，或者使用 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 的 &lt;code class="code"&gt;
+MAP_ANONYMOUS&lt;/code&gt;
+ 标志分配的内存。
+这些是「匿名(anonymous)」页面——之所以这么称呼它们是因为他们没有任何东西作后备——
+后文中我称他们为匿名内存。&lt;/p&gt;
+&lt;a aria-controls="38d36a1d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#38d36a1d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="38d36a1d"&gt;
+There are other types of memory too –
+shared memory, slab memory, kernel stack memory, buffers, and the like –
+but anonymous memory and file memory are the most well known and
+easy to understand ones, so I will use these in my examples,
+although they apply equally to these types too.&lt;/blockquote&gt;
+&lt;p&gt;还有其它类型的内存——共享内存、slab内存、内核栈内存、文件缓冲区（buffers），这种的——
+但是匿名内存和文件内存是最知名也最好理解的，所以后面的例子里我会用这两个说明，
+虽然后面的说明也同样适用于别的这些内存类型。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;可回收/不可回收内存&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="896d577c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#896d577c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="896d577c"&gt;
+One of the most fundamental questions when thinking about a particular type
+of memory is whether it is able to be reclaimed or not.
+"Reclaim" here means that the system can, without losing data,
+purge pages of that type from physical memory.&lt;/blockquote&gt;
+&lt;p&gt;考虑某种内存的类型时，一个非常基础的问题是这种内存是否能被回收。
+「回收（Reclaim）」在这里是指系统可以，在不丢失数据的前提下，从物理内存中释放这种内存的页面。&lt;/p&gt;
+&lt;a aria-controls="c8915ce3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c8915ce3" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="c8915ce3"&gt;
+For some page types, this is typically fairly trivial. For example,
+in the case of clean (unmodified) page cache memory,
+we're simply caching something that we have on disk for performance,
+so we can drop the page without having to do any special operations.&lt;/blockquote&gt;
+&lt;p&gt;对一些内存类型而言，是否可回收通常可以直接判断。比如对于那些干净（未修改）的页面缓存内存，
+我们只是为了性能在用它们缓存一些磁盘上现有的数据，所以我们可以直接扔掉这些页面，
+不需要做什么特殊的操作。&lt;/p&gt;
+&lt;a aria-controls="543b6f9b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#543b6f9b" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="543b6f9b"&gt;
+For some page types, this is possible, but not trivial. For example,
+in the case of dirty (modified) page cache memory, we can't just drop the page,
+because the disk doesn't have our modifications yet.
+As such we either need to deny reclamation or first get our changes back to
+disk before we can drop this memory.&lt;/blockquote&gt;
+&lt;p&gt;对有些内存类型而言，回收是可能的，但是不是那么直接。比如对脏（修改过）的页面缓存内存，
+我们不能直接扔掉这些页面，因为磁盘上还没有写入我们所做的修改。这种情况下，我们可以选择拒绝回收，
+或者选择先等待我们的变更写入磁盘之后才能扔掉这些内存。&lt;/p&gt;
+&lt;a aria-controls="5111480d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5111480d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="5111480d"&gt;
+For some page types, this is not possible. For example,
+in the case of the anonymous pages mentioned previously,
+they only exist in memory and in no other backing store,
+so they have to be kept there.&lt;/blockquote&gt;
+&lt;p&gt;对还有些内存类型而言，是不能回收的。比如前面提到的匿名页面，它们只存在于内存中，没有任何后备存储，
+所以它们必须留在内存里。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id26"&gt;说到交换区的本质&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="99551744" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#99551744" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="99551744"&gt;
+&lt;p&gt;If you look for descriptions of the purpose of swap on Linux,
+you'll inevitably find many people talking about it as if it is merely
+an extension of the physical RAM for use in emergencies. For example,
+here is a random post I got as one of the top results from typing
+"what is swap" in Google:&lt;/p&gt;
+&lt;blockquote&gt;
+Swap is essentially emergency memory; a space set aside for times
+when your system temporarily needs more physical memory than you
+have available in RAM. It's considered "bad" in the sense that
+it's slow and inefficient, and if your system constantly needs
+to use swap then it obviously doesn't have enough memory. […]
+If you have enough RAM to handle all of your needs, and don't
+expect to ever max it out, then you should be perfectly safe
+running without a swap space.&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果你去搜 Linux 上交换区的目的的描述，肯定会找到很多人说交换区只是在紧急时用来扩展物理内存的机制。
+比如下面这段是我在 google 中输入「什么是 swap」 从前排结果中随机找到的一篇：&lt;/p&gt;
+&lt;blockquote&gt;
+交换区本质上是紧急内存；是为了应对你的系统临时所需内存多余你现有物理内存时，专门分出一块额外空间。
+大家觉得交换区「不好」是因为它又慢又低效，并且如果你的系统一直需要使用交换区那说明它明显没有足够的内存。
+［……］如果你有足够内存覆盖所有你需要的情况，而且你觉得肯定不会用满内存，那么完全可以不用交换区
+安全地运行系统。&lt;/blockquote&gt;
+&lt;a aria-controls="fe4c8bc1" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe4c8bc1" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fe4c8bc1"&gt;
+To be clear, I don't blame the poster of this comment at all for the content
+of their post – this is accepted as "common knowledge" by a lot of
+Linux sysadmins and is probably one of the most likely things that you will
+hear from one if you ask them to talk about swap. It is unfortunately also,
+however, a misunderstanding of the purpose and use of swap, especially on
+modern systems.&lt;/blockquote&gt;
+&lt;p&gt;事先说明，我不想因为这些文章的内容责怪这些文章的作者——这些内容被很多 Linux 系统管理员认为是「常识」，
+并且很可能你问他们什么是交换区的时候他们会给你这样的回答。但是也很不幸的是，
+这种认识是使用交换区的目的的一种普遍误解，尤其在现代系统上。&lt;/p&gt;
+&lt;a aria-controls="77407587" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#77407587" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="77407587"&gt;
+Above, I talked about reclamation for anonymous pages being "not possible",
+as anonymous pages by their nature have no backing store to fall back to
+when being purged from memory – as such, their reclamation would result in
+complete data loss for those pages. What if we could create such a
+store for these pages, though?&lt;/blockquote&gt;
+&lt;p&gt;前文中我说过回收匿名页面的内存是「不可能的」，因为匿名内存的特点，把它们从内存中清除掉之后，
+没有别的存储区域能作为他们的备份——因此，要回收它们会造成数据丢失。但是，如果我们为这种内存页面创建
+一种后备存储呢？&lt;/p&gt;
+&lt;a aria-controls="75be861f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#75be861f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="75be861f"&gt;
+Well, this is precisely what swap is for. Swap is a storage area for these
+seemingly "unreclaimable" pages that allows us to page them out to
+a storage device on demand. This means that they can now be considered as
+equally eligible for reclaim as their more trivially reclaimable friends,
+like clean file pages, allowing more efficient use of available physical memory.&lt;/blockquote&gt;
+&lt;p&gt;嗯，这正是交换区存在的意义。交换区是一块存储空间，用来让这些看起来「不可回收」的内存页面在需要的时候
+可以交换到存储设备上。这意味着有了交换区之后，这些匿名页面也和别的那些可回收内存一样，
+可以作为内存回收的候选，就像干净文件页面，从而允许更有效地使用物理内存。&lt;/p&gt;
+&lt;a aria-controls="aa3951ca" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#aa3951ca" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="aa3951ca"&gt;
+&lt;strong&gt;Swap is primarily a mechanism for equality of reclamation,&lt;/strong&gt;
+&lt;strong&gt;not for emergency "extra memory". Swap is not what makes your application&lt;/strong&gt;
+&lt;strong&gt;slow – entering overall memory contention is what makes your application slow.&lt;/strong&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;交换区主要是为了平等的回收机制，而不是为了紧急情况的「额外内存」。使用交换区不会让你的程序变慢——&lt;/strong&gt;
+&lt;strong&gt;进入内存竞争的状态才是让程序变慢的元凶。&lt;/strong&gt;&lt;/p&gt;
+&lt;a aria-controls="526740fe" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#526740fe" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="526740fe"&gt;
+So in what situations under this "equality of reclamation"
+scenario would we legitimately choose to reclaim anonymous pages?
+Here are, abstractly, some not uncommon scenarios:&lt;/blockquote&gt;
+&lt;p&gt;那么在这种「平等的可回收机遇」的情况下，让我们选择回收匿名页面的行为在何种场景中更合理呢？
+抽象地说，比如在下述不算罕见的场景中：&lt;/p&gt;
+&lt;a aria-controls="a12ad6df" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a12ad6df" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a12ad6df"&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;During initialisation, a long-running program may allocate and
+use many pages. These pages may also be used as part of shutdown/cleanup,
+but are not needed once the program is "started" (in an
+application-specific sense). This is fairly common for daemons which
+have significant dependencies to initialise.&lt;/li&gt;
+&lt;li&gt;During the program's normal operation, we may allocate memory which is
+only used rarely. It may make more sense for overall system performance
+to require a &lt;strong&gt;major fault&lt;/strong&gt; to page these in from disk on demand,
+instead using the memory for something else that's more important.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;程序初始化的时候，那些长期运行的程序可能要分配和使用很多页面。这些页面可能在最后的关闭/清理的
+时候还需要使用，但是在程序「启动」之后（以具体的程序相关的方式）持续运行的时候不需要访问。
+对后台服务程序来说，很多后台程序要初始化不少依赖库，这种情况很常见。&lt;/li&gt;
+&lt;li&gt;在程序的正常运行过程中，我们可能分配一些很少使用的内存。对整体系统性能而言可能比起让这些内存页
+一直留在内存中，只有在用到的时候才按需把它们用 &lt;strong&gt;缺页异常（major fault）&lt;/strong&gt; 换入内存，
+可以空出更多内存留给更重要的东西。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;cgroupv2: Linux's new unified control group hierarchy (QCON London 2017)&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/ikZ8_mRotT4"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id10"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;考察有无交换区时会发生什么&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="fc974b28" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fc974b28" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fc974b28"&gt;
+Let's look at typical situations, and how they perform with and without
+swap present. I talk about metrics around "memory contention" in my
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;talk on cgroup v2&lt;/a&gt; .&lt;/blockquote&gt;
+&lt;p&gt;我们来看一些在常见场景中，有无交换区时分别会如何运行。
+在我的 &lt;a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4"&gt;关于 cgroup v2 的演讲&lt;/a&gt;
+中探讨过「内存竞争」的指标。&lt;/p&gt;
+&lt;div class="section" id="id11"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id28"&gt;在无/低内存竞争的状态下&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="a577bbc2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#a577bbc2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="a577bbc2"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; We can choose to swap out rarely-used anonymous memory that
+may only be used during a small part of the process lifecycle,
+allowing us to use this memory to improve cache hit rate,
+or do other optimisations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; We cannot swap out rarely-used anonymous memory,
+as it's locked in memory. While this may not immediately
+present as a problem, on some workloads this may represent
+a non-trivial drop in performance due to stale,
+anonymous pages taking space away from more important use.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 我们可以选择换出那些只有在进程生存期内很小一部分时间会访问的匿名内存，
+这允许我们空出更多内存空间用来提升缓存命中率，或者做别的优化。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无交换区:&lt;/strong&gt; 我们不能换出那些很少使用的匿名内存，因为它们被锁在了内存中。虽然这通常不会直接表现出问题，
+但是在一些工作条件下这可能造成卡顿导致不平凡的性能下降，因为匿名内存占着空间不能给
+更重要的需求使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+译注：关于 &lt;strong&gt;内存热度&lt;/strong&gt; 和 &lt;strong&gt;内存颠簸（thrash）&lt;/strong&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;讨论内核中内存管理的时候经常会说到内存页的 &lt;strong&gt;冷热&lt;/strong&gt; 程度。这里冷热是指历史上内存页被访问到的频度，
+内存管理的经验在说，历史上在近期频繁访问的 &lt;strong&gt;热&lt;/strong&gt; 内存，在未来也可能被频繁访问，
+从而应该留在物理内存里；反之历史上不那么频繁访问的 &lt;strong&gt;冷&lt;/strong&gt; 内存，在未来也可能很少被用到，
+从而可以考虑交换到磁盘或者丢弃文件缓存。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;颠簸（thrash）&lt;/strong&gt; 这个词在文中出现多次但是似乎没有详细介绍，实际计算机科学专业的课程中应该有讲过。
+一段时间内，让程序继续运行所需的热内存总量被称作程序的工作集（workset），估算工作集大小，
+换句话说判断进程分配的内存页中哪些属于 &lt;strong&gt;热&lt;/strong&gt; 内存哪些属于 &lt;strong&gt;冷&lt;/strong&gt; 内存，是内核中
+内存管理的最重要的工作。当分配给程序的内存大于工作集的时候，程序可以不需要等待I/O全速运行；
+而当分配给程序的内存不足以放下整个工作集的时候，意味着程序每执行一小段就需要等待换页或者等待
+磁盘缓存读入所需内存页，产生这种情况的时候，从用户角度来看可以观察到程序肉眼可见的「卡顿」。
+当系统中所有程序都内存不足的时候，整个系统都处于颠簸的状态下，响应速度直接降至磁盘I/O的带宽。
+如本文所说，禁用交换区并不能防止颠簸，只是从等待换页变成了等待文件缓存，
+给程序分配超过工作集大小的内存才能防止颠簸。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id12"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id29"&gt;在中/高内存竞争的状态下&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="266f0b15" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#266f0b15" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="266f0b15"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; All memory types have an equal possibility of being reclaimed.
+This means we have more chance of being able to reclaim pages
+successfully – that is, we can reclaim pages that are not quickly
+faulted back in again (thrashing).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; Anonymous pages are locked into memory as they have nowhere to go.
+The chance of successful long-term page reclamation is lower,
+as we have only some types of memory eligible to be reclaimed
+at all. The risk of page thrashing is higher. The casual
+reader might think that this would still be better as it might
+avoid having to do disk I/O, but this isn't true –
+we simply transfer the disk I/O of swapping to dropping
+hot page caches and dropping code segments we need soon.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 所有内存类型都有平等的被回收的可能性。这意味着我们回收页面有更高的成功率——
+成功回收的意思是说被回收的那些页面不会在近期内被缺页异常换回内存中（颠簸）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无交换区:&lt;/strong&gt; 匿名内存因为无处可去所以被锁在内存中。长期内存回收的成功率变低了，因为我们成体上
+能回收的页面总量少了。发生缺页颠簸的危险性更高了。缺乏经验的读者可能觉得这某时也是好事，
+因为这能避免进行磁盘I/O，但是实际上不是如此——我们只是把交换页面造成的磁盘I/O变成了扔掉热缓存页
+和扔掉代码段，这些页面很可能马上又要从文件中读回来。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id30"&gt;在临时内存占用高峰时&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="bf276ac9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#bf276ac9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="bf276ac9"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;With swap:&lt;/strong&gt; We're more resilient to temporary spikes, but in cases of
+severe memory starvation, the period from memory thrashing beginning
+to the OOM killer may be prolonged. We have more visibility into the
+instigators of memory pressure and can act on them more reasonably,
+and can perform a controlled intervention.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Without swap&lt;/strong&gt; The OOM killer is triggered more quickly as anonymous
+pages are locked into memory and cannot be reclaimed. We're more likely to
+thrash on memory, but the time between thrashing and OOMing is reduced.
+Depending on your application, this may be better or worse. For example,
+a queue-based application may desire this quick transfer from thrashing
+to killing. That said, this is still too late to be really useful –
+the OOM killer is only invoked at moments of severe starvation,
+and relying on this method for such behaviour would be better replaced
+with more opportunistic killing of processes as memory contention
+is reached in the first place.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;有交换区:&lt;/strong&gt; 我们对内存使用激增的情况更有抵抗力，但是在严重的内存不足的情况下，
+从开始发生内存颠簸到 OOM 杀手开始工作的时间会被延长。内存压力造成的问题更容易观察到，
+从而可能更有效地应对，或者更有机会可控地干预。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;无交换区:&lt;/strong&gt; 因为匿名内存被锁在内存中了不能被回收，所以 OOM 杀手会被更早触发。
+发生内存颠簸的可能性更大，但是发生颠簸之后到 OOM 解决问题的时间间隔被缩短了。
+基于你的程序，这可能更好或是更糟。比如说，基于队列的程序可能更希望这种从颠簸到杀进程的转换更快发生。
+即便如此，发生 OOM 的时机通常还是太迟于是没什么帮助——只有在系统极度内存紧缺的情况下才会请出
+OOM 杀手，如果想依赖这种行为模式，不如换成更早杀进程的方案，因为在这之前已经发生内存竞争了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id14"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id31"&gt;好吧，所以我需要系统交换区，但是我该怎么为每个程序微调它的行为？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="7f9321c9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#7f9321c9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="7f9321c9"&gt;
+You didn't think you'd get through this entire post without me plugging cgroup v2, did you? ;-)&lt;/blockquote&gt;
+&lt;p&gt;你肯定想到了我写这篇文章一定会在哪儿插点 cgroup v2 的安利吧？ ;-)&lt;/p&gt;
+&lt;a aria-controls="3fcbadba" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#3fcbadba" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="3fcbadba"&gt;
+Obviously, it's hard for a generic heuristic algorithm to be right all the time,
+so it's important for you to be able to give guidance to the kernel.
+Historically the only tuning you could do was at the system level,
+using &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ . This has two problems: &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+is incredibly hard to reason about because it only feeds in as
+a small part of a larger heuristic system, and it also is system-wide
+instead of being granular to a smaller set of processes.&lt;/blockquote&gt;
+&lt;p&gt;显然，要设计一种对所有情况都有效的启发算法会非常难，所以给内核提一些指引就很重要。
+历史上我们只能在整个系统层面做这方面微调，通过 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 。这有两方面问题：
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的行为很难准确控制，因为它只是传递给一个更大的启发式算法中的一个小参数；
+并且它是一个系统级别的设置，没法针对一小部分进程微调。&lt;/p&gt;
+&lt;a aria-controls="dc0990d3" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#dc0990d3" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="dc0990d3"&gt;
+You can also use &lt;code class="code"&gt;
+mlock&lt;/code&gt;
+ to lock pages into memory, but this requires
+either modifying program code, fun with &lt;code class="code"&gt;
+LD_PRELOAD&lt;/code&gt;
+ , or doing
+horrible things with a debugger at runtime.
+In VM-based languages this also doesn't work very well, since you
+generally have no control over allocation and end up having to
+&lt;code class="code"&gt;
+mlockall&lt;/code&gt;
+ , which has no precision towards the pages
+you actually care about.&lt;/blockquote&gt;
+&lt;p&gt;你可以用 &lt;code class="code"&gt;
+mlock&lt;/code&gt;
+ 把页面锁在内存里，但是这要么必须改程序代码，或者折腾
+&lt;code class="code"&gt;
+LD_PRELOAD&lt;/code&gt;
+ ，或者在运行期用调试器做一些魔法操作。对基于虚拟机的语言来说这种方案也不能
+很好工作，因为通常你没法控制内存分配，最后得用上 &lt;code class="code"&gt;
+mlockall&lt;/code&gt;
+
+，而这个没有办法精确指定你实际上想锁住的页面。&lt;/p&gt;
+&lt;a aria-controls="ee392737" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#ee392737" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="ee392737"&gt;
+cgroup v2 has a tunable per-cgroup in the form of &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+
+, which allows us to tell the kernel to prefer other applications for
+reclaim below a certain threshold of memory used. This allows us to not
+prevent the kernel from swapping out parts of our application,
+but prefer to reclaim from other applications under memory contention.
+Under normal conditions, the kernel's swap logic is generally pretty good,
+and allowing it to swap out pages opportunistically generally increases
+system performance. Swap thrash under heavy memory contention is not ideal,
+but it's more a property of simply running out of memory entirely than
+a problem with the swapper. In these situations, you typically want to
+fail fast by self-killing non-critical processes when memory pressure
+starts to build up.&lt;/blockquote&gt;
+&lt;p&gt;cgroup v2 提供了一套可以每个 cgroup 微调的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+
+，允许我们告诉内核说当使用的内存低于一定阈值之后优先回收别的程序的内存。这可以让我们不强硬禁止内核
+换出程序的一部分内存，但是当发生内存竞争的时候让内核优先回收别的程序的内存。在正常条件下，
+内核的交换逻辑通常还是不错的，允许它有条件地换出一部分页面通常可以改善系统性能。在内存竞争的时候
+发生交换颠簸虽然不理想，但是这更多地是单纯因为整体内存不够了，而不是因为交换进程（swapper）导致的问题。
+在这种场景下，你通常希望在内存压力开始积攒的时候通过自杀一些非关键的进程的方式来快速退出（fail fast）。&lt;/p&gt;
+&lt;a aria-controls="d789770a" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d789770a" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="d789770a"&gt;
+You can not simply rely on the OOM killer for this. The OOM killer is
+only invoked in situations of dire failure when we've already entered
+a state where the system is severely unhealthy and may well have been
+so for a while. You need to opportunistically handle the situation yourself
+before ever thinking about the OOM killer.&lt;/blockquote&gt;
+&lt;p&gt;你不能依赖 OOM 杀手达成这个。 OOM 杀手只有在非常急迫的情况下才会出动，那时系统已经处于极度不健康的
+状态了，而且很可能在这种状态下保持了一阵子了。需要在开始考虑 OOM 杀手之前，积极地自己处理这种情况。&lt;/p&gt;
+&lt;a aria-controls="fe0515e4" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#fe0515e4" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="fe0515e4"&gt;
+Determination of memory pressure is somewhat difficult using traditional
+Linux memory counters, though. We have some things which seem somewhat related,
+but are merely tangential – memory usage, page scans, etc – and from these
+metrics alone it's very hard to tell an efficient memory configuration
+from one that's trending towards memory contention. There is a group of us
+at Facebook, spearheaded by &lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+, working on developing new metrics that expose memory pressure more easily
+that should help with this in future. If you're interested in hearing more
+about this,
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;I go into detail about one metric being considered in my talk on cgroup v2&lt;/a&gt;.&lt;/blockquote&gt;
+&lt;p&gt;不过，用传统的 Linux 内存统计数据还是挺难判断内存压力的。我们有一些看起来相关的系统指标，但是都
+只是支离破碎的——内存用量、页面扫描，这些——单纯从这些指标很难判断系统是处于高效的内存利用率还是
+在滑向内存竞争状态。我们在 Facebook 有个团队，由
+&lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+牵头，努力开发一些能评价内存压力的新指标，希望能在今后改善目前的现状。
+如果你对这方面感兴趣， &lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;在我的 cgroup v2 的演讲中介绍到一个被提议的指标&lt;/a&gt;
+。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id16"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id32"&gt;调优&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="id17"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id33"&gt;那么，我需要多少交换空间？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="5b5c883c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#5b5c883c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="5b5c883c"&gt;
+In general, the minimum amount of swap space required for optimal
+memory management depends on the number of anonymous pages pinned into
+memory that are rarely reaccessed by an application, and the value of
+reclaiming those anonymous pages. The latter is mostly a question of
+which pages are no longer purged to make way for these infrequently
+accessed anonymous pages.&lt;/blockquote&gt;
+&lt;p&gt;通常而言，最优内存管理所需的最小交换空间取决于程序固定在内存中而又很少访问到的匿名页面的数量，
+以及回收这些匿名页面换来的价值。后者大体上来说是问哪些页面不再会因为要保留这些很少访问的匿名页面而
+被回收掉腾出空间。&lt;/p&gt;
+&lt;a aria-controls="f070dec0" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#f070dec0" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="f070dec0"&gt;
+If you have a bunch of disk space and a recent (4.0+) kernel,
+more swap is almost always better than less. In older kernels &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+,
+one of the kernel processes responsible for managing swap, was historically
+very overeager to swap out memory aggressively the more swap you had.
+In recent times, swapping behaviour when a large amount of swap space is
+available has been significantly improved. If you're running kernel 4.0+,
+having a larger swap on a modern kernel should not result in overzealous
+swapping. As such, if you have the space, having a swap size of a few GB
+keeps your options open on modern kernels.&lt;/blockquote&gt;
+&lt;p&gt;如果你有足够大的磁盘空间和比较新的内核版本（4.0+），越大的交换空间基本上总是越好的。
+更老的内核上 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ ， 内核中负责管理交换区的内核线程，在历史上倾向于有越多交换空间就
+急于交换越多内存出去。在最近一段时间，可用交换空间很大的时候的交换行为已经改善了很多。
+如果在运行 4.0+ 以后的内核，即便有很大的交换区在现代内核上也不会很激进地做交换。因此，
+如果你有足够的容量，现代内核上有个几个 GB 的交换空间大小能让你有更多选择。&lt;/p&gt;
+&lt;a aria-controls="d981b13d" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#d981b13d" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="d981b13d"&gt;
+If you're more constrained with disk space, then the answer really
+depends on the tradeoffs you have to make, and the nature of the environment.
+Ideally you should have enough swap to make your system operate optimally
+at normal and peak (memory) load. What I'd recommend is setting up a few
+testing systems with 2-3GB of swap or more, and monitoring what happens
+over the course of a week or so under varying (memory) load conditions.
+As long as you haven't encountered severe memory starvation during that week
+– in which case the test will not have been very useful – you will probably
+end up with some number of MB of swap occupied. As such, it's probably worth
+having at least that much swap available, in addition to a little buffer for
+changing workloads. &lt;code class="code"&gt;
+atop&lt;/code&gt;
+ in logging mode can also show you which applications
+are having their pages swapped out in the &lt;code class="code"&gt;
+SWAPSZ&lt;/code&gt;
+ column, so if you don't
+already use it on your servers to log historic server state you probably
+want to set it up on these test machines with logging mode as part of this
+experiment. This also tells you when your application started swapping out
+pages, which you can tie to log events or other key data.&lt;/blockquote&gt;
+&lt;p&gt;如果你的磁盘空间优先，那么答案更多取决于你愿意做的取舍，以及运行的环境。理想上应该有足够的交换空间
+能高效应对正常负载和高峰（内存）负载。我建议先用 2-3GB 或者更多的交换空间搭个测试环境，
+然后监视在不同（内存）负载条件下持续一周左右的情况。只要在那一周里没有发生过严重的内存不足——
+发生了的话说明测试结果没什么用——在测试结束的时候大概会留有多少 MB 交换区占用。
+作为结果说明你至少应该有那么多可用的交换空间，再多加一些以应对负载变化。用日志模式跑 &lt;code class="code"&gt;
+atop&lt;/code&gt;
+
+可以在 &lt;code class="code"&gt;
+SWAPSZ&lt;/code&gt;
+ 栏显示程序的页面被交换出去的情况，所以如果你还没用它记录服务器历史日志的话
+，这次测试中可以试试在测试机上用它记录日志。这也会告诉你什么时候你的程序开始换出页面，你可以用这个
+对照事件日志或者别的关键数据。&lt;/p&gt;
+&lt;a aria-controls="c81cfdce" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#c81cfdce" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="c81cfdce"&gt;
+Another thing worth considering is the nature of the swap medium.
+Swap reads tend to be highly random, since we can't reliably predict
+which pages will be refaulted and when. On an SSD this doesn't matter much,
+but on spinning disks, random I/O is extremely expensive since it requires
+physical movement to achieve. On the other hand, refaulting of file pages
+is likely less random, since files related to the operation of a single
+application at runtime tend to be less fragmented. This might mean that on
+a spinning disk you may want to bias more towards reclaiming file pages
+instead of swapping out anonymous pages, but again, you need to test and
+evaluate how this balances out for your workload.&lt;/blockquote&gt;
+&lt;p&gt;另一点值得考虑的是交换空间所在存储设备的媒介。读取交换区倾向于很随机，因为我们不能可靠预测什么时候
+什么页面会被再次访问。在 SSD 上这不是什么问题，但是在传统磁盘上，随机 I/O 操作会很昂贵，
+因为需要物理动作寻道。另一方面，重新加载文件缓存可能不那么随机，因为单一程序在运行期的文件读操作
+一般不会太碎片化。这可能意味着在传统磁盘上你想更多地回收文件页面而不是换出匿名页面，但仍就，
+你需要做测试评估在你的工作负载下如何取得平衡。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+译注：关于休眠到磁盘时的交换空间大小&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+原文这里建议交换空间至少是物理内存大小，我觉得实际上不需要。休眠到磁盘的时候内核会写回并丢弃
+所有有文件作后备的可回收页面，交换区只需要能放下那些没有文件后备的页面就可以了。
+如果去掉文件缓存页面之后剩下的已用物理内存总量能完整放入交换区中，就可以正常休眠。
+对于桌面浏览器这种内存大户，通常有很多缓存页可以在休眠的时候丢弃。&lt;/div&gt;
+&lt;/div&gt;
+&lt;a aria-controls="34173e8b" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#34173e8b" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="34173e8b"&gt;
+For laptop/desktop users who want to hibernate to swap, this also needs to
+be taken into account – in this case your swap file should be at least
+your physical RAM size.&lt;/blockquote&gt;
+&lt;p&gt;对笔记本/桌面用户如果想要休眠到交换区，这也需要考虑——这种情况下你的交换文件应该至少是物理内存大小。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="swappiness"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id34"&gt;我的 swappiness 应该如何设置？&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="02421253" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#02421253" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="02421253"&gt;
+First, it's important to understand what &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ does.
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ is a sysctl that biases memory reclaim either towards
+reclamation of anonymous pages, or towards file pages. It does this using two
+different attributes: &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ (our willingness to reclaim file pages)
+and &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ (our willingness to reclaim anonymous pages).
+&lt;code class="code"&gt;
+vm.swappiness`plays into this, as it becomes the default value for
+:code:`anon_prio&lt;/code&gt;
+, and it also is subtracted from the default value of 200
+for &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+, which means for a value of &lt;code class="code"&gt;
+vm.swappiness = 50&lt;/code&gt;
+,
+the outcome is that &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ is 50, and &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ is 150
+(the exact numbers don't matter as much as their relative weight compared to the other).&lt;/blockquote&gt;
+&lt;p&gt;首先很重要的一点是，要理解 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 是做什么的。
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 是一个 sysctl 用来控制在内存回收的时候，是优先回收匿名页面，
+还是优先回收文件页面。内存回收的时候用两个属性： &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ （回收文件页面的倾向）
+和 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ （回收匿名页面的倾向）。 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 控制这两个值，
+因为它是 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ 的默认值，然后也是默认 200 减去它之后 &lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ 的默认值。
+意味着如果我们设置 &lt;code class="code"&gt;
+vm.swappiness = 50&lt;/code&gt;
+ 那么结果是 &lt;code class="code"&gt;
+anon_prio&lt;/code&gt;
+ 是 50，
+&lt;code class="code"&gt;
+file_prio&lt;/code&gt;
+ 是 150 （这里数值本身不是很重要，重要的是两者之间的权重比）。&lt;/p&gt;
+&lt;a aria-controls="b2897dd9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b2897dd9" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b2897dd9"&gt;
+This means that, in general, &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+&lt;strong&gt;is simply a ratio of how&lt;/strong&gt;
+&lt;strong&gt;costly reclaiming and refaulting anonymous memory is compared to file memory&lt;/strong&gt;
+&lt;strong&gt;for your hardware and workload&lt;/strong&gt;. The lower the value, the more you tell the
+kernel that infrequently accessed anonymous pages are expensive to swap out
+and in on your hardware. The higher the value, the more you tell the kernel
+that the cost of swapping anonymous pages and file pages is similar on your
+hardware. The memory management subsystem will still try to mostly decide
+whether it swaps file or anonymous pages based on how hot the memory is,
+but swappiness tips the cost calculation either more towards swapping or
+more towards dropping filesystem caches when it could go either way.
+On SSDs these are basically as expensive as each other, so setting
+&lt;code class="code"&gt;
+vm.swappiness = 100&lt;/code&gt;
+ (full equality) may work well.
+On spinning disks, swapping may be significantly more expensive since
+swapping in generally requires random reads, so you may want to
+bias more towards a lower value.&lt;/blockquote&gt;
+&lt;p&gt;这意味着，通常来说 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+&lt;strong&gt;只是一个比例，用来衡量在你的硬件和工作负载下，&lt;/strong&gt;
+&lt;strong&gt;回收和换回匿名内存还是文件内存哪种更昂贵&lt;/strong&gt; 。设定的值越低，你就是在告诉内核说换出那些不常访问的
+匿名页面在你的硬件上开销越昂贵；设定的值越高，你就是在告诉内核说在你的硬件上交换匿名页和
+文件缓存的开销越接近。内存管理子系统仍然还是会根据实际想要回收的内存的访问热度尝试自己决定具体是
+交换出文件还是匿名页面，只不过 swappiness 会在两种回收方式皆可的时候，在计算开销权重的过程中左右
+是该更多地做交换还是丢弃缓存。在 SSD 上这两种方式基本上是同等开销，所以设成
+&lt;code class="code"&gt;
+vm.swappiness = 100&lt;/code&gt;
+ （同等比重）可能工作得不错。在传统磁盘上，交换页面可能会更昂贵，
+因为通常需要随机读取，所以你可能想要设低一些。&lt;/p&gt;
+&lt;a aria-controls="916d89d2" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#916d89d2" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="916d89d2"&gt;
+The reality is that most people don't really have a feeling about which
+their hardware demands, so it's non-trivial to tune this value based on
+instinct alone – this is something that you need to test using different
+values. You can also spend time evaluating the memory composition of your
+system and core applications and their behaviour under mild memory reclamation.&lt;/blockquote&gt;
+&lt;p&gt;现实是大部分人对他们的硬件需求没有什么感受，所以根据直觉调整这个值可能挺困难的 ——
+你需要用不同的值做测试。你也可以花时间评估一下你的系统的内存分配情况和核心应用在大量回收内存的时候的行为表现。&lt;/p&gt;
+&lt;a aria-controls="1716806c" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#1716806c" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="1716806c"&gt;
+When talking about &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ , an extremely important change to
+consider from recent(ish) times is
+&lt;a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd"&gt;this change to vmscan by Satoru Moriya in 2012&lt;/a&gt;
+, which changes the way that &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ is handled
+quite significantly.&lt;/blockquote&gt;
+&lt;p&gt;讨论 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 的时候，一个极为重要需要考虑的修改是（相对）近期在
+&lt;a class="reference external" href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/patch/?id=fe35004fbf9eaf67482b074a2e032abb9c89b1dd"&gt;2012 年左右 Satoru Moriya 对 vmscan 行为的修改&lt;/a&gt;
+，它显著改变了代码对 &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ 这个值的处理方式。&lt;/p&gt;
+&lt;a aria-controls="0d73ddd8" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#0d73ddd8" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="0d73ddd8"&gt;
+Essentially, the patch makes it so that we are extremely biased against
+scanning (and thus reclaiming) any anonymous pages at all with
+&lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ , unless we are already encountering severe
+memory contention. As mentioned previously in this post, that's generally
+not what you want, since this prevents equality of reclamation prior to
+extreme memory pressure occurring, which may actually lead to this
+extreme memory pressure in the first place. &lt;code class="code"&gt;
+vm.swappiness = 1&lt;/code&gt;
+
+is the lowest you can go without invoking the special casing for
+anonymous page scanning implemented in that patch.&lt;/blockquote&gt;
+&lt;p&gt;基本上来说这个补丁让我们在 &lt;code class="code"&gt;
+vm.swappiness = 0&lt;/code&gt;
+ 的时候会极度避免扫描（进而回收）匿名页面，
+除非我们已经在经历严重的内存抢占。就如本文前面所属，这种行为基本上不会是你想要的，
+因为这种行为会导致在发生内存抢占之前无法保证内存回收的公平性，这甚至可能是最初导致发生内存抢占的原因。
+想要避免这个补丁中对扫描匿名页面的特殊行为的话， &lt;code class="code"&gt;
+vm.swappiness = 1&lt;/code&gt;
+ 是你能设置的最低值。&lt;/p&gt;
+&lt;a aria-controls="8283fab5" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#8283fab5" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="8283fab5"&gt;
+The kernel default here is &lt;code class="code"&gt;
+vm.swappiness = 60&lt;/code&gt;
+. This value is
+generally not too bad for most workloads, but it's hard to have a
+general default that suits all workloads. As such, a valuable extension
+to the tuning mentioned in the "how much swap do I need" section above
+would be to test these systems with differing values for &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+, and monitor your application and system metrics under heavy (memory) load.
+Some time in the near future, once we have a decent implementation of
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;refault detection&lt;/a&gt; in the kernel,
+you'll also be able to determine this somewhat workload-agnostically by
+looking at cgroup v2's page refaulting metrics.&lt;/blockquote&gt;
+&lt;p&gt;内核在这里设置的默认值是 &lt;code class="code"&gt;
+vm.swappiness = 60&lt;/code&gt;
+ 。这个值对大部分工作负载来说都不会太坏，
+但是很难有一个默认值能符合所有种类的工作负载。因此，对上面「 &lt;a class="reference internal" href="#id17"&gt;那么，我需要多少交换空间？&lt;/a&gt;
+」那段讨论的一点重要扩展可以说，在测试系统中可以尝试使用不同的 &lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+
+，然后监视你的程序和系统在重（内存）负载下的性能指标。在未来某天，如果我们在内核中有了合理的
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;缺页检测&lt;/a&gt; ，你也将能通过 cgroup v2 的页面缺页
+指标来以负载无关的方式决定这个。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=beefUhRH5lU"&gt;SREcon19 Asia/Pacific - Linux Memory Management at Scale: Under the Hood&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/beefUhRH5lU"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id19"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id35"&gt;2019年07月更新：内核 4.20+ 中的内存压力指标&lt;/a&gt;&lt;/h3&gt;
+&lt;a aria-controls="2cbb410f" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#2cbb410f" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="2cbb410f"&gt;
+The refault metrics mentioned as in development earlier are now in the
+kernel from 4.20 onwards and can be enabled with &lt;code class="code"&gt;
+CONFIG_PSI=y&lt;/code&gt;
+
+. See my talk at SREcon at around the 25:05 mark:&lt;/blockquote&gt;
+&lt;p&gt;前文中提到的开发中的内存缺页检测指标已经进入 4.20+ 以上版本的内核，可以通过
+&lt;code class="code"&gt;
+CONFIG_PSI=y&lt;/code&gt;
+ 开启。详情参见我在 SREcon 大约 25:05 左右的讨论。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id20"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id36"&gt;结论&lt;/a&gt;&lt;/h2&gt;
+&lt;a aria-controls="01142bf6" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#01142bf6" role="button"&gt;
+&lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="01142bf6"&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Swap is a useful tool to allow equality of reclamation of memory pages,
+but its purpose is frequently misunderstood, leading to its negative
+perception across the industry. If you use swap in the spirit intended,
+though – as a method of increasing equality of reclamation – you'll
+find that it's a useful tool instead of a hindrance.&lt;/li&gt;
+&lt;li&gt;Disabling swap does not prevent disk I/O from becoming a problem under
+memory contention, it simply shifts the disk I/O thrashing from anonymous
+pages to file pages. Not only may this be less efficient, as we have
+a smaller pool of pages to select from for reclaim, but it may also
+contribute to getting into this high contention state in the first place.&lt;/li&gt;
+&lt;li&gt;Swap can make a system slower to OOM kill, since it provides another,
+slower source of memory to thrash on in out of memory situations – the
+OOM killer is only used by the kernel as a last resort, after things have
+already become monumentally screwed. The solutions here depend on your system:&lt;ul&gt;
+&lt;li&gt;You can opportunistically change the system workload depending on
+cgroup-local or global memory pressure. This prevents getting into these
+situations in the first place, but solid memory pressure metrics are
+lacking throughout the history of Unix. Hopefully this should be
+better soon with the addition of refault detection.&lt;/li&gt;
+&lt;li&gt;You can bias reclaiming (and thus swapping) away from certain processes
+per-cgroup using memory.low, allowing you to protect critical daemons
+without disabling swap entirely.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;交换区是允许公平地回收内存的有用工具，但是它的目的经常被人误解，导致它在业内这种负面声誉。如果
+你是按照原本的目的使用交换区的话——作为增加内存回收公平性的方式——你会发现它是很有效的工具而不是阻碍。&lt;/li&gt;
+&lt;li&gt;禁用交换区并不能在内存竞争的时候防止磁盘I/O的问题，它只不过把匿名页面的磁盘I/O变成了文件页面的
+磁盘I/O。这不仅更低效，因为我们回收内存的时候能选择的页面范围更小了，而且它可能是导致高度内存竞争
+状态的元凶。&lt;/li&gt;
+&lt;li&gt;有交换区会导致系统更慢地使用 OOM 杀手，因为在缺少内存的情况下它提供了另一种更慢的内存，
+会持续地内存颠簸——内核调用 OOM 杀手只是最后手段，会晚于所有事情已经被搞得一团糟之后。
+解决方案取决于你的系统：&lt;ul&gt;
+&lt;li&gt;你可以预先更具每个 cgroup 的或者系统全局的内存压力改变系统负载。这能防止我们最初进入内存竞争
+的状态，但是 Unix 的历史中一直缺乏可靠的内存压力检测方式。希望不久之后在有了
+&lt;a class="reference external" href="https://youtu.be/ikZ8_mRotT4?t=2145"&gt;缺页检测&lt;/a&gt; 这样的性能指标之后能改善这一点。&lt;/li&gt;
+&lt;li&gt;你可以使用 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 让内核不倾向于回收（进而交换）特定一些 cgroup 中的进程，
+允许你在不禁用交换区的前提下保护关键后台服务。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr class="docutils"/&gt;
+&lt;p&gt;感谢在撰写本文时 &lt;a class="reference external" href="https://github.com/rahulg"&gt;Rahul&lt;/a&gt; ，
+&lt;a class="reference external" href="https://github.com/htejun"&gt;Tejun&lt;/a&gt; 和
+&lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
+提供的诸多建议和反馈。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="translate"></category><category term="swappiness"></category></entry><entry><title>系統中的大多數文件有多大？</title><link href="//farseerfc.me/file-size-histogram.html" rel="alternate"></link><published>2020-06-11T15:45:00+09:00</published><updated>2020-06-11T15:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-06-11:/file-size-histogram.html</id><summary type="html">
 &lt;div class="section" id="id2"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;&lt;strong&gt;你覺得，你的系統中大多數文件大概有多大？&lt;/strong&gt;&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;這是一個很有意思的問題，你可以試着先猜一下。&lt;/p&gt;
@@ -851,7 +2695,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
 但是理解了 FTL 的差異後就可以看出這種「優化」只針對線性寫入，不一定適合放系統文件根目錄的文件系統。&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -1313,7 +3157,7 @@ discard 不光影响文件系统写入性能，还可能发送大量被设备忽
 实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
 比如有些标明着「为视频优化」之类宣传标语的「外置SSD」，对消费者来说可能会觉得为视频优化的话一定性能好，
 但是理解了 FTL 的差异后就可以看出这种「优化」只针对线性写入，不一定适合放系统文件根目录的文件系统。&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -1420,7 +3264,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不過理解了磁盤的機械結構的話，柱面的概念就比較合理了，尋址時先驅動磁頭臂旋轉，
 磁頭臂上多個磁頭一起飛到某個磁道上，從而運動磁頭臂的動作定義了一個柱面。
 柱面和磁頭（CH）組合起來能定位到某個特定的磁道，畫張圖大概如下圖所示：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中值得注意的是磁道的編號方式，我用相同的顏色畫出了相同的磁道。因爲按照 CHS
 的順序尋址，所以先定位柱面，然後選定磁頭。磁盤上按半徑從外向內定義柱面的編號，最外圈的磁道位於
@@ -1453,7 +3297,7 @@ BIOS 的程序。&lt;/p&gt;
 後纔能繼續讀下一個扇區，如果物理排列上連續編號扇區，可能等 CPU
 做完這些事情後磁頭已經旋轉到之後幾個扇區上了。所以出廠時做磁盤低級格式化的時候，
 會跳躍着給扇區編號，給 CPU 留足處理時間。比如下圖：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中假設有3個柱面，每個柱面6個磁頭，每個磁道內11個扇區，並且畫出了三種不同的扇區編號跳轉情況，
 分別是磁道內的扇區跳轉（+3），柱面內的磁頭跳轉（+5），以及柱面間跳轉（+10）。
@@ -1782,7 +3626,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不过理解了磁盘的机械结构的话，柱面的概念就比较合理了，寻址时先驱动磁头臂旋转，
 磁头臂上多个磁头一起飞到某个磁道上，从而运动磁头臂的动作定义了一个柱面。
 柱面和磁头（CH）组合起来能定位到某个特定的磁道，画张图大概如下图所示：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中值得注意的是磁道的编号方式，我用相同的颜色画出了相同的磁道。因为按照 CHS
 的顺序寻址，所以先定位柱面，然后选定磁头。磁盘上按半径从外向内定义柱面的编号，最外圈的磁道位于
@@ -1815,7 +3659,7 @@ BIOS 的程序。&lt;/p&gt;
 后才能继续读下一个扇区，如果物理排列上连续编号扇区，可能等 CPU
 做完这些事情后磁头已经旋转到之后几个扇区上了。所以出厂时做磁盘低级格式化的时候，
 会跳跃着给扇区编号，给 CPU 留足处理时间。比如下图：&lt;/p&gt;
-&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
+&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中假设有3个柱面，每个柱面6个磁头，每个磁道内11个扇区，并且画出了三种不同的扇区编号跳转情况，
 分别是磁道内的扇区跳转（+3），柱面内的磁头跳转（+5），以及柱面间跳转（+10）。
@@ -2879,7 +4723,7 @@ btrfs subvolume snapshot&lt;/code&gt;
 &lt;li&gt;檢查點（checkpoint）：從 ZFS on Linux v0.8.0 開始&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;梳理一下這些概念之間的關係也是最初想寫下這篇筆記的初衷。先畫個簡圖，隨後逐一講講這些概念：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
 &lt;p&gt;上圖中，假設我們有一個 pool ，其中有 3 個文件系統叫 fs1~fs3 和一個 zvol 叫 zv1
 ，然後文件系統 fs1 有兩個快照 s1 和 s2 ，和兩個書籤 b1 和 b2。pool 整體有兩個檢查點 cp1 和
 cp2 。這個簡圖將作爲例子在後面介紹這些概念。&lt;/p&gt;
@@ -3008,7 +4852,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3021,7 +4865,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -3310,10 +5154,10 @@ GC 回收空間，這裏是本文要講的區別，所以在我看來不用 GC �
 &lt;p&gt;舉個例子，比如下圖是一個日誌結構文件系統的磁盤佔用，其中綠色是數據，藍色是元數據（比如目錄結構和
 inode），紅色是文件系統級關鍵數據（比如最後的日誌提交點），一開始可能是這樣，有9個數據塊，
 2個元數據塊，1個系統塊：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
 &lt;p&gt;現在要覆蓋 2 和 3 的內容，新寫入 n2 和 n3 ，再刪除 4 號的內容 ，然後修改 10 裏面的 inode 變成 n10
 引用這些新數據，然後寫入一個新提交 n12 ，用黃色表示不再被引用的垃圾，提交完大概是這樣：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
 &lt;p&gt;日誌結構文件系統需要 GC 比較容易理解，寫日誌嘛，總得有一個「添加到末尾」的寫入點，比如上面圖中的
 n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空間末尾，這時候就要覆蓋寫空間開頭，
 就很難判斷「末尾」在什麼地方，而下一次寫入需要在哪裏了。
@@ -3335,7 +5179,7 @@ n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空
 又不利於利用整個可用空間，這裏的抉擇有個平衡點。&lt;/p&gt;
 &lt;p&gt;繼續上面的例子，假設上面文件系統的圖示中每一列的4塊是一個段，想要回收最開頭那個段，
 那麼需要搬運還在用的 1 到空閒空間，順帶修改引用它的 n10 ，最後提交 n12 ：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
 &lt;p&gt;要掃描並釋放一整段，需要掃描整個文件系統中別的元數據（圖中的 n12 和 n10 和
 11）來確定有沒有引用到目標段中的地址，可見釋放一個段是一個 &lt;span class="math"&gt;\(O(N)\)&lt;/span&gt; 的操作，其中 N
 是元數據段的數量，按文件系統的大小增長，
@@ -3374,7 +5218,7 @@ GC 算法則排除掉用戶手動標記的快照之後，根據快照創建的�
 的設計早期中考慮既然需要支持快照，那就把記錄數據塊佔用情況的位圖，變成快照的數組。
 於是整個文件系統有個 256 大小的快照利用率數組，數組中每個快照記錄自己佔用的數據塊位圖，
 文件系統中最多能容納 255 個快照。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
 &lt;p&gt;上面每個單元格都是一個二進制位，表示某個快照有沒有引用某個數據塊。有這樣一個位圖的數組之後，
 就可以直接掃描位圖判斷出某個數據塊是否已經佔用，可以找出尚未被佔用的數據塊用作空間分配，
 也可以方便地計算每個快照引用的空間大小或者獨佔的空間大小，估算刪除快照後可以釋放的空間。&lt;/p&gt;
@@ -3441,7 +5285,7 @@ How ZFS snapshots really work And why they perform well (usually)&lt;/div&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;我們對 fs 創建了 s1 快照，刪除了 fs 中某個文件，創建了 s2 快照，然後用 reflink
 把剛剛刪除的文件從 s1 中複製出來，再創建 s3 。如此操作之後，按時間順序有 s1、s2、s3 三個快照：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f91316de.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f91316de.png"/&gt;
 &lt;p&gt;其中只有 s2 不存在 somefile ，而 s1 、 s3 和當前的 fs 都有，並且都引用到了同一個數據塊。
 於是從時間線來看， somefile 的數據塊在 s2 中「死掉」了，又在 s3 中「復活」了。&lt;/p&gt;
 &lt;p&gt;而 ZFS (目前還）不支持 reflink ，所以沒法像這樣讓數據塊復活。一旦某個數據塊在某個快照中「死」了，
@@ -3486,7 +5330,7 @@ CoW 了新的子節點。&lt;/li&gt;
 &lt;p&gt;🐰兔子算法爲每個數據集（文件系統或快照）增加了一個數據結構，叫死亡列表（dead list），
 記錄 &lt;strong&gt;前一個快照中還活着，而當前數據集中死掉了的數據塊指針&lt;/strong&gt;
 ，換句話說就是在本數據集中「殺掉」的數據塊。舉例畫圖大概是這樣&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ab76244a.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ab76244a.png"/&gt;
 &lt;p&gt;上圖中有三個快照和一個文件系統，共 4 個數據集。每個數據集維護自己的死亡列表，
 死亡列表中是那些在該數據集中被刪掉的數據塊。於是🐰兔子算法把🐢烏龜算法所做的操作分成了兩部分，
 一部分在文件系統刪除數據時記錄死亡列表，另一部分在刪除快照時根據死亡列表釋放需要釋放的塊。&lt;/p&gt;
@@ -3532,7 +5376,7 @@ CoW 了新的子節點。&lt;/li&gt;
 都需要掃描死亡列表中的塊指針，根據指針中記錄的 birth txg 做判斷是否能直接釋放或是需要保留到另一個快照的死亡列表。
 於是🐆豹子算法的思路是，在死亡列表中記錄塊指針時，就把其中的塊指針按 birth txg 分成子列表（sublist）。&lt;/p&gt;
 &lt;p&gt;比如上面🐰兔子算法中那4個死亡列表，可以這樣拆成子列表：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/34b39b01.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/34b39b01.png"/&gt;
 &lt;p&gt;這樣拆成子列表之後，每次從死亡列表中釋放數據塊都能根據出生時間找到對應的子列表，
 然後連續釋放整個子列表。每次合併死亡列表時，也能直接用單鏈表穿起需要合併的子列表，不需要複製塊指針。&lt;/p&gt;
 &lt;p&gt;死亡列表並不在跟蹤快照的獨佔大小，而是在跟蹤快照所需負責刪除的數據塊大小，
@@ -3570,7 +5414,7 @@ OpenZFS Summit 2017 有個演講 &lt;a class="reference external" href="https://
 &lt;p&gt;克隆不光要記錄新數據塊的誕生，還要記錄新數據塊可能的死亡，所以磁盤上保存的生存日誌雖然叫 livelist
 ，但不像死亡列表那樣是列表的形式，而是日誌的形式，而內存中保存的生存日誌則組織成了棵
 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91"&gt;自平衡樹（AVLTree）&lt;/a&gt; 來加速查找。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/7f244754.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/7f244754.png"/&gt;
 &lt;p&gt;磁盤上存儲的生存日誌如上圖，每個表項記錄它是分配（A）或者刪除（F）一個數據塊，同時記錄數據塊的地址。
 這些記錄在一般情況下直接記錄在日誌末尾，隨着對克隆的寫入操作而不斷增長，長到一定程度則從內存中的
 AVL Tree 直接輸出一個新的生存日誌替代掉舊的，合併其中對應的分配和刪除操作。&lt;/p&gt;
@@ -4324,7 +6168,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -4687,7 +6531,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -5775,7 +7619,7 @@ btrfs subvolume snapshot&lt;/code&gt;
 &lt;li&gt;检查点（checkpoint）：从 ZFS on Linux v0.8.0 开始&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;梳理一下这些概念之间的关系也是最初想写下这篇笔记的初衷。先画个简图，随后逐一讲讲这些概念：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f0cd8a5f.png"/&gt;
 &lt;p&gt;上图中，假设我们有一个 pool ，其中有 3 个文件系统叫 fs1~fs3 和一个 zvol 叫 zv1
 ，然后文件系统 fs1 有两个快照 s1 和 s2 ，和两个书签 b1 和 b2。pool 整体有两个检查点 cp1 和
 cp2 。这个简图将作为例子在后面介绍这些概念。&lt;/p&gt;
@@ -5904,7 +7748,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -5917,7 +7761,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -6206,10 +8050,10 @@ GC 回收空间，这里是本文要讲的区别，所以在我看来不用 GC �
 &lt;p&gt;举个例子，比如下图是一个日志结构文件系统的磁盘占用，其中绿色是数据，蓝色是元数据（比如目录结构和
 inode），红色是文件系统级关键数据（比如最后的日志提交点），一开始可能是这样，有9个数据块，
 2个元数据块，1个系统块：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c8f452c3.png"/&gt;
 &lt;p&gt;现在要覆盖 2 和 3 的内容，新写入 n2 和 n3 ，再删除 4 号的内容 ，然后修改 10 里面的 inode 变成 n10
 引用这些新数据，然后写入一个新提交 n12 ，用黄色表示不再被引用的垃圾，提交完大概是这样：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/a0eb592f.png"/&gt;
 &lt;p&gt;日志结构文件系统需要 GC 比较容易理解，写日志嘛，总得有一个「添加到末尾」的写入点，比如上面图中的
 n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空间末尾，这时候就要覆盖写空间开头，
 就很难判断「末尾」在什么地方，而下一次写入需要在哪里了。
@@ -6231,7 +8075,7 @@ n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空
 又不利于利用整个可用空间，这里的抉择有个平衡点。&lt;/p&gt;
 &lt;p&gt;继续上面的例子，假设上面文件系统的图示中每一列的4块是一个段，想要回收最开头那个段，
 那么需要搬运还在用的 1 到空闲空间，顺带修改引用它的 n10 ，最后提交 n12 ：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ba5b5955.png"/&gt;
 &lt;p&gt;要扫描并释放一整段，需要扫描整个文件系统中别的元数据（图中的 n12 和 n10 和
 11）来确定有没有引用到目标段中的地址，可见释放一个段是一个 &lt;span class="math"&gt;\(O(N)\)&lt;/span&gt; 的操作，其中 N
 是元数据段的数量，按文件系统的大小增长，
@@ -6270,7 +8114,7 @@ GC 算法则排除掉用户手动标记的快照之后，根据快照创建的�
 的设计早期中考虑既然需要支持快照，那就把记录数据块占用情况的位图，变成快照的数组。
 于是整个文件系统有个 256 大小的快照利用率数组，数组中每个快照记录自己占用的数据块位图，
 文件系统中最多能容纳 255 个快照。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5dfeb8e2.png"/&gt;
 &lt;p&gt;上面每个单元格都是一个二进制位，表示某个快照有没有引用某个数据块。有这样一个位图的数组之后，
 就可以直接扫描位图判断出某个数据块是否已经占用，可以找出尚未被占用的数据块用作空间分配，
 也可以方便地计算每个快照引用的空间大小或者独占的空间大小，估算删除快照后可以释放的空间。&lt;/p&gt;
@@ -6337,7 +8181,7 @@ How ZFS snapshots really work And why they perform well (usually)&lt;/div&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;我们对 fs 创建了 s1 快照，删除了 fs 中某个文件，创建了 s2 快照，然后用 reflink
 把刚刚删除的文件从 s1 中复制出来，再创建 s3 。如此操作之后，按时间顺序有 s1、s2、s3 三个快照：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/f91316de.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/f91316de.png"/&gt;
 &lt;p&gt;其中只有 s2 不存在 somefile ，而 s1 、 s3 和当前的 fs 都有，并且都引用到了同一个数据块。
 于是从时间线来看， somefile 的数据块在 s2 中「死掉」了，又在 s3 中「复活」了。&lt;/p&gt;
 &lt;p&gt;而 ZFS (目前还）不支持 reflink ，所以没法像这样让数据块复活。一旦某个数据块在某个快照中「死」了，
@@ -6382,7 +8226,7 @@ CoW 了新的子节点。&lt;/li&gt;
 &lt;p&gt;🐰兔子算法为每个数据集（文件系统或快照）增加了一个数据结构，叫死亡列表（dead list），
 记录 &lt;strong&gt;前一个快照中还活着，而当前数据集中死掉了的数据块指针&lt;/strong&gt;
 ，换句话说就是在本数据集中「杀掉」的数据块。举例画图大概是这样&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/ab76244a.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/ab76244a.png"/&gt;
 &lt;p&gt;上图中有三个快照和一个文件系统，共 4 个数据集。每个数据集维护自己的死亡列表，
 死亡列表中是那些在该数据集中被删掉的数据块。于是🐰兔子算法把🐢乌龟算法所做的操作分成了两部分，
 一部分在文件系统删除数据时记录死亡列表，另一部分在删除快照时根据死亡列表释放需要释放的块。&lt;/p&gt;
@@ -6428,7 +8272,7 @@ CoW 了新的子节点。&lt;/li&gt;
 都需要扫描死亡列表中的块指针，根据指针中记录的 birth txg 做判断是否能直接释放或是需要保留到另一个快照的死亡列表。
 于是🐆豹子算法的思路是，在死亡列表中记录块指针时，就把其中的块指针按 birth txg 分成子列表（sublist）。&lt;/p&gt;
 &lt;p&gt;比如上面🐰兔子算法中那4个死亡列表，可以这样拆成子列表：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/34b39b01.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/34b39b01.png"/&gt;
 &lt;p&gt;这样拆成子列表之后，每次从死亡列表中释放数据块都能根据出生时间找到对应的子列表，
 然后连续释放整个子列表。每次合并死亡列表时，也能直接用单链表穿起需要合并的子列表，不需要复制块指针。&lt;/p&gt;
 &lt;p&gt;死亡列表并不在跟踪快照的独占大小，而是在跟踪快照所需负责删除的数据块大小，
@@ -6466,7 +8310,7 @@ OpenZFS Summit 2017 有个演讲 &lt;a class="reference external" href="https://
 &lt;p&gt;克隆不光要记录新数据块的诞生，还要记录新数据块可能的死亡，所以磁盘上保存的生存日志虽然叫 livelist
 ，但不像死亡列表那样是列表的形式，而是日志的形式，而内存中保存的生存日志则组织成了棵
 &lt;a class="reference external" href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91"&gt;自平衡树（AVLTree）&lt;/a&gt; 来加速查找。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/7f244754.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/7f244754.png"/&gt;
 &lt;p&gt;磁盘上存储的生存日志如上图，每个表项记录它是分配（A）或者删除（F）一个数据块，同时记录数据块的地址。
 这些记录在一般情况下直接记录在日志末尾，随着对克隆的写入操作而不断增长，长到一定程度则从内存中的
 AVL Tree 直接输出一个新的生存日志替代掉旧的，合并其中对应的分配和删除操作。&lt;/p&gt;
@@ -7220,7 +9064,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="table docutils field-list" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -7583,7 +9427,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -13132,7 +14976,7 @@ provides&lt;/code&gt;
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的繪圖模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，沒有混成器的時候 X 是這樣畫圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 繪圖，
 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
@@ -13144,7 +14988,7 @@ GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進�
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的繪圖模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，沒有混成器的時候 X 是這樣畫圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的應用程序沒有統一的繪圖 API 。GTK+ 在 3.0 之後統一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 繪圖，
 而 Cairo 則是基於 PDF 1.4 的繪圖模型構建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的繪圖是用 Cairo 進行，
@@ -13195,7 +15039,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;/ol&gt;
 &lt;p&gt;有了 Composite 擴展，一個 X 程序就可以調用這些 API 實現混成器。
 這裏有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教學解釋如何使用 Composite 擴展&lt;/a&gt; 。開啓了混成的 X 是這樣繪圖的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/18f7774d.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
 &lt;p&gt;整個 X 的混成器模型與 Mac OS X 的混成器模型相比，有如下幾點顯著的區別：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，對混成的繪製方式和繪製普通窗口一樣。
@@ -13328,7 +15172,7 @@ because it is broken and maintainerless.&lt;/blockquote&gt;
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
@@ -13340,7 +15184,7 @@ GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进�
 &lt;div class="section" id="x"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;原始的 X 的绘图模型&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;首先，没有混成器的时候 X 是这样画图的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/e06d011e.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/e06d011e.png"/&gt;
 &lt;p&gt;X 的应用程序没有统一的绘图 API 。GTK+ 在 3.0 之后统一用 &lt;a class="reference external" href="http://cairographics.org/"&gt;Cairo&lt;/a&gt; 绘图，
 而 Cairo 则是基于 PDF 1.4 的绘图模型构建的，
 GTK 的 2.0 和之前的版本中也有很大一部分的绘图是用 Cairo 进行，
@@ -13391,7 +15235,7 @@ CreateRegionFromBorderClip&lt;/code&gt;
 &lt;/ol&gt;
 &lt;p&gt;有了 Composite 扩展，一个 X 程序就可以调用这些 API 实现混成器。
 这里有篇 &lt;a class="reference external" href="http://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/"&gt;教学解释如何使用 Composite 扩展&lt;/a&gt; 。开启了混成的 X 是这样绘图的：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/18f7774d.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/18f7774d.png"/&gt;
 &lt;p&gt;整个 X 的混成器模型与 Mac OS X 的混成器模型相比，有如下几点显著的区别：&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;混成的部分是交由外部的程序完成的，对混成的绘制方式和绘制普通窗口一样。
@@ -13626,12 +15470,12 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技術，簡單地說，就是每個窗口並非直接輸出到顯示設備，而是把內容輸出到 (Display) PostScript
 格式交給窗口管理器，然後窗口管理器再在需要的時候把 PostScript 用軟件解釋器解釋成位圖顯示在屏幕上。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/8d293c10.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/&gt;
 &lt;p&gt;比起讓窗口直接繪製，這種方案在滾動和移動窗口的時候不需要重新渲染保存好的 DPS ，
 所以能實現實時渲染。到了實現 Mac OS X 的時候，爲了同時兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考慮到 Adobe 對蘋果收取的高昂的 Display PostScript 授權費，
 Mac OS X 的 Quartz 技術在矢量圖的 PDF 描述模型和最終渲染之間又插入了一層抽象：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5807c26a.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Mission Control&lt;/div&gt;
@@ -13741,7 +15585,7 @@ Longhorn 中的 Wobbly 效果&lt;/div&gt;
 並且跳票推遲多年之後的 Windows Vista 中實現了完整的混成器
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager"&gt;Desktop Window Manager (DWM)&lt;/a&gt;
 。整個 DWM 的架構和 Mac OS X 上看到的很像：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/1763baf6.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/&gt;
 &lt;p&gt;和 Mac OS X 的情況類似， Windows Vista 之後的應用程序有兩套主要的繪圖庫，一套是從早期
 Win32API 就沿用至今的 GDI（以及GDI+），另一套是隨着 Longhorn 計劃開發出的 WPF 。
 WPF 的所有用戶界面控件都繪製在 DirectX 貼圖上，所以使用了 WPF 的程序也可以看作是
@@ -13945,12 +15789,12 @@ NeXTSTEP 桌面&lt;/div&gt;
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Display_PostScript"&gt;Display PostScript (DPS)&lt;/a&gt;
 技术，简单地说，就是每个窗口并非直接输出到显示设备，而是把内容输出到 (Display) PostScript
 格式交给窗口管理器，然后窗口管理器再在需要的时候把 PostScript 用软件解释器解释成位图显示在屏幕上。&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/8d293c10.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/8d293c10.png"/&gt;
 &lt;p&gt;比起让窗口直接绘制，这种方案在滚动和移动窗口的时候不需要重新渲染保存好的 DPS ，
 所以能实现实时渲染。到了实现 Mac OS X 的时候，为了同时兼容老的 Mac 程序 API (carbon)
 以及更快的渲染速度，以及考虑到 Adobe 对苹果收取的高昂的 Display PostScript 授权费，
 Mac OS X 的 Quartz 技术在矢量图的 PDF 描述模型和最终渲染之间又插入了一层抽象：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/5807c26a.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/5807c26a.png"/&gt;
 &lt;div class="panel panel-default"&gt;
 &lt;div class="panel-heading"&gt;
 Mission Control&lt;/div&gt;
@@ -14060,7 +15904,7 @@ Longhorn 中的 Wobbly 效果&lt;/div&gt;
 并且跳票推迟多年之后的 Windows Vista 中实现了完整的混成器
 &lt;a class="reference external" href="http://en.wikipedia.org/wiki/Desktop_Window_Manager"&gt;Desktop Window Manager (DWM)&lt;/a&gt;
 。整个 DWM 的架构和 Mac OS X 上看到的很像：&lt;/p&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/1763baf6.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/1763baf6.png"/&gt;
 &lt;p&gt;和 Mac OS X 的情况类似， Windows Vista 之后的应用程序有两套主要的绘图库，一套是从早期
 Win32API 就沿用至今的 GDI（以及GDI+），另一套是随着 Longhorn 计划开发出的 WPF 。
 WPF 的所有用户界面控件都绘制在 DirectX 贴图上，所以使用了 WPF 的程序也可以看作是
@@ -14382,7 +16226,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;經過以上設置之後，一切正常的話，每次對主 repo 推送更新的同時， Travis-CI 就會自動
-拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
+拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中顯示編譯狀態。&lt;/p&gt;
@@ -14636,7 +16480,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
-拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
+拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中显示编译状态。&lt;/p&gt;
@@ -15543,7 +17387,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -15561,7 +17405,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -15577,7 +17421,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -15595,7 +17439,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -15622,7 +17466,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -15644,7 +17488,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -15874,7 +17718,7 @@ Markdown、 reStructuredText、 AsciiDoc 等這種輕量級標記語言裏。
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;plantuml 是繪製UML的，除此之外還有一個類似的工具是繪製一般的 &lt;ruby&gt;&lt;rb&gt;流程圖&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -16070,7 +17914,7 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -16314,7 +18158,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -16332,7 +18176,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -16348,7 +18192,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -16366,7 +18210,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -16393,7 +18237,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -16415,7 +18259,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table last first docutils borderless"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils table last"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -16645,7 +18489,7 @@ Markdown、 reStructuredText、 AsciiDoc 等这种轻量级标记语言里。
 &lt;div class="panel-heading"&gt;
 嵌入 Ditaa 的示例&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/973a8424.png"/&gt;
+&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/973a8424.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;plantuml 是绘制UML的，除此之外还有一个类似的工具是绘制一般的 &lt;ruby&gt;&lt;rb&gt;流程图&lt;/rb&gt;&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;diagram&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
@@ -16841,7 +18685,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -17900,7 +19744,7 @@ After rendering&lt;/div&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -18217,7 +20061,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -18516,7 +20360,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
 中存在的问题。他们首先确定修改是事后修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027个修改）&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -18833,7 +20677,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table docutils borderless"&gt;
+&lt;table border="0" class="table borderless docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -19631,7 +21475,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -19648,7 +21492,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -19668,7 +21512,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -19685,7 +21529,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -20643,13 +22487,13 @@ type&lt;/code&gt;
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -20766,13 +22610,13 @@ debug into it and make minor modifications.&lt;/p&gt;
 &lt;p&gt;So I started searching for Static Blog Engine in Python on Github. The author of the great framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; , &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; ,
 wrote a &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; , but it's not well developed. &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; seems to be complete enough, but it use &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;MarkDown&lt;/a&gt; as its default markup
 language, and the design of its homepage is too fashion to be used as blog. Finally I found &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; .&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id3" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id3" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Such as the difference between Python 2.x and 3.x , and also difference in C-API of implementations of &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; , &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; , &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; , &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; .&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id4" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id4" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Yes, we have &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; and &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; , but all these are package manager, running in a perticular Python implementation. Python implementation itself don't need a manager. Version issue of Python largely have been solved by lightweight converters such as &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; and &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; , you don't need to store multiple implementations of Python in your disk for different packages. Yes you can use  &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; if you need to preserve stablility but this is another story.&lt;/td&gt;&lt;/tr&gt;
@@ -20892,13 +22736,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 &lt;p&gt;実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; それとも &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 両方も Unix/Linux/MacOSX しか実行できないらしいです。ギークとしたの皆は絶対に Windows つかっじゃいけないんですか？（本当かも……）。&lt;/p&gt;
 &lt;p&gt;残りは Ruby と Python の争いです。私は &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; に詳しくない、比べると &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; のほうが私に向いています。それに、どっちでも &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; を依存しシンタックス・ハイライトをしているから、 Rubyist 達も少なくとも Python を入れなきゃダメみたいです。 私の好みは一切の Ruby コンポーネントを頼らず、 C 拡張もない純粋な Python の実現がほしいです。&lt;/p&gt;
 &lt;p&gt;そこから Github に Python で実現した静的ブログ・エンジンを探し始めた。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; の作者である &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 氏が書いた &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; が素晴らしいが、あんまり他人に使われていないようです。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; は多く使われているけれと、ホームページにブログの感じがみえないです。最後に &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; を見かけました。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;例えば Python 2.x と 3.x の間にあまりにも巨大なる差、それと &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; など各実現間に微妙な違いがあります。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;はい、こっちに &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; とか &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; があります、ですがそれらはパッケージ管理、特定なPython環境を入れた後の話です。Python自身はまだ管理する必要がないです。 Python のバージョン問題も &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; とか &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; のようなツールで変換すればいいです、違うソフトを実行するためたくさんの Python バージョンを残る必要はないです。もしバージョンの違いが気にするなら &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; を使うのも構わないが、それも別のことです。&lt;/td&gt;&lt;/tr&gt;
@@ -21014,13 +22858,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="table docutils footnote" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
