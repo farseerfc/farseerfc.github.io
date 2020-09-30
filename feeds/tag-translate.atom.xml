@@ -19,9 +19,9 @@ swap 針對 Linux 內核，在別的系統包括 macOS/WinNT 或者 Unix 系統�
 中明確建議了 swap 分區通常應該是兩倍物理內存大小，這一點建議對 FreeBSD 系內核的內存管理可能非常合理，
 而不一定適合 Linux 內核，FreeBSD 和 Linux 有不同的內存管理方式尤其是 swap 和 page cache 和
 buffer cache 的處理方式有諸多不同。&lt;/p&gt;
-&lt;p&gt;經常有朋友看到系統卡噸之後看系統內存使用狀況觀察到大量 swap 佔用，於是覺得卡噸是來源於 swap
-。就像文中所述，相關不蘊含因果，產生內存顛簸之後的確會造成大量 swap 佔用，也會造成系統卡噸，
-但是 swap 不是導致卡噸的原因，關掉 swap 或者調低 swappiness 並不能阻止卡噸，只會將 swap
+&lt;p&gt;經常有朋友看到系統卡頓之後看系統內存使用狀況觀察到大量 swap 佔用，於是覺得卡頓是來源於 swap
+。就像文中所述，相關不蘊含因果，產生內存顛簸之後的確會造成大量 swap 佔用，也會造成系統卡頓，
+但是 swap 不是導致卡頓的原因，關掉 swap 或者調低 swappiness 並不能阻止卡頓，只會將 swap
 造成的 I/O 轉化爲加載文件緩存造成的 I/O 。&lt;/p&gt;
 &lt;p&gt;以下是原文翻譯：&lt;/p&gt;
 &lt;hr class="docutils"/&gt;
@@ -630,7 +630,7 @@ already use it on your servers to log historic server state you probably
 want to set it up on these test machines with logging mode as part of this
 experiment. This also tells you when your application started swapping out
 pages, which you can tie to log events or other key data.&lt;/blockquote&gt;
-&lt;p&gt;如果你的磁盤空間優先，那麼答案更多取決於你願意做的取捨，以及運行的環境。理想上應該有足夠的交換空間
+&lt;p&gt;如果你的磁盤空間有限，那麼答案更多取決於你願意做的取捨，以及運行的環境。理想上應該有足夠的交換空間
 能高效應對正常負載和高峰（內存）負載。我建議先用 2-3GB 或者更多的交換空間搭個測試環境，
 然後監視在不同（內存）負載條件下持續一週左右的情況。只要在那一週裏沒有發生過嚴重的內存不足——
 發生了的話說明測試結果沒什麼用——在測試結束的時候大概會留有多少 MB 交換區佔用。
@@ -921,7 +921,7 @@ memory.low&lt;/code&gt;
 &lt;a class="reference external" href="https://patchwork.kernel.org/project/LKML/list/?submitter=45"&gt;Johannes&lt;/a&gt;
 提供的諸多建議和反饋。&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="translate"></category><category term="swappiness"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="translate"></category><category term="swappiness"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -949,7 +949,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -971,7 +971,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -985,7 +985,7 @@ memory.low&lt;/code&gt;
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1013,7 +1013,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1035,7 +1035,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1054,7 +1054,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1073,7 +1073,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1089,7 +1089,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -1123,7 +1123,7 @@ memory.low&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table docutils borderless translate-paragraph"&gt;
+&lt;table border="0" class="borderless translate-paragraph table docutils"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;

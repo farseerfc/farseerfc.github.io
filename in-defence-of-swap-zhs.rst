@@ -22,9 +22,9 @@ swap 针对 Linux 内核，在别的系统包括 macOS/WinNT 或者 Unix 系统�
 而不一定适合 Linux 内核，FreeBSD 和 Linux 有不同的内存管理方式尤其是 swap 和 page cache 和
 buffer cache 的处理方式有诸多不同。
 
-经常有朋友看到系统卡吨之后看系统内存使用状况观察到大量 swap 占用，于是觉得卡吨是来源于 swap
-。就像文中所述，相关不蕴含因果，产生内存颠簸之后的确会造成大量 swap 占用，也会造成系统卡吨，
-但是 swap 不是导致卡吨的原因，关掉 swap 或者调低 swappiness 并不能阻止卡吨，只会将 swap
+经常有朋友看到系统卡顿之后看系统内存使用状况观察到大量 swap 占用，于是觉得卡顿是来源于 swap
+。就像文中所述，相关不蕴含因果，产生内存颠簸之后的确会造成大量 swap 占用，也会造成系统卡顿，
+但是 swap 不是导致卡顿的原因，关掉 swap 或者调低 swappiness 并不能阻止卡顿，只会将 swap
 造成的 I/O 转化为加载文件缓存造成的 I/O 。
 
 以下是原文翻译：
@@ -641,7 +641,7 @@ cgroup v2 提供了一套可以每个 cgroup 微调的 :code:`memory.low`
    experiment. This also tells you when your application started swapping out
    pages, which you can tie to log events or other key data.
 
-如果你的磁盘空间优先，那么答案更多取决于你愿意做的取舍，以及运行的环境。理想上应该有足够的交换空间
+如果你的磁盘空间有限，那么答案更多取决于你愿意做的取舍，以及运行的环境。理想上应该有足够的交换空间
 能高效应对正常负载和高峰（内存）负载。我建议先用 2-3GB 或者更多的交换空间搭个测试环境，
 然后监视在不同（内存）负载条件下持续一周左右的情况。只要在那一周里没有发生过严重的内存不足——
 发生了的话说明测试结果没什么用——在测试结束的时候大概会留有多少 MB 交换区占用。
