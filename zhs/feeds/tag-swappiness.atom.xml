@@ -734,6 +734,30 @@ anon_prio&lt;/code&gt;
 &lt;code class="code"&gt;
 file_prio&lt;/code&gt;
  是 150 （这里数值本身不是很重要，重要的是两者之间的权重比）。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+译注：关于 SSD 上的 swappiness&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;p&gt;原文这里说 SSD 上 swap 和 drop page cache 差不多开销所以 &lt;code class="code"&gt;
+vm.swappiness = 100&lt;/code&gt;
+
+。我觉得实际上要考虑 swap out 的时候会产生写入操作，而 drop page cache 可能不需要写入（
+要看页面是否是脏页）。如果负载本身对I/O带宽比较敏感，稍微调低 swappiness 可能对性能更好，
+内核的默认值 60 是个不错的默认值。以及桌面用户可能对性能不那么关心，反而更关心 SSD
+的写入寿命，虽然说 SSD 写入寿命一般也足够桌面用户，不过调低 swappiness
+可能也能减少一部分不必要的写入（因为写回脏页是必然会发生的，而写 swap 可以避免）。
+当然太低的 swappiness 会对性能有负面影响（因为太多匿名页面留在物理内存里而降低了缓存命中率）
+，这里的权衡也需要根据具体负载做测试。&lt;/p&gt;
+&lt;p&gt;另外澄清一点误解， swap 分区还是 swap 文件对系统运行时的性能而言没有差别。或许有人会觉得
+swap 文件要经过文件系统所以会有性能损失，在译文之前译者说过 Linux 的内存管理子系统基本上独立于文件系统。
+实际上 Linux 上的 swapon 在设置 swap 文件作为交换空间的时候会读取一次文件系统元数据，
+确定 swap 文件在磁盘上的地址范围，随后运行的过程中做交换就和文件系统无关了。关于 swap
+空间是否连续的影响，因为 swap 读写基本是页面单位的随机读写，所以即便连续的 swap 空间（swap
+分区）也并不能改善 swap 的性能。希疏文件的地址范围本身不连续，写入希疏文件的空洞需要
+文件系统分配磁盘空间，所以在 Linux 上交换文件不能是希疏文件。只要不是希疏文件，
+连续的文件内地址范围在磁盘上是否连续（是否有文件碎片）基本不影响能否 swapon 或者使用 swap 时的性能。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;a aria-controls="b2897dd9" aria-expanded="false" class="translate-collapse-btn" data-toggle="collapse" href="#b2897dd9" role="button"&gt;
 &lt;span class="badge badge-pill badge-light"&gt;&lt;i class="fa fa-language"&gt;&lt;/i&gt; &lt;/span&gt;&lt;/a&gt;&lt;blockquote class="collapse" id="b2897dd9"&gt;
 This means that, in general, &lt;code class="code"&gt;
