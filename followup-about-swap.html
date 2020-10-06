@@ -280,7 +280,7 @@ Unit）做虛擬內存地址到物理內存地址的地址翻譯，現代架構�
 <h2>誤解2: 但是沒有交換區的話，虛擬內存地址都有物理內存對應嘛</h2>
 <p>很多朋友也理解上述操作系統實現虛擬內存的方式，但是仍然會有疑問：「我知道虛擬內存和交換區的區別，
 但是沒有交換區的話，虛擬內存地址都有物理內存對應，不用交換區的話就不會遇到讀虛擬內存需要讀寫磁盤
-導致的卡噸了嘛」。</p>
+導致的卡頓了嘛」。</p>
 <p>這種理解也是錯的，禁用交換區的時候，也會有一部分分配給程序的虛擬內存不對應物理內存，
 比如使用 <code class="code">
 mmap</code>
@@ -374,7 +374,7 @@ malloc/​mmap</code>
 程序分配虛擬內存的速率可以是「突發」的，比如一個系統調用中分配 1GiB 大小，而實際寫入數據的速率會被
 CPU 執行速度等因素限制，不會短期內突然寫入很多頁面。
 這個分配速率導致的時間差內內核可以完成很多後臺工作，比如回收內存，
-比如把會收到的別的進程用過的內存頁面初始化爲全0，這部分後臺工作可以和程序的執行過程並行，
+比如把回收到的別的進程用過的內存頁面初始化爲全0，這部分後臺工作可以和程序的執行過程並行，
 從而當程序實際用到內存的時候，需要的準備工作已經做完了，大部分場景下可以直接分配物理內存出來。</p>
 <p>如果程序要做實時響應，想避免因爲惰性分配造成的性能不穩定，可以使用 <code class="code">
 mlock/​mlockall</code>
@@ -403,7 +403,7 @@ VPS 提供商劃分虛擬機有超售，操作系統管理內存也同樣有這�
 <div class="panel-heading">
 zone 內水位線</div>
 <div class="panel-body">
-<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/>
+<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c995609e.png"/>
 </div>
 </div>
 <p>一個 Zone 內的頁面分配情況可以右圖描繪。
@@ -516,7 +516,7 @@ vm.min_free_kbytes</code>
 <code class="code">
 vm.min_free_kbytes = 67584</code>
  ，於是 min 水位線在這個位置。
-其它兩個水位線基於這個計算，在 low 基礎上增加總內存量的 <code class="code">
+其它兩個水位線基於這個計算，在 min 基礎上增加總內存量的 <code class="code">
 vm.watermark_scale_factor /​ 10000</code>
 
 比例（在小內存的系統上還有額外考慮），默認 <code class="code">
@@ -601,9 +601,8 @@ vm.watermark_scale_factor</code>
 swap 或者調低 swappiness 之後就不會這樣了。於是網上大量流傳着解釋這一現象，並進一步建議禁用
 swap 或者調低 swappiness 的文章。我相信不少關心系統性能調優的人看過這篇「
 <a class="reference external" href="https://rudd-o.com/linux-and-free-software/tales-from-responsivenessland-why-linux-feels-slow-and-how-to-fix-that">Tales from responsivenessland: why Linux feels slow, and how to fix that</a>
-」或是它的轉載、翻譯，用中文搜索的話還能找到更多
-<a class="reference external" href="http://blog.itpub.net/29371470/viewspace-1250975">錯誤解釋 swappiness 目的</a>
-的文章，將 swappiness 解釋成是控制內存和交換區比例的參數。</p>
+」或是它的轉載、翻譯，用中文搜索的話還能找到更多錯誤解釋 swappiness 目的的文章，比如
+<a class="reference external" href="http://blog.itpub.net/29371470/viewspace-1250975">這篇將 swappiness 解釋成是控制內存和交換區比例的參數</a> 。</p>
 <p>除去那些有技術上謬誤的文章，這些網文中描述的現象是有道理的，不單純是以訛傳訛。
 桌面環境中內存分配策略的不確定性和服務器環境中很不一樣，複製、下載、解壓大文件等導致一段時間內
 大量佔用頁面緩存，以至於把操作結束後需要的頁面攆出物理內存，無論是交換出去的方式還是以丟棄頁面緩存的方式，
@@ -622,6 +621,20 @@ v2 ，前面 Chris 的文章也有提到 cgroup v2 的 <code class="code">
 memory.low</code>
  可以某種程度上建議內存子系統
 儘量避免回收某些 cgroup 進程的內存。</p>
+<p>於是有了 cgroup 之後，另一種思路是把複製文件等大量使用內存而之後又不需要保留頁面緩存的程序單獨放入
+cgroup 內限制它的內存用量，用一點點複製文件時的性能損失換來整體系統的響應流暢度。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+關於 cgroup v1 和 v2</div>
+<div class="panel-body">
+<p>稍微跑題說一下 cgroup v2 相對於 v1 帶來的優勢。這方面優勢在
+<a class="reference external" href="https://www.youtube.com/watch?v=ikZ8_mRotT4">Chris Down 另一個關於 cgroup v2 演講</a>
+中有提到。老 cgroup v1 按控制器區分 cgroup 層級，從而內存控制器所限制的東西和 IO
+控制器所限制的東西是獨立的。在內核角度來看，頁面寫回（page writeback）和交換（swap）正是
+夾在內存控制器和IO控制器管理的邊界上，從而用 v1 的 cgroup 難以同時管理。 v2
+通過統一控制器層級解決了這方面限制。具體見下面 Chris Down 的演講。</p>
+<div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/ikZ8_mRotT4"></iframe></div></div>
+</div>
 </div>
 <div class="section" id="cgroup-v2">
 <h2>用 cgroup v2 限制進程的內存分配</h2>
@@ -641,7 +654,8 @@ memory.low</code>
 </ul>
 <p>到達這些 cgroup 設定閾值的時候，還可以設置內核回調的處理程序，從用戶空間做一些程序相關的操作。</p>
 <p>Linux 有了 cgroup v2 之後，就可以通過對某些程序設置內存用量限制，避免他們產生的頁面請求把別的
-程序所需的頁面擠出物理內存。使用 systemd 的系統中，首先需要 <a class="reference external" href="https://wiki.archlinux.org/index.php/Cgroups#Switching_to_cgroups_v2">啓用 cgroup v2</a>
+程序所需的頁面擠出物理內存。使用 systemd 的系統中，首先需要
+<a class="reference external" href="https://wiki.archlinux.org/index.php/Cgroups#Switching_to_cgroups_v2">啓用 cgroup v2</a>
 ，在內核引導參數中加上 <code class="code">
 systemd.unified_cgroup_hierarchy=1</code>
 
@@ -670,10 +684,12 @@ limit-mem</code>
 </pre></div>
 <p>實際用法有很多，可以參考 systemd 文檔
 <a class="reference external" href="http://www.jinbuguo.com/systemd/systemd.resource-control.html">man systemd.resource-control</a>
-， <a class="reference external" href="/links.html#xuanwo">xuanwo</a> 也 <a class="reference external" href="https://xuanwo.io/2018/10/30/tips-of-systemd/">有篇博客介紹過</a>
+， <a class="reference external" href="/links.html#xuanwo">xuanwo</a> 也 <a class="reference external" href="https://xuanwo.io/2018/10/30/tips-of-systemd/">有篇博客介紹過 systemd 下資源限制</a>
+， <a class="reference external" href="/links.html#lilydjwg">lilydjwg</a> 也 <a class="reference external" href="https://blog.lilydjwg.me/2019/3/2/use-cgroups-to-limit-memory-usage-for-specific-processes.214196.html">寫過用 cgroup 限制進程內存的用法</a>
+和 <a class="reference external" href="https://blog.lilydjwg.me/2020/5/11/priority-and-nice-value-in-linux.215304.html">用 cgroup 之後對 CPU 調度的影響</a>
 。</p>
 </div>
-<div class="section" id="id13">
+<div class="section" id="id12">
 <h2>未來展望</h2>
 <p>最近新版的 gnome 和 KDE 已經開始爲桌面環境下用戶程序的進程創建 systemd scope 了，
 可以通過 <code class="code">
@@ -685,10 +701,14 @@ app-APPNAME-HASH.scope</code>
 有了這些 scope 之後，事實上用戶程序的資源分配某種程度上已經相互獨立，
 不過默認的用戶程序沒有施加多少限制。</p>
 <p>今後可以展望，桌面環境可以提供用戶友好的方式對這些桌面程序施加公平性的限制。
-不光是內存分配的大小限制，包括 CPU 和 IO 佔用方面也會更公平
-（，值得一提 ext4 和 btrfs 支持對 IO 的公平調度和 per-cgroup 限制，而 XFS
-目前好像還沒有這方面支持）。
-相信不遠的將來，複製大文件之類常見普通操作不再需要手動調用加以限制，
+不光是內存分配的大小限制，包括 CPU 和 IO 佔用方面也會更公平。
+值得一提的是傳統的 ext4/xfs/f2fs 之類的文件系統雖然支持
+<a class="reference external" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#writeback">cgroup writeback 節流</a>
+但是因爲他們有額外的 journaling 寫入，難以單獨針對某些 cgroup 限制 IO
+寫入帶寬（對文件系統元數據的寫入難以統計到具體某組進程）。
+而 btrfs 通過 CoW 避免了 journaling ，
+<a class="reference external" href="https://facebookmicrosites.github.io/btrfs/docs/btrfs-facebook.html#io-control-with-cgroup2">在這方面有更好的支持</a>
+。相信不遠的將來，複製大文件之類常見普通操作不再需要手動調用加以限制，
 就能避免單個程序佔用太多資源影響別的程序。</p>
 </div>
 <script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
