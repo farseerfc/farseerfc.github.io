@@ -1,5 +1,979 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-09-30T13:45:00+09:00</updated><entry><title>【译】替 swap 辩护：常见的误解</title><link href="//farseerfc.me/zhs/in-defence-of-swap.html" rel="alternate"></link><published>2020-09-30T13:45:00+09:00</published><updated>2020-09-30T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-09-30:/zhs/in-defence-of-swap.html</id><summary type="html">&lt;p&gt;这篇翻译自 Chris Down 的博文
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Farseerfc的小窝</title><link href="//farseerfc.me/zhs/" rel="alternate"></link><link href="//farseerfc.me/feeds/all.atom.xml" rel="self"></link><id>//farseerfc.me/zhs/</id><updated>2020-10-06T13:45:00+09:00</updated><entry><title>关于 swap 的一些补充</title><link href="//farseerfc.me/zhs/followup-about-swap.html" rel="alternate"></link><published>2020-10-06T13:45:00+09:00</published><updated>2020-10-06T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-10-06:/zhs/followup-about-swap.html</id><summary type="html">&lt;p&gt;上周翻译完 &lt;a class="reference external" href="//farseerfc.me/zhs/in-defence-of-swap.html"&gt;【译】替 swap 辩护：常见的误解&lt;/a&gt;
+之后很多朋友们似乎还有些疑问和误解，于是写篇后续澄清一下。事先声明我不是内核开发者，
+这里说的只是我的理解，
+&lt;a class="reference external" href="https://www.kernel.org/doc/gorman/html/understand/understand005.html"&gt;基于内核文档中关于物理内存的描述&lt;/a&gt;
+，新的内核代码的具体行为可能和我的理解有所出入，欢迎踊跃讨论。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=7aONIVSXiJ8"&gt;Introduction to Memory Management in Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/7aONIVSXiJ8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;误解1: swap 是虚拟内存，虚拟内存肯定比物理内存慢嘛&lt;/h2&gt;
+&lt;p&gt;这种误解进一步的结论通常是：「使用虚拟内存肯定会减慢系统运行时性能，如果物理内存足够为什么还要用虚拟的？」
+这种误解是把虚拟内存和交换区的实现方式类比于「虚拟磁盘」或者「虚拟机」等同的方式，
+也隐含「先用物理内存，用完了之后用虚拟内存」也即下面的「误解3」的理解。&lt;/p&gt;
+&lt;p&gt;首先，交换区（swap） &lt;strong&gt;不是&lt;/strong&gt; 虚拟内存。操作系统中说「物理内存」还是「虚拟内存」的时候在指程序代码
+寻址时使用的内存地址方式，使用物理地址空间时是在访问物理内存，使用虚拟地址空间时是在访问虚拟内存 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;上周翻译完 &lt;a class="reference external" href="//farseerfc.me/zhs/in-defence-of-swap.html"&gt;【译】替 swap 辩护：常见的误解&lt;/a&gt;
+之后很多朋友们似乎还有些疑问和误解，于是写篇后续澄清一下。事先声明我不是内核开发者，
+这里说的只是我的理解，
+&lt;a class="reference external" href="https://www.kernel.org/doc/gorman/html/understand/understand005.html"&gt;基于内核文档中关于物理内存的描述&lt;/a&gt;
+，新的内核代码的具体行为可能和我的理解有所出入，欢迎踊跃讨论。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=7aONIVSXiJ8"&gt;Introduction to Memory Management in Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/7aONIVSXiJ8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;误解1: swap 是虚拟内存，虚拟内存肯定比物理内存慢嘛&lt;/h2&gt;
+&lt;p&gt;这种误解进一步的结论通常是：「使用虚拟内存肯定会减慢系统运行时性能，如果物理内存足够为什么还要用虚拟的？」
+这种误解是把虚拟内存和交换区的实现方式类比于「虚拟磁盘」或者「虚拟机」等同的方式，
+也隐含「先用物理内存，用完了之后用虚拟内存」也即下面的「误解3」的理解。&lt;/p&gt;
+&lt;p&gt;首先，交换区（swap） &lt;strong&gt;不是&lt;/strong&gt; 虚拟内存。操作系统中说「物理内存」还是「虚拟内存」的时候在指程序代码
+寻址时使用的内存地址方式，使用物理地址空间时是在访问物理内存，使用虚拟地址空间时是在访问虚拟内存。
+现代操作系统在大部分情况下都在使用虚拟地址空间寻址， &lt;strong&gt;包括&lt;/strong&gt; 在执行内核代码的时候。&lt;/p&gt;
+&lt;p&gt;并且，交换区 &lt;strong&gt;不是&lt;/strong&gt; 实现虚拟内存的方式。操作系统使用内存管理单元（MMU，Memory Management
+Unit）做虚拟内存地址到物理内存地址的地址翻译，现代架构下 MMU 通常是 CPU
+的一部分，配有它专用的一小块存储区叫做地址转换旁路缓存（TLB，Translation Lookaside Buffer），
+只有在 TLB 中没有相关地址翻译信息的时候 MMU 才会以缺页中断的形式调用操作系统内核帮忙。
+除了 TLB 信息不足的时候，大部分情况下使用虚拟内存都是硬件直接实现的地址翻译，没有软件模拟开销。
+实现虚拟内存不需要用到交换区，交换区只是操作系统实现虚拟内存后能提供的一个附加功能，
+即便没有交换区，操作系统大部分时候也在用虚拟内存，包括在大部分内核代码中。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;误解2: 但是没有交换区的话，虚拟内存地址都有物理内存对应嘛&lt;/h2&gt;
+&lt;p&gt;很多朋友也理解上述操作系统实现虚拟内存的方式，但是仍然会有疑问：「我知道虚拟内存和交换区的区别，
+但是没有交换区的话，虚拟内存地址都有物理内存对应，不用交换区的话就不会遇到读虚拟内存需要读写磁盘
+导致的卡吨了嘛」。&lt;/p&gt;
+&lt;p&gt;这种理解也是错的，禁用交换区的时候，也会有一部分分配给程序的虚拟内存不对应物理内存，
+比如使用 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 调用实现内存映射文件的时候。实际上即便是使用 &lt;code class="code"&gt;
+read/​write&lt;/code&gt;
+
+读写文件， Linux 内核中（可能现代操作系统内核都）在底下是用和 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 相同的机制建立文件
+到虚拟地址空间的地址映射，然后实际读写到虚拟地址时靠缺页中断把文件内容载入页面缓存（page cache
+）。内核加载可执行程序和动态链接库的方式也是通过内存映射文件。甚至可以进一步说，
+用户空间的虚拟内存地址范围内，除了匿名页之外，其它虚拟地址都是文件后备（backed by file
+），而匿名页通过交换区作为文件后备。上篇文章中提到的别的类型的内存，比如共享内存页面（shm
+）是被一个内存中的虚拟文件系统后备的，这一点有些套娃先暂且不提。于是事实是无论有没有交换区，
+缺页的时候总会有磁盘读写从慢速存储加载到物理内存，这进一步引出上篇文章中对于交换区和页面缓存这两者的讨论。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;误解3： 不是内存快用完的时候才会交换的么？&lt;/h2&gt;
+&lt;p&gt;简短的答案可以说「是」，但是内核理解的「内存快用完」和你理解的很可能不同。
+也可以说「不是」，就算按照内核理解的「内存快用完」的定义，内存快用完的时候内核的行为是去回收内存，
+至于回收内存的时候内核会做什么有个复杂的启发式经验算法，实际上真的内存快满的时候根本来不及做
+swap ，内核可能会尝试丢弃 page cache 甚至丢弃 vfs cache (dentry cache / inode cache)
+这些不需要磁盘I/O就能更快获取可用内存的动作。&lt;/p&gt;
+&lt;p&gt;深究这些内核机制之前，我在思考为什么很多朋友会问出这样的问题。可能大部分这么问的人，学过编程，
+稍微学过基本的操作系统原理，在脑海里对内核分配页面留着这样一种印象（C伪代码）：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;////////////////////  userspace space  ////////////////&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;malloc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mmap&lt;/span&gt;&lt;span class="p"&gt;(...);&lt;/span&gt;                                    &lt;span class="c1"&gt;// 从内核分配内存页&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;alloc_from_page&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pages&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;                        &lt;span class="c1"&gt;// 从拿到的内存页细分&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="c1"&gt;////////////////////  kernel space  //////////////////&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;SYSCALL&lt;/span&gt; &lt;span class="n"&gt;do_mmap&lt;/span&gt;&lt;span class="p"&gt;(...){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   &lt;span class="c1"&gt;//...&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nr_page&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="c1"&gt;// 可用内存不够了！尝试搞点内存&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;page_frame_info&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lru_pop_page_frame&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;     &lt;span class="c1"&gt;// 找出最少访问的页面&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;pf_type&lt;/span&gt; &lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nl"&gt;PAGE_CACHE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;drop_page_cache&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="c1"&gt;// 丢弃文件缓存&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nl"&gt;SWAP&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;       &lt;span class="n"&gt;swap_out&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;        &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="c1"&gt;// &amp;lt;- 写磁盘，所以系统卡了！&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="c1"&gt;// ... 别的方式回收 least_accessed&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;append_free_page&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;free_page_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;           &lt;span class="c1"&gt;// 回收到的页面加入可用列表&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="c1"&gt;// 搞到内存了！返回给程序&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;-=&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;phy_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;take_from_free_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;free_page_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;assign_virtual_addr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;phy_addr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这种逻辑隐含三层 &lt;strong&gt;错误的&lt;/strong&gt; 假设：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;分配物理内存是发生在从内核分配内存的时候的，比如 &lt;code class="code"&gt;
+malloc/​mmap&lt;/code&gt;
+ 的时候。&lt;/li&gt;
+&lt;li&gt;内存回收是发生在进程请求内存分配的上下文里的，换句话说进程在等内核的内存回收返回内存，
+不回收到内存，进程就得不到内存。&lt;/li&gt;
+&lt;li&gt;交换出内存到 swap 是发生在内存回收的时候的，会阻塞内核的内存回收，进而阻塞程序的内存分配。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这种把内核代码当作「具有特权的库函数调用」的看法，可能很易于理解，
+甚至早期可能的确有操作系统的内核是这么实现的，但是很可惜现代操作系统都不是这么做的。
+上面三层假设的错误之处在于：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;在程序请求内存的时候，比如 &lt;code class="code"&gt;
+malloc/​mmap&lt;/code&gt;
+ 的时候，内核只做虚拟地址分配，
+记录下某段虚拟地址空间对这个程序是可以合法访问的，但是不实际分配物理内存给程序。
+在程序第一次访问到虚拟地址的时候，才会实际分配物理内存。这种叫 &lt;strong&gt;惰性分配（lazy allocation）&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;在内核感受到内存分配压力之后，早在内核内存用尽之前，内核就会在后台慢慢扫描并回收内存页。
+内存回收通常不发生在内存分配的时候，除非在内存非常短缺的情况下，后台内存回收来不及满足当前分配请求，
+才会发生 &lt;strong&gt;直接回收(direct reclamation)&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;同样除了直接回收的情况，大部分正常情况下换出页面是内存管理子系统调用 DMA 在后台慢慢做的，
+交换页面出去不会阻塞内核的内存回收，更不会阻塞程序做内存分配（malloc
+）和使用内存(实际访问惰性分配的内存页)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也就是说，现代操作系统内核是高度并行化的设计，内存分配方方面面需要消耗计算资源或者 I/O
+带宽的场景，都会尽量并行化，最大程度利用好计算机所有组件（CPU/MMU/DMA/IO）的吞吐率，
+不到紧要关头需要直接回收的场合，就不会阻塞程序的正常执行流程。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;惰性分配有什么好处？&lt;/h2&gt;
+&lt;p&gt;或许会有人问：「我让你分配内存，你给我分配了个虚拟的，到用的时候还要做很多事情才能给我，这不是骗人嘛」，
+或者会有人担心惰性分配会对性能造成负面影响。&lt;/p&gt;
+&lt;p&gt;这里实际情况是程序从分配虚拟内存的时候，「到用的时候」，这之间有段时间间隔，可以留给内核做准备
+。程序可能一下子分配一大片内存地址，然后再在执行过程中解析数据慢慢往地址范围内写东西。
+程序分配虚拟内存的速率可以是「突发」的，比如一个系统调用中分配 1GiB 大小，而实际写入数据的速率会被
+CPU 执行速度等因素限制，不会短期内突然写入很多页面。
+这个分配速率导致的时间差内内核可以完成很多后台工作，比如回收内存，
+比如把会收到的别的进程用过的内存页面初始化为全0，这部分后台工作可以和程序的执行过程并行，
+从而当程序实际用到内存的时候，需要的准备工作已经做完了，大部分场景下可以直接分配物理内存出来。&lt;/p&gt;
+&lt;p&gt;如果程序要做实时响应，想避免因为惰性分配造成的性能不稳定，可以使用 &lt;code class="code"&gt;
+mlock/​mlockall&lt;/code&gt;
+
+将得到的虚拟内存锁定在物理内存中，锁的过程中内核会做物理内存分配。不过要区分「性能不稳定」和「低性能」，
+预先分配内存可以避免实际使用内存时分配物理页面的额外开销，但是会拖慢整体吞吐率，所以要谨慎使用。&lt;/p&gt;
+&lt;p&gt;很多程序分配了很大一片地址空间，但是实际并不会用完这些地址，直到程序执行结束这些虚拟地址也一直
+处于没有对应物理地址的情况。惰性分配可以避免为这些情况浪费物理内存页面，使得很多程序可以无忧无虑地
+随意分配内存地址而不用担心性能损失。这种分配方式也叫「超额分配（overcommit）」。飞机票有超售，
+VPS 提供商划分虚拟机有超售，操作系统管理内存也同样有这种现象，合理使用超额分配能改善整体系统效率。&lt;/p&gt;
+&lt;p&gt;内核要高效地做到惰性分配而不影响程序执行效率的前提之一，在于程序真的用到内存的时候，
+内核能不做太多操作就立刻分配出来，也就是说内核需要时时刻刻在手上留有一部分空页，
+满足程序执行时内存分配的需要。换句话说，内核需要早在物理内存用尽之前，就开始回收内存。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;那么内核什么时候会开始回收内存？&lt;/h2&gt;
+&lt;p&gt;首先一些背景知识：物理内存地址空间并不是都平等，因为一些地址范围可以做
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Direct_memory_access"&gt;DMA&lt;/a&gt; 而另一些不能，以及
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Non-uniform_memory_access"&gt;NUMA&lt;/a&gt;
+等硬件环境倾向于让 CPU 访问其所在 NUMA 节点内存范围。在 32bit
+系统上内核的虚拟地址空间还有低端内存和高端内存的区分，他们会倾向于使用不同属性的物理内存，到
+64bit 系统上已经没有了这种限制。&lt;/p&gt;
+&lt;p&gt;硬件限制了内存分配的自由度，于是内核把物理内存空间分成多个 Zone
+，每个 Zone 内各自管理可用内存， Zone 内的内存页之间是相互平等的。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+zone 内水位线&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;一个 Zone 内的页面分配情况可以右图描绘。
+除了已用内存页，剩下的就是空闲页（free pages），空闲页范围中有三个水位线（watermark
+）评估当前内存压力情况，分别是高位（high）、低位（low）、最小位（min）。&lt;/p&gt;
+&lt;p&gt;当内存分配使得空闲页水位低于低位线，内核会唤醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 后台线程， &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+
+负责扫描物理页面的使用情况并挑选一部分页面做回收，直到可用页面数量恢复到水位线高位（high）以上。
+如果 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 回收内存的速度慢于程序执行实际分配内存的速度，
+可用空闲页数量可能进一步下降，降至低于最小水位（min）之后，内核会让内存分配进入
+&lt;strong&gt;直接回收(direct reclamation)&lt;/strong&gt; 模式，在直接回收模式下，程序分配某个物理页的请求（
+第一次访问某个已分配虚拟页面的时候）会导致在进程上下文中阻塞式地调用内存回收代码。&lt;/p&gt;
+&lt;p&gt;除了内核在后台回收内存，进程也可以主动释放内存，比如有程序退出的时候就会释放一大片内存页，
+所以可用页面数量可能会升至水位线高位以上。有太多可用页面浪费资源对整体系统运行效率也不是好事，
+所以系统会积极缓存文件读写，所有 page cache 都留在内存中，直到可用页面降至低水位以下触发
+&lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 开始工作。&lt;/p&gt;
+&lt;p&gt;设置最小水位线（min）的原因在于，内核中有些硬件也会突然请求大量内存，比如来自网卡接收到的数据包，
+预留出最小水位线以下的内存给内核内部和硬件使用。&lt;/p&gt;
+&lt;p&gt;设置高低两个控制 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 开关的水位线是基于控制理论。唤醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+
+扫描内存页面本身有一定计算开销，于是每次唤醒它干活的话就让它多做一些活（ high - low
+），避免频繁多次唤醒。&lt;/p&gt;
+&lt;p&gt;因为有这些水位线，系统中根据程序请求内存的「速率」，整个系统的内存分配在宏观的一段时间内可能处于以下几种状态：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;strong&gt;不回收：&lt;/strong&gt; 系统中的程序申请内存速度很慢，或者程序主动释放内存的速度很快，
+（比如程序执行时间很短，不怎么进行文件读写就马上退出，）此时可用页面数量可能一直处于低水位线以上，
+内核不会主动回收内存，所有文件读写都会以页面缓存的形式留在物理内存中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;后台回收：&lt;/strong&gt; 系统中的程序在缓慢申请内存，比如做文件读写，
+比如分配并使用匿名页面。系统会时不时地唤醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 在后台做内存回收，
+不会干扰到程序的执行效率。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;直接回收：&lt;/strong&gt; 如果程序申请内存的速度快于 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 后台回收内存的速度，
+空闲内存最终会跌破最小水位线，随后的内存申请会进入直接回收的代码路径，从而极大限制内存分配速度。
+在直接分配和后台回收的同时作用下，空闲内存可能会时不时回到最小水位线以上，
+但是如果程序继续申请内存，空闲内存量就会在最小水位线附近上下徘徊。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;杀进程回收：&lt;/strong&gt; 甚至直接分配和后台回收的同时作用也不足以拖慢程序分配内存的速度的时候，
+最终空闲内存会完全用完，此时触发 OOM 杀手干活杀进程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;系统状态处于 &lt;strong&gt;1. 不回收&lt;/strong&gt;  的时候表明分配给系统的内存量过多，比如系统刚刚启动之类的时候。
+理想上应该让系统长期处于 &lt;strong&gt;2. 后台回收&lt;/strong&gt; 的状态，此时最大化利用缓存的效率而又不会因为内存回收
+减缓程序执行速度。如果系统引导后长期处于 &lt;strong&gt;1. 不回收&lt;/strong&gt; 的状态下，那么说明没有充分利用空闲内存做
+文件缓存，有些 unix 服务比如 &lt;a class="reference external" href="https://wiki.archlinux.org/index.php/preload"&gt;preload&lt;/a&gt; 可用来提前填充文件缓存。&lt;/p&gt;
+&lt;p&gt;如果系统频繁进入 &lt;strong&gt;3. 直接回收&lt;/strong&gt; 的状态，表明在这种工作负载下系统需要减慢一些内存分配速度，
+让 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 有足够时间回收内存。就如前一篇翻译中 Chris
+所述，频繁进入这种状态也不一定代表「内存不足」，可能表示内存分配处于非常高效的利用状态下，
+系统充分利用慢速的磁盘带宽，为快速的内存缓存提供足够的可用空间。
+&lt;strong&gt;直接回收&lt;/strong&gt; 是否对进程负载有负面影响要看具体负载的特性。
+此时选择禁用 swap 并不能降低磁盘I/O，反而可能缩短 &lt;strong&gt;2. 后台回收&lt;/strong&gt; 状态能持续的时间，
+导致更快进入 &lt;strong&gt;4. 杀进程回收&lt;/strong&gt; 的极端状态。&lt;/p&gt;
+&lt;p&gt;当然如果系统长期处于 &lt;strong&gt;直接回收&lt;/strong&gt; 的状态的话，则说明内存总量不足，需要考虑增加物理内存，
+或者减少系统负载了。如果系统进入 &lt;strong&gt;4. 杀进程回收&lt;/strong&gt; 的状态，不光用空间的进程会受影响，
+并且还可能导致内核态的内存分配受影响，产生网络丢包之类的结果。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;微调内存管理水位线&lt;/h2&gt;
+&lt;p&gt;可以看一下运行中的系统中每个 Zone 的水位线在哪儿。比如我手上这个 16GiB 的系统中：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ cat /proc/zoneinfo&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone      DMA&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;3459&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;16&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;20&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;24&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;4095&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3997&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3975&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone    DMA32&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;225265&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;3140&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;3925&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;4710&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;1044480&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;780044&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;763629&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone   Normal&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;300413&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;13739&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;17173&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;20607&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3328410&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;因为不是 NUMA 系统，所以只有一个 NUMA node，其中根据 DMA 类型共有 3 个 Zone 分别叫 DMA,
+DMA32, Normal 。三个 Zone 的物理地址范围（spanned）加起来大概有
+&lt;span class="math"&gt;\(4095+1044480+3407872\)&lt;/span&gt; 大约 17GiB 的地址空间，而实际可访问的地址范围（present
+）加起来有 &lt;span class="math"&gt;\(3997+780044+3407872\)&lt;/span&gt; 大约 16GiB 的可访问物理内存。&lt;/p&gt;
+&lt;p&gt;其中空闲页面有 &lt;span class="math"&gt;\(3459+762569+1460218\)&lt;/span&gt; 大约 8.5GiB ，三条水位线分别在：
+&lt;span class="math"&gt;\(\texttt{high} = 24+4710+20607 = 98\texttt{MiB}\)&lt;/span&gt; ，
+&lt;span class="math"&gt;\(\texttt{low} = 20+3925+17173 = 82\texttt{MiB}\)&lt;/span&gt; ，
+&lt;span class="math"&gt;\(\texttt{min} = 16+3140+13739 = 65\texttt{MiB}\)&lt;/span&gt; 的位置。&lt;/p&gt;
+&lt;p&gt;具体这些水位线的确定方式基于几个 sysctl 。首先 min 基于 &lt;code class="code"&gt;
+vm.min_free_kbytes&lt;/code&gt;
+
+默认是基于内核低端内存量的平方根算的值，并限制到最大 64MiB 再加点余量，比如我这台机器上
+&lt;code class="code"&gt;
+vm.min_free_kbytes = 67584&lt;/code&gt;
+ ，于是 min 水位线在这个位置。
+其它两个水位线基于这个计算，在 low 基础上增加总内存量的 &lt;code class="code"&gt;
+vm.watermark_scale_factor /​ 10000&lt;/code&gt;
+
+比例（在小内存的系统上还有额外考虑），默认 &lt;code class="code"&gt;
+vm.watermark_scale_factor = 10&lt;/code&gt;
+
+在大内存系统上意味着 low 比 min 高 0.1% ， high 比 low 高 0.1% 。&lt;/p&gt;
+&lt;p&gt;可以手动设置这些值，以更早触发内存回收，比如将 &lt;code class="code"&gt;
+vm.watermark_scale_factor&lt;/code&gt;
+ 设为 100:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sudo tee /proc/sys/vm/watermark_scale_factor&lt;/span&gt;
+&lt;span class="code-line"&gt;$ cat /proc/zoneinfo&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone      DMA&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;3459&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;16&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;55&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;94&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;4095&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3997&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3975&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   Node &lt;span class="m"&gt;0&lt;/span&gt;, zone    DMA32&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;101987&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;3149&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;10785&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;18421&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;1044480&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;780044&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;763629&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   Node &lt;span class="m"&gt;0&lt;/span&gt;, zone   Normal&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;61987&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;13729&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;47013&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;80297&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3328410&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;得到的三条水位线分别在 &lt;span class="math"&gt;\(\texttt{min} = 16+3149+13729 = 66\texttt{MiB}\)&lt;/span&gt;
+， &lt;span class="math"&gt;\(\texttt{low} = 55+10785+47013 = 226\texttt{MiB}\)&lt;/span&gt;
+， &lt;span class="math"&gt;\(\texttt{high} = 94+18421+80297 = 386\texttt{MiB}\)&lt;/span&gt; ，
+从而 low 和 high 分别比 min 提高 160MiB 也就是内存总量的 1% 左右。&lt;/p&gt;
+&lt;p&gt;在 swap 放在 HDD 的系统中，因为换页出去的速度较慢，除了上篇文章说的降低
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 之外，还可以适当提高 &lt;code class="code"&gt;
+vm.watermark_scale_factor&lt;/code&gt;
+
+让内核更早开始回收内存，这虽然会稍微降低缓存命中率，但是另一方面可以在进入直接回收模式之前
+有更多时间做后台换页，也将有助于改善系统整体流畅度。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h2&gt;只有 0.1% ，这不就是说内存快用完的时候么？&lt;/h2&gt;
+&lt;p&gt;所以之前的「误解3」我说答案可以说「是」或者「不是」，但是无论回答是或不是，都代表了认为「swap
+就是额外的慢速内存」的错误看法。当有人在强调「swap 是内存快用完的时候才交换」的时候，
+隐含地，是在把系统总体的内存分配看作是一个静态的划分过程：打个比方这就像在说，我的系统里存储空间有快速
+128GiB SSD 和慢速 HDD 的 1TiB ，同样内存有快速的 16GiB RAM 和慢速 16GiB 的 swap 。
+这种静态划分的类比是错误的看待方式，因为系统回收内存进而做页面交换的方式是动态平衡的过程，
+需要考虑到「时间」和「速率」而非单纯看「容量」。&lt;/p&gt;
+&lt;p&gt;假设 swap 所在的存储设备可以支持 5MiB/s 的吞吐率（ HDD 上可能更慢， SSD
+上可能更快，这里需要关注数量级），相比之下 DDR3 大概有 10GiB/s 的吞吐率，DDR4 大概有 20GiB/s
+，无论多快的 SSD 也远达不到这样的吞吐（可能 Intel Optane 这样的
+&lt;a class="reference external" href="https://lwn.net/Articles/717953/"&gt;DAX&lt;/a&gt; 设备会改变这里的状况）。从而把 swap
+当作慢速内存的视角来看的话，加权平均的速率是非常悲观的，「 16G 的 DDR3 + 16G 的 swap 会有
+&lt;span class="math"&gt;\(\frac{16 \times 10 \times 1024 + 16 \times 5}{16+16} = 5 \texttt{GiB/s}\)&lt;/span&gt;
+的吞吐？所以开 swap 导致系统速度降了一半？」显然不能这样看待。&lt;/p&gt;
+&lt;p&gt;动态的看待方式是， swap 设备能提供 5MiB/s 的吞吐，这意味着：如果我们能把未来 10
+分钟内不会访问到的页面换出到 swap ，那么就相当于有
+&lt;span class="math"&gt;\(10 \times 60 \texttt{s} \times 5 \texttt{MiB/s} = 3000 \texttt{MiB}\)&lt;/span&gt;
+的额外内存，用来放那 10 分钟内可能会访问到的页面缓存。
+10 分钟只是随口说的一段时间，可以换成 10 秒或者 10 小时，重要的是只要页面交换发生在后台，
+不阻塞前台程序的执行，那么 swap 设备提供的额外吞吐率相当于一段时间内提供了更大的物理内存，
+总是能提升页面缓存的命中，从而改善系统性能。&lt;/p&gt;
+&lt;p&gt;当然系统内核不能预知「未来 10 分钟内需要的页面」，只能根据历史上访问内存的情况预估之后可能会访问的情况，
+估算不准的情况下，比如最近10分钟内用过的页面缓存在之后10分钟内不再被使用的时候，
+为了把最近这10分钟内访问过的页面留在物理内存中，可能会把之后10分钟内要用到的匿名页面换出到了交换设备上。
+于是会有下面的情况：&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="swap-swap"&gt;
+&lt;h2&gt;但是我开了 swap 之后，一旦复制大文件，系统就变卡，不开 swap 不会这样的&lt;/h2&gt;
+&lt;p&gt;大概电脑用户都经历过这种现象，不限于 Linux 用户，包括 macOS 和 Windows 上也是。
+在文件管理器中复制了几个大文件之后，切换到别的程序系统就极其卡顿，复制已经结束之后的一段时间也会如此。
+复制的过程中系统交换区的使用率在上涨，复制结束后下降，显然 swap 在其中有重要因素，并且禁用
+swap 或者调低 swappiness 之后就不会这样了。于是网上大量流传着解释这一现象，并进一步建议禁用
+swap 或者调低 swappiness 的文章。我相信不少关心系统性能调优的人看过这篇「
+&lt;a class="reference external" href="https://rudd-o.com/linux-and-free-software/tales-from-responsivenessland-why-linux-feels-slow-and-how-to-fix-that"&gt;Tales from responsivenessland: why Linux feels slow, and how to fix that&lt;/a&gt;
+」或是它的转载、翻译，用中文搜索的话还能找到更多
+&lt;a class="reference external" href="http://blog.itpub.net/29371470/viewspace-1250975"&gt;错误解释 swappiness 目的&lt;/a&gt;
+的文章，将 swappiness 解释成是控制内存和交换区比例的参数。&lt;/p&gt;
+&lt;p&gt;除去那些有技术上谬误的文章，这些网文中描述的现象是有道理的，不单纯是以讹传讹。
+桌面环境中内存分配策略的不确定性和服务器环境中很不一样，复制、下载、解压大文件等导致一段时间内
+大量占用页面缓存，以至于把操作结束后需要的页面撵出物理内存，无论是交换出去的方式还是以丢弃页面缓存的方式，
+都会导致桌面响应性降低。&lt;/p&gt;
+&lt;p&gt;不过就像前文 Chris 所述，这种现象其实并不能通过禁止 swap 的方式缓解：禁止 swap 或者调整
+swappiness 让系统尽量避免 swap 只影响回收匿名页面的策略，不影响系统回收页面的时机，
+也不能避免系统丢弃将要使用的页面缓存而导致的卡顿。&lt;/p&gt;
+&lt;p&gt;以前在 Linux 上也没有什么好方法能避免这种现象。 macOS 转用 APFS 作为默认文件系统之后，
+从文件管理器（Finder）复制文件默认启用 file clone 快速完成，这操作不实际复制文件数据，
+一个隐含优势在不需要读入文件内容，从而不会导致大量页面缓存失效。 Linux 上同样可以用支持
+reflink 的文件系统比如 btrfs 或者开了 reflink=1 的 xfs 达到类似的效果。
+不过 reflink 也只能拯救复制文件的情况，不能改善解压文件、下载文件、计算文件校验等情况下，
+一次性处理大文件对内存产生的压力。&lt;/p&gt;
+&lt;p&gt;好在最近几年 Linux 有了 cgroup ，允许更细粒度地调整系统资源分配。进一步现在我们有了 cgroup
+v2 ，前面 Chris 的文章也有提到 cgroup v2 的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 可以某种程度上建议内存子系统
+尽量避免回收某些 cgroup 进程的内存。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="cgroup-v2"&gt;
+&lt;h2&gt;用 cgroup v2 限制进程的内存分配&lt;/h2&gt;
+&lt;p&gt;实际上有了 cgroup v2 之后，还有更多控制内存分配的方案。 &lt;a class="reference external" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory"&gt;cgroup v2 的内存控制器&lt;/a&gt;
+可以对某个 cgroup 设置这些阈值：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;memory.min&lt;/strong&gt; : 最小内存限制。内存用量低于此值后系统不会回收内存。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.low&lt;/strong&gt; : 低内存水位。内存用量低于此值后系统会尽量避免回收内存。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.high&lt;/strong&gt; : 高内存水位。内存用量高于此值后系统会积极回收内存，并且会对内存分配节流（throttle）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.max&lt;/strong&gt; : 最大内存限制。内存用量高于此值后系统会对内存分配请求返回 ENOMEM，或者在 cgroup 内触发 OOM 。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;可见这些设定值可以当作 per-cgroup 的内存分配水位线，作用于某一部分进程而非整个系统。
+针对交换区使用情况也可设置这些阈值：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;memory.swap.high&lt;/strong&gt; : 高交换区水位，交换区用量高于此值后会对交换区分配节流。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.swap.max&lt;/strong&gt; : 最大交换区限制，交换区用量高于此值后不再会发生匿名页交换。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;到达这些 cgroup 设定阈值的时候，还可以设置内核回调的处理程序，从用户空间做一些程序相关的操作。&lt;/p&gt;
+&lt;p&gt;Linux 有了 cgroup v2 之后，就可以通过对某些程序设置内存用量限制，避免他们产生的页面请求把别的
+程序所需的页面挤出物理内存。使用 systemd 的系统中，首先需要 &lt;a class="reference external" href="https://wiki.archlinux.org/index.php/Cgroups#Switching_to_cgroups_v2"&gt;启用 cgroup v2&lt;/a&gt;
+，在内核引导参数中加上 &lt;code class="code"&gt;
+systemd.unified_cgroup_hierarchy=1&lt;/code&gt;
+
+。然后开启用户权限代理：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# systemctl edit user@1000.service&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;Delegate&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后可以定义用户会话的 slice （slice 是 systemd 术语，用来映射 cgroup ），比如创建一个叫
+&lt;code class="code"&gt;
+limit-mem&lt;/code&gt;
+ 的 slice ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ cat ~/.config/systemd/user/limit-mem.slice&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="o"&gt;[&lt;/span&gt;Slice&lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemoryHigh&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;3G&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemoryMax&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;4G&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemorySwapMax&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2G&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后可以用 systemd-run 限制在某个 slice 中打开一个 shell：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ systemd-run --user --slice&lt;span class="o"&gt;=&lt;/span&gt;limit-mem.slice --shell&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;或者定义一个 shell alias 用来限制任意命令：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;type&lt;/span&gt; limit-mem&lt;/span&gt;
+&lt;span class="code-line"&gt;limit-mem is an &lt;span class="nb"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; /usr/bin/time systemd-run --user --pty --same-dir --wait --collect --slice&lt;span class="o"&gt;=&lt;/span&gt;limit-mem.slice&lt;/span&gt;
+&lt;span class="code-line"&gt;$ limit-mem cp some-large-file dest/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;实际用法有很多，可以参考 systemd 文档
+&lt;a class="reference external" href="http://www.jinbuguo.com/systemd/systemd.resource-control.html"&gt;man systemd.resource-control&lt;/a&gt;
+， &lt;a class="reference external" href="/links.html#xuanwo"&gt;xuanwo&lt;/a&gt; 也 &lt;a class="reference external" href="https://xuanwo.io/2018/10/30/tips-of-systemd/"&gt;有篇博客介绍过&lt;/a&gt;
+。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h2&gt;未来展望&lt;/h2&gt;
+&lt;p&gt;最近新版的 gnome 和 KDE 已经开始为桌面环境下用户程序的进程创建 systemd scope 了，
+可以通过 &lt;code class="code"&gt;
+systemd-cgls&lt;/code&gt;
+ 观察到，每个通过桌面文件（.desktop）开启的用户空间程序
+都有个独立的名字叫 &lt;code class="code"&gt;
+app-APPNAME-HASH.scope&lt;/code&gt;
+ 之类的 systemd scope 。
+有了这些 scope 之后，事实上用户程序的资源分配某种程度上已经相互独立，
+不过默认的用户程序没有施加多少限制。&lt;/p&gt;
+&lt;p&gt;今后可以展望，桌面环境可以提供用户友好的方式对这些桌面程序施加公平性的限制。
+不光是内存分配的大小限制，包括 CPU 和 IO 占用方面也会更公平
+（，值得一提 ext4 和 btrfs 支持对 IO 的公平调度和 per-cgroup 限制，而 XFS
+目前好像还没有这方面支持）。
+相信不远的将来，复制大文件之类常见普通操作不再需要手动调用加以限制，
+就能避免单个程序占用太多资源影响别的程序。&lt;/p&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="swappiness"></category><category term="kswapd"></category><category term="watermark"></category><category term="watermark_scale_factor"></category><category term="cgroup v2"></category></entry><entry><title>關於 swap 的一些補充</title><link href="//farseerfc.me/followup-about-swap.html" rel="alternate"></link><published>2020-10-06T13:45:00+09:00</published><updated>2020-10-06T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-10-06:/followup-about-swap.html</id><summary type="html">&lt;p&gt;上週翻譯完 &lt;a class="reference external" href="//farseerfc.me/in-defence-of-swap.html"&gt;【譯】替 swap 辯護：常見的誤解&lt;/a&gt;
+之後很多朋友們似乎還有些疑問和誤解，於是寫篇後續澄清一下。事先聲明我不是內核開發者，
+這裏說的只是我的理解，
+&lt;a class="reference external" href="https://www.kernel.org/doc/gorman/html/understand/understand005.html"&gt;基於內核文檔中關於物理內存的描述&lt;/a&gt;
+，新的內核代碼的具體行爲可能和我的理解有所出入，歡迎踊躍討論。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=7aONIVSXiJ8"&gt;Introduction to Memory Management in Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/7aONIVSXiJ8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;誤解1: swap 是虛擬內存，虛擬內存肯定比物理內存慢嘛&lt;/h2&gt;
+&lt;p&gt;這種誤解進一步的結論通常是：「使用虛擬內存肯定會減慢系統運行時性能，如果物理內存足夠爲什麼還要用虛擬的？」
+這種誤解是把虛擬內存和交換區的實現方式類比於「虛擬磁盤」或者「虛擬機」等同的方式，
+也隱含「先用物理內存，用完了之後用虛擬內存」也即下面的「誤解3」的理解。&lt;/p&gt;
+&lt;p&gt;首先，交換區（swap） &lt;strong&gt;不是&lt;/strong&gt; 虛擬內存。操作系統中說「物理內存」還是「虛擬內存」的時候在指程序代碼
+尋址時使用的內存地址方式，使用物理地址空間時是在訪問物理內存，使用虛擬地址空間時是在訪問虛擬內存 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;上週翻譯完 &lt;a class="reference external" href="//farseerfc.me/in-defence-of-swap.html"&gt;【譯】替 swap 辯護：常見的誤解&lt;/a&gt;
+之後很多朋友們似乎還有些疑問和誤解，於是寫篇後續澄清一下。事先聲明我不是內核開發者，
+這裏說的只是我的理解，
+&lt;a class="reference external" href="https://www.kernel.org/doc/gorman/html/understand/understand005.html"&gt;基於內核文檔中關於物理內存的描述&lt;/a&gt;
+，新的內核代碼的具體行爲可能和我的理解有所出入，歡迎踊躍討論。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+&lt;a class="reference external" href="https://www.youtube.com/watch?v=7aONIVSXiJ8"&gt;Introduction to Memory Management in Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/7aONIVSXiJ8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h2&gt;誤解1: swap 是虛擬內存，虛擬內存肯定比物理內存慢嘛&lt;/h2&gt;
+&lt;p&gt;這種誤解進一步的結論通常是：「使用虛擬內存肯定會減慢系統運行時性能，如果物理內存足夠爲什麼還要用虛擬的？」
+這種誤解是把虛擬內存和交換區的實現方式類比於「虛擬磁盤」或者「虛擬機」等同的方式，
+也隱含「先用物理內存，用完了之後用虛擬內存」也即下面的「誤解3」的理解。&lt;/p&gt;
+&lt;p&gt;首先，交換區（swap） &lt;strong&gt;不是&lt;/strong&gt; 虛擬內存。操作系統中說「物理內存」還是「虛擬內存」的時候在指程序代碼
+尋址時使用的內存地址方式，使用物理地址空間時是在訪問物理內存，使用虛擬地址空間時是在訪問虛擬內存。
+現代操作系統在大部分情況下都在使用虛擬地址空間尋址， &lt;strong&gt;包括&lt;/strong&gt; 在執行內核代碼的時候。&lt;/p&gt;
+&lt;p&gt;並且，交換區 &lt;strong&gt;不是&lt;/strong&gt; 實現虛擬內存的方式。操作系統使用內存管理單元（MMU，Memory Management
+Unit）做虛擬內存地址到物理內存地址的地址翻譯，現代架構下 MMU 通常是 CPU
+的一部分，配有它專用的一小塊存儲區叫做地址轉換旁路緩存（TLB，Translation Lookaside Buffer），
+只有在 TLB 中沒有相關地址翻譯信息的時候 MMU 纔會以缺頁中斷的形式調用操作系統內核幫忙。
+除了 TLB 信息不足的時候，大部分情況下使用虛擬內存都是硬件直接實現的地址翻譯，沒有軟件模擬開銷。
+實現虛擬內存不需要用到交換區，交換區只是操作系統實現虛擬內存後能提供的一個附加功能，
+即便沒有交換區，操作系統大部分時候也在用虛擬內存，包括在大部分內核代碼中。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h2&gt;誤解2: 但是沒有交換區的話，虛擬內存地址都有物理內存對應嘛&lt;/h2&gt;
+&lt;p&gt;很多朋友也理解上述操作系統實現虛擬內存的方式，但是仍然會有疑問：「我知道虛擬內存和交換區的區別，
+但是沒有交換區的話，虛擬內存地址都有物理內存對應，不用交換區的話就不會遇到讀虛擬內存需要讀寫磁盤
+導致的卡噸了嘛」。&lt;/p&gt;
+&lt;p&gt;這種理解也是錯的，禁用交換區的時候，也會有一部分分配給程序的虛擬內存不對應物理內存，
+比如使用 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 調用實現內存映射文件的時候。實際上即便是使用 &lt;code class="code"&gt;
+read/​write&lt;/code&gt;
+
+讀寫文件， Linux 內核中（可能現代操作系統內核都）在底下是用和 &lt;code class="code"&gt;
+mmap&lt;/code&gt;
+ 相同的機制建立文件
+到虛擬地址空間的地址映射，然後實際讀寫到虛擬地址時靠缺頁中斷把文件內容載入頁面緩存（page cache
+）。內核加載可執行程序和動態鏈接庫的方式也是通過內存映射文件。甚至可以進一步說，
+用戶空間的虛擬內存地址範圍內，除了匿名頁之外，其它虛擬地址都是文件後備（backed by file
+），而匿名頁通過交換區作爲文件後備。上篇文章中提到的別的類型的內存，比如共享內存頁面（shm
+）是被一個內存中的虛擬文件系統後備的，這一點有些套娃先暫且不提。於是事實是無論有沒有交換區，
+缺頁的時候總會有磁盤讀寫從慢速存儲加載到物理內存，這進一步引出上篇文章中對於交換區和頁面緩存這兩者的討論。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id5"&gt;
+&lt;h2&gt;誤解3： 不是內存快用完的時候才會交換的麼？&lt;/h2&gt;
+&lt;p&gt;簡短的答案可以說「是」，但是內核理解的「內存快用完」和你理解的很可能不同。
+也可以說「不是」，就算按照內核理解的「內存快用完」的定義，內存快用完的時候內核的行爲是去回收內存，
+至於回收內存的時候內核會做什麼有個複雜的啓發式經驗算法，實際上真的內存快滿的時候根本來不及做
+swap ，內核可能會嘗試丟棄 page cache 甚至丟棄 vfs cache (dentry cache / inode cache)
+這些不需要磁盤I/O就能更快獲取可用內存的動作。&lt;/p&gt;
+&lt;p&gt;深究這些內核機制之前，我在思考爲什麼很多朋友會問出這樣的問題。可能大部分這麼問的人，學過編程，
+稍微學過基本的操作系統原理，在腦海裏對內核分配頁面留着這樣一種印象（C僞代碼）：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;////////////////////  userspace space  ////////////////&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;malloc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;pages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mmap&lt;/span&gt;&lt;span class="p"&gt;(...);&lt;/span&gt;                                    &lt;span class="c1"&gt;// 從內核分配內存頁&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;alloc_from_page&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pages&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;                        &lt;span class="c1"&gt;// 從拿到的內存頁細分&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="c1"&gt;////////////////////  kernel space  //////////////////&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;SYSCALL&lt;/span&gt; &lt;span class="n"&gt;do_mmap&lt;/span&gt;&lt;span class="p"&gt;(...){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   &lt;span class="c1"&gt;//...&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nr_page&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="c1"&gt;// 可用內存不夠了！嘗試搞點內存&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;page_frame_info&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lru_pop_page_frame&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;     &lt;span class="c1"&gt;// 找出最少訪問的頁面&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;pf_type&lt;/span&gt; &lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nl"&gt;PAGE_CACHE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;drop_page_cache&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="c1"&gt;// 丟棄文件緩存&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nl"&gt;SWAP&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;       &lt;span class="n"&gt;swap_out&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;        &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;  &lt;span class="c1"&gt;// &amp;lt;- 寫磁盤，所以系統卡了！&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;      &lt;span class="c1"&gt;// ... 別的方式回收 least_accessed&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;append_free_page&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;free_page_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;           &lt;span class="c1"&gt;// 回收到的頁面加入可用列表&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;    &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="c1"&gt;// 搞到內存了！返回給程序&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;-=&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;phy_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;take_from_free_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;free_page_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;assign_virtual_addr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;phy_addr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;這種邏輯隱含三層 &lt;strong&gt;錯誤的&lt;/strong&gt; 假設：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;分配物理內存是發生在從內核分配內存的時候的，比如 &lt;code class="code"&gt;
+malloc/​mmap&lt;/code&gt;
+ 的時候。&lt;/li&gt;
+&lt;li&gt;內存回收是發生在進程請求內存分配的上下文裏的，換句話說進程在等內核的內存回收返回內存，
+不回收到內存，進程就得不到內存。&lt;/li&gt;
+&lt;li&gt;交換出內存到 swap 是發生在內存回收的時候的，會阻塞內核的內存回收，進而阻塞程序的內存分配。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;這種把內核代碼當作「具有特權的庫函數調用」的看法，可能很易於理解，
+甚至早期可能的確有操作系統的內核是這麼實現的，但是很可惜現代操作系統都不是這麼做的。
+上面三層假設的錯誤之處在於：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;在程序請求內存的時候，比如 &lt;code class="code"&gt;
+malloc/​mmap&lt;/code&gt;
+ 的時候，內核只做虛擬地址分配，
+記錄下某段虛擬地址空間對這個程序是可以合法訪問的，但是不實際分配物理內存給程序。
+在程序第一次訪問到虛擬地址的時候，才會實際分配物理內存。這種叫 &lt;strong&gt;惰性分配（lazy allocation）&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;在內核感受到內存分配壓力之後，早在內核內存用盡之前，內核就會在後臺慢慢掃描並回收內存頁。
+內存回收通常不發生在內存分配的時候，除非在內存非常短缺的情況下，後臺內存回收來不及滿足當前分配請求，
+纔會發生 &lt;strong&gt;直接回收(direct reclamation)&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;同樣除了直接回收的情況，大部分正常情況下換出頁面是內存管理子系統調用 DMA 在後臺慢慢做的，
+交換頁面出去不會阻塞內核的內存回收，更不會阻塞程序做內存分配（malloc
+）和使用內存(實際訪問惰性分配的內存頁)。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也就是說，現代操作系統內核是高度並行化的設計，內存分配方方面面需要消耗計算資源或者 I/O
+帶寬的場景，都會儘量並行化，最大程度利用好計算機所有組件（CPU/MMU/DMA/IO）的吞吐率，
+不到緊要關頭需要直接回收的場合，就不會阻塞程序的正常執行流程。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id6"&gt;
+&lt;h2&gt;惰性分配有什麼好處？&lt;/h2&gt;
+&lt;p&gt;或許會有人問：「我讓你分配內存，你給我分配了個虛擬的，到用的時候還要做很多事情才能給我，這不是騙人嘛」，
+或者會有人擔心惰性分配會對性能造成負面影響。&lt;/p&gt;
+&lt;p&gt;這裏實際情況是程序從分配虛擬內存的時候，「到用的時候」，這之間有段時間間隔，可以留給內核做準備
+。程序可能一下子分配一大片內存地址，然後再在執行過程中解析數據慢慢往地址範圍內寫東西。
+程序分配虛擬內存的速率可以是「突發」的，比如一個系統調用中分配 1GiB 大小，而實際寫入數據的速率會被
+CPU 執行速度等因素限制，不會短期內突然寫入很多頁面。
+這個分配速率導致的時間差內內核可以完成很多後臺工作，比如回收內存，
+比如把會收到的別的進程用過的內存頁面初始化爲全0，這部分後臺工作可以和程序的執行過程並行，
+從而當程序實際用到內存的時候，需要的準備工作已經做完了，大部分場景下可以直接分配物理內存出來。&lt;/p&gt;
+&lt;p&gt;如果程序要做實時響應，想避免因爲惰性分配造成的性能不穩定，可以使用 &lt;code class="code"&gt;
+mlock/​mlockall&lt;/code&gt;
+
+將得到的虛擬內存鎖定在物理內存中，鎖的過程中內核會做物理內存分配。不過要區分「性能不穩定」和「低性能」，
+預先分配內存可以避免實際使用內存時分配物理頁面的額外開銷，但是會拖慢整體吞吐率，所以要謹慎使用。&lt;/p&gt;
+&lt;p&gt;很多程序分配了很大一片地址空間，但是實際並不會用完這些地址，直到程序執行結束這些虛擬地址也一直
+處於沒有對應物理地址的情況。惰性分配可以避免爲這些情況浪費物理內存頁面，使得很多程序可以無憂無慮地
+隨意分配內存地址而不用擔心性能損失。這種分配方式也叫「超額分配（overcommit）」。飛機票有超售，
+VPS 提供商劃分虛擬機有超售，操作系統管理內存也同樣有這種現象，合理使用超額分配能改善整體系統效率。&lt;/p&gt;
+&lt;p&gt;內核要高效地做到惰性分配而不影響程序執行效率的前提之一，在於程序真的用到內存的時候，
+內核能不做太多操作就立刻分配出來，也就是說內核需要時時刻刻在手上留有一部分空頁，
+滿足程序執行時內存分配的需要。換句話說，內核需要早在物理內存用盡之前，就開始回收內存。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id7"&gt;
+&lt;h2&gt;那麼內核什麼時候會開始回收內存？&lt;/h2&gt;
+&lt;p&gt;首先一些背景知識：物理內存地址空間並不是都平等，因爲一些地址範圍可以做
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Direct_memory_access"&gt;DMA&lt;/a&gt; 而另一些不能，以及
+&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Non-uniform_memory_access"&gt;NUMA&lt;/a&gt;
+等硬件環境傾向於讓 CPU 訪問其所在 NUMA 節點內存範圍。在 32bit
+系統上內核的虛擬地址空間還有低端內存和高端內存的區分，他們會傾向於使用不同屬性的物理內存，到
+64bit 系統上已經沒有了這種限制。&lt;/p&gt;
+&lt;p&gt;硬件限制了內存分配的自由度，於是內核把物理內存空間分成多個 Zone
+，每個 Zone 內各自管理可用內存， Zone 內的內存頁之間是相互平等的。&lt;/p&gt;
+&lt;div class="panel panel-default"&gt;
+&lt;div class="panel-heading"&gt;
+zone 內水位線&lt;/div&gt;
+&lt;div class="panel-body"&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;一個 Zone 內的頁面分配情況可以右圖描繪。
+除了已用內存頁，剩下的就是空閒頁（free pages），空閒頁範圍中有三個水位線（watermark
+）評估當前內存壓力情況，分別是高位（high）、低位（low）、最小位（min）。&lt;/p&gt;
+&lt;p&gt;當內存分配使得空閒頁水位低於低位線，內核會喚醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 後臺線程， &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+
+負責掃描物理頁面的使用情況並挑選一部分頁面做回收，直到可用頁面數量恢復到水位線高位（high）以上。
+如果 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 回收內存的速度慢於程序執行實際分配內存的速度，
+可用空閒頁數量可能進一步下降，降至低於最小水位（min）之後，內核會讓內存分配進入
+&lt;strong&gt;直接回收(direct reclamation)&lt;/strong&gt; 模式，在直接回收模式下，程序分配某個物理頁的請求（
+第一次訪問某個已分配虛擬頁面的時候）會導致在進程上下文中阻塞式地調用內存回收代碼。&lt;/p&gt;
+&lt;p&gt;除了內核在後臺回收內存，進程也可以主動釋放內存，比如有程序退出的時候就會釋放一大片內存頁，
+所以可用頁面數量可能會升至水位線高位以上。有太多可用頁面浪費資源對整體系統運行效率也不是好事，
+所以系統會積極緩存文件讀寫，所有 page cache 都留在內存中，直到可用頁面降至低水位以下觸發
+&lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 開始工作。&lt;/p&gt;
+&lt;p&gt;設置最小水位線（min）的原因在於，內核中有些硬件也會突然請求大量內存，比如來自網卡接收到的數據包，
+預留出最小水位線以下的內存給內核內部和硬件使用。&lt;/p&gt;
+&lt;p&gt;設置高低兩個控制 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 開關的水位線是基於控制理論。喚醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+
+掃描內存頁面本身有一定計算開銷，於是每次喚醒它幹活的話就讓它多做一些活（ high - low
+），避免頻繁多次喚醒。&lt;/p&gt;
+&lt;p&gt;因爲有這些水位線，系統中根據程序請求內存的「速率」，整個系統的內存分配在宏觀的一段時間內可能處於以下幾種狀態：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;strong&gt;不回收：&lt;/strong&gt; 系統中的程序申請內存速度很慢，或者程序主動釋放內存的速度很快，
+（比如程序執行時間很短，不怎麼進行文件讀寫就馬上退出，）此時可用頁面數量可能一直處於低水位線以上，
+內核不會主動回收內存，所有文件讀寫都會以頁面緩存的形式留在物理內存中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;後臺回收：&lt;/strong&gt; 系統中的程序在緩慢申請內存，比如做文件讀寫，
+比如分配並使用匿名頁面。系統會時不時地喚醒 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 在後臺做內存回收，
+不會干擾到程序的執行效率。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;直接回收：&lt;/strong&gt; 如果程序申請內存的速度快於 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 後臺回收內存的速度，
+空閒內存最終會跌破最小水位線，隨後的內存申請會進入直接回收的代碼路徑，從而極大限制內存分配速度。
+在直接分配和後臺回收的同時作用下，空閒內存可能會時不時回到最小水位線以上，
+但是如果程序繼續申請內存，空閒內存量就會在最小水位線附近上下徘徊。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;殺進程回收：&lt;/strong&gt; 甚至直接分配和後臺回收的同時作用也不足以拖慢程序分配內存的速度的時候，
+最終空閒內存會完全用完，此時觸發 OOM 殺手幹活殺進程。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;系統狀態處於 &lt;strong&gt;1. 不回收&lt;/strong&gt;  的時候表明分配給系統的內存量過多，比如系統剛剛啓動之類的時候。
+理想上應該讓系統長期處於 &lt;strong&gt;2. 後臺回收&lt;/strong&gt; 的狀態，此時最大化利用緩存的效率而又不會因爲內存回收
+減緩程序執行速度。如果系統引導後長期處於 &lt;strong&gt;1. 不回收&lt;/strong&gt; 的狀態下，那麼說明沒有充分利用空閒內存做
+文件緩存，有些 unix 服務比如 &lt;a class="reference external" href="https://wiki.archlinux.org/index.php/preload"&gt;preload&lt;/a&gt; 可用來提前填充文件緩存。&lt;/p&gt;
+&lt;p&gt;如果系統頻繁進入 &lt;strong&gt;3. 直接回收&lt;/strong&gt; 的狀態，表明在這種工作負載下系統需要減慢一些內存分配速度，
+讓 &lt;code class="code"&gt;
+kswapd&lt;/code&gt;
+ 有足夠時間回收內存。就如前一篇翻譯中 Chris
+所述，頻繁進入這種狀態也不一定代表「內存不足」，可能表示內存分配處於非常高效的利用狀態下，
+系統充分利用慢速的磁盤帶寬，爲快速的內存緩存提供足夠的可用空間。
+&lt;strong&gt;直接回收&lt;/strong&gt; 是否對進程負載有負面影響要看具體負載的特性。
+此時選擇禁用 swap 並不能降低磁盤I/O，反而可能縮短 &lt;strong&gt;2. 後臺回收&lt;/strong&gt; 狀態能持續的時間，
+導致更快進入 &lt;strong&gt;4. 殺進程回收&lt;/strong&gt; 的極端狀態。&lt;/p&gt;
+&lt;p&gt;當然如果系統長期處於 &lt;strong&gt;直接回收&lt;/strong&gt; 的狀態的話，則說明內存總量不足，需要考慮增加物理內存，
+或者減少系統負載了。如果系統進入 &lt;strong&gt;4. 殺進程回收&lt;/strong&gt; 的狀態，不光用空間的進程會受影響，
+並且還可能導致內核態的內存分配受影響，產生網絡丟包之類的結果。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id8"&gt;
+&lt;h2&gt;微調內存管理水位線&lt;/h2&gt;
+&lt;p&gt;可以看一下運行中的系統中每個 Zone 的水位線在哪兒。比如我手上這個 16GiB 的系統中：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ cat /proc/zoneinfo&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone      DMA&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;3459&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;16&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;20&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;24&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;4095&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3997&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3975&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone    DMA32&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;225265&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;3140&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;3925&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;4710&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;1044480&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;780044&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;763629&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone   Normal&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;300413&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;13739&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;17173&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;20607&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3328410&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;因爲不是 NUMA 系統，所以只有一個 NUMA node，其中根據 DMA 類型共有 3 個 Zone 分別叫 DMA,
+DMA32, Normal 。三個 Zone 的物理地址範圍（spanned）加起來大概有
+&lt;span class="math"&gt;\(4095+1044480+3407872\)&lt;/span&gt; 大約 17GiB 的地址空間，而實際可訪問的地址範圍（present
+）加起來有 &lt;span class="math"&gt;\(3997+780044+3407872\)&lt;/span&gt; 大約 16GiB 的可訪問物理內存。&lt;/p&gt;
+&lt;p&gt;其中空閒頁面有 &lt;span class="math"&gt;\(3459+762569+1460218\)&lt;/span&gt; 大約 8.5GiB ，三條水位線分別在：
+&lt;span class="math"&gt;\(\texttt{high} = 24+4710+20607 = 98\texttt{MiB}\)&lt;/span&gt; ，
+&lt;span class="math"&gt;\(\texttt{low} = 20+3925+17173 = 82\texttt{MiB}\)&lt;/span&gt; ，
+&lt;span class="math"&gt;\(\texttt{min} = 16+3140+13739 = 65\texttt{MiB}\)&lt;/span&gt; 的位置。&lt;/p&gt;
+&lt;p&gt;具體這些水位線的確定方式基於幾個 sysctl 。首先 min 基於 &lt;code class="code"&gt;
+vm.min_free_kbytes&lt;/code&gt;
+
+默認是基於內核低端內存量的平方根算的值，並限制到最大 64MiB 再加點餘量，比如我這臺機器上
+&lt;code class="code"&gt;
+vm.min_free_kbytes = 67584&lt;/code&gt;
+ ，於是 min 水位線在這個位置。
+其它兩個水位線基於這個計算，在 low 基礎上增加總內存量的 &lt;code class="code"&gt;
+vm.watermark_scale_factor /​ 10000&lt;/code&gt;
+
+比例（在小內存的系統上還有額外考慮），默認 &lt;code class="code"&gt;
+vm.watermark_scale_factor = 10&lt;/code&gt;
+
+在大內存系統上意味着 low 比 min 高 0.1% ， high 比 low 高 0.1% 。&lt;/p&gt;
+&lt;p&gt;可以手動設置這些值，以更早觸發內存回收，比如將 &lt;code class="code"&gt;
+vm.watermark_scale_factor&lt;/code&gt;
+ 設爲 100:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sudo tee /proc/sys/vm/watermark_scale_factor&lt;/span&gt;
+&lt;span class="code-line"&gt;$ cat /proc/zoneinfo&lt;/span&gt;
+&lt;span class="code-line"&gt;Node &lt;span class="m"&gt;0&lt;/span&gt;, zone      DMA&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;3459&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;16&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;55&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;94&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;4095&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3997&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3975&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   Node &lt;span class="m"&gt;0&lt;/span&gt;, zone    DMA32&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;101987&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;3149&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;10785&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;18421&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;1044480&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;780044&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;763629&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   Node &lt;span class="m"&gt;0&lt;/span&gt;, zone   Normal&lt;/span&gt;
+&lt;span class="code-line"&gt;   pages free     &lt;span class="m"&gt;61987&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         min      &lt;span class="m"&gt;13729&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         low      &lt;span class="m"&gt;47013&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         high     &lt;span class="m"&gt;80297&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         spanned  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         present  &lt;span class="m"&gt;3407872&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;         managed  &lt;span class="m"&gt;3328410&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;得到的三條水位線分別在 &lt;span class="math"&gt;\(\texttt{min} = 16+3149+13729 = 66\texttt{MiB}\)&lt;/span&gt;
+， &lt;span class="math"&gt;\(\texttt{low} = 55+10785+47013 = 226\texttt{MiB}\)&lt;/span&gt;
+， &lt;span class="math"&gt;\(\texttt{high} = 94+18421+80297 = 386\texttt{MiB}\)&lt;/span&gt; ，
+從而 low 和 high 分別比 min 提高 160MiB 也就是內存總量的 1% 左右。&lt;/p&gt;
+&lt;p&gt;在 swap 放在 HDD 的系統中，因爲換頁出去的速度較慢，除了上篇文章說的降低
+&lt;code class="code"&gt;
+vm.swappiness&lt;/code&gt;
+ 之外，還可以適當提高 &lt;code class="code"&gt;
+vm.watermark_scale_factor&lt;/code&gt;
+
+讓內核更早開始回收內存，這雖然會稍微降低緩存命中率，但是另一方面可以在進入直接回收模式之前
+有更多時間做後臺換頁，也將有助於改善系統整體流暢度。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id9"&gt;
+&lt;h2&gt;只有 0.1% ，這不就是說內存快用完的時候麼？&lt;/h2&gt;
+&lt;p&gt;所以之前的「誤解3」我說答案可以說「是」或者「不是」，但是無論回答是或不是，都代表了認爲「swap
+就是額外的慢速內存」的錯誤看法。當有人在強調「swap 是內存快用完的時候才交換」的時候，
+隱含地，是在把系統總體的內存分配看作是一個靜態的劃分過程：打個比方這就像在說，我的系統裏存儲空間有快速
+128GiB SSD 和慢速 HDD 的 1TiB ，同樣內存有快速的 16GiB RAM 和慢速 16GiB 的 swap 。
+這種靜態劃分的類比是錯誤的看待方式，因爲系統回收內存進而做頁面交換的方式是動態平衡的過程，
+需要考慮到「時間」和「速率」而非單純看「容量」。&lt;/p&gt;
+&lt;p&gt;假設 swap 所在的存儲設備可以支持 5MiB/s 的吞吐率（ HDD 上可能更慢， SSD
+上可能更快，這裏需要關注數量級），相比之下 DDR3 大概有 10GiB/s 的吞吐率，DDR4 大概有 20GiB/s
+，無論多快的 SSD 也遠達不到這樣的吞吐（可能 Intel Optane 這樣的
+&lt;a class="reference external" href="https://lwn.net/Articles/717953/"&gt;DAX&lt;/a&gt; 設備會改變這裏的狀況）。從而把 swap
+當作慢速內存的視角來看的話，加權平均的速率是非常悲觀的，「 16G 的 DDR3 + 16G 的 swap 會有
+&lt;span class="math"&gt;\(\frac{16 \times 10 \times 1024 + 16 \times 5}{16+16} = 5 \texttt{GiB/s}\)&lt;/span&gt;
+的吞吐？所以開 swap 導致系統速度降了一半？」顯然不能這樣看待。&lt;/p&gt;
+&lt;p&gt;動態的看待方式是， swap 設備能提供 5MiB/s 的吞吐，這意味着：如果我們能把未來 10
+分鐘內不會訪問到的頁面換出到 swap ，那麼就相當於有
+&lt;span class="math"&gt;\(10 \times 60 \texttt{s} \times 5 \texttt{MiB/s} = 3000 \texttt{MiB}\)&lt;/span&gt;
+的額外內存，用來放那 10 分鐘內可能會訪問到的頁面緩存。
+10 分鐘只是隨口說的一段時間，可以換成 10 秒或者 10 小時，重要的是只要頁面交換發生在後臺，
+不阻塞前臺程序的執行，那麼 swap 設備提供的額外吞吐率相當於一段時間內提供了更大的物理內存，
+總是能提升頁面緩存的命中，從而改善系統性能。&lt;/p&gt;
+&lt;p&gt;當然系統內核不能預知「未來 10 分鐘內需要的頁面」，只能根據歷史上訪問內存的情況預估之後可能會訪問的情況，
+估算不準的情況下，比如最近10分鐘內用過的頁面緩存在之後10分鐘內不再被使用的時候，
+爲了把最近這10分鐘內訪問過的頁面留在物理內存中，可能會把之後10分鐘內要用到的匿名頁面換出到了交換設備上。
+於是會有下面的情況：&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="swap-swap"&gt;
+&lt;h2&gt;但是我開了 swap 之後，一旦複製大文件，系統就變卡，不開 swap 不會這樣的&lt;/h2&gt;
+&lt;p&gt;大概電腦用戶都經歷過這種現象，不限於 Linux 用戶，包括 macOS 和 Windows 上也是。
+在文件管理器中複製了幾個大文件之後，切換到別的程序系統就極其卡頓，複製已經結束之後的一段時間也會如此。
+複製的過程中系統交換區的使用率在上漲，複製結束後下降，顯然 swap 在其中有重要因素，並且禁用
+swap 或者調低 swappiness 之後就不會這樣了。於是網上大量流傳着解釋這一現象，並進一步建議禁用
+swap 或者調低 swappiness 的文章。我相信不少關心系統性能調優的人看過這篇「
+&lt;a class="reference external" href="https://rudd-o.com/linux-and-free-software/tales-from-responsivenessland-why-linux-feels-slow-and-how-to-fix-that"&gt;Tales from responsivenessland: why Linux feels slow, and how to fix that&lt;/a&gt;
+」或是它的轉載、翻譯，用中文搜索的話還能找到更多
+&lt;a class="reference external" href="http://blog.itpub.net/29371470/viewspace-1250975"&gt;錯誤解釋 swappiness 目的&lt;/a&gt;
+的文章，將 swappiness 解釋成是控制內存和交換區比例的參數。&lt;/p&gt;
+&lt;p&gt;除去那些有技術上謬誤的文章，這些網文中描述的現象是有道理的，不單純是以訛傳訛。
+桌面環境中內存分配策略的不確定性和服務器環境中很不一樣，複製、下載、解壓大文件等導致一段時間內
+大量佔用頁面緩存，以至於把操作結束後需要的頁面攆出物理內存，無論是交換出去的方式還是以丟棄頁面緩存的方式，
+都會導致桌面響應性降低。&lt;/p&gt;
+&lt;p&gt;不過就像前文 Chris 所述，這種現象其實並不能通過禁止 swap 的方式緩解：禁止 swap 或者調整
+swappiness 讓系統儘量避免 swap 只影響回收匿名頁面的策略，不影響系統回收頁面的時機，
+也不能避免系統丟棄將要使用的頁面緩存而導致的卡頓。&lt;/p&gt;
+&lt;p&gt;以前在 Linux 上也沒有什麼好方法能避免這種現象。 macOS 轉用 APFS 作爲默認文件系統之後，
+從文件管理器（Finder）複製文件默認啓用 file clone 快速完成，這操作不實際複製文件數據，
+一個隱含優勢在不需要讀入文件內容，從而不會導致大量頁面緩存失效。 Linux 上同樣可以用支持
+reflink 的文件系統比如 btrfs 或者開了 reflink=1 的 xfs 達到類似的效果。
+不過 reflink 也只能拯救複製文件的情況，不能改善解壓文件、下載文件、計算文件校驗等情況下，
+一次性處理大文件對內存產生的壓力。&lt;/p&gt;
+&lt;p&gt;好在最近幾年 Linux 有了 cgroup ，允許更細粒度地調整系統資源分配。進一步現在我們有了 cgroup
+v2 ，前面 Chris 的文章也有提到 cgroup v2 的 &lt;code class="code"&gt;
+memory.low&lt;/code&gt;
+ 可以某種程度上建議內存子系統
+儘量避免回收某些 cgroup 進程的內存。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="cgroup-v2"&gt;
+&lt;h2&gt;用 cgroup v2 限制進程的內存分配&lt;/h2&gt;
+&lt;p&gt;實際上有了 cgroup v2 之後，還有更多控制內存分配的方案。 &lt;a class="reference external" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory"&gt;cgroup v2 的內存控制器&lt;/a&gt;
+可以對某個 cgroup 設置這些閾值：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;memory.min&lt;/strong&gt; : 最小內存限制。內存用量低於此值後系統不會回收內存。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.low&lt;/strong&gt; : 低內存水位。內存用量低於此值後系統會儘量避免回收內存。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.high&lt;/strong&gt; : 高內存水位。內存用量高於此值後系統會積極回收內存，並且會對內存分配節流（throttle）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.max&lt;/strong&gt; : 最大內存限制。內存用量高於此值後系統會對內存分配請求返回 ENOMEM，或者在 cgroup 內觸發 OOM 。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;可見這些設定值可以當作 per-cgroup 的內存分配水位線，作用於某一部分進程而非整個系統。
+針對交換區使用情況也可設置這些閾值：&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;strong&gt;memory.swap.high&lt;/strong&gt; : 高交換區水位，交換區用量高於此值後會對交換區分配節流。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;memory.swap.max&lt;/strong&gt; : 最大交換區限制，交換區用量高於此值後不再會發生匿名頁交換。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;到達這些 cgroup 設定閾值的時候，還可以設置內核回調的處理程序，從用戶空間做一些程序相關的操作。&lt;/p&gt;
+&lt;p&gt;Linux 有了 cgroup v2 之後，就可以通過對某些程序設置內存用量限制，避免他們產生的頁面請求把別的
+程序所需的頁面擠出物理內存。使用 systemd 的系統中，首先需要 &lt;a class="reference external" href="https://wiki.archlinux.org/index.php/Cgroups#Switching_to_cgroups_v2"&gt;啓用 cgroup v2&lt;/a&gt;
+，在內核引導參數中加上 &lt;code class="code"&gt;
+systemd.unified_cgroup_hierarchy=1&lt;/code&gt;
+
+。然後開啓用戶權限代理：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# systemctl edit user@1000.service&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;Delegate&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然後可以定義用戶會話的 slice （slice 是 systemd 術語，用來映射 cgroup ），比如創建一個叫
+&lt;code class="code"&gt;
+limit-mem&lt;/code&gt;
+ 的 slice ：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ cat ~/.config/systemd/user/limit-mem.slice&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="o"&gt;[&lt;/span&gt;Slice&lt;span class="o"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemoryHigh&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;3G&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemoryMax&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;4G&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="nv"&gt;MemorySwapMax&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2G&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然後可以用 systemd-run 限制在某個 slice 中打開一個 shell：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ systemd-run --user --slice&lt;span class="o"&gt;=&lt;/span&gt;limit-mem.slice --shell&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;或者定義一個 shell alias 用來限制任意命令：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="code-line"&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;type&lt;/span&gt; limit-mem&lt;/span&gt;
+&lt;span class="code-line"&gt;limit-mem is an &lt;span class="nb"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; /usr/bin/time systemd-run --user --pty --same-dir --wait --collect --slice&lt;span class="o"&gt;=&lt;/span&gt;limit-mem.slice&lt;/span&gt;
+&lt;span class="code-line"&gt;$ limit-mem cp some-large-file dest/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;實際用法有很多，可以參考 systemd 文檔
+&lt;a class="reference external" href="http://www.jinbuguo.com/systemd/systemd.resource-control.html"&gt;man systemd.resource-control&lt;/a&gt;
+， &lt;a class="reference external" href="/links.html#xuanwo"&gt;xuanwo&lt;/a&gt; 也 &lt;a class="reference external" href="https://xuanwo.io/2018/10/30/tips-of-systemd/"&gt;有篇博客介紹過&lt;/a&gt;
+。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id13"&gt;
+&lt;h2&gt;未來展望&lt;/h2&gt;
+&lt;p&gt;最近新版的 gnome 和 KDE 已經開始爲桌面環境下用戶程序的進程創建 systemd scope 了，
+可以通過 &lt;code class="code"&gt;
+systemd-cgls&lt;/code&gt;
+ 觀察到，每個通過桌面文件（.desktop）開啓的用戶空間程序
+都有個獨立的名字叫 &lt;code class="code"&gt;
+app-APPNAME-HASH.scope&lt;/code&gt;
+ 之類的 systemd scope 。
+有了這些 scope 之後，事實上用戶程序的資源分配某種程度上已經相互獨立，
+不過默認的用戶程序沒有施加多少限制。&lt;/p&gt;
+&lt;p&gt;今後可以展望，桌面環境可以提供用戶友好的方式對這些桌面程序施加公平性的限制。
+不光是內存分配的大小限制，包括 CPU 和 IO 佔用方面也會更公平
+（，值得一提 ext4 和 btrfs 支持對 IO 的公平調度和 per-cgroup 限制，而 XFS
+目前好像還沒有這方面支持）。
+相信不遠的將來，複製大文件之類常見普通操作不再需要手動調用加以限制，
+就能避免單個程序佔用太多資源影響別的程序。&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="tech"></category><category term="swap"></category><category term="mm"></category><category term="memory management"></category><category term="swappiness"></category><category term="kswapd"></category><category term="watermark"></category><category term="watermark_scale_factor"></category><category term="cgroup v2"></category></entry><entry><title>【译】替 swap 辩护：常见的误解</title><link href="//farseerfc.me/zhs/in-defence-of-swap.html" rel="alternate"></link><published>2020-09-30T13:45:00+09:00</published><updated>2020-09-30T13:45:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2020-09-30:/zhs/in-defence-of-swap.html</id><summary type="html">&lt;p&gt;这篇翻译自 Chris Down 的博文
 &lt;a class="reference external" href="https://chrisdown.name/2018/01/02/in-defence-of-swap.html"&gt;In defence of swap: common misconceptions&lt;/a&gt;
 。 &lt;a class="reference external" href="https://github.com/cdown/chrisdown.name/blob/master/LICENSE"&gt;原文的协议&lt;/a&gt;
 是 &lt;a class="reference external" href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;CC BY-SA 4.0&lt;/a&gt;
@@ -24,6 +998,7 @@ buffer cache 的处理方式有诸多不同。&lt;/p&gt;
 但是 swap 不是导致卡顿的原因，关掉 swap 或者调低 swappiness 并不能阻止卡顿，只会将 swap
 造成的 I/O 转化为加载文件缓存造成的 I/O 。&lt;/p&gt;
 &lt;p&gt;以下是原文翻译：&lt;/p&gt;
+
 &lt;hr class="docutils"/&gt;
 &lt;p&gt;这篇文章也有 &lt;a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html"&gt;日文&lt;/a&gt;
 和 &lt;a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya"&gt;俄文&lt;/a&gt;
@@ -970,6 +1945,7 @@ buffer cache 的處理方式有諸多不同。&lt;/p&gt;
 但是 swap 不是導致卡頓的原因，關掉 swap 或者調低 swappiness 並不能阻止卡頓，只會將 swap
 造成的 I/O 轉化爲加載文件緩存造成的 I/O 。&lt;/p&gt;
 &lt;p&gt;以下是原文翻譯：&lt;/p&gt;
+
 &lt;hr class="docutils"/&gt;
 &lt;p&gt;這篇文章也有 &lt;a class="reference external" href="https://chrisdown.name/ja/2018/01/02/in-defence-of-swap.html"&gt;日文&lt;/a&gt;
 和 &lt;a class="reference external" href="https://softdroid.net/v-zashchitu-svopa-rasprostranennye-zabluzhdeniya"&gt;俄文&lt;/a&gt;
@@ -2743,7 +3719,7 @@ discard 不光影响文件系统写入性能，还可能发送大量被设备忽
 实际上大家买到的盘可能处于这些极端策略中的一些中间点，市场细分下并不是这么高低端分明。
 比如有些标明着「为视频优化」之类宣传标语的「外置SSD」，对消费者来说可能会觉得为视频优化的话一定性能好，
 但是理解了 FTL 的差异后就可以看出这种「优化」只针对线性写入，不一定适合放系统文件根目录的文件系统。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -3205,7 +4181,7 @@ discard 不光影響文件系統寫入性能，還可能發送大量被設備忽
 實際上大家買到的盤可能處於這些極端策略中的一些中間點，市場細分下並不是這麼高低端分明。
 比如有些標明着「爲視頻優化」之類宣傳標語的「外置SSD」，對消費者來說可能會覺得爲視頻優化的話一定性能好，
 但是理解了 FTL 的差異後就可以看出這種「優化」只針對線性寫入，不一定適合放系統文件根目錄的文件系統。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="34%"/&gt;
 &lt;col width="34%"/&gt;
@@ -3312,7 +4288,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不过理解了磁盘的机械结构的话，柱面的概念就比较合理了，寻址时先驱动磁头臂旋转，
 磁头臂上多个磁头一起飞到某个磁道上，从而运动磁头臂的动作定义了一个柱面。
 柱面和磁头（CH）组合起来能定位到某个特定的磁道，画张图大概如下图所示：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/790bfd1c.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中值得注意的是磁道的编号方式，我用相同的颜色画出了相同的磁道。因为按照 CHS
 的顺序寻址，所以先定位柱面，然后选定磁头。磁盘上按半径从外向内定义柱面的编号，最外圈的磁道位于
@@ -3345,7 +4321,7 @@ BIOS 的程序。&lt;/p&gt;
 后才能继续读下一个扇区，如果物理排列上连续编号扇区，可能等 CPU
 做完这些事情后磁头已经旋转到之后几个扇区上了。所以出厂时做磁盘低级格式化的时候，
 会跳跃着给扇区编号，给 CPU 留足处理时间。比如下图：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/adb6edc3.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上图中假设有3个柱面，每个柱面6个磁头，每个磁道内11个扇区，并且画出了三种不同的扇区编号跳转情况，
 分别是磁道内的扇区跳转（+3），柱面内的磁头跳转（+5），以及柱面间跳转（+10）。
@@ -3674,7 +4650,7 @@ chs-illustrate-trans.svg&lt;/object&gt;
 不過理解了磁盤的機械結構的話，柱面的概念就比較合理了，尋址時先驅動磁頭臂旋轉，
 磁頭臂上多個磁頭一起飛到某個磁道上，從而運動磁頭臂的動作定義了一個柱面。
 柱面和磁頭（CH）組合起來能定位到某個特定的磁道，畫張圖大概如下圖所示：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/780dfc96.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中值得注意的是磁道的編號方式，我用相同的顏色畫出了相同的磁道。因爲按照 CHS
 的順序尋址，所以先定位柱面，然後選定磁頭。磁盤上按半徑從外向內定義柱面的編號，最外圈的磁道位於
@@ -3707,7 +4683,7 @@ BIOS 的程序。&lt;/p&gt;
 後纔能繼續讀下一個扇區，如果物理排列上連續編號扇區，可能等 CPU
 做完這些事情後磁頭已經旋轉到之後幾個扇區上了。所以出廠時做磁盤低級格式化的時候，
 會跳躍着給扇區編號，給 CPU 留足處理時間。比如下圖：&lt;/p&gt;
-&lt;object class="embed-responsive-item tikz" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
+&lt;object class="tikz embed-responsive-item" data="//farseerfc.me/uml/8d15ed13.svg" type="image/svg+xml"&gt;
 tikz diagram&lt;/object&gt;
 &lt;p&gt;上圖中假設有3個柱面，每個柱面6個磁頭，每個磁道內11個扇區，並且畫出了三種不同的扇區編號跳轉情況，
 分別是磁道內的扇區跳轉（+3），柱面內的磁頭跳轉（+5），以及柱面間跳轉（+10）。
@@ -4900,7 +5876,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -4913,7 +5889,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -5242,7 +6218,7 @@ n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空
 &lt;p&gt;基于段的 GC 还有一个显著缺陷，需要扫描元数据，复制搬运仍然被引用到的块，这不光会增加设备写入，
 还需要调整现有数据结构中的指针，调整指针需要更多写入，同时又释放更多数据块，
 F2FS 等一些文件系统设计中把这个问题叫 Wandering Tree Problem ，在 F2FS
-设计中是通过近乎「作弊」的 &lt;a class="reference external" href="WanderingTreeProblem"&gt;NAT 转换表&lt;/a&gt;
+设计中是通过近乎「作弊」的 &lt;a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/f2fs.html#id1"&gt;NAT 转换表&lt;/a&gt;
 放在存储设备期待的 FAT 所在位置，不仅能让需要扫描的元数据更集中，还能减少这种指针调整导致的写入。&lt;/p&gt;
 &lt;p&gt;不过基于段的 GC 也有一些好处，它不需要复杂的文件系统设计，不需要特殊构造的指针，
 就能很方便地支持大量快照。一些日志结构文件系统比如 NILFS 用这一点支持了「连续快照（continuous
@@ -6216,7 +7192,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -6579,7 +7555,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -7796,7 +8772,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;p&gt;檢查點也是 btrfs 目前沒有的功能。 btrfs 目前不能對頂層子卷做遞歸的 snapshot ，btrfs
 的子卷也沒有類似 ZFS 數據集的層級關係和可繼承屬性，從而沒法實現類似檢查點的功能。&lt;/p&gt;
 &lt;p&gt;除了書籤和檢查點之外，剩下的概念可以在 ZFS 和 btrfs 之間有如下映射關係：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -7809,7 +8785,7 @@ reflink 引用），從而 btrfs 沒法（或者很難）實現書籤功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;對 ZFS 數據集的操作，大部分也可以找到對應的對 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -8138,7 +9114,7 @@ n12 就是當前的寫入點。空盤上連續往後寫而不 GC 總會遇到空
 &lt;p&gt;基於段的 GC 還有一個顯著缺陷，需要掃描元數據，複製搬運仍然被引用到的塊，這不光會增加設備寫入，
 還需要調整現有數據結構中的指針，調整指針需要更多寫入，同時又釋放更多數據塊，
 F2FS 等一些文件系統設計中把這個問題叫 Wandering Tree Problem ，在 F2FS
-設計中是通過近乎「作弊」的 &lt;a class="reference external" href="WanderingTreeProblem"&gt;NAT 轉換表&lt;/a&gt;
+設計中是通過近乎「作弊」的 &lt;a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/f2fs.html#id1"&gt;NAT 轉換表&lt;/a&gt;
 放在存儲設備期待的 FAT 所在位置，不僅能讓需要掃描的元數據更集中，還能減少這種指針調整導致的寫入。&lt;/p&gt;
 &lt;p&gt;不過基於段的 GC 也有一些好處，它不需要複雜的文件系統設計，不需要特殊構造的指針，
 就能很方便地支持大量快照。一些日誌結構文件系統比如 NILFS 用這一點支持了「連續快照（continuous
@@ -9112,7 +10088,7 @@ btrfs 中叫做「反向引用（back reference，簡稱 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有兩種記錄方式是因爲它們各有性能上的優缺點：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -9475,7 +10451,7 @@ Chris 的博客也有兩篇文章《
 &lt;p&gt;ZFS dedup 是存儲池級別（pool-wide）開關的特性，所以大概在 MOS 之類的地方有存儲一個特殊的數據結構，
 叫 DeDup Table 簡稱 DDT 。DDT 目前是存儲設備上的一個 hash table ，因爲是存儲池級別的元數據，
 所以在 ZFS 中存儲了三份完全一樣的 DDT ，DDT 的內容是大概如下結構：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;
@@ -11841,7 +12817,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 就不會再繼續敲密碼了。而且似乎對攻擊者也沒有什麼好處？要是他 usb attach 到了我的設備上，
 我就能控制他的鍵盤了耶~&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+</content><category term="tech"></category><category term="linux"></category><category term="archlinux"></category><category term="raspberrypi"></category><category term="usbip"></category><category term="usb"></category><category term="forward"></category></entry><entry><title>【听译】君さえいなけりゃよかった</title><link href="//farseerfc.me/zhs/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/zhs/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11869,7 +12845,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11891,7 +12867,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11905,7 +12881,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;虽说只要不在意就可以了　却一句不剩全收集了起来&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;td&gt;啊　不应该是这样的　不应该是这样的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11933,7 +12909,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11955,7 +12931,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11974,7 +12950,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -11993,7 +12969,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12009,7 +12985,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12043,7 +13019,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12061,7 +13037,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="听译"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+</content><category term="life"></category><category term="translate"></category><category term="chouyaku"></category><category term="kimi"></category><category term="sae"></category><category term="inakerya"></category><category term="听译"></category></entry><entry><title>【聽譯】君さえいなけりゃよかった</title><link href="//farseerfc.me/kimisaeinakerya.html" rel="alternate"></link><published>2018-12-23T23:04:00+09:00</published><updated>2018-12-23T23:04:00+09:00</updated><author><name>farseerfc</name></author><id>tag:farseerfc.me,2018-12-23:/kimisaeinakerya.html</id><summary type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12089,7 +13065,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12111,7 +13087,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12125,7 +13101,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;td&gt;雖說只要不在意就可以了　卻一句不剩全收集了起來&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;ああ　こんなはずじゃない　こんなはずじゃない&lt;/td&gt;
-&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;td&gt;啊　不應該是這樣的　不應該是這樣的 …&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</summary><content type="html">&lt;div align="left" class="youtube embed-responsive embed-responsive-16by9"&gt;&lt;iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/-KOeQapXsx8"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12153,7 +13129,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12175,7 +13151,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12194,7 +13170,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12213,7 +13189,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12229,7 +13205,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -12263,7 +13239,7 @@ PC 這邊沒法 attach 設備了，應該馬上會發現吧。我敲打 sudo 之
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;hr class="docutils"/&gt;
-&lt;table border="0" class="table borderless translate-paragraph docutils"&gt;
+&lt;table border="0" class="docutils translate-paragraph borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="50%"/&gt;
 &lt;col width="50%"/&gt;
@@ -16274,7 +17250,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 编辑并发布静态博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;经过以上设置之后，一切正常的话，每次对主 repo 推送更新的同时， Travis-CI 就会自动
-拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
+拉来更新然后编译并发布了。可以放置这样的图标 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在项目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中显示编译状态。&lt;/p&gt;
@@ -16528,7 +17504,7 @@ make github&lt;/code&gt;
 &lt;div class="section" id="web"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;用 Web 編輯並發佈靜態博客&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;經過以上設置之後，一切正常的話，每次對主 repo 推送更新的同時， Travis-CI 就會自動
-拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="img-responsive no-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
+拉來更新然後編譯並發佈了。可以放置這樣的圖標 &lt;img alt="travisIcon" class="no-responsive img-responsive" src="https://travis-ci.org/farseerfc/farseerfc.svg?branch=master"/&gt; 在項目的 &lt;code class="code"&gt;
 Readme.md&lt;/code&gt;
 
 中顯示編譯狀態。&lt;/p&gt;
@@ -17435,7 +18411,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根据宽度自动分栏和瀑布式布局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下来目标是让主页的文章列表像 Google+ 主页那样根据显示器宽度自动调整分栏，使得宽度不同的
 显示器上每个分栏的宽度接近。想要达到的效果是，根据上面定义的屏幕宽度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -17453,7 +18429,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用单栏文章列表、单栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -17469,7 +18445,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -17487,7 +18463,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -17514,7 +18490,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三栏文章列表、双栏 侧边栏 固定布局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -17536,7 +18512,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -17962,7 +18938,7 @@ summary 这个插件原本的实现只允许抽取一段文字，我又对它的
 了我的主题，不过他们用了我修改的早期版本，还是原本的 Bootstrap 3 和
 bootstrap-material-design 样式。自己草草修改的东西被别人用到果然还是有点小激动呢，
 以及接下来不能马马虎虎地写 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;赛65:17「看哪！我造新天新地」启21:5「我将一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -18206,7 +19182,7 @@ xl&lt;/code&gt;
 &lt;h4&gt;&lt;a class="toc-backref" href="#id45"&gt;根據寬度自動分欄和瀑布式佈局&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;接下來目標是讓主頁的文章列表像 Google+ 主頁那樣根據顯示器寬度自動調整分欄，使得寬度不同的
 顯示器上每個分欄的寬度接近。想要達到的效果是，根據上面定義的屏幕寬度尺寸：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="17%"/&gt;
@@ -18224,7 +19200,7 @@ sm&lt;/code&gt;
 md&lt;/code&gt;
  用單欄文章列表、單欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="100%"/&gt;
 &lt;/colgroup&gt;
@@ -18240,7 +19216,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -18258,7 +19234,7 @@ md&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="53%"/&gt;
 &lt;col width="47%"/&gt;
@@ -18285,7 +19261,7 @@ lg&lt;/code&gt;
 xl&lt;/code&gt;
  用三欄文章列表、雙欄 側邊欄 固定佈局&lt;/td&gt;
 &lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="35%"/&gt;
 &lt;col width="35%"/&gt;
@@ -18307,7 +19283,7 @@ xl&lt;/code&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/td&gt;
-&lt;td colspan="2"&gt;&lt;table border="0" class="table borderless first last docutils"&gt;
+&lt;td colspan="2"&gt;&lt;table border="0" class="first borderless docutils last table"&gt;
 &lt;colgroup&gt;
 &lt;col width="26%"/&gt;
 &lt;col width="26%"/&gt;
@@ -18733,7 +19709,7 @@ summary 這個插件原本的實現只允許抽取一段文字，我又對它的
 了我的主題，不過他們用了我修改的早期版本，還是原本的 Bootstrap 3 和
 bootstrap-material-design 樣式。自己草草修改的東西被別人用到果然還是有點小激動呢，
 以及接下來不能馬馬虎虎地寫 commit 消息了。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id37" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id37" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;賽65:17「看哪！我造新天新地」啟21:5「我將一切都更新了。」&lt;/td&gt;&lt;/tr&gt;
@@ -19792,7 +20768,7 @@ After rendering&lt;/div&gt;
 &lt;p&gt;他们学习了历史上的log记录，然后试图找到重复修改的输出log的语句，确定log
 中存在的问题。他们首先确定修改是事后修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027个修改）&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -20109,7 +21085,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一个月的工作缩短到了3, 4天。没有比较presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -20408,7 +21384,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;他們學習了歷史上的log記錄，然後試圖找到重複修改的輸出log的語句，確定log
 中存在的問題。他們首先確定修改是事後修改。&lt;/p&gt;
 &lt;p&gt;通常的修改的比例（9027個修改）&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="10%"/&gt;
 &lt;col width="90%"/&gt;
@@ -20725,7 +21701,7 @@ many anomaly clone are note bug, high false positive&lt;/li&gt;
 &lt;p&gt;hashing a window of 5 lines of normalized (tokenized) code, dropping
 3/4 of the hashing&lt;/p&gt;
 &lt;p&gt;把ccfinder一個月的工作縮短到了3, 4天。沒有比較presion和recall。&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="11%"/&gt;
 &lt;col width="89%"/&gt;
@@ -21523,7 +22499,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -21540,7 +22516,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意设计为既可以托管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在单机上独立使用。&lt;/p&gt;
 &lt;p&gt;项目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代码地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪云平台，类似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的东西。&lt;/td&gt;&lt;/tr&gt;
@@ -21560,7 +22536,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -21577,7 +22553,7 @@ Mining Android Bug
 &lt;p&gt;Pyssy 被有意設計爲既可以託管寄宿在 SAE &lt;a class="footnote-reference" href="#sae" id="id3"&gt;[1]&lt;/a&gt; 上，也可以在單機上獨立使用。&lt;/p&gt;
 &lt;p&gt;項目地址： &lt;a class="reference external" href="http://pyssy.sinaapp.com/"&gt;http://pyssy.sinaapp.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github上的源代碼地址： &lt;a class="reference external" href="https://github.com/yssy-d3/pyssy"&gt;https://github.com/yssy-d3/pyssy&lt;/a&gt;&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="sae" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="sae" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id3"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="http://sae.sina.com.cn/"&gt;Sina App Engine&lt;/a&gt; ，新浪雲平臺，類似 &lt;a class="reference external" href="https://appengine.google.com/"&gt;Google App Engine&lt;/a&gt; 的東西。&lt;/td&gt;&lt;/tr&gt;
@@ -22535,13 +23511,13 @@ type&lt;/code&gt;
 依赖 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作为代码着色器，那么其实 Rubyist 也至少需要安装 Python 。 我倾向于不依赖任何 Ruby 组件，最好没有 C 扩展
 的纯 Python 实现。&lt;/p&gt;
 &lt;p&gt;于是我开始在 Github 上找 Python 的静态博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 写的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起来不错，不过似乎没有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不过默认的标记语言是 MarkDown ， 又依赖于几个 Ruby 组建，而且官方网站的设计实在太前卫。 最终我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 与 3.x 之间看似难以跨越的鸿沟，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各个实现之间的微妙差别。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我们有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我们有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不过这些都是包管理器，都是装好特定的Python实现之后的事情。 Python实现本身还不需要包管理器来管理。 Python 的版本问题基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 这样的轻量级转换器就可以了，你不需要为了安装多个软件而在硬盘里留下多个不同版本的 Python 。 如果为了引用的稳定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不过这又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;
@@ -22658,13 +23634,13 @@ debug into it and make minor modifications.&lt;/p&gt;
 &lt;p&gt;So I started searching for Static Blog Engine in Python on Github. The author of the great framework &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; , &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; ,
 wrote a &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; , but it's not well developed. &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; seems to be complete enough, but it use &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;MarkDown&lt;/a&gt; as its default markup
 language, and the design of its homepage is too fashion to be used as blog. Finally I found &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; .&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id3" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id3" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Such as the difference between Python 2.x and 3.x , and also difference in C-API of implementations of &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; , &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; , &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; , &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; .&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id4" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id4" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Yes, we have &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; and &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; , but all these are package manager, running in a perticular Python implementation. Python implementation itself don't need a manager. Version issue of Python largely have been solved by lightweight converters such as &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; and &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; , you don't need to store multiple implementations of Python in your disk for different packages. Yes you can use  &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; if you need to preserve stablility but this is another story.&lt;/td&gt;&lt;/tr&gt;
@@ -22784,13 +23760,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 &lt;p&gt;実際に迷惑したのは、私は今自由に持って遊べる Linux 環境が持っていないということ（ほしいなぁ……）。 ですが &lt;a class="reference external" href="http://beginrescueend.com/"&gt;RVM&lt;/a&gt; それとも &lt;a class="reference external" href="https://github.com/sstephenson/rbenv"&gt;rbenv&lt;/a&gt; 両方も Unix/Linux/MacOSX しか実行できないらしいです。ギークとしたの皆は絶対に Windows つかっじゃいけないんですか？（本当かも……）。&lt;/p&gt;
 &lt;p&gt;残りは Ruby と Python の争いです。私は &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; に詳しくない、比べると &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;ReST&lt;/a&gt; のほうが私に向いています。それに、どっちでも &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; を依存しシンタックス・ハイライトをしているから、 Rubyist 達も少なくとも Python を入れなきゃダメみたいです。 私の好みは一切の Ruby コンポーネントを頼らず、 C 拡張もない純粋な Python の実現がほしいです。&lt;/p&gt;
 &lt;p&gt;そこから Github に Python で実現した静的ブログ・エンジンを探し始めた。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; の作者である &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 氏が書いた &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; が素晴らしいが、あんまり他人に使われていないようです。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; は多く使われているけれと、ホームページにブログの感じがみえないです。最後に &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; を見かけました。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;例えば Python 2.x と 3.x の間にあまりにも巨大なる差、それと &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; など各実現間に微妙な違いがあります。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;はい、こっちに &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; とか &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; があります、ですがそれらはパッケージ管理、特定なPython環境を入れた後の話です。Python自身はまだ管理する必要がないです。 Python のバージョン問題も &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; とか &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; のようなツールで変換すればいいです、違うソフトを実行するためたくさんの Python バージョンを残る必要はないです。もしバージョンの違いが気にするなら &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; を使うのも構わないが、それも別のことです。&lt;/td&gt;&lt;/tr&gt;
@@ -22906,13 +23882,13 @@ language, and the design of its homepage is too fashion to be used as blog. Fina
 依賴 &lt;a class="reference external" href="http://pygments.org/"&gt;Pygments&lt;/a&gt; 作爲代碼着色器，那麼其實 Rubyist 也至少需要安裝 Python 。 我傾向於不依賴任何 Ruby 組件，最好沒有 C 擴展
 的純 Python 實現。&lt;/p&gt;
 &lt;p&gt;於是我開始在 Github 上找 Python 的靜態博客引擎。 &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; 的作者 &lt;a class="reference external" href="https://github.com/mitsuhiko"&gt;mitsuhiko&lt;/a&gt; 寫的 &lt;a class="reference external" href="https://github.com/mitsuhiko/rstblog"&gt;rstblog&lt;/a&gt; 看起來不錯，不過似乎沒有多少人在用。 &lt;a class="reference external" href="http://ringce.com/hyde"&gt;Hyde&lt;/a&gt; 似乎很完善，不過默認的標記語言是 MarkDown ， 又依賴於幾個 Ruby 組建，而且官方網站的設計實在太前衛。 最終我看到了 &lt;a class="reference external" href="http://pelican.notmyidea.org/en/latest/"&gt;Pelican&lt;/a&gt; 。&lt;/p&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id10" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id10" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id8"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;比如 Python 2.x 與 3.x 之間看似難以跨越的鴻溝，以及 &lt;a class="reference external" href="http://pypy.org/"&gt;PyPy&lt;/a&gt; 、 &lt;a class="reference external" href="http://python.org/"&gt;CPython&lt;/a&gt; 、 &lt;a class="reference external" href="http://www.stackless.com/"&gt;Stackless&lt;/a&gt; 、 &lt;a class="reference external" href="http://cython.org/"&gt;Cython&lt;/a&gt; 等各個實現之間的微妙差別。&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;table border="0" class="footnote table docutils" frame="void" id="id11" rules="none"&gt;
+&lt;table border="0" class="docutils footnote table" frame="void" id="id11" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#id9"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;是的，我們有 &lt;a class="reference external" href="http://packages.python.org/distribute/easy_install.html"&gt;easy_install&lt;/a&gt; ，我們有 &lt;a class="reference external" href="http://www.pip-installer.org/en/latest/index.html"&gt;pip&lt;/a&gt; ， 不過這些都是包管理器，都是裝好特定的Python實現之後的事情。 Python實現本身還不需要包管理器來管理。 Python 的版本問題基本上也只需要 &lt;a class="reference external" href="http://docs.python.org/release/3.0.1/library/2to3.html"&gt;2to3.py&lt;/a&gt; 和 &lt;a class="reference external" href="http://www.startcodon.com/wordpress/?cat=8"&gt;3to2.py&lt;/a&gt; 這樣的輕量級轉換器就可以了，你不需要爲了安裝多個軟件而在硬盤裏留下多個不同版本的 Python 。 如果爲了引用的穩定性，你可以用 &lt;a class="reference external" href="http://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt; ，不過這又是另一回事情了。&lt;/td&gt;&lt;/tr&gt;

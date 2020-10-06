@@ -922,7 +922,7 @@ n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空
 基于段的 GC 还有一个显著缺陷，需要扫描元数据，复制搬运仍然被引用到的块，这不光会增加设备写入，
 还需要调整现有数据结构中的指针，调整指针需要更多写入，同时又释放更多数据块，
 F2FS 等一些文件系统设计中把这个问题叫 Wandering Tree Problem ，在 F2FS
-设计中是通过近乎「作弊」的 <span class="s">`NAT 转换表 </span><span class="si">&lt;Wandering Tree Problem&gt;</span><span class="s">`_</span>
+设计中是通过近乎「作弊」的 <span class="s">`NAT 转换表 </span><span class="si">&lt;https://www.kernel.org/doc/html/latest/filesystems/f2fs.html#id1&gt;</span><span class="s">`_</span>
 放在存储设备期待的 FAT 所在位置，不仅能让需要扫描的元数据更集中，还能减少这种指针调整导致的写入。
 
 不过基于段的 GC 也有一些好处，它不需要复杂的文件系统设计，不需要特殊构造的指针，

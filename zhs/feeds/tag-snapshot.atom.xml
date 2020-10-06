@@ -980,7 +980,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;p&gt;检查点也是 btrfs 目前没有的功能。 btrfs 目前不能对顶层子卷做递归的 snapshot ，btrfs
 的子卷也没有类似 ZFS 数据集的层级关系和可继承属性，从而没法实现类似检查点的功能。&lt;/p&gt;
 &lt;p&gt;除了书签和检查点之外，剩下的概念可以在 ZFS 和 btrfs 之间有如下映射关系：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -993,7 +993,7 @@ reflink 引用），从而 btrfs 没法（或者很难）实现书签功能。&l
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;对 ZFS 数据集的操作，大部分也可以找到对应的对 btrfs 子卷的操作。&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -1322,7 +1322,7 @@ n12 就是当前的写入点。空盘上连续往后写而不 GC 总会遇到空
 &lt;p&gt;基于段的 GC 还有一个显著缺陷，需要扫描元数据，复制搬运仍然被引用到的块，这不光会增加设备写入，
 还需要调整现有数据结构中的指针，调整指针需要更多写入，同时又释放更多数据块，
 F2FS 等一些文件系统设计中把这个问题叫 Wandering Tree Problem ，在 F2FS
-设计中是通过近乎「作弊」的 &lt;a class="reference external" href="WanderingTreeProblem"&gt;NAT 转换表&lt;/a&gt;
+设计中是通过近乎「作弊」的 &lt;a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/f2fs.html#id1"&gt;NAT 转换表&lt;/a&gt;
 放在存储设备期待的 FAT 所在位置，不仅能让需要扫描的元数据更集中，还能减少这种指针调整导致的写入。&lt;/p&gt;
 &lt;p&gt;不过基于段的 GC 也有一些好处，它不需要复杂的文件系统设计，不需要特殊构造的指针，
 就能很方便地支持大量快照。一些日志结构文件系统比如 NILFS 用这一点支持了「连续快照（continuous
@@ -2296,7 +2296,7 @@ btrfs 中叫做「反向引用（back reference，简称 backref）」。所以�
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;有两种记录方式是因为它们各有性能上的优缺点：&lt;/p&gt;
-&lt;table border="0" class="field-list table docutils" frame="void" rules="none"&gt;
+&lt;table border="0" class="field-list docutils table" frame="void" rules="none"&gt;
 &lt;col class="field-name"/&gt;
 &lt;col class="field-body"/&gt;
 &lt;tbody valign="top"&gt;
@@ -2659,7 +2659,7 @@ Chris 的博客也有两篇文章《
 &lt;p&gt;ZFS dedup 是存储池级别（pool-wide）开关的特性，所以大概在 MOS 之类的地方有存储一个特殊的数据结构，
 叫 DeDup Table 简称 DDT 。DDT 目前是存储设备上的一个 hash table ，因为是存储池级别的元数据，
 所以在 ZFS 中存储了三份完全一样的 DDT ，DDT 的内容是大概如下结构：&lt;/p&gt;
-&lt;table border="0" class="table borderless docutils"&gt;
+&lt;table border="0" class="docutils borderless table"&gt;
 &lt;colgroup&gt;
 &lt;col width="24%"/&gt;
 &lt;col width="54%"/&gt;

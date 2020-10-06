@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"
+>
+<head>
+    <title>關於 swap 的一些補充 - Farseerfc的小窩</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="theme-color" content="#6b5594">
+    <meta name="msapplication-navbutton-color" content="#6b5594">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#6b5594">
+    <link rel="manifest" href="/manifest.json">
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="//farseerfc.me/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="//farseerfc.me/images/favicon-16x16.png" sizes="16x16">
+<link rel="mask-icon" href="//farseerfc.me/images/safari-pinned-tab.svg" color="#603cba">
+
+<link rel="canonical" href="//farseerfc.me/followup-about-swap.html">
+
+        <meta name="author" content="farseerfc" />
+        <meta name="keywords" content="swap,mm,memory management,swappiness,kswapd,watermark,watermark_scale_factor,cgroup v2" />
+        <meta name="description" content="上週翻譯完 【譯】替 swap 辯護：常見的誤解 之後很多朋友們似乎還有些疑問和誤解，於是寫篇後續澄清一下。事先聲明我不是內核開發者， 這裏說的只是我的理解， 基於內核文檔中關於物理內存的描述 ，新的內核代碼的具體行爲可能和我的理解有所出入，歡迎踊躍討論。 Introduction to Memory Management in Linux 誤解1: swap 是虛擬內存，虛擬內存肯定比物理內存慢嘛 這種誤解進一步的結論通常是：「使用虛擬內存肯定會減慢系統運行時性能，如果物理內存足夠爲什麼還要用虛擬的？」 這種誤解是把虛擬內存和交換區的實現方式類比於「虛擬磁盤」或者「虛擬機」等同的方式， 也隱含「先用物理內存，用完了之後用虛擬內存」也即下面的「誤解3」的理解。 首先，交換區（swap） 不是 虛擬內存。操作系統中說「物理內存」還是「虛擬內存」的時候在指程序代碼 尋址時使用的內存地址方式，使用物理地址空間時是在訪問物理內存，使用虛擬地址空間時是在訪問虛擬內存 …" />
+
+        <meta property="og:site_name" content="Farseerfc的小窩" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="關於 swap 的一些補充"/>
+        <meta property="og:url" content="//farseerfc.me/followup-about-swap.html"/>
+        <meta property="og:description" content="上週翻譯完 【譯】替 swap 辯護：常見的誤解 之後很多朋友們似乎還有些疑問和誤解，於是寫篇後續澄清一下。事先聲明我不是內核開發者， 這裏說的只是我的理解， 基於內核文檔中關於物理內存的描述 ，新的內核代碼的具體行爲可能和我的理解有所出入，歡迎踊躍討論。 Introduction to Memory Management in Linux 誤解1: swap 是虛擬內存，虛擬內存肯定比物理內存慢嘛 這種誤解進一步的結論通常是：「使用虛擬內存肯定會減慢系統運行時性能，如果物理內存足夠爲什麼還要用虛擬的？」 這種誤解是把虛擬內存和交換區的實現方式類比於「虛擬磁盤」或者「虛擬機」等同的方式， 也隱含「先用物理內存，用完了之後用虛擬內存」也即下面的「誤解3」的理解。 首先，交換區（swap） 不是 虛擬內存。操作系統中說「物理內存」還是「虛擬內存」的時候在指程序代碼 尋址時使用的內存地址方式，使用物理地址空間時是在訪問物理內存，使用虛擬地址空間時是在訪問虛擬內存 …"/>
+        <meta property="article:published_time" content="2020-10-06" />
+            <meta property="article:section" content="tech" />
+            <meta property="article:tag" content="swap" />
+            <meta property="article:tag" content="mm" />
+            <meta property="article:tag" content="memory management" />
+            <meta property="article:tag" content="swappiness" />
+            <meta property="article:tag" content="kswapd" />
+            <meta property="article:tag" content="watermark" />
+            <meta property="article:tag" content="watermark_scale_factor" />
+            <meta property="article:tag" content="cgroup v2" />
+            <meta property="article:author" content="farseerfc" />
+        <meta property="og:image"
+                  content="//farseerfc.me/followup-about-swap.png"/>
+
+
+
+    <!-- Bootstrap -->
+        <link href="//farseerfc.me/theme/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//farseerfc.me/theme/css/pygments/monokai.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/html4css1.css" rel="stylesheet">
+    <link rel="stylesheet" href="//farseerfc.me/theme/css/style.css" type="text/css"/>
+
+        <link href="//farseerfc.me/feeds/atom.xml" type="application/atom+xml" rel="alternate"
+              title="Farseerfc的小窩 ATOM Feed"/>
+
+        <link href="//farseerfc.me/theme/css/material.min.css" rel="stylesheet">
+        <link href="//farseerfc.me/theme/css/ripples.css" rel="stylesheet">
+    <link href="//farseerfc.me/theme/css/github-markdown.css" rel="stylesheet">
+</head>
+<body>
+<div style="display:none" id="title">關於 swap 的一些補充 - Farseerfc的小窩</div>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">切換導航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="//farseerfc.me/" class="navbar-brand">
+Farseerfc的小窩            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+
+                    <li class="dropdown hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="mdi-action-translate"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="//farseerfc.me/">繁體</a></li>
+                            <li><a href="//farseerfc.me/jp/">日本語</a></li>
+                            <li><a href="//farseerfc.me/en/">English</a></li>
+                            <li><a href="//farseerfc.me/zhs/">简体</a></li>
+                        </ul>
+                    </li>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-md hidden-sm">
+                        <li class="active"><a href="//farseerfc.me/"><i class="mdi-action-translate"></i>繁體</a></li>
+                        <li><a href="//farseerfc.me/jp/"><i class="mdi-action-translate"></i>日本語</a></li>
+                        <li><a href="//farseerfc.me/en/"><i class="mdi-action-translate"></i>English</a></li>
+                        <li><a href="//farseerfc.me/zhs/"><i class="mdi-action-translate"></i>简体</a></li>
+                    </ul>
+
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-user"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                             <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                                 關於
+                              </a></li>
+                             <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                                 友情鏈接
+                              </a></li>
+                        </ul>
+                    </li>
+
+                  <ul class="nav navbar-nav hidden-xs hidden-sm">
+                     <li class=""><a href="//farseerfc.me/pages/about.html"><i class="fa fa-user"></i>
+                         關於
+                      </a></li>
+                     <li class=""><a href="//farseerfc.me/pages/links.html"><i class="fa fa-user"></i>
+                         友情鏈接
+                      </a></li>
+                  </ul>
+            </ul>
+
+                <ul class="nav navbar-nav hidden-md hidden-lg hidden-xl">
+                    <li class="dropdown hidden-md hidden-lg hidden-xl">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                            <i class="fa fa-folder-o"></i><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li >
+                                <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                            </li>
+                            <li >
+                                <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                            </li>
+                            <li class="active">
+                                <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                    <ul class="nav navbar-nav hidden-xs hidden-sm">
+                        <li >
+                            <a href="//farseerfc.me/category/import.html"><i class="fa fa-folder-o"></i> Import</a>
+                        </li>
+                        <li >
+                            <a href="//farseerfc.me/category/life.html"><i class="fa fa-folder-o"></i> Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="//farseerfc.me/category/tech.html"><i class="fa fa-folder-o"></i> Tech</a>
+                        </li>
+                    </ul>
+
+
+
+            <ul class="nav navbar-nav navbar-right hidden-sm hidden-md hidden-lg hidden-xl">
+                <li class="dropdown hidden-md hidden-lg hidden-xl">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+                        <i class="fa fa-search"></i><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><span>
+                        <form class="navbar-search" action="/search.html">
+                          <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                        </form></span>
+                      </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-right navbar-form hidden-xs">
+              <li><span>
+                <form class="navbar-search" action="/search.html">
+                  <input type="text" class="search-query form-control col-lg-16" placeholder="搜索" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right hidden-xs">
+              <li><a href="//farseerfc.me/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">歸檔</span></a></li>
+              <li><a href="//farseerfc.me/feeds/atom.xml" title="Atom feeds for all articles"><i class="fa fa-rss"></i></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container" style="min-height: 100%;height: auto !important;height: 100%;">
+    <div class="row" style="padding-bottom:80px;padding-top:80px;">
+        <div class="col-xl-21 col-lg-20 col-md-18">
+            <div id="loading-block">
+            <ol class="breadcrumb">
+                <li><a href="//farseerfc.me/" title="Farseerfc的小窩"><i class="fa fa-home fa-lg"></i></a></li>
+                <li><a href="//farseerfc.me/category/tech.html" title="tech">tech</a></li>
+                <li class="active">關於 swap 的一些補充</li>
+            </ol>
+    <section id="content" class="article-content">
+        <article>
+            <header class="page-header jumbotron jumbotron-primary panel-primary" id="article-header">
+                <div class="panel-heading">
+                    <h1>
+                        關於 swap 的一些補充
+                        <a href="//farseerfc.me/followup-about-swap.html"
+                           rel="bookmark"
+                           class="btn btn-primary btn-lg"
+                           title="到 關於 swap 的一些補充 的永久鏈接">
+                           <i class="mdi-action-launch"></i>
+                        </a>
+                    </h1>
+                </div>
+                <div class="panel-body">
+<div class="post-info">
+    <span class="published">
+        <time datetime="2020-10-06T13:45:00+09:00"><i class="fa fa-calendar"></i> 2020年10月06日(週二)</time>
+    </span>
+
+
+
+<div class="btn-group translations">
+<a href="javascript:void(0)" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="mdi-action-translate"></i><span class="caret"></a>
+<ul class="dropdown-menu">
+<li class="active"><a href="//farseerfc.me/followup-about-swap.html">繁體</a></li><li><a href="//farseerfc.me/zhs/followup-about-swap.html" class="translate">简体</a></li></ul>
+</div>
+
+    <a onclick="$.get('//farseerfc.me/followup-about-swap.rst.html', function(data){$('#source-code').html(data)});$('#article-content').toggle();$('#source-content').toggle();" class="btn btn-primary" title="顯示這篇文章的源文件"><i class="fa fa-code"></i></a>
+    <a href="//farseerfc.me/followup-about-swap.pdf" class="btn btn-primary" title="顯示這篇文章的印刷版PDF文件" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+    <a href="//farseerfc.me/followup-about-swap.png" class="btn btn-primary" title="顯示這篇文章的截圖PNG文件" target="_blank""><i class="fa fa-file-photo-o"></i></a>
+
+<small><span><a href="//farseerfc.me/followup-about-swap.html#disqus_thread" class="btn btn-primary" data-disqus-identifier="followup-about-swap" data-disqus-url="http://farseerfc.me/followup-about-swap.html"><i class="fa fa-comments-o"></i></a></span></small><span class="btn-group">
+	<a href="//farseerfc.me/tag/swap.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swap</a>
+	<a href="//farseerfc.me/tag/mm.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> mm</a>
+	<a href="//farseerfc.me/tag/memory-management.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> memory management</a>
+	<a href="//farseerfc.me/tag/swappiness.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> swappiness</a>
+	<a href="//farseerfc.me/tag/kswapd.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> kswapd</a>
+	<a href="//farseerfc.me/tag/watermark.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> watermark</a>
+	<a href="//farseerfc.me/tag/watermark_scale_factor.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> watermark_scale_factor</a>
+	<a href="//farseerfc.me/tag/cgroup-v2.html" class="btn btn-primary btn-xs"><i class="fa fa-tag"></i> cgroup v2</a>
+</span>
+
+
+
+</div><!-- /.post-info -->                </div>
+            </header>
+
+            <div class="entry-content jumbotron" id="article-content">
+                <p>上週翻譯完 <a class="reference external" href="//farseerfc.me/in-defence-of-swap.html">【譯】替 swap 辯護：常見的誤解</a>
+之後很多朋友們似乎還有些疑問和誤解，於是寫篇後續澄清一下。事先聲明我不是內核開發者，
+這裏說的只是我的理解，
+<a class="reference external" href="https://www.kernel.org/doc/gorman/html/understand/understand005.html">基於內核文檔中關於物理內存的描述</a>
+，新的內核代碼的具體行爲可能和我的理解有所出入，歡迎踊躍討論。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+<a class="reference external" href="https://www.youtube.com/watch?v=7aONIVSXiJ8">Introduction to Memory Management in Linux</a></div>
+<div class="panel-body">
+<div align="left" class="youtube embed-responsive embed-responsive-16by9"><iframe allow="fullscreen" class="embed-responsive-item" frameborder="0" src="https://www.youtube.com/embed/7aONIVSXiJ8"></iframe></div></div>
+</div>
+<div class="section" id="id3">
+<h2>誤解1: swap 是虛擬內存，虛擬內存肯定比物理內存慢嘛</h2>
+<p>這種誤解進一步的結論通常是：「使用虛擬內存肯定會減慢系統運行時性能，如果物理內存足夠爲什麼還要用虛擬的？」
+這種誤解是把虛擬內存和交換區的實現方式類比於「虛擬磁盤」或者「虛擬機」等同的方式，
+也隱含「先用物理內存，用完了之後用虛擬內存」也即下面的「誤解3」的理解。</p>
+<p>首先，交換區（swap） <strong>不是</strong> 虛擬內存。操作系統中說「物理內存」還是「虛擬內存」的時候在指程序代碼
+尋址時使用的內存地址方式，使用物理地址空間時是在訪問物理內存，使用虛擬地址空間時是在訪問虛擬內存。
+現代操作系統在大部分情況下都在使用虛擬地址空間尋址， <strong>包括</strong> 在執行內核代碼的時候。</p>
+<p>並且，交換區 <strong>不是</strong> 實現虛擬內存的方式。操作系統使用內存管理單元（MMU，Memory Management
+Unit）做虛擬內存地址到物理內存地址的地址翻譯，現代架構下 MMU 通常是 CPU
+的一部分，配有它專用的一小塊存儲區叫做地址轉換旁路緩存（TLB，Translation Lookaside Buffer），
+只有在 TLB 中沒有相關地址翻譯信息的時候 MMU 纔會以缺頁中斷的形式調用操作系統內核幫忙。
+除了 TLB 信息不足的時候，大部分情況下使用虛擬內存都是硬件直接實現的地址翻譯，沒有軟件模擬開銷。
+實現虛擬內存不需要用到交換區，交換區只是操作系統實現虛擬內存後能提供的一個附加功能，
+即便沒有交換區，操作系統大部分時候也在用虛擬內存，包括在大部分內核代碼中。</p>
+</div>
+<div class="section" id="id4">
+<h2>誤解2: 但是沒有交換區的話，虛擬內存地址都有物理內存對應嘛</h2>
+<p>很多朋友也理解上述操作系統實現虛擬內存的方式，但是仍然會有疑問：「我知道虛擬內存和交換區的區別，
+但是沒有交換區的話，虛擬內存地址都有物理內存對應，不用交換區的話就不會遇到讀虛擬內存需要讀寫磁盤
+導致的卡噸了嘛」。</p>
+<p>這種理解也是錯的，禁用交換區的時候，也會有一部分分配給程序的虛擬內存不對應物理內存，
+比如使用 <code class="code">
+mmap</code>
+ 調用實現內存映射文件的時候。實際上即便是使用 <code class="code">
+read/​write</code>
+
+讀寫文件， Linux 內核中（可能現代操作系統內核都）在底下是用和 <code class="code">
+mmap</code>
+ 相同的機制建立文件
+到虛擬地址空間的地址映射，然後實際讀寫到虛擬地址時靠缺頁中斷把文件內容載入頁面緩存（page cache
+）。內核加載可執行程序和動態鏈接庫的方式也是通過內存映射文件。甚至可以進一步說，
+用戶空間的虛擬內存地址範圍內，除了匿名頁之外，其它虛擬地址都是文件後備（backed by file
+），而匿名頁通過交換區作爲文件後備。上篇文章中提到的別的類型的內存，比如共享內存頁面（shm
+）是被一個內存中的虛擬文件系統後備的，這一點有些套娃先暫且不提。於是事實是無論有沒有交換區，
+缺頁的時候總會有磁盤讀寫從慢速存儲加載到物理內存，這進一步引出上篇文章中對於交換區和頁面緩存這兩者的討論。</p>
+</div>
+<div class="section" id="id5">
+<h2>誤解3： 不是內存快用完的時候才會交換的麼？</h2>
+<p>簡短的答案可以說「是」，但是內核理解的「內存快用完」和你理解的很可能不同。
+也可以說「不是」，就算按照內核理解的「內存快用完」的定義，內存快用完的時候內核的行爲是去回收內存，
+至於回收內存的時候內核會做什麼有個複雜的啓發式經驗算法，實際上真的內存快滿的時候根本來不及做
+swap ，內核可能會嘗試丟棄 page cache 甚至丟棄 vfs cache (dentry cache / inode cache)
+這些不需要磁盤I/O就能更快獲取可用內存的動作。</p>
+<p>深究這些內核機制之前，我在思考爲什麼很多朋友會問出這樣的問題。可能大部分這麼問的人，學過編程，
+稍微學過基本的操作系統原理，在腦海裏對內核分配頁面留着這樣一種印象（C僞代碼）：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1">////////////////////  userspace space  ////////////////</span></span>
+<span class="code-line"><span class="kt">void</span><span class="o">*</span> <span class="nf">malloc</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span></span>
+<span class="code-line">    <span class="kt">void</span><span class="o">*</span> <span class="n">pages</span> <span class="o">=</span> <span class="n">mmap</span><span class="p">(...);</span>                                    <span class="c1">// 從內核分配內存頁</span></span>
+<span class="code-line">    <span class="k">return</span> <span class="n">alloc_from_page</span><span class="p">(</span><span class="n">pages</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>                        <span class="c1">// 從拿到的內存頁細分</span></span>
+<span class="code-line"><span class="p">}</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="c1">////////////////////  kernel space  //////////////////</span></span>
+<span class="code-line"><span class="kt">void</span> <span class="o">*</span> <span class="n">SYSCALL</span> <span class="n">do_mmap</span><span class="p">(...){</span></span>
+<span class="code-line">   <span class="c1">//...</span></span>
+<span class="code-line">   <span class="k">return</span> <span class="nf">kmalloc_pages</span><span class="p">(</span><span class="n">nr_page</span><span class="p">);</span></span>
+<span class="code-line"><span class="p">}</span></span>
+<span class="code-line"></span>
+<span class="code-line"><span class="kt">void</span><span class="o">*</span> <span class="n">kmalloc_pages</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span></span>
+<span class="code-line">  <span class="k">while</span> <span class="p">(</span> <span class="n">available_mem</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="p">)</span> <span class="p">{</span></span>
+<span class="code-line">    <span class="c1">// 可用內存不夠了！嘗試搞點內存</span></span>
+<span class="code-line">    <span class="n">page_frame_info</span><span class="o">*</span> <span class="n">least_accessed</span> <span class="o">=</span> <span class="n">lru_pop_page_frame</span><span class="p">();</span>     <span class="c1">// 找出最少訪問的頁面</span></span>
+<span class="code-line">    <span class="k">switch</span> <span class="p">(</span> <span class="n">least_accessed</span> <span class="o">-&gt;</span> <span class="n">pf_type</span> <span class="p">){</span></span>
+<span class="code-line">      <span class="k">case</span> <span class="nl">PAGE_CACHE</span><span class="p">:</span> <span class="n">drop_page_cache</span><span class="p">(</span><span class="n">least_accessed</span><span class="p">);</span> <span class="k">break</span><span class="p">;</span>  <span class="c1">// 丟棄文件緩存</span></span>
+<span class="code-line">      <span class="k">case</span> <span class="nl">SWAP</span><span class="p">:</span>       <span class="n">swap_out</span><span class="p">(</span><span class="n">least_accessed</span><span class="p">);</span>        <span class="k">break</span><span class="p">;</span>  <span class="c1">// &lt;- 寫磁盤，所以系統卡了！</span></span>
+<span class="code-line">      <span class="c1">// ... 別的方式回收 least_accessed</span></span>
+<span class="code-line">    <span class="p">}</span></span>
+<span class="code-line">    <span class="n">append_free_page</span><span class="p">(</span><span class="n">free_page_list</span><span class="p">,</span> <span class="n">least_accessed</span><span class="p">);</span>           <span class="c1">// 回收到的頁面加入可用列表</span></span>
+<span class="code-line">    <span class="n">available_mem</span> <span class="o">+=</span> <span class="n">least_accessed</span> <span class="o">-&gt;</span> <span class="n">size</span><span class="p">;</span></span>
+<span class="code-line">  <span class="p">}</span></span>
+<span class="code-line">  <span class="c1">// 搞到內存了！返回給程序</span></span>
+<span class="code-line">  <span class="n">available_mem</span> <span class="o">-=</span> <span class="n">size</span><span class="p">;</span></span>
+<span class="code-line">  <span class="kt">void</span> <span class="o">*</span> <span class="n">phy_addr</span> <span class="o">=</span> <span class="n">take_from_free_list</span><span class="p">(</span><span class="n">free_page_list</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span></span>
+<span class="code-line">  <span class="k">return</span> <span class="nf">assign_virtual_addr</span><span class="p">(</span><span class="n">phy_addr</span><span class="p">);</span></span>
+<span class="code-line"><span class="p">}</span></span>
+</pre></div>
+<p>這種邏輯隱含三層 <strong>錯誤的</strong> 假設：</p>
+<ol class="arabic simple">
+<li>分配物理內存是發生在從內核分配內存的時候的，比如 <code class="code">
+malloc/​mmap</code>
+ 的時候。</li>
+<li>內存回收是發生在進程請求內存分配的上下文裏的，換句話說進程在等內核的內存回收返回內存，
+不回收到內存，進程就得不到內存。</li>
+<li>交換出內存到 swap 是發生在內存回收的時候的，會阻塞內核的內存回收，進而阻塞程序的內存分配。</li>
+</ol>
+<p>這種把內核代碼當作「具有特權的庫函數調用」的看法，可能很易於理解，
+甚至早期可能的確有操作系統的內核是這麼實現的，但是很可惜現代操作系統都不是這麼做的。
+上面三層假設的錯誤之處在於：</p>
+<ol class="arabic simple">
+<li>在程序請求內存的時候，比如 <code class="code">
+malloc/​mmap</code>
+ 的時候，內核只做虛擬地址分配，
+記錄下某段虛擬地址空間對這個程序是可以合法訪問的，但是不實際分配物理內存給程序。
+在程序第一次訪問到虛擬地址的時候，才會實際分配物理內存。這種叫 <strong>惰性分配（lazy allocation）</strong> 。</li>
+<li>在內核感受到內存分配壓力之後，早在內核內存用盡之前，內核就會在後臺慢慢掃描並回收內存頁。
+內存回收通常不發生在內存分配的時候，除非在內存非常短缺的情況下，後臺內存回收來不及滿足當前分配請求，
+纔會發生 <strong>直接回收(direct reclamation)</strong> 。</li>
+<li>同樣除了直接回收的情況，大部分正常情況下換出頁面是內存管理子系統調用 DMA 在後臺慢慢做的，
+交換頁面出去不會阻塞內核的內存回收，更不會阻塞程序做內存分配（malloc
+）和使用內存(實際訪問惰性分配的內存頁)。</li>
+</ol>
+<p>也就是說，現代操作系統內核是高度並行化的設計，內存分配方方面面需要消耗計算資源或者 I/O
+帶寬的場景，都會儘量並行化，最大程度利用好計算機所有組件（CPU/MMU/DMA/IO）的吞吐率，
+不到緊要關頭需要直接回收的場合，就不會阻塞程序的正常執行流程。</p>
+</div>
+<div class="section" id="id6">
+<h2>惰性分配有什麼好處？</h2>
+<p>或許會有人問：「我讓你分配內存，你給我分配了個虛擬的，到用的時候還要做很多事情才能給我，這不是騙人嘛」，
+或者會有人擔心惰性分配會對性能造成負面影響。</p>
+<p>這裏實際情況是程序從分配虛擬內存的時候，「到用的時候」，這之間有段時間間隔，可以留給內核做準備
+。程序可能一下子分配一大片內存地址，然後再在執行過程中解析數據慢慢往地址範圍內寫東西。
+程序分配虛擬內存的速率可以是「突發」的，比如一個系統調用中分配 1GiB 大小，而實際寫入數據的速率會被
+CPU 執行速度等因素限制，不會短期內突然寫入很多頁面。
+這個分配速率導致的時間差內內核可以完成很多後臺工作，比如回收內存，
+比如把會收到的別的進程用過的內存頁面初始化爲全0，這部分後臺工作可以和程序的執行過程並行，
+從而當程序實際用到內存的時候，需要的準備工作已經做完了，大部分場景下可以直接分配物理內存出來。</p>
+<p>如果程序要做實時響應，想避免因爲惰性分配造成的性能不穩定，可以使用 <code class="code">
+mlock/​mlockall</code>
+
+將得到的虛擬內存鎖定在物理內存中，鎖的過程中內核會做物理內存分配。不過要區分「性能不穩定」和「低性能」，
+預先分配內存可以避免實際使用內存時分配物理頁面的額外開銷，但是會拖慢整體吞吐率，所以要謹慎使用。</p>
+<p>很多程序分配了很大一片地址空間，但是實際並不會用完這些地址，直到程序執行結束這些虛擬地址也一直
+處於沒有對應物理地址的情況。惰性分配可以避免爲這些情況浪費物理內存頁面，使得很多程序可以無憂無慮地
+隨意分配內存地址而不用擔心性能損失。這種分配方式也叫「超額分配（overcommit）」。飛機票有超售，
+VPS 提供商劃分虛擬機有超售，操作系統管理內存也同樣有這種現象，合理使用超額分配能改善整體系統效率。</p>
+<p>內核要高效地做到惰性分配而不影響程序執行效率的前提之一，在於程序真的用到內存的時候，
+內核能不做太多操作就立刻分配出來，也就是說內核需要時時刻刻在手上留有一部分空頁，
+滿足程序執行時內存分配的需要。換句話說，內核需要早在物理內存用盡之前，就開始回收內存。</p>
+</div>
+<div class="section" id="id7">
+<h2>那麼內核什麼時候會開始回收內存？</h2>
+<p>首先一些背景知識：物理內存地址空間並不是都平等，因爲一些地址範圍可以做
+<a class="reference external" href="https://en.wikipedia.org/wiki/Direct_memory_access">DMA</a> 而另一些不能，以及
+<a class="reference external" href="https://en.wikipedia.org/wiki/Non-uniform_memory_access">NUMA</a>
+等硬件環境傾向於讓 CPU 訪問其所在 NUMA 節點內存範圍。在 32bit
+系統上內核的虛擬地址空間還有低端內存和高端內存的區分，他們會傾向於使用不同屬性的物理內存，到
+64bit 系統上已經沒有了這種限制。</p>
+<p>硬件限制了內存分配的自由度，於是內核把物理內存空間分成多個 Zone
+，每個 Zone 內各自管理可用內存， Zone 內的內存頁之間是相互平等的。</p>
+<div class="panel panel-default">
+<div class="panel-heading">
+zone 內水位線</div>
+<div class="panel-body">
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/>
+</div>
+</div>
+<p>一個 Zone 內的頁面分配情況可以右圖描繪。
+除了已用內存頁，剩下的就是空閒頁（free pages），空閒頁範圍中有三個水位線（watermark
+）評估當前內存壓力情況，分別是高位（high）、低位（low）、最小位（min）。</p>
+<p>當內存分配使得空閒頁水位低於低位線，內核會喚醒 <code class="code">
+kswapd</code>
+ 後臺線程， <code class="code">
+kswapd</code>
+
+負責掃描物理頁面的使用情況並挑選一部分頁面做回收，直到可用頁面數量恢復到水位線高位（high）以上。
+如果 <code class="code">
+kswapd</code>
+ 回收內存的速度慢於程序執行實際分配內存的速度，
+可用空閒頁數量可能進一步下降，降至低於最小水位（min）之後，內核會讓內存分配進入
+<strong>直接回收(direct reclamation)</strong> 模式，在直接回收模式下，程序分配某個物理頁的請求（
+第一次訪問某個已分配虛擬頁面的時候）會導致在進程上下文中阻塞式地調用內存回收代碼。</p>
+<p>除了內核在後臺回收內存，進程也可以主動釋放內存，比如有程序退出的時候就會釋放一大片內存頁，
+所以可用頁面數量可能會升至水位線高位以上。有太多可用頁面浪費資源對整體系統運行效率也不是好事，
+所以系統會積極緩存文件讀寫，所有 page cache 都留在內存中，直到可用頁面降至低水位以下觸發
+<code class="code">
+kswapd</code>
+ 開始工作。</p>
+<p>設置最小水位線（min）的原因在於，內核中有些硬件也會突然請求大量內存，比如來自網卡接收到的數據包，
+預留出最小水位線以下的內存給內核內部和硬件使用。</p>
+<p>設置高低兩個控制 <code class="code">
+kswapd</code>
+ 開關的水位線是基於控制理論。喚醒 <code class="code">
+kswapd</code>
+
+掃描內存頁面本身有一定計算開銷，於是每次喚醒它幹活的話就讓它多做一些活（ high - low
+），避免頻繁多次喚醒。</p>
+<p>因爲有這些水位線，系統中根據程序請求內存的「速率」，整個系統的內存分配在宏觀的一段時間內可能處於以下幾種狀態：</p>
+<ol class="arabic simple">
+<li><strong>不回收：</strong> 系統中的程序申請內存速度很慢，或者程序主動釋放內存的速度很快，
+（比如程序執行時間很短，不怎麼進行文件讀寫就馬上退出，）此時可用頁面數量可能一直處於低水位線以上，
+內核不會主動回收內存，所有文件讀寫都會以頁面緩存的形式留在物理內存中。</li>
+<li><strong>後臺回收：</strong> 系統中的程序在緩慢申請內存，比如做文件讀寫，
+比如分配並使用匿名頁面。系統會時不時地喚醒 <code class="code">
+kswapd</code>
+ 在後臺做內存回收，
+不會干擾到程序的執行效率。</li>
+<li><strong>直接回收：</strong> 如果程序申請內存的速度快於 <code class="code">
+kswapd</code>
+ 後臺回收內存的速度，
+空閒內存最終會跌破最小水位線，隨後的內存申請會進入直接回收的代碼路徑，從而極大限制內存分配速度。
+在直接分配和後臺回收的同時作用下，空閒內存可能會時不時回到最小水位線以上，
+但是如果程序繼續申請內存，空閒內存量就會在最小水位線附近上下徘徊。</li>
+<li><strong>殺進程回收：</strong> 甚至直接分配和後臺回收的同時作用也不足以拖慢程序分配內存的速度的時候，
+最終空閒內存會完全用完，此時觸發 OOM 殺手幹活殺進程。</li>
+</ol>
+<p>系統狀態處於 <strong>1. 不回收</strong>  的時候表明分配給系統的內存量過多，比如系統剛剛啓動之類的時候。
+理想上應該讓系統長期處於 <strong>2. 後臺回收</strong> 的狀態，此時最大化利用緩存的效率而又不會因爲內存回收
+減緩程序執行速度。如果系統引導後長期處於 <strong>1. 不回收</strong> 的狀態下，那麼說明沒有充分利用空閒內存做
+文件緩存，有些 unix 服務比如 <a class="reference external" href="https://wiki.archlinux.org/index.php/preload">preload</a> 可用來提前填充文件緩存。</p>
+<p>如果系統頻繁進入 <strong>3. 直接回收</strong> 的狀態，表明在這種工作負載下系統需要減慢一些內存分配速度，
+讓 <code class="code">
+kswapd</code>
+ 有足夠時間回收內存。就如前一篇翻譯中 Chris
+所述，頻繁進入這種狀態也不一定代表「內存不足」，可能表示內存分配處於非常高效的利用狀態下，
+系統充分利用慢速的磁盤帶寬，爲快速的內存緩存提供足夠的可用空間。
+<strong>直接回收</strong> 是否對進程負載有負面影響要看具體負載的特性。
+此時選擇禁用 swap 並不能降低磁盤I/O，反而可能縮短 <strong>2. 後臺回收</strong> 狀態能持續的時間，
+導致更快進入 <strong>4. 殺進程回收</strong> 的極端狀態。</p>
+<p>當然如果系統長期處於 <strong>直接回收</strong> 的狀態的話，則說明內存總量不足，需要考慮增加物理內存，
+或者減少系統負載了。如果系統進入 <strong>4. 殺進程回收</strong> 的狀態，不光用空間的進程會受影響，
+並且還可能導致內核態的內存分配受影響，產生網絡丟包之類的結果。</p>
+</div>
+<div class="section" id="id8">
+<h2>微調內存管理水位線</h2>
+<p>可以看一下運行中的系統中每個 Zone 的水位線在哪兒。比如我手上這個 16GiB 的系統中：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>$ cat /proc/zoneinfo</span>
+<span class="code-line">Node <span class="m">0</span>, zone      DMA</span>
+<span class="code-line">   pages free     <span class="m">3459</span></span>
+<span class="code-line">         min      <span class="m">16</span></span>
+<span class="code-line">         low      <span class="m">20</span></span>
+<span class="code-line">         high     <span class="m">24</span></span>
+<span class="code-line">         spanned  <span class="m">4095</span></span>
+<span class="code-line">         present  <span class="m">3997</span></span>
+<span class="code-line">         managed  <span class="m">3975</span></span>
+<span class="code-line">Node <span class="m">0</span>, zone    DMA32</span>
+<span class="code-line">   pages free     <span class="m">225265</span></span>
+<span class="code-line">         min      <span class="m">3140</span></span>
+<span class="code-line">         low      <span class="m">3925</span></span>
+<span class="code-line">         high     <span class="m">4710</span></span>
+<span class="code-line">         spanned  <span class="m">1044480</span></span>
+<span class="code-line">         present  <span class="m">780044</span></span>
+<span class="code-line">         managed  <span class="m">763629</span></span>
+<span class="code-line">Node <span class="m">0</span>, zone   Normal</span>
+<span class="code-line">   pages free     <span class="m">300413</span></span>
+<span class="code-line">         min      <span class="m">13739</span></span>
+<span class="code-line">         low      <span class="m">17173</span></span>
+<span class="code-line">         high     <span class="m">20607</span></span>
+<span class="code-line">         spanned  <span class="m">3407872</span></span>
+<span class="code-line">         present  <span class="m">3407872</span></span>
+<span class="code-line">         managed  <span class="m">3328410</span></span>
+</pre></div>
+<p>因爲不是 NUMA 系統，所以只有一個 NUMA node，其中根據 DMA 類型共有 3 個 Zone 分別叫 DMA,
+DMA32, Normal 。三個 Zone 的物理地址範圍（spanned）加起來大概有
+<span class="math">\(4095+1044480+3407872\)</span> 大約 17GiB 的地址空間，而實際可訪問的地址範圍（present
+）加起來有 <span class="math">\(3997+780044+3407872\)</span> 大約 16GiB 的可訪問物理內存。</p>
+<p>其中空閒頁面有 <span class="math">\(3459+762569+1460218\)</span> 大約 8.5GiB ，三條水位線分別在：
+<span class="math">\(\texttt{high} = 24+4710+20607 = 98\texttt{MiB}\)</span> ，
+<span class="math">\(\texttt{low} = 20+3925+17173 = 82\texttt{MiB}\)</span> ，
+<span class="math">\(\texttt{min} = 16+3140+13739 = 65\texttt{MiB}\)</span> 的位置。</p>
+<p>具體這些水位線的確定方式基於幾個 sysctl 。首先 min 基於 <code class="code">
+vm.min_free_kbytes</code>
+
+默認是基於內核低端內存量的平方根算的值，並限制到最大 64MiB 再加點餘量，比如我這臺機器上
+<code class="code">
+vm.min_free_kbytes = 67584</code>
+ ，於是 min 水位線在這個位置。
+其它兩個水位線基於這個計算，在 low 基礎上增加總內存量的 <code class="code">
+vm.watermark_scale_factor /​ 10000</code>
+
+比例（在小內存的系統上還有額外考慮），默認 <code class="code">
+vm.watermark_scale_factor = 10</code>
+
+在大內存系統上意味着 low 比 min 高 0.1% ， high 比 low 高 0.1% 。</p>
+<p>可以手動設置這些值，以更早觸發內存回收，比如將 <code class="code">
+vm.watermark_scale_factor</code>
+ 設爲 100:</p>
+<div class="highlight"><pre><span class="code-line"><span></span>$ <span class="nb">echo</span> <span class="m">100</span> <span class="p">|</span> sudo tee /proc/sys/vm/watermark_scale_factor</span>
+<span class="code-line">$ cat /proc/zoneinfo</span>
+<span class="code-line">Node <span class="m">0</span>, zone      DMA</span>
+<span class="code-line">   pages free     <span class="m">3459</span></span>
+<span class="code-line">         min      <span class="m">16</span></span>
+<span class="code-line">         low      <span class="m">55</span></span>
+<span class="code-line">         high     <span class="m">94</span></span>
+<span class="code-line">         spanned  <span class="m">4095</span></span>
+<span class="code-line">         present  <span class="m">3997</span></span>
+<span class="code-line">         managed  <span class="m">3975</span></span>
+<span class="code-line">   Node <span class="m">0</span>, zone    DMA32</span>
+<span class="code-line">   pages free     <span class="m">101987</span></span>
+<span class="code-line">         min      <span class="m">3149</span></span>
+<span class="code-line">         low      <span class="m">10785</span></span>
+<span class="code-line">         high     <span class="m">18421</span></span>
+<span class="code-line">         spanned  <span class="m">1044480</span></span>
+<span class="code-line">         present  <span class="m">780044</span></span>
+<span class="code-line">         managed  <span class="m">763629</span></span>
+<span class="code-line">   Node <span class="m">0</span>, zone   Normal</span>
+<span class="code-line">   pages free     <span class="m">61987</span></span>
+<span class="code-line">         min      <span class="m">13729</span></span>
+<span class="code-line">         low      <span class="m">47013</span></span>
+<span class="code-line">         high     <span class="m">80297</span></span>
+<span class="code-line">         spanned  <span class="m">3407872</span></span>
+<span class="code-line">         present  <span class="m">3407872</span></span>
+<span class="code-line">         managed  <span class="m">3328410</span></span>
+</pre></div>
+<p>得到的三條水位線分別在 <span class="math">\(\texttt{min} = 16+3149+13729 = 66\texttt{MiB}\)</span>
+， <span class="math">\(\texttt{low} = 55+10785+47013 = 226\texttt{MiB}\)</span>
+， <span class="math">\(\texttt{high} = 94+18421+80297 = 386\texttt{MiB}\)</span> ，
+從而 low 和 high 分別比 min 提高 160MiB 也就是內存總量的 1% 左右。</p>
+<p>在 swap 放在 HDD 的系統中，因爲換頁出去的速度較慢，除了上篇文章說的降低
+<code class="code">
+vm.swappiness</code>
+ 之外，還可以適當提高 <code class="code">
+vm.watermark_scale_factor</code>
+
+讓內核更早開始回收內存，這雖然會稍微降低緩存命中率，但是另一方面可以在進入直接回收模式之前
+有更多時間做後臺換頁，也將有助於改善系統整體流暢度。</p>
+</div>
+<div class="section" id="id9">
+<h2>只有 0.1% ，這不就是說內存快用完的時候麼？</h2>
+<p>所以之前的「誤解3」我說答案可以說「是」或者「不是」，但是無論回答是或不是，都代表了認爲「swap
+就是額外的慢速內存」的錯誤看法。當有人在強調「swap 是內存快用完的時候才交換」的時候，
+隱含地，是在把系統總體的內存分配看作是一個靜態的劃分過程：打個比方這就像在說，我的系統裏存儲空間有快速
+128GiB SSD 和慢速 HDD 的 1TiB ，同樣內存有快速的 16GiB RAM 和慢速 16GiB 的 swap 。
+這種靜態劃分的類比是錯誤的看待方式，因爲系統回收內存進而做頁面交換的方式是動態平衡的過程，
+需要考慮到「時間」和「速率」而非單純看「容量」。</p>
+<p>假設 swap 所在的存儲設備可以支持 5MiB/s 的吞吐率（ HDD 上可能更慢， SSD
+上可能更快，這裏需要關注數量級），相比之下 DDR3 大概有 10GiB/s 的吞吐率，DDR4 大概有 20GiB/s
+，無論多快的 SSD 也遠達不到這樣的吞吐（可能 Intel Optane 這樣的
+<a class="reference external" href="https://lwn.net/Articles/717953/">DAX</a> 設備會改變這裏的狀況）。從而把 swap
+當作慢速內存的視角來看的話，加權平均的速率是非常悲觀的，「 16G 的 DDR3 + 16G 的 swap 會有
+<span class="math">\(\frac{16 \times 10 \times 1024 + 16 \times 5}{16+16} = 5 \texttt{GiB/s}\)</span>
+的吞吐？所以開 swap 導致系統速度降了一半？」顯然不能這樣看待。</p>
+<p>動態的看待方式是， swap 設備能提供 5MiB/s 的吞吐，這意味着：如果我們能把未來 10
+分鐘內不會訪問到的頁面換出到 swap ，那麼就相當於有
+<span class="math">\(10 \times 60 \texttt{s} \times 5 \texttt{MiB/s} = 3000 \texttt{MiB}\)</span>
+的額外內存，用來放那 10 分鐘內可能會訪問到的頁面緩存。
+10 分鐘只是隨口說的一段時間，可以換成 10 秒或者 10 小時，重要的是只要頁面交換發生在後臺，
+不阻塞前臺程序的執行，那麼 swap 設備提供的額外吞吐率相當於一段時間內提供了更大的物理內存，
+總是能提升頁面緩存的命中，從而改善系統性能。</p>
+<p>當然系統內核不能預知「未來 10 分鐘內需要的頁面」，只能根據歷史上訪問內存的情況預估之後可能會訪問的情況，
+估算不準的情況下，比如最近10分鐘內用過的頁面緩存在之後10分鐘內不再被使用的時候，
+爲了把最近這10分鐘內訪問過的頁面留在物理內存中，可能會把之後10分鐘內要用到的匿名頁面換出到了交換設備上。
+於是會有下面的情況：</p>
+</div>
+<div class="section" id="swap-swap">
+<h2>但是我開了 swap 之後，一旦複製大文件，系統就變卡，不開 swap 不會這樣的</h2>
+<p>大概電腦用戶都經歷過這種現象，不限於 Linux 用戶，包括 macOS 和 Windows 上也是。
+在文件管理器中複製了幾個大文件之後，切換到別的程序系統就極其卡頓，複製已經結束之後的一段時間也會如此。
+複製的過程中系統交換區的使用率在上漲，複製結束後下降，顯然 swap 在其中有重要因素，並且禁用
+swap 或者調低 swappiness 之後就不會這樣了。於是網上大量流傳着解釋這一現象，並進一步建議禁用
+swap 或者調低 swappiness 的文章。我相信不少關心系統性能調優的人看過這篇「
+<a class="reference external" href="https://rudd-o.com/linux-and-free-software/tales-from-responsivenessland-why-linux-feels-slow-and-how-to-fix-that">Tales from responsivenessland: why Linux feels slow, and how to fix that</a>
+」或是它的轉載、翻譯，用中文搜索的話還能找到更多
+<a class="reference external" href="http://blog.itpub.net/29371470/viewspace-1250975">錯誤解釋 swappiness 目的</a>
+的文章，將 swappiness 解釋成是控制內存和交換區比例的參數。</p>
+<p>除去那些有技術上謬誤的文章，這些網文中描述的現象是有道理的，不單純是以訛傳訛。
+桌面環境中內存分配策略的不確定性和服務器環境中很不一樣，複製、下載、解壓大文件等導致一段時間內
+大量佔用頁面緩存，以至於把操作結束後需要的頁面攆出物理內存，無論是交換出去的方式還是以丟棄頁面緩存的方式，
+都會導致桌面響應性降低。</p>
+<p>不過就像前文 Chris 所述，這種現象其實並不能通過禁止 swap 的方式緩解：禁止 swap 或者調整
+swappiness 讓系統儘量避免 swap 只影響回收匿名頁面的策略，不影響系統回收頁面的時機，
+也不能避免系統丟棄將要使用的頁面緩存而導致的卡頓。</p>
+<p>以前在 Linux 上也沒有什麼好方法能避免這種現象。 macOS 轉用 APFS 作爲默認文件系統之後，
+從文件管理器（Finder）複製文件默認啓用 file clone 快速完成，這操作不實際複製文件數據，
+一個隱含優勢在不需要讀入文件內容，從而不會導致大量頁面緩存失效。 Linux 上同樣可以用支持
+reflink 的文件系統比如 btrfs 或者開了 reflink=1 的 xfs 達到類似的效果。
+不過 reflink 也只能拯救複製文件的情況，不能改善解壓文件、下載文件、計算文件校驗等情況下，
+一次性處理大文件對內存產生的壓力。</p>
+<p>好在最近幾年 Linux 有了 cgroup ，允許更細粒度地調整系統資源分配。進一步現在我們有了 cgroup
+v2 ，前面 Chris 的文章也有提到 cgroup v2 的 <code class="code">
+memory.low</code>
+ 可以某種程度上建議內存子系統
+儘量避免回收某些 cgroup 進程的內存。</p>
+</div>
+<div class="section" id="cgroup-v2">
+<h2>用 cgroup v2 限制進程的內存分配</h2>
+<p>實際上有了 cgroup v2 之後，還有更多控制內存分配的方案。 <a class="reference external" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory">cgroup v2 的內存控制器</a>
+可以對某個 cgroup 設置這些閾值：</p>
+<ul class="simple">
+<li><strong>memory.min</strong> : 最小內存限制。內存用量低於此值後系統不會回收內存。</li>
+<li><strong>memory.low</strong> : 低內存水位。內存用量低於此值後系統會儘量避免回收內存。</li>
+<li><strong>memory.high</strong> : 高內存水位。內存用量高於此值後系統會積極回收內存，並且會對內存分配節流（throttle）。</li>
+<li><strong>memory.max</strong> : 最大內存限制。內存用量高於此值後系統會對內存分配請求返回 ENOMEM，或者在 cgroup 內觸發 OOM 。</li>
+</ul>
+<p>可見這些設定值可以當作 per-cgroup 的內存分配水位線，作用於某一部分進程而非整個系統。
+針對交換區使用情況也可設置這些閾值：</p>
+<ul class="simple">
+<li><strong>memory.swap.high</strong> : 高交換區水位，交換區用量高於此值後會對交換區分配節流。</li>
+<li><strong>memory.swap.max</strong> : 最大交換區限制，交換區用量高於此值後不再會發生匿名頁交換。</li>
+</ul>
+<p>到達這些 cgroup 設定閾值的時候，還可以設置內核回調的處理程序，從用戶空間做一些程序相關的操作。</p>
+<p>Linux 有了 cgroup v2 之後，就可以通過對某些程序設置內存用量限制，避免他們產生的頁面請求把別的
+程序所需的頁面擠出物理內存。使用 systemd 的系統中，首先需要 <a class="reference external" href="https://wiki.archlinux.org/index.php/Cgroups#Switching_to_cgroups_v2">啓用 cgroup v2</a>
+，在內核引導參數中加上 <code class="code">
+systemd.unified_cgroup_hierarchy=1</code>
+
+。然後開啓用戶權限代理：</p>
+<div class="highlight"><pre><span class="code-line"><span></span><span class="c1"># systemctl edit user@1000.service</span></span>
+<span class="code-line"><span class="o">[</span>Service<span class="o">]</span></span>
+<span class="code-line"><span class="nv">Delegate</span><span class="o">=</span>yes</span>
+</pre></div>
+<p>然後可以定義用戶會話的 slice （slice 是 systemd 術語，用來映射 cgroup ），比如創建一個叫
+<code class="code">
+limit-mem</code>
+ 的 slice ：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>$ cat ~/.config/systemd/user/limit-mem.slice</span>
+<span class="code-line"><span class="o">[</span>Slice<span class="o">]</span></span>
+<span class="code-line"><span class="nv">MemoryHigh</span><span class="o">=</span>3G</span>
+<span class="code-line"><span class="nv">MemoryMax</span><span class="o">=</span>4G</span>
+<span class="code-line"><span class="nv">MemorySwapMax</span><span class="o">=</span>2G</span>
+</pre></div>
+<p>然後可以用 systemd-run 限制在某個 slice 中打開一個 shell：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>$ systemd-run --user --slice<span class="o">=</span>limit-mem.slice --shell</span>
+</pre></div>
+<p>或者定義一個 shell alias 用來限制任意命令：</p>
+<div class="highlight"><pre><span class="code-line"><span></span>$ <span class="nb">type</span> limit-mem</span>
+<span class="code-line">limit-mem is an <span class="nb">alias</span> <span class="k">for</span> /usr/bin/time systemd-run --user --pty --same-dir --wait --collect --slice<span class="o">=</span>limit-mem.slice</span>
+<span class="code-line">$ limit-mem cp some-large-file dest/</span>
+</pre></div>
+<p>實際用法有很多，可以參考 systemd 文檔
+<a class="reference external" href="http://www.jinbuguo.com/systemd/systemd.resource-control.html">man systemd.resource-control</a>
+， <a class="reference external" href="/links.html#xuanwo">xuanwo</a> 也 <a class="reference external" href="https://xuanwo.io/2018/10/30/tips-of-systemd/">有篇博客介紹過</a>
+。</p>
+</div>
+<div class="section" id="id13">
+<h2>未來展望</h2>
+<p>最近新版的 gnome 和 KDE 已經開始爲桌面環境下用戶程序的進程創建 systemd scope 了，
+可以通過 <code class="code">
+systemd-cgls</code>
+ 觀察到，每個通過桌面文件（.desktop）開啓的用戶空間程序
+都有個獨立的名字叫 <code class="code">
+app-APPNAME-HASH.scope</code>
+ 之類的 systemd scope 。
+有了這些 scope 之後，事實上用戶程序的資源分配某種程度上已經相互獨立，
+不過默認的用戶程序沒有施加多少限制。</p>
+<p>今後可以展望，桌面環境可以提供用戶友好的方式對這些桌面程序施加公平性的限制。
+不光是內存分配的大小限制，包括 CPU 和 IO 佔用方面也會更公平
+（，值得一提 ext4 和 btrfs 支持對 IO 的公平調度和 per-cgroup 限制，而 XFS
+目前好像還沒有這方面支持）。
+相信不遠的將來，複製大文件之類常見普通操作不再需要手動調用加以限制，
+就能避免單個程序佔用太多資源影響別的程序。</p>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            </div>
+            <div class="entry-content jumbotron" id="source-content" style="display: none">
+                <!-- <pre><code id="source-code">
+                </code></pre> -->
+                <div id="source-code"></div>
+            </div>
+            <!-- /.entry-content -->
+
+            <div class="row" id="prevnext">
+                <div class="col-xs-12">
+                    <a href="//farseerfc.me/in-defence-of-swap.html" class="btn btn-default btn-lg" style="float:left;clear:both;background-color:#fff;">
+                        <h4><i class="fa fa-arrow-left"></i>
+                        【譯】替 swap 辯護：常見的誤解
+                        </h4>
+                    </a>
+                </div>
+                <div class="col-xs-12">
+                </div>
+            </div>
+
+
+<section class="comments" id="comments">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="githubissue-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#githubissue-comments" aria-expanded="true" aria-controls="githubissue-comments">
+              <i class="fa fa-comments-o"></i> Github Issue 留言            </a>
+          </h4>
+        </div>
+        <div id="githubissue-comments" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="githubissue-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="githubissue-comments">
+請用你的 GitHub 賬戶登錄並在<a class="btn btn-primary withripple" href="https://github.com/farseerfc/farseerfc.github.io/issues/98#new_comment_field" target="_blank">這篇文章的 Issue 頁下</a>留言                <div id="githubissue_comments"></div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  var reaction_fa = {
+    "+1": "thumbs-o-up",
+    "-1": "thumbs-o-down",
+    "laugh": "smile-o",
+    "hooray": "gift",
+    "confused": "frown-o",
+    "heart": "heart-o"
+  };
+
+  function loadComments(data) {
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = "https://github.com/" + data[i].user.login;
+      var clink = "https://github.com/farseerfc/farseerfc.github.io/issues/98#issuecomment-" + data[i].url.substring(data[i].url.lastIndexOf("/")+1);
+      var cbody = data[i].body_html || data[i].body;
+      var cavatarlink = data[i].user.avatar_url;
+      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      var cdate = new Date(data[i].created_at).toLocaleString("zh-Hans", options);
+      var reactions = data[i].reactions;
+      var creactions = "";
+      if(reactions){
+        for(reactionkey in reaction_fa){
+          if(reactions[reactionkey] > 0) {
+              creactions += '<i class="fa fa-'+ reaction_fa[reactionkey]+'"></i>' + reactions[reactionkey] + "&nbsp;";
+          }
+        }
+      }
+      $("#githubissue_comments").append("<div class='media'><div class='media-left'><a href=\""+ cuserlink +'\"><img src="' + cavatarlink + '" width="48" class="media-object">' + "</a></div><div class='media-body'><h4 class='media-heading'><a class='commentuser' href=\""+ cuserlink + "\">" + cuser + "</a><small>&nbsp; 留言於 &nbsp;<a class='commentdate' href=\"" + clink + "\">" + cdate + "</a></small>&nbsp;"+ creactions + "</h4><div class='commentbody markdown-body'>" + cbody + "</div></div>");
+      $(".email-hidden-toggle > a").on("click", function (e){
+        e.preventDefault();
+        $(".email-hidden-reply", this.parent).toggle();
+      });
+    }
+  }
+  $.ajax("https://api.github.com/repos/farseerfc/farseerfc.github.io/issues/98/comments", {
+    headers: {Accept: "application/vnd.github.squirrel-girl-preview.full+json"},
+    dataType: "json",
+    success: function(msg){
+      loadComments(msg);
+   }
+  });
+});
+</script>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading" role="tab" id="disqus-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#disqus-comments" aria-expanded="false" aria-controls="disqus-comments">
+              <i class="fa fa-comments-o"></i> Disqus 留言            </a>
+          </h4>
+        </div>
+        <div id="disqus-comments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="disqus-heading">
+          <div class="panel-body">
+            <div class="tab-pane fade active in" id="disqus-comments">
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                    var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+                            var disqus_identifier = 'followup-about-swap';
+                        var disqus_url = 'http://farseerfc.me/followup-about-swap.html';
+
+                    var disqus_config = function () {
+
+                        this.language = "zh";
+                    };
+
+                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+                <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>        </article>
+    </section>
+
+
+            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <a data-dismiss="modal" href="javascript:void(0);">
+            <img id="mimg" src="" style="width:100%;height:auto">
+          </a>
+        </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6" id="sidebar">
+            <aside>
+
+<section>
+    <div class="sidebar-container">
+<div class="sidebar-item ">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-user fa-lg"></i>
+<a href="//farseerfc.me/pages/about.html">
+關於 farseerfc</a>
+        </h4>
+    </div>
+<div class="panel-body" id="aboutme">
+        <a href="//farseerfc.me/pages/about.html"><img width="100%" src="//farseerfc.me/../images/avatar.jpg"/></a>
+    <h3 style="text-align:center">
+<a href="https://sak.uy/"                  target="_blank">
+<i class="fa fa-music" style="text-align:center"></i></a>
+<a href="https://twitter.com/farseerfc"                  target="_blank">
+<i class="fa fa-twitter" style="text-align:center"></i></a>
+<a href="https://github.com/farseerfc"                   target="_blank">
+<i class="fa fa-github" style="text-align:center"></i></a>
+<a href="http://www.facebook.com/farseerfc"              target="_blank">
+<i class="fa fa-facebook" style="text-align:center"></i></a>
+<a href="https://plus.google.com/u/0/+JiachenYang/posts" target="_blank">
+<i class="fa fa-google-plus" style="text-align:center"></i></a>
+<a href="mailto:farseerfc@gmail.com" target="_blank">
+<i class="mdi-communication-email" style="text-align:center"></i></a>
+</h3>
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="//farseerfc.me/tags.html"><i class="fa fa-tags fa-lg"></i><span class="icon-label">標籤雲</span></a>
+        </h4>
+    </div>
+<div class="panel-body">
+    <ul class="list-group list-inline tagcloud" id="tags">
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/swap.html">
+                    swap <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/mm.html">
+                    mm <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/memory-management.html">
+                    memory management <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/swappiness.html">
+                    swappiness <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kswapd.html">
+                    kswapd <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/watermark.html">
+                    watermark <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/watermark_scale_factor.html">
+                    watermark_scale_factor <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cgroup-v2.html">
+                    cgroup v2 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/translate.html">
+                    translate <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fsbi-ji.html">
+                    FS筆記 <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/fs-notes.html">
+                    FS notes <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/file.html">
+                    file <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/size.html">
+                    size <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/histogram.html">
+                    histogram <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ftl.html">
+                    FTL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ssd.html">
+                    SSD <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb-stick.html">
+                    USB stick <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/emmc.html">
+                    eMMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/mmc.html">
+                    MMC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sd-card.html">
+                    SD Card <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chs.html">
+                    CHS <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cylinder.html">
+                    cylinder <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/head.html">
+                    head <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sector.html">
+                    sector <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/lba.html">
+                    LBA <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/smr.html">
+                    SMR <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/4kn.html">
+                    4Kn <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/btrfs.html">
+                    btrfs <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zfs.html">
+                    zfs <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/cow.html">
+                    cow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/snapshot.html">
+                    snapshot <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/clone.html">
+                    clone <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/subvolume.html">
+                    subvolume <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dedup.html">
+                    dedup <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/reflink.html">
+                    reflink <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/spa.html">
+                    SPA <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dmu.html">
+                    DMU <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/dsl.html">
+                    DSL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zpl.html">
+                    ZPL <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/layered.html">
+                    layered <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/architecture.html">
+                    architecture <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zio.html">
+                    ZIO <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/vdev.html">
+                    VDEV <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/arc.html">
+                    ARC <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zap.html">
+                    ZAP <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zil.html">
+                    ZIL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/zvol.html">
+                    ZVOL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/friend.html">
+                    friend <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/horo.html">
+                    horo <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/life.html">
+                    life <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/linux.html">
+                    linux <sup> 9</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/archlinux.html">
+                    archlinux <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/raspberrypi.html">
+                    raspberrypi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usbip.html">
+                    usbip <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/usb.html">
+                    usb <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/forward.html">
+                    forward <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/chouyaku.html">
+                    chouyaku <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/kimi.html">
+                    kimi <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/sae.html">
+                    sae <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/inakerya.html">
+                    inakerya <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ting-yi.html">
+                    聽譯 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/dotfiles.html">
+                    dotfiles <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/stow.html">
+                    stow <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/zhihu.html">
+                    zhihu <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gplv3.html">
+                    GPLv3 <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/licenses.html">
+                    licenses <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/linus-torvalds.html">
+                    Linus Torvalds <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/gpl.html">
+                    GPL <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/fsf.html">
+                    FSF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/eff.html">
+                    EFF <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-1">
+                <a href="//farseerfc.me/tag/c.html">
+                    C <sup> 15</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/pelican.html">
+                    pelican <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/github.html">
+                    github <sup> 3</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/pages.html">
+                    pages <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/issues.html">
+                    issues <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-2">
+                <a href="//farseerfc.me/tag/python.html">
+                    python <sup> 5</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacvis.html">
+                    pacvis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacman.html">
+                    pacman <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/arch.html">
+                    arch <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/pacgraph.html">
+                    pacgraph <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/wayland.html">
+                    wayland <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/xorg.html">
+                    xorg <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/compositor.html">
+                    compositor <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/desktop.html">
+                    desktop <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/macosx.html">
+                    macosx <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/windows.html">
+                    windows <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/window.html">
+                    window <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/manager.html">
+                    manager <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/blog.html">
+                    blog <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/writing.html">
+                    writing <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis.html">
+                    travis <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/travis-ci.html">
+                    travis-ci <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/ubuntu.html">
+                    ubuntu <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/japan.html">
+                    japan <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-4">
+                <a href="//farseerfc.me/tag/academic.html">
+                    academic <sup> 1</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/material.html">
+                    material <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/icse.html">
+                    icse <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/software.html">
+                    software <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/microsoft.html">
+                    microsoft <sup> 2</sup>
+                </a>
+            </li>
+            <li class="list-group-item tag-3">
+                <a href="//farseerfc.me/tag/java.html">
+                    java <sup> 2</sup>
+                </a>
+            </li>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub倉庫</span>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/farseerfc">@farseerfc</a> on GitHub<br>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://sak.uy/">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">Sakuya的音樂盒</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="other_blog_posts">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+    </div>
+</div>
+</div>
+<div class="sidebar-item hidden-xs">
+<div class="panel panel-default">
+	<div class="panel-heading">
+        <h4>
+<a href="https://t.me/s/fcnotes">
+<i class="fa fa-home fa-lg"></i><span class="icon-label">fc fs筆記</span>
+</a>
+        </h4>
+    </div>
+    <div class="panel-body" style="padding: 0px">
+        <div id="tg_channel_iframe">
+            <iframe frameborder="0" style="width:100%;height:500px" src="https://rants.nichi.workers.dev/fcnotes"></iframe>
+        </div>
+    </div>
+</div>
+</div>
+
+    </div>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+
+
+<footer id="fcfooter">
+   <hr/>
+   <div class="container">
+      <div class="row">
+         <div class="col-md-24">
+         <p><small>
+            &copy; 2020 farseerfc
+            &middot; 通過            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a> 生成                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    <!-- Content -->
+  <!-- licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise. -->
+
+         </small></p>
+         </div>
+      </div>
+   </div>
+   <a href="#" class="btn btn-primary btn-fab btn-raised mdi-editor-vertical-align-top withripple" style="position:fixed;bottom:30px;right:30px;z-index:1000"></a>
+</footer>
+<script src="//farseerfc.me/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//farseerfc.me/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="//farseerfc.me/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'farseerfc',
+                count: 5,
+                skip_forks: false,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="//farseerfc.me/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+<!-- Other Blog JS -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (!window.jXHR) {
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '//farseerfc.me/theme/js/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+        other_blog.showRepos({
+            url: 'https://sak.uy/',
+            target: '#other_blog_posts'
+        });
+    });
+</script>
+<script src="//farseerfc.me/theme/js/other_blog.js" type="text/javascript"></script>
+<!-- End Other Blog JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'farseerfcgithub'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29540705-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End Google Analytics Code -->
+
+<script src="//farseerfc.me/theme/js/ripples.min.js"></script>
+<script src="//farseerfc.me/theme/js/material.min.js"></script>
+<script src="//farseerfc.me/theme/js/jquery.bootstrap-autohidingnavbar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.material.init();
+        $("div.navbar").autoHidingNavbar();
+        $(".img-responsive").css("cursor","pointer").on('click',function(){
+            var sr=$(this).attr('src');
+            $('#mimg').attr('src',sr);
+            $('#myModal').modal('show');
+        });
+        $('#affix-toc').affix({
+          offset: {
+            top: function(){
+                if($('#affix-toc').hasClass("affix"))
+                    return $('#sidebar').height();
+                return $('#sidebar').height() - $('#affix-toc').height();
+            },
+            bottom: function (){
+                return $("#fcfooter").offset().top -
+                    $("#article-content").offset().top -
+                    $("#article-content").height() + 20;
+            }
+          }
+        });
+        $('#affix-toc').width($('#sidebar').width());
+    });
+    $(window).resize(function () {
+       $('#affix-toc').width($('#sidebar').width());
+    });
+</script>
+
+</body>
+</html>
