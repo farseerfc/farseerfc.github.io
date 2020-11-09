@@ -80,12 +80,12 @@ swap ，内核可能会尝试丢弃 page cache 甚至丢弃 vfs cache (dentry ca
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="c1"&gt;////////////////////  kernel space  //////////////////&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;SYSCALL&lt;/span&gt; &lt;span class="n"&gt;do_mmap&lt;/span&gt;&lt;span class="p"&gt;(...){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;SYSCALL&lt;/span&gt; &lt;span class="nf"&gt;do_mmap&lt;/span&gt;&lt;span class="p"&gt;(...){&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;   &lt;span class="c1"&gt;//...&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;   &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nr_page&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;   &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nr_page&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nf"&gt;kmalloc_pages&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="c1"&gt;// 可用内存不够了！尝试搞点内存&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;    &lt;span class="n"&gt;page_frame_info&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;least_accessed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lru_pop_page_frame&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;     &lt;span class="c1"&gt;// 找出最少访问的页面&lt;/span&gt;&lt;/span&gt;
@@ -100,7 +100,7 @@ swap ，内核可能会尝试丢弃 page cache 甚至丢弃 vfs cache (dentry ca
 &lt;span class="code-line"&gt;  &lt;span class="c1"&gt;// 搞到内存了！返回给程序&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="n"&gt;available_mem&lt;/span&gt; &lt;span class="o"&gt;-=&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;  &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;phy_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;take_from_free_list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;free_page_list&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
-&lt;span class="code-line"&gt;  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;assign_virtual_addr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;phy_addr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
+&lt;span class="code-line"&gt;  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;assign_virtual_addr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;phy_addr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/span&gt;
 &lt;span class="code-line"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;这种逻辑隐含三层 &lt;strong&gt;错误的&lt;/strong&gt; 假设：&lt;/p&gt;
@@ -170,7 +170,7 @@ VPS 提供商划分虚拟机有超售，操作系统管理内存也同样有这�
 &lt;div class="panel-heading"&gt;
 zone 内水位线&lt;/div&gt;
 &lt;div class="panel-body"&gt;
-&lt;img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c995609e.png"/&gt;
+&lt;img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;一个 Zone 内的页面分配情况可以右图描绘。

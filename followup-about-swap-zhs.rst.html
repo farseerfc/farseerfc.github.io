@@ -78,12 +78,12 @@ swap ，内核可能会尝试丢弃 page cache 甚至丢弃 vfs cache (dentry ca
     <span class="p">}</span>
 
     <span class="c1">////////////////////  kernel space  //////////////////</span>
-    <span class="kt">void</span> <span class="o">*</span> <span class="n">SYSCALL</span> <span class="n">do_mmap</span><span class="p">(...){</span>
+    <span class="kt">void</span> <span class="o">*</span> <span class="n">SYSCALL</span> <span class="nf">do_mmap</span><span class="p">(...){</span>
        <span class="c1">//...</span>
-       <span class="k">return</span> <span class="nf">kmalloc_pages</span><span class="p">(</span><span class="n">nr_page</span><span class="p">);</span>
+       <span class="k">return</span> <span class="n">kmalloc_pages</span><span class="p">(</span><span class="n">nr_page</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="kt">void</span><span class="o">*</span> <span class="n">kmalloc_pages</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span>
+    <span class="kt">void</span><span class="o">*</span> <span class="nf">kmalloc_pages</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span>
       <span class="k">while</span> <span class="p">(</span> <span class="n">available_mem</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="p">)</span> <span class="p">{</span>
         <span class="c1">// 可用内存不够了！尝试搞点内存</span>
         <span class="n">page_frame_info</span><span class="o">*</span> <span class="n">least_accessed</span> <span class="o">=</span> <span class="n">lru_pop_page_frame</span><span class="p">();</span>     <span class="c1">// 找出最少访问的页面</span>
@@ -98,7 +98,7 @@ swap ，内核可能会尝试丢弃 page cache 甚至丢弃 vfs cache (dentry ca
       <span class="c1">// 搞到内存了！返回给程序</span>
       <span class="n">available_mem</span> <span class="o">-=</span> <span class="n">size</span><span class="p">;</span>
       <span class="kt">void</span> <span class="o">*</span> <span class="n">phy_addr</span> <span class="o">=</span> <span class="n">take_from_free_list</span><span class="p">(</span><span class="n">free_page_list</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nf">assign_virtual_addr</span><span class="p">(</span><span class="n">phy_addr</span><span class="p">);</span>
+      <span class="k">return</span> <span class="n">assign_virtual_addr</span><span class="p">(</span><span class="n">phy_addr</span><span class="p">);</span>
     <span class="p">}</span>
 
 这种逻辑隐含三层 <span class="gs">**错误的**</span> 假设：

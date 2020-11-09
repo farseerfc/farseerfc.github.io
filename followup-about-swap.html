@@ -313,12 +313,12 @@ swap ，內核可能會嘗試丟棄 page cache 甚至丟棄 vfs cache (dentry ca
 <span class="code-line"><span class="p">}</span></span>
 <span class="code-line"></span>
 <span class="code-line"><span class="c1">////////////////////  kernel space  //////////////////</span></span>
-<span class="code-line"><span class="kt">void</span> <span class="o">*</span> <span class="n">SYSCALL</span> <span class="n">do_mmap</span><span class="p">(...){</span></span>
+<span class="code-line"><span class="kt">void</span> <span class="o">*</span> <span class="n">SYSCALL</span> <span class="nf">do_mmap</span><span class="p">(...){</span></span>
 <span class="code-line">   <span class="c1">//...</span></span>
-<span class="code-line">   <span class="k">return</span> <span class="nf">kmalloc_pages</span><span class="p">(</span><span class="n">nr_page</span><span class="p">);</span></span>
+<span class="code-line">   <span class="k">return</span> <span class="n">kmalloc_pages</span><span class="p">(</span><span class="n">nr_page</span><span class="p">);</span></span>
 <span class="code-line"><span class="p">}</span></span>
 <span class="code-line"></span>
-<span class="code-line"><span class="kt">void</span><span class="o">*</span> <span class="n">kmalloc_pages</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span></span>
+<span class="code-line"><span class="kt">void</span><span class="o">*</span> <span class="nf">kmalloc_pages</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span></span>
 <span class="code-line">  <span class="k">while</span> <span class="p">(</span> <span class="n">available_mem</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="p">)</span> <span class="p">{</span></span>
 <span class="code-line">    <span class="c1">// 可用內存不夠了！嘗試搞點內存</span></span>
 <span class="code-line">    <span class="n">page_frame_info</span><span class="o">*</span> <span class="n">least_accessed</span> <span class="o">=</span> <span class="n">lru_pop_page_frame</span><span class="p">();</span>     <span class="c1">// 找出最少訪問的頁面</span></span>
@@ -333,7 +333,7 @@ swap ，內核可能會嘗試丟棄 page cache 甚至丟棄 vfs cache (dentry ca
 <span class="code-line">  <span class="c1">// 搞到內存了！返回給程序</span></span>
 <span class="code-line">  <span class="n">available_mem</span> <span class="o">-=</span> <span class="n">size</span><span class="p">;</span></span>
 <span class="code-line">  <span class="kt">void</span> <span class="o">*</span> <span class="n">phy_addr</span> <span class="o">=</span> <span class="n">take_from_free_list</span><span class="p">(</span><span class="n">free_page_list</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span></span>
-<span class="code-line">  <span class="k">return</span> <span class="nf">assign_virtual_addr</span><span class="p">(</span><span class="n">phy_addr</span><span class="p">);</span></span>
+<span class="code-line">  <span class="k">return</span> <span class="n">assign_virtual_addr</span><span class="p">(</span><span class="n">phy_addr</span><span class="p">);</span></span>
 <span class="code-line"><span class="p">}</span></span>
 </pre></div>
 <p>這種邏輯隱含三層 <strong>錯誤的</strong> 假設：</p>
@@ -403,7 +403,7 @@ VPS 提供商劃分虛擬機有超售，操作系統管理內存也同樣有這�
 <div class="panel-heading">
 zone 內水位線</div>
 <div class="panel-body">
-<img alt="ditaa diagram" class="img-responsive ditaa" src="//farseerfc.me/uml/c995609e.png"/>
+<img alt="ditaa diagram" class="ditaa img-responsive" src="//farseerfc.me/uml/c995609e.png"/>
 </div>
 </div>
 <p>一個 Zone 內的頁面分配情況可以右圖描繪。
