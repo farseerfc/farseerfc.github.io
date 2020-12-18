@@ -288,7 +288,7 @@ Table of Contents                        </div>
 <h3><a class="toc-backref" href="#id13">FAT系文件系統與簇大小</a></h3>
 <p>在 FAT 系文件系統(FAT12/16/32/exFAT)中，整個存儲空間除了一些保留扇區之外，被分爲兩大塊區域，
 看起來類似這樣：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/a4484d35.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/a4484d35.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>前一部分區域放文件分配表（File Allocation Table），後一部分是實際存儲文件和目錄的數據區。
 數據區被劃分成「簇（cluster）」，每個簇是一到多個連續扇區，然後文件分配表中表項的數量
@@ -299,7 +299,7 @@ tikz diagram</object>
 </ol>
 <p>比如在根目錄中有 4 個不同大小文件的 FAT16 中，使用 512 字節的簇大小的文件系統，其根目錄結構和
 FAT 表可能看起來像下圖這樣：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/03616644.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/03616644.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>目錄結構中的文件記錄是固定長度的，其中保存 8.3 長度的文件名，一些文件屬性（修改日期和時間、
 隱藏文件之類的），文件大小的字節數，和一個起始簇號。起始簇號在 FAT 表中引出一個簇號的單鏈表，
@@ -312,7 +312,7 @@ FAT系文件系統中每個簇有多大，由文件系統總容量，以及 FAT 
 table.right-align-columns td,th {
     text-align: right
 }
-</style><table border="0" class="right-align-columns table docutils borderless">
+</style><table border="0" class="borderless table right-align-columns docutils">
 <colgroup>
 <col width="32%"/>
 <col width="17%"/>
@@ -456,7 +456,7 @@ FAT12 和 FAT16 都被 FAT 表項的最大數量限制（分別是 4068 和 6546
 <p>FAT 系的簇大小是可以由用戶在創建文件系統時指定的，大部分普通用戶會使用系統根據存儲設備容量推算的默認值，
 而存儲設備的生產廠商則可以根據底層存儲設備的特性決定一個適合存儲設備的簇大小。在選擇簇大小時，
 要考慮取捨，較小的簇意味着同樣容量下更多的簇數，而較大的簇意味着更少的簇數，取捨在於：</p>
-<table border="0" class="field-list docutils table" frame="void" rules="none">
+<table border="0" class="table field-list docutils" frame="void" rules="none">
 <col class="field-name"/>
 <col class="field-body"/>
 <tbody valign="top">
@@ -484,7 +484,7 @@ FAT12 和 FAT16 都被 FAT 表項的最大數量限制（分別是 4068 和 6546
 中有大量小文件，每個不足一簇的小文件都要佔用完整一簇的大小。可能注意到上圖 512B
 的簇大小時整個文件系統佔用反而比 1KiB 簇大小時的更大，這是因爲 512B 簇大小的時候 FAT
 表本身的佔用更大。具體數字如下表：</p>
-<table border="0" class="right-align-columns table docutils borderless">
+<table border="0" class="borderless table right-align-columns docutils">
 <colgroup>
 <col width="18%"/>
 <col width="16%"/>
@@ -572,7 +572,7 @@ NTFS 和其它 Unix-like 系統的文件系統都使用塊位圖(block bitmap)�
 等文件系統，使用在 inode 中記錄塊映射（bmap, block mapping）的方式記錄文件存儲的地址範圍。
 術語上 UFS 中所稱的「塊（block）」等價於微軟系文件系統中所稱的「簇（cluster）」，
 都是對底層存儲設備中扇區尋址的抽象。</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/ed141837.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/ed141837.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>上圖乍看和 FAT 總體結構很像，實際上重要的是「inode表」和「數據塊」兩大區域分別所佔的比例。
 FAT 系文件系統中，每個簇需要在 FAT 表中有一個表項，所以 FAT 表的大小是每簇大小佔 2字節 （FAT16）
@@ -595,7 +595,7 @@ UFS 如何安排 inode 表與數據塊的宏觀佈局可能今後有空再談，
 每個目錄表項代表一個文件（除了 VFAT 的長文件名用隱藏目錄表項），佔用 32
 字節，引出一個單鏈表表達文件存儲地址；在 UFS 中，目錄內容和 inode
 表中的表項和文件地址的樣子像是這樣：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/9b4755c4.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/9b4755c4.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>UFS 中每個目錄文件的內容可以看作是單純的（文件名：inode號）構成的數組，最早 Unix v7
 的文件系統中文件名長度被限制在 14 字節，後來很快就演變成可以接受更長的文件名只要以 <code class="code">
@@ -634,7 +634,7 @@ file</code>
 inode 佔用 128 字節，其中有 60 字節存儲塊映射，可以存放 12 個直接塊指針和三級間接塊指針。
 詳細的 ext2 inode 結構可見下圖，結構來自 <a class="reference external" href="https://www.nongnu.org/ext2-doc/ext2.html#inode-table">ext2 文檔</a>
 。</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/087c0e2c.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/087c0e2c.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>結構中 osd1 和 osd2 兩大塊被定義爲是系統實現相關（OS Dependent）的區域，具體到 Linux 上的
 ext2/3 實現中 osd2 的部分區域被拿來保存 uid/gid/size/blocks 等位數不夠的數據的高位，
@@ -725,7 +725,7 @@ F2FS 的設計者把傳統日誌結構文件系統中，文件系統的關鍵樹
 在地址空間前面一小部分通常是 FAT 表的範圍內，放入一個節點地址轉換表（NAT，Node Address Table），
 隨後當文件內容或者 inode 改變的時候只需要更新 NAT 中記錄的地址，就可以切斷漫遊樹需要更新到樹根的特點，
 避免每次修改一個文件都需要重新寫入核心樹結構導致的寫入放大。於是 F2FS 的宏觀結構看起來像是下圖：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/b910e9a5.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/b910e9a5.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>超級塊（SB, superblock）中記錄關於文件系統不變的元信息，傳統 UFS
 中那些會變化的統計信息（比如共有多少 inode ，其中用了多少 inode ）單獨分出來記錄，叫做檢查點（
@@ -825,7 +825,7 @@ inode 剩餘的空間可以用來存儲數據分支和擴展屬性。</p>
 <div class="section" id="ext4">
 <h3><a class="toc-backref" href="#id20">ext4 中的小文件內聯優化</a></h3>
 <p>ext4 中首先將 ext2/3 的 128 字節 inode 擴展到了默認 256 字節大小，整個結構類似下圖：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/20d214ee.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/20d214ee.svg" type="image/svg+xml">
 tikz diagram</object>
 <p>對比上面 ext2 的 inode ，ext4 中用 osd2 的位置額外存了很多數據的高位，擴展了那些數據的位數，
 隨後在增加的結構中加入了幾個時間戳的納秒支持。之後總共 256 字節的 inode 保存了大約 156 的
@@ -860,13 +860,13 @@ $MFT 起始位置中記錄的第一項文件記錄了關於 $MFT 自身的元數
 實際上 Windows 的 NTFS 驅動在創建文件系統時給 $MFT 預留了很大一片存儲區， Windows XP
 之後的碎片整理工具也會非常積極地對 $MFT 文件本身做碎片整理，於是通常存儲設備上的 $MFT
 不會散佈在很多地方而是集中在 NTFS 分區靠前的一塊連續位置。於是宏觀而言 NTFS 像是這樣：</p>
-<object class="embed-responsive-item tikz" data="//farseerfc.me/uml/1ba69afb.svg" type="image/svg+xml">
+<object class="tikz embed-responsive-item" data="//farseerfc.me/uml/1ba69afb.svg" type="image/svg+xml">
 tikz diagram</object>
 </div>
 </div>
 <div class="section" id="id11">
 <h2><a class="toc-backref" href="#id22">上述文件系統彙總</a></h2>
-<table border="0" class="table docutils borderless">
+<table border="0" class="borderless table docutils">
 <caption>文件系統彙總</caption>
 <colgroup>
 <col width="20%"/>
@@ -1028,7 +1028,7 @@ tikz diagram</object>
             <div class="panel panel-default" id="series">
                 <div class="panel-heading">
                   <h4>
-This is part <built-in method index of str object at 0x7f000f790f30> of the "" series:                  </h4>
+This is part <built-in method index of str object at 0x7fe780c80d50> of the "" series:                  </h4>
                 </div>
                 <ul class="list-group">
                 </ul>
